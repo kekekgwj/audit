@@ -1,11 +1,30 @@
 import { createSlice } from '@reduxjs/toolkit';
-interface IStoreGraph {}
-const initialStateGraph: IStoreGraph = {};
+// interface IStoreGraph {}
+export interface INodeInfo {
+	id: string | null;
+	x: Number | null;
+	y: Number | null;
+}
+export const initialStateGraph: INodeInfo = {
+	id: null,
+	x: null,
+	y: null
+};
+// const initialStateGraph: IStoreGraph = {
+// 	id: '',
+// 	x: '',
+// 	y: ''
+// };
 const graphSlice = createSlice({
 	name: 'graph',
 	initialState: initialStateGraph,
 	reducers: {
-		toClickNode(state, action) {}
+		toClickNode(state, action) {
+			state.id = action.payload.id;
+			state.x = action.payload.x;
+			state.y = action.payload.y;
+			console.log(state.id, 122222);
+		}
 	}
 });
 
