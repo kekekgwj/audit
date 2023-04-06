@@ -1,3 +1,4 @@
+import type { GraphData, NodeConfig, EdgeConfig } from '@antv/graphin';
 /**
  * 属性面板
  */
@@ -21,7 +22,18 @@ interface IResponse {
 interface IDTO {
 	nodes: INode[];
 	edges: IEdge[];
+	styles: any;
 }
-
-interface INode {}
-interface IEdge {}
+interface INodeProps {
+	[key: string]: any;
+}
+interface INode {
+	id: string;
+	props: INodeProps;
+	groupId: string;
+}
+interface IEdge {
+	id: string;
+	source: string;
+	target: string;
+}
