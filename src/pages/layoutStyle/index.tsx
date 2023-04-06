@@ -31,9 +31,19 @@ const NodeDetail = React.memo(() => {
 		console.log(nodeInfo, 666666);
 	}, [nodeInfo]);
 	return (
-		<div>
-			<div>节点id</div>
-			<div>{nodeInfo.id}</div>
+		<div className="node-detail-box">
+			<div className="detail-item">
+				<div>节点id</div>
+				<div>{nodeInfo.id}</div>
+			</div>
+			<div className="detail-item">
+				<div>节点x</div>
+				<div>{nodeInfo.x}</div>
+			</div>
+			<div className="detail-item">
+				<div>节点y</div>
+				<div>{nodeInfo.y}</div>
+			</div>
 		</div>
 	);
 });
@@ -44,8 +54,12 @@ const LayoutStyle = React.memo((prop: Props) => {
 	const { changeLayout, type } = prop;
 	return (
 		<div className="style-content">
+			<div className="node-detail">
+				<div className="style-title">节点详情</div>
+				<NodeDetail></NodeDetail>
+			</div>
 			<div className="node-style">
-				<div className="style-title">节点属性编码</div>
+				<div className="style-title">节点样式</div>
 				<Form
 					labelCol={{ span: 4 }}
 					wrapperCol={{ span: 14 }}
@@ -64,10 +78,7 @@ const LayoutStyle = React.memo((prop: Props) => {
 					</Form.Item>
 				</Form>
 			</div>
-			<div className="node-detail">
-				<div className="style-title">节点详情</div>
-				<NodeDetail></NodeDetail>
-			</div>
+
 			<div className="layout-setting">
 				<div className="style-title">布局设置</div>
 				<div>
