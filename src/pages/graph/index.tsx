@@ -10,7 +10,11 @@ import { INode, NodeConfig } from '@antv/g6';
 import type { GraphinData, EdgeStyle, NodeStyle } from '@antv/graphin';
 const { DragCanvas, ZoomCanvas, DragNode, ActivateRelations } = Behaviors;
 // import { dispatch } from '../../redux/store';
-import { toClickNode, initialStateGraph } from '../../redux/reducers';
+import {
+	toClickNode,
+	toClickEdge,
+	initialStateGraph
+} from '../../redux/reducers';
 import { useSelector, useDispatch } from 'react-redux';
 import { store } from '../../redux/store';
 import { render } from 'react-dom';
@@ -21,7 +25,15 @@ const mockData: GraphinData = {
 		{
 			id: 'node-0',
 			x: 100,
-			y: 100
+			y: 100,
+			style: {
+				label: {
+					value: '我是node0',
+					position: 'center',
+					offset: [20, 5],
+					fill: 'green'
+				}
+			}
 		},
 		{
 			id: 'node-1',
@@ -36,8 +48,19 @@ const mockData: GraphinData = {
 	],
 	edges: [
 		{
+			id: 'edge-0-1',
 			source: 'node-0',
 			target: 'node-1'
+		},
+		{
+			id: 'edge-1-2',
+			source: 'node-1',
+			target: 'node-2'
+		},
+		{
+			id: 'edge-2-0',
+			source: 'node-2',
+			target: 'node-0'
 		}
 	]
 };
@@ -97,17 +120,35 @@ RightBarCom.displayName = 'RightBarCom';
 const SampleBehavior = React.memo(() => {
 	const dispatch = useDispatch();
 	const { graph, apis } = useContext(GraphinContext);
+
 	useEffect(() => {
 		const handleClick = (evt: IG6GraphEvent) => {
 			const node = evt.item as INode;
 			const model = node.getModel() as NodeConfig;
 			apis.focusNodeById(model.id);
+			const el = graph.findById(model.id);
+			console.log(el, model, 130000000000);
 			dispatch(toClickNode({ id: model.id, x: model.x, y: model.y }));
+		};
+
+		const handleEdegClick = (evt: IG6GraphEvent) => {
+			const edge = evt.item;
+			const model = edge.getModel();
+			console.log(evt, model, 10999999);
+			dispatch(
+				toClickEdge({
+					id: model.id,
+					source: model.source,
+					target: model.target
+				})
+			);
 		};
 		// 每次点击聚焦到点击节点上
 		graph.on('node:click', handleClick);
+		graph.on('edge:click', handleEdegClick);
 		return () => {
 			graph.off('node:click', handleClick);
+			graph.off('edge:click', handleEdegClick);
 		};
 	}, []);
 	return null;
