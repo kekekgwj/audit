@@ -1,33 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
-// interface IStoreGraph {}
-export interface INodeInfo {
-	id: string | null;
-	x: Number | null;
-	y: Number | null;
-}
-export const initialStateGraph: INodeInfo = {
-	id: null,
-	x: null,
-	y: null
-};
-// const initialStateGraph: IStoreGraph = {
-// 	id: '',
-// 	x: '',
-// 	y: ''
-// };
-const graphSlice = createSlice({
-	name: 'graph',
-	initialState: initialStateGraph,
-	reducers: {
-		toClickNode(state, action) {
-			state.id = action.payload.id;
-			state.x = action.payload.x;
-			state.y = action.payload.y;
-			console.log(state.id, 122222);
-		}
-	}
+import { combineReducers, createSlice } from '@reduxjs/toolkit';
+import knowLedgeGraphReducer from './knowLedgeGraphSlice';
+
+const rootReducer = combineReducers({
+	knowLedgeGraph: knowLedgeGraphReducer,
+	dataAnaylsis
 });
-
-export const { toClickNode } = graphSlice.actions;
-
 export default graphSlice.reducer;

@@ -8,9 +8,13 @@ import React, {
 	useState
 } from 'react';
 import type { ReactNode } from 'react';
+import ASSETS from '../assets/index';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
+import { Selection } from '@antv/x6-plugin-selection';
+import { Keyboard } from '@antv/x6-plugin-keyboard';
 
+const { SQL, UNION, JOIN, FILTER, TABLE } = ASSETS;
 const GraphContext = createContext<X6.Graph | null>(null);
 
 interface Props {
@@ -18,7 +22,106 @@ interface Props {
 	container?: HTMLDivElement;
 	children?: ReactNode;
 }
-
+const ports = {
+	groups: {
+		top: {
+			position: 'top',
+			attrs: {
+				circle: {
+					r: 4,
+					magnet: true,
+					stroke: '#5F95FF',
+					strokeWidth: 1,
+					fill: '#fff',
+					style: {
+						visibility: 'hidden'
+					}
+				}
+			}
+		},
+		right: {
+			position: 'right',
+			attrs: {
+				circle: {
+					r: 4,
+					magnet: true,
+					stroke: '#5F95FF',
+					strokeWidth: 1,
+					fill: '#fff',
+					style: {
+						visibility: 'hidden'
+					}
+				}
+			}
+		},
+		bottom: {
+			position: 'bottom',
+			attrs: {
+				circle: {
+					r: 4,
+					magnet: true,
+					stroke: '#5F95FF',
+					strokeWidth: 1,
+					fill: '#fff',
+					style: {
+						visibility: 'hidden'
+					}
+				}
+			}
+		},
+		left: {
+			position: 'left',
+			attrs: {
+				circle: {
+					r: 4,
+					magnet: true,
+					stroke: '#5F95FF',
+					strokeWidth: 1,
+					fill: '#fff',
+					style: {
+						visibility: 'hidden'
+					}
+				}
+			}
+		}
+	},
+	items: [
+		{
+			group: 'top'
+		},
+		{
+			group: 'right'
+		},
+		{
+			group: 'bottom'
+		},
+		{
+			group: 'left'
+		}
+	]
+};
+const imageShapes = [
+	{
+		label: 'SQL',
+		image: SQL
+	},
+	{
+		label: 'UNION',
+		image: UNION
+	},
+	{
+		label: 'JOIN',
+		image: JOIN
+	},
+	{
+		label: 'TABLE',
+		image: TABLE
+	},
+	{
+		label: 'FILTER',
+		image: FILTER
+	}
+];
 export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 	(props, ref) => {
 		const [graph, setGraph] = useState<X6.Graph | null>(null);
@@ -30,51 +133,79 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 		} = props;
 		const containerRef = useRef<HTMLDivElement>(container || null);
 		const stencilRef = useRef<HTMLDivElement>(null);
-		const imageShapes = [
-			{
-				label: 'Client',
-				image:
-					'https://gw.alipayobjects.com/zos/bmw-prod/687b6cb9-4b97-42a6-96d0-34b3099133ac.svg'
-			},
-			{
-				label: 'Http',
-				image:
-					'https://gw.alipayobjects.com/zos/bmw-prod/dc1ced06-417d-466f-927b-b4a4d3265791.svg'
-			},
-			{
-				label: 'Api',
-				image:
-					'https://gw.alipayobjects.com/zos/bmw-prod/c55d7ae1-8d20-4585-bd8f-ca23653a4489.svg'
-			},
-			{
-				label: 'Sql',
-				image:
-					'https://gw.alipayobjects.com/zos/bmw-prod/6eb71764-18ed-4149-b868-53ad1542c405.svg'
-			},
-			{
-				label: 'Clound',
-				image:
-					'https://gw.alipayobjects.com/zos/bmw-prod/c36fe7cb-dc24-4854-aeb5-88d8dc36d52e.svg'
-			},
-			{
-				label: 'Mq',
-				image:
-					'https://gw.alipayobjects.com/zos/bmw-prod/2010ac9f-40e7-49d4-8c4a-4fcf2f83033b.svg'
-			}
-		];
 
+		const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
+			for (let i = 0, len = ports.length; i < len; i += 1) {
+				ports[i].style.visibility = show ? 'visible' : 'hidden';
+			}
+		};
 		useEffect(() => {
 			if (containerRef.current && !graph) {
 				const graph = new X6.Graph({
 					container: containerRef.current,
+					grid: true,
+					connecting: {
+						router: 'manhattan',
+						connector: {
+							name: 'rounded',
+							args: {
+								radius: 8
+							}
+						},
+						anchor: 'center',
+						connectionPoint: 'anchor',
+						allowBlank: false,
+						snap: {
+							radius: 20
+						},
+						createEdge() {
+							return new X6.Shape.Edge({
+								attrs: {
+									line: {
+										stroke: '#A2B1C3',
+										strokeWidth: 2,
+										targetMarker: {
+											name: 'block',
+											width: 12,
+											height: 8
+										}
+									}
+								},
+								zIndex: 0
+							});
+						},
+						validateConnection({ targetMagnet }) {
+							return !!targetMagnet;
+						}
+					},
+					highlighting: {
+						magnetAdsorbed: {
+							name: 'stroke',
+							args: {
+								attrs: {
+									fill: '#5F95FF',
+									stroke: '#5F95FF'
+								}
+							}
+						}
+					},
 					...other
 				});
-				graph.use(
-					new Snapline({
-						enabled: true,
-						sharp: true
-					})
-				);
+				graph
+					.use(
+						new Snapline({
+							enabled: true,
+							sharp: true
+						})
+					)
+					.use(
+						new Selection({
+							enabled: true,
+							rubberband: true,
+							showNodeSelectionBox: true
+						})
+					)
+					.use(new Keyboard({ enabled: true }));
 				setGraph(graph);
 				if (typeof ref === 'function') {
 					ref(graph);
@@ -85,8 +216,8 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 					const stencil = new Stencil({
 						target: graph,
 						collapsable: true,
-						stencilGraphWidth: 200,
-						stencilGraphHeight: 180,
+						stencilGraphWidth: 180,
+						stencilGraphHeight: 320,
 						groups: [
 							{
 								name: 'group1'
@@ -131,7 +262,8 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 									fontSize: 12,
 									fill: '#fff'
 								}
-							}
+							},
+							ports: { ...ports }
 						},
 						true
 					);
@@ -147,13 +279,53 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 						})
 					);
 
-					console.log(imageNodes);
 					stencil.load(imageNodes, 'group1');
 					stencilRef?.current?.appendChild(stencil.container);
 				}
 			}
 		}, [graph, other, ref]);
+		useEffect(() => {
+			if (!graph) {
+				return;
+			}
+			graph.on('node:mouseenter', () => {
+				const container = document.getElementById('x6-graph')!;
+				const ports = container.querySelectorAll(
+					'.x6-port-body'
+				) as NodeListOf<SVGElement>;
+				showPorts(ports, true);
+			});
+			graph.on('node:mouseleave', () => {
+				const container = document.getElementById('x6-graph')!;
+				const ports = container.querySelectorAll(
+					'.x6-port-body'
+				) as NodeListOf<SVGElement>;
+				showPorts(ports, false);
+			});
+			graph.on('node:dblclick', ({ node }) => {
+				console.log(node.id);
+			});
+			graph.bindKey(['meta+a', 'ctrl+a'], () => {
+				const nodes = graph.getNodes();
+				if (nodes) {
+					graph.select(nodes);
+				}
+			});
 
+			// delete
+			graph.bindKey('backspace', () => {
+				const cells = graph.getSelectedCells();
+				if (cells.length) {
+					graph.removeCells(cells);
+				}
+			});
+			return () => {
+				graph.off('node:mouseenter');
+				graph.off('node:mouseleave');
+				graph.unbindKey('backspace');
+				graph.unbindKey(['meta+a', 'ctrl+a']);
+			};
+		}, [graph]);
 		return (
 			<div
 				className={className}
@@ -170,7 +342,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 						ref={stencilRef}
 						style={{ position: 'relative', width: '200px', height: '400px' }}
 					></div>
-					<div className="x6-content" ref={containerRef}></div>
+					<div className="x6-content" id="x6-graph" ref={containerRef}></div>
 
 					{!!graph && children}
 				</GraphContext.Provider>

@@ -47,6 +47,7 @@
 
 // export default DataAnalysis;
 import AddNodeBehavior from './AddNodeBehavior';
+import GraphExport from './ExportData';
 import FromJSONBehavior from './FromJSONBehavior';
 import { Graph, useGraphInstance, useGraphState } from './lib/index';
 import React, { useEffect, useCallback, useState, useRef } from 'react';
@@ -57,6 +58,7 @@ const X6Graph = () => {
 		<Graph width={800} height={600}>
 			<AddNodeBehavior />
 			<FromJSONBehavior />
+			<GraphExport />
 		</Graph>
 	);
 };
