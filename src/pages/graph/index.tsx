@@ -32,35 +32,81 @@ const mockData: GraphinData = {
 					position: 'center',
 					offset: [20, 5],
 					fill: 'green'
+				},
+				keyshape: {
+					size: 80,
+					stroke: '#ff9f0f',
+					fill: '#ff9f0ea6'
 				}
 			}
 		},
 		{
 			id: 'node-1',
 			x: 200,
-			y: 200
+			y: 200,
+			style: {
+				label: {
+					value: '我是node1',
+					position: 'center',
+					offset: [20, 5],
+					fill: 'green'
+				},
+				keyshape: {
+					size: 60,
+					stroke: '#ff9f0f',
+					fill: '#ff9f0ea6'
+				}
+			}
 		},
 		{
 			id: 'node-2',
 			x: 100,
-			y: 300
+			y: 300,
+			style: {
+				label: {
+					value: '我是node2',
+					position: 'center',
+					offset: [20, 5],
+					fill: 'green'
+				},
+				keyshape: {
+					size: 40,
+					stroke: '#ff9f0f',
+					fill: '#ff9f0ea6'
+				}
+			}
 		}
 	],
 	edges: [
 		{
 			id: 'edge-0-1',
 			source: 'node-0',
-			target: 'node-1'
+			target: 'node-1',
+			style: {
+				label: {
+					value: '我是边1'
+				}
+			}
 		},
 		{
 			id: 'edge-1-2',
 			source: 'node-1',
-			target: 'node-2'
+			target: 'node-2',
+			style: {
+				label: {
+					value: '我是边2'
+				}
+			}
 		},
 		{
 			id: 'edge-2-0',
 			source: 'node-2',
-			target: 'node-0'
+			target: 'node-0',
+			style: {
+				label: {
+					value: '我是边3'
+				}
+			}
 		}
 	]
 };
@@ -68,17 +114,21 @@ const mockData: GraphinData = {
 interface Props {
 	type: string;
 	changeLayout: (layout: any) => void;
+	changeDefaultEdge: (layout: any) => void;
 }
 
 // 右边信息展示
 const RightBarCom = React.memo((props: Props) => {
 	// 改变布局及其配置的方法
-	const { changeLayout, type } = props;
+	const { changeLayout, type, changeDefaultEdge } = props;
 	const onChange = (key: string) => {
 		console.log(key);
 	};
 
 	const defaultStyle: React.CSSProperties = {
+		position: 'absolute',
+		right: 0,
+		top: 0,
 		width: '500px',
 		height: '600px'
 	};
@@ -88,7 +138,11 @@ const RightBarCom = React.memo((props: Props) => {
 			key: '1',
 			label: `布局样式`,
 			children: (
-				<LayoutStyle type={type} changeLayout={changeLayout}></LayoutStyle>
+				<LayoutStyle
+					type={type}
+					changeLayout={changeLayout}
+					changeDefaultEdge={changeDefaultEdge}
+				></LayoutStyle>
 			)
 		},
 		{
@@ -125,25 +179,27 @@ const SampleBehavior = React.memo(() => {
 		const handleClick = (evt: IG6GraphEvent) => {
 			const node = evt.item as INode;
 			const model = node.getModel() as NodeConfig;
-			apis.focusNodeById(model.id);
 			const el = graph.findById(model.id);
-			console.log(el, model, 130000000000);
-			dispatch(toClickNode({ id: model.id, x: model.x, y: model.y }));
+			console.log(el, node, model, 130000000000);
+			dispatch(
+				toClickNode({ id: model.id, x: model.x, y: model.y, type: 'node' })
+			);
 		};
 
 		const handleEdegClick = (evt: IG6GraphEvent) => {
 			const edge = evt.item;
 			const model = edge.getModel();
-			console.log(evt, model, 10999999);
+			const el = graph.findById(model.id);
+			console.log(el, model, 10999999);
 			dispatch(
 				toClickEdge({
 					id: model.id,
-					source: model.source,
-					target: model.target
+					// source: model.source,
+					// target: model.target,
+					type: 'edge'
 				})
 			);
 		};
-		// 每次点击聚焦到点击节点上
 		graph.on('node:click', handleClick);
 		graph.on('edge:click', handleEdegClick);
 		return () => {
@@ -161,24 +217,49 @@ const Graph = () => {
 		type: 'dagre',
 		options: {}
 	});
+
+	// 默认节点样式配置
+	// const [defaultNode, setdefaultNode] = React.useState({
+	// 	nodeStyle: {}
+	// });
+
+	//默认边样式配置
+	const [defaultEdge, setdefaultEdge] = React.useState({
+		type: 'line',
+		style: {
+			stroke: '#00f'
+		}
+	});
+
+	// 修改布局
 	const changeLayout = (value) => {
 		setState(value);
 	};
+
+	// 修改默认边配置
+	const changeDefaultEdge = (value) => {
+		setdefaultEdge(value);
+		console.log(defaultEdge, 2344444);
+	};
+	// useEffect(() => {}, [defaultEdge]);
 	const { type, options } = state;
+
 	return (
 		<div className="main-content">
-			<div className="graphin-content">
-				<Graphin data={mockData} layout={{ type, ...options }}>
-					<ZoomCanvas disabled />
-					<SampleBehavior></SampleBehavior>
-					{/* <NodeDetail></NodeDetail> */}
-				</Graphin>
-			</div>
-			<RightBarCom
-				type={type}
-				changeLayout={changeLayout}
-				className="right-bar"
-			></RightBarCom>
+			<Graphin
+				data={mockData}
+				layout={{ type, ...options }}
+				defaultEdge={defaultEdge}
+			>
+				<ZoomCanvas disabled />
+				<SampleBehavior></SampleBehavior>
+				<RightBarCom
+					type={type}
+					changeLayout={changeLayout}
+					className="right-bar"
+					changeDefaultEdge={changeDefaultEdge}
+				></RightBarCom>
+			</Graphin>
 		</div>
 	);
 };

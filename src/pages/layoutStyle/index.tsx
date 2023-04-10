@@ -6,53 +6,134 @@ import networkLayouts from './layoutsOptions';
 import { useSelector, useDispatch } from 'react-redux';
 import Graphin, { GraphinContext } from '@antv/graphin';
 import { Form, Input, Button, Radio, Select } from 'antd';
+import { Divider } from 'rc-menu';
 
 interface Props {
 	type: string;
 	changeLayout: (layout: any) => void;
+	changeDefaultEdge: (layout: any) => void;
 }
+
+// 默认全局样式
+const DefaultStyle = React.memo((prop: Props) => {
+	const { graph, apis } = useContext(GraphinContext);
+	const [form] = Form.useForm();
+	const { changeDefaultEdge } = prop;
+	const { setFieldsValue, resetFields } = form;
+
+	const handleTransform = (res) => {
+		if (changeDefaultEdge) {
+			const newData = {
+				type: 'arc',
+				style: {
+					stroke: '#f00'
+				}
+			};
+			changeDefaultEdge(newData);
+		}
+	};
+
+	return (
+		<div className="default-style-box">
+			<Form
+				form={form}
+				labelCol={{ span: 4 }}
+				wrapperCol={{ span: 14 }}
+				layout="horizontal"
+				style={{ maxWidth: 600 }}
+				onFinish={(res: any) => {
+					handleTransform(res);
+				}}
+			>
+				<div className="default-node-style">
+					<div>默认节点样式</div>
+					<Form.Item label="颜色" name="nodeColor">
+						<Input />
+					</Form.Item>
+					<Form.Item label="大小" name="nodeSize">
+						<Input />
+					</Form.Item>
+				</div>
+
+				<div className="default-node-style">
+					<div>默认边样式</div>
+					<Form.Item label="颜色" name="EdgeColor">
+						<Input />
+					</Form.Item>
+					<Form.Item label="大小" name="EdgeSize">
+						<Input />
+					</Form.Item>
+				</div>
+
+				<Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+					<Button type="primary" htmlType="submit">
+						设置
+					</Button>
+				</Form.Item>
+			</Form>
+		</div>
+	);
+});
 
 // 节点详情
 const NodeDetail = React.memo(() => {
 	const nodeInfo = useSelector((state) => state);
 	const { graph, apis } = useContext(GraphinContext);
-	// const el = graph?.findById(nodeInfo.id);
-	// const [form] = Form.useForm();
-	// const { setFieldsValue, resetFields } = form;
+	const [form] = Form.useForm();
+	const { setFieldsValue, resetFields } = form;
+	const el = graph.findById(nodeInfo.id) || graph.findById('node-0');
+	const model = el?.getModel();
 	useEffect(() => {
-		// setFieldsValue({});
-		// console.log(el, 26666666666666666);
-	}, [nodeInfo]);
+		console.log(model, 2444444);
+		setFieldsValue({
+			label: model.style?.label.value || '',
+			size: model.style?.keyshape.size || ''
+		});
+	}, [nodeInfo, setFieldsValue]);
+
+	const changeNodeStyle = (res) => {
+		console.log(res);
+		graph.updateItem(nodeInfo.id, {
+			style: {
+				label: {
+					value: res.label
+				},
+				keyshape: {
+					size: res.size - 0
+				}
+			}
+		});
+	};
+
 	return (
 		<div>
 			<div className="node-detail-box">
 				<div className="detail-item">
 					<div>节点id</div>
-					<div>{nodeInfo.id}</div>
-				</div>
-				<div className="detail-item">
-					<div>节点x</div>
-					<div>{nodeInfo.x}</div>
-				</div>
-				<div className="detail-item">
-					<div>节点y</div>
-					<div>{nodeInfo.y}</div>
+					<div>{model.id}</div>
 				</div>
 			</div>
-			<div classNmae="node-style-box">
+			<div className="node-style-box">
 				<Form
+					form={form}
 					labelCol={{ span: 4 }}
 					wrapperCol={{ span: 14 }}
 					layout="horizontal"
 					style={{ maxWidth: 600 }}
+					onFinish={(res: any) => {
+						changeNodeStyle(res);
+					}}
 				>
 					<Form.Item label="节点描述" name="label">
 						<Input />
 					</Form.Item>
-					<Form.Item label="属性">
-						<Select>
-							<Select.Option value="demo">Demo</Select.Option>
-						</Select>
+					<Form.Item label="节点大小" name="size">
+						<Input />
+					</Form.Item>
+					<Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+						<Button type="primary" htmlType="submit">
+							设置
+						</Button>
 					</Form.Item>
 				</Form>
 			</div>
@@ -61,21 +142,62 @@ const NodeDetail = React.memo(() => {
 });
 NodeDetail.displayName = 'NodeDetail';
 
-// 节点详情
+// 边详情
 const EdgeDetail = React.memo(() => {
 	const graphinInfo = useSelector((state) => state);
+	const { graph, apis } = useContext(GraphinContext);
+	const [form] = Form.useForm();
+	const { setFieldsValue, resetFields } = form;
+	const el = graph.findById(graphinInfo.id) || graph.findById('edge-0-1');
+	const model = el?.getModel();
 	useEffect(() => {
-		console.log(graphinInfo, 666666);
-	}, [graphinInfo]);
+		console.log(model, 9111111);
+		setFieldsValue({
+			label: model.style?.label.value || ''
+		});
+	}, [graphinInfo, el, model]);
+	const changeEdgeStyle = (res) => {
+		graph.updateItem(graphinInfo.id, {
+			style: {
+				label: {
+					value: res.label
+				}
+			}
+		});
+	};
+
 	return (
-		<div className="node-detail-box">
-			<div className="detail-item">
-				<div>边起点</div>
-				<div>{graphinInfo.source}</div>
+		<div>
+			<div className="node-detail-box">
+				<div className="detail-item">
+					<div>边起点</div>
+					<div>{model.source}</div>
+				</div>
+				<div className="detail-item">
+					<div>边终点</div>
+					<div>{model.target}</div>
+				</div>
 			</div>
-			<div className="detail-item">
-				<div>边终点</div>
-				<div>{graphinInfo.target}</div>
+			<div className="edge-style-box">
+				<Form
+					form={form}
+					labelCol={{ span: 4 }}
+					wrapperCol={{ span: 14 }}
+					layout="horizontal"
+					style={{ maxWidth: 600 }}
+					onFinish={(res: any) => {
+						changeEdgeStyle(res);
+					}}
+				>
+					<Form.Item label="边描述" name="label">
+						<Input />
+					</Form.Item>
+					<Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+						<Button type="primary" htmlType="submit">
+							设置
+						</Button>
+					</Form.Item>
+				</Form>
 			</div>
 		</div>
 	);
@@ -84,38 +206,24 @@ EdgeDetail.displayName = 'EdgeDetail';
 
 //布局样式组件
 const LayoutStyle = React.memo((prop: Props) => {
-	const { changeLayout, type } = prop;
+	const { changeLayout, type, changeDefaultEdge } = prop;
+	const elInfo = useSelector((state) => state);
+	useEffect(() => {
+		console.log(elInfo, 116666);
+	}, [elInfo]);
+	const curComponent = elInfo.type == 'node' ? <NodeDetail /> : <EdgeDetail />;
 	return (
 		<div className="style-content">
 			<div className="node-detail">
-				<div className="style-title">节点详情</div>
-				<NodeDetail></NodeDetail>
+				<div className="style-title">默认样式</div>
+				<DefaultStyle changeDefaultEdge={changeDefaultEdge}></DefaultStyle>
 			</div>
 			<div className="node-detail">
-				<div className="style-title">边详情</div>
-				<EdgeDetail></EdgeDetail>
+				<div className="style-title">
+					{elInfo.type == 'node' ? '节点详情' : '边详情'}
+				</div>
+				{curComponent}
 			</div>
-			<div className="node-style">
-				<div className="style-title">节点样式</div>
-				<Form
-					labelCol={{ span: 4 }}
-					wrapperCol={{ span: 14 }}
-					layout="horizontal"
-					style={{ maxWidth: 600 }}
-				>
-					<Form.Item label="节点类型">
-						<Select>
-							<Select.Option value="demo">Demo</Select.Option>
-						</Select>
-					</Form.Item>
-					<Form.Item label="属性">
-						<Select>
-							<Select.Option value="demo">Demo</Select.Option>
-						</Select>
-					</Form.Item>
-				</Form>
-			</div>
-
 			<div className="layout-setting">
 				<div className="style-title">布局设置</div>
 				<div>

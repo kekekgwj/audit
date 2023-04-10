@@ -2,17 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 // interface IStoreGraph {}
 export interface IStoreGraph {
 	id: string | null;
-	x: Number | null;
-	y: Number | null;
-	source: string | null;
-	target: string | null;
+	type: string | null;
 }
 export const initialStateGraph: IStoreGraph = {
 	id: null,
-	x: null,
-	y: null,
-	source: null,
-	target: null
+	type: null
 };
 // const initialStateGraph: IStoreGraph = {
 // 	id: '',
@@ -25,14 +19,12 @@ const graphSlice = createSlice({
 	reducers: {
 		toClickNode(state, action) {
 			state.id = action.payload.id;
-			state.x = action.payload.x;
-			state.y = action.payload.y;
+			state.type = action.payload.type;
 			console.log(state.id, 122222);
 		},
 		toClickEdge(state, action) {
 			state.id = action.payload.id;
-			state.source = action.payload.source;
-			state.target = action.payload.target;
+			state.type = action.payload.type;
 		}
 	}
 });
