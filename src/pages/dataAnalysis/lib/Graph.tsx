@@ -13,6 +13,8 @@ import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Keyboard } from '@antv/x6-plugin-keyboard';
+import { dispatch } from '../../../redux/store';
+import { toDoubleClickNode } from '../../../redux/reducers/dataAnalysis';
 
 const { SQL, UNION, JOIN, FILTER, TABLE } = ASSETS;
 const GraphContext = createContext<X6.Graph | null>(null);
@@ -103,23 +105,28 @@ const ports = {
 const imageShapes = [
 	{
 		label: 'SQL',
-		image: SQL
+		image: SQL,
+		type: 'SQL'
 	},
 	{
 		label: 'UNION',
-		image: UNION
+		image: UNION,
+		type: 'UNION'
 	},
 	{
 		label: 'JOIN',
-		image: JOIN
+		image: JOIN,
+		type: 'JOIN'
 	},
 	{
 		label: 'TABLE',
-		image: TABLE
+		image: TABLE,
+		type: 'TABLE'
 	},
 	{
 		label: 'FILTER',
-		image: FILTER
+		image: FILTER,
+		type: 'FILTER'
 	}
 ];
 export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
@@ -174,8 +181,9 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 								zIndex: 0
 							});
 						},
-						validateConnection({ targetMagnet }) {
-							return !!targetMagnet;
+						validateConnection(...args) {
+							console.log(args);
+							return true;
 						}
 					},
 					highlighting: {
@@ -274,7 +282,8 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 							attrs: {
 								image: {
 									'xlink:href': item.image
-								}
+								},
+								custom: { type: item.type }
 							}
 						})
 					);
@@ -303,7 +312,8 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 				showPorts(ports, false);
 			});
 			graph.on('node:dblclick', ({ node }) => {
-				console.log(node.id);
+				const { id } = node;
+				dispatch(toDoubleClickNode({ id, showPanel: true }));
 			});
 			graph.bindKey(['meta+a', 'ctrl+a'], () => {
 				const nodes = graph.getNodes();

@@ -10,7 +10,10 @@ import { INode, NodeConfig } from '@antv/g6';
 import type { GraphinData, EdgeStyle, NodeStyle } from '@antv/graphin';
 const { DragCanvas, ZoomCanvas, DragNode, ActivateRelations } = Behaviors;
 // import { dispatch } from '../../redux/store';
-import { toClickNode, initialStateGraph } from '../../redux/reducers';
+import {
+	toClickNode,
+	initialStateGraph
+} from '../../redux/reducers/knowLedgeGraphSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { store } from '../../redux/store';
 import { render } from 'react-dom';

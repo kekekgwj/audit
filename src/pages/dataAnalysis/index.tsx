@@ -49,6 +49,7 @@
 import AddNodeBehavior from './AddNodeBehavior';
 import GraphExport from './ExportData';
 import FromJSONBehavior from './FromJSONBehavior';
+import NodeDetailPanel from './components/NodeDetailPanel';
 import { Graph, useGraphInstance, useGraphState } from './lib/index';
 import React, { useEffect, useCallback, useState, useRef } from 'react';
 const X6Graph = () => {
@@ -59,6 +60,7 @@ const X6Graph = () => {
 			<AddNodeBehavior />
 			<FromJSONBehavior />
 			<GraphExport />
+			<NodeDetailPanel />
 		</Graph>
 	);
 };
