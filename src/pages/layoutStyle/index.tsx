@@ -20,13 +20,25 @@ const DefaultStyle = React.memo((prop: Props) => {
 	const [form] = Form.useForm();
 	const { changeDefaultEdge } = prop;
 	const { setFieldsValue, resetFields } = form;
+	useEffect(() => {
+		setFieldsValue({
+			stroke: '',
+			lineWidth: 1
+		});
+	}, [setFieldsValue]);
 
 	const handleTransform = (res) => {
+		console.log(res, 31111);
 		if (changeDefaultEdge) {
 			const newData = {
-				type: 'arc',
 				style: {
-					stroke: '#f00'
+					label: {
+						value: ''
+					},
+					keyshape: {
+						lineWidth: Number(res.lineWidt),
+						stroke: res.stroke
+					}
 				}
 			};
 			changeDefaultEdge(newData);
@@ -57,10 +69,10 @@ const DefaultStyle = React.memo((prop: Props) => {
 
 				<div className="default-node-style">
 					<div>默认边样式</div>
-					<Form.Item label="颜色" name="EdgeColor">
+					<Form.Item label="颜色" name="stroke">
 						<Input />
 					</Form.Item>
-					<Form.Item label="大小" name="EdgeSize">
+					<Form.Item label="线条宽度" name="lineWidth">
 						<Input />
 					</Form.Item>
 				</div>

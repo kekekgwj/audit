@@ -95,6 +95,10 @@ const mockData: GraphinData = {
 			style: {
 				label: {
 					value: '我是边2'
+				},
+				keyshape: {
+					lineWidth: 5,
+					stroke: '#00f'
 				}
 			}
 		},
@@ -213,6 +217,100 @@ SampleBehavior.displayName = 'SampleBehavior';
 
 // 画布主体
 const Graph = () => {
+	const [data, setData] = React.useState({
+		nodes: [
+			{
+				id: 'node-0',
+				x: 100,
+				y: 100,
+				style: {
+					label: {
+						value: '我是node0',
+						position: 'center',
+						offset: [20, 5],
+						fill: 'green'
+					},
+					keyshape: {
+						size: 80,
+						stroke: '#ff9f0f',
+						fill: '#ff9f0ea6'
+					}
+				}
+			},
+			{
+				id: 'node-1',
+				x: 200,
+				y: 200,
+				style: {
+					label: {
+						value: '我是node1',
+						position: 'center',
+						offset: [20, 5],
+						fill: 'green'
+					},
+					keyshape: {
+						size: 60,
+						stroke: '#ff9f0f',
+						fill: '#ff9f0ea6'
+					}
+				}
+			},
+			{
+				id: 'node-2',
+				x: 100,
+				y: 300,
+				style: {
+					label: {
+						value: '我是node2',
+						position: 'center',
+						offset: [20, 5],
+						fill: 'green'
+					},
+					keyshape: {
+						size: 40,
+						stroke: '#ff9f0f',
+						fill: '#ff9f0ea6'
+					}
+				}
+			}
+		],
+		edges: [
+			{
+				id: 'edge-0-1',
+				source: 'node-0',
+				target: 'node-1',
+				style: {
+					label: {
+						value: '我是边1'
+					}
+				}
+			},
+			{
+				id: 'edge-1-2',
+				source: 'node-1',
+				target: 'node-2',
+				style: {
+					label: {
+						value: '我是边2'
+					},
+					keyshape: {
+						lineWidth: 5,
+						stroke: '#00f'
+					}
+				}
+			},
+			{
+				id: 'edge-2-0',
+				source: 'node-2',
+				target: 'node-0',
+				style: {
+					label: {
+						value: '我是边3'
+					}
+				}
+			}
+		]
+	});
 	const [state, setState] = React.useState({
 		type: 'dagre',
 		options: {}
@@ -223,34 +321,35 @@ const Graph = () => {
 	// 	nodeStyle: {}
 	// });
 
-	//默认边样式配置
-	const [defaultEdge, setdefaultEdge] = React.useState({
-		type: 'line',
-		style: {
-			stroke: '#00f'
-		}
-	});
-
 	// 修改布局
 	const changeLayout = (value) => {
 		setState(value);
 	};
 
 	// 修改默认边配置
-	const changeDefaultEdge = (value) => {
-		setdefaultEdge(value);
-		console.log(defaultEdge, 2344444);
+	const changeDefaultEdge = async (value) => {
+		console.log(value, 2511111);
+		mockData.edges.forEach((edge) => {
+			edge.style.label = Object.assign({}, value.style.label, edge.style.label);
+			edge.style.keyshape = Object.assign(
+				{},
+				value.style.keyshape,
+				edge.style.keyshape
+			);
+		});
+		console.log(mockData, 2655555);
+		setData(mockData);
+		console.log(data, 26333333);
 	};
-	// useEffect(() => {}, [defaultEdge]);
+
 	const { type, options } = state;
+	useEffect(() => {
+		console.log(mockData, data, 270000);
+	}, [mockData]);
 
 	return (
 		<div className="main-content">
-			<Graphin
-				data={mockData}
-				layout={{ type, ...options }}
-				defaultEdge={defaultEdge}
-			>
+			<Graphin data={data} layout={{ type, ...options }}>
 				<ZoomCanvas disabled />
 				<SampleBehavior></SampleBehavior>
 				<RightBarCom
