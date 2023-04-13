@@ -6,7 +6,6 @@ import networkLayouts from './layoutsOptions';
 import { useSelector, useDispatch } from 'react-redux';
 import Graphin, { GraphinContext } from '@antv/graphin';
 import { Form, Input, Button, Radio, Select } from 'antd';
-import { Divider } from 'rc-menu';
 
 interface Props {
 	type: string;

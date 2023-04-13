@@ -4,6 +4,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './index.css';
 import Graph from './pages/graph';
 import RealtionShip from './pages/relationShip';
+import AlgorithmMining from './pages/algorithmMining';
 import { store } from './redux/store';
 // import router from './routes/index';
 import { Provider } from 'react-redux';
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
 	{
 		path: '/',
 		element: <RealtionShip />
+	},
+	{
+		path: '/algorithmMining',
+		element: <AlgorithmMining />
 	}
 ]);
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

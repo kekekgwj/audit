@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import './relationship.less';
-import GraphinCom from './components/graphin';
+import './algorithm.less';
+import GraphinCom from '../relationShip/components/graphin';
 import SideBar from './components/sideBar';
+
 import { Button } from 'antd';
 
 const mockData: GraphinData = {
@@ -99,7 +100,7 @@ const mockData: GraphinData = {
 	]
 };
 
-const RelationShipCom = () => {
+const Algorithm = () => {
 	// 数据来源
 	const [data, setDate] = React.useState(mockData);
 	// 更新数据
@@ -128,4 +129,4 @@ const RelationShipCom = () => {
 	);
 };
 
-export default RelationShipCom;
+export default Algorithm;
