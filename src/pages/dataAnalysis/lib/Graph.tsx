@@ -15,7 +15,9 @@ import { Selection } from '@antv/x6-plugin-selection';
 import { Keyboard } from '@antv/x6-plugin-keyboard';
 import { dispatch } from '../../../redux/store';
 import { toDoubleClickNode } from '../../../redux/reducers/dataAnalysis';
-
+import { Options } from '@antv/x6/lib/graph/options';
+import { message } from 'antd';
+import { JoinConfigPanel } from '../components/ConfigPanel';
 const { SQL, UNION, JOIN, FILTER, TABLE } = ASSETS;
 const GraphContext = createContext<X6.Graph | null>(null);
 
@@ -102,33 +104,91 @@ const ports = {
 		}
 	]
 };
-const imageShapes = [
+
+enum IImageTypes {
+	SQL = 'SQL',
+	UNION = 'UNION',
+	JOIN = 'JOIN',
+	TABLE = 'TABLE',
+	FILTER = 'FILTER'
+}
+
+interface IImageShapes {
+	label: string;
+	image: string;
+	type: IImageTypes;
+}
+const imageShapes: IImageShapes[] = [
 	{
 		label: 'SQL',
 		image: SQL,
-		type: 'SQL'
+		type: IImageTypes.SQL
 	},
 	{
 		label: 'UNION',
 		image: UNION,
-		type: 'UNION'
+		type: IImageTypes.UNION
 	},
 	{
 		label: 'JOIN',
 		image: JOIN,
-		type: 'JOIN'
+		type: IImageTypes.JOIN
 	},
 	{
 		label: 'TABLE',
 		image: TABLE,
-		type: 'TABLE'
+		type: IImageTypes.TABLE
 	},
 	{
 		label: 'FILTER',
 		image: FILTER,
-		type: 'FILTER'
+		type: IImageTypes.FILTER
 	}
 ];
+
+const validateConnectionRule = (
+	graph: X6.Graph,
+	params: Options.ValidateConnectionArgs
+) => {
+	const { sourceCell, targetCell } = params;
+	const getAttrsById = (id: string) => {
+		const cell = graph.getCellById(id);
+		return cell.getAttrs();
+	};
+	const sourceCellID = sourceCell?.id;
+	const targetCellID = targetCell?.id;
+	if (sourceCellID === targetCellID) {
+		// message.error('不能自连接');
+		return false;
+	}
+	if (!sourceCellID || !targetCellID) {
+		return;
+	}
+	const sourceCellAttrs = getAttrsById(sourceCell.id);
+	const targetCellAttrs = getAttrsById(targetCell.id);
+
+	const sourceType = sourceCellAttrs.custom?.type;
+	const targetType = targetCellAttrs.custom?.type;
+
+	if (sourceType === IImageTypes.TABLE && targetType === IImageTypes.TABLE) {
+		message.error('table不能连接table');
+		return false;
+	}
+	if (sourceType === IImageTypes.SQL && targetType === IImageTypes.SQL) {
+		message.error('sql不能连接sql');
+		return false;
+	}
+	return true;
+};
+
+const getNodeTypeById = (graph: X6.Graph, ids: string[] | string) => {
+	const idAry = Array.isArray(ids) ? ids : [ids];
+	return idAry.map((id) => {
+		const cell = graph.getCellById(id);
+		const attrs = cell.getAttrs();
+		return attrs.custom.type;
+	});
+};
 export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 	(props, ref) => {
 		const [graph, setGraph] = useState<X6.Graph | null>(null);
@@ -181,8 +241,8 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 								zIndex: 0
 							});
 						},
-						validateConnection(...args) {
-							console.log(args);
+						validateConnection(args) {
+							validateConnectionRule(graph, args);
 							return true;
 						}
 					},
@@ -314,6 +374,40 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			graph.on('node:dblclick', ({ node }) => {
 				const { id } = node;
 				dispatch(toDoubleClickNode({ id, showPanel: true }));
+				const cell = graph.getCellById(id);
+				const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
+				const { UNION, JOIN, FILTER, TABLE, SQL } = IImageTypes;
+				if ([UNION, JOIN].includes(clickNodeType)) {
+					console.log('union or join');
+				}
+				if ([FILTER].includes(clickNodeType)) {
+				}
+				if (TABLE === clickNodeType) {
+				}
+
+				if (SQL === clickNodeType) {
+				}
+				const edges = graph.getEdges();
+				const sourceNodes: string[] = [];
+				// 找到节点的所有连接节点
+				edges.forEach((e) => {
+					const sourceID = e.getSourceCellId();
+					const targetID = e.getTargetCellId();
+					if (targetID === id) {
+						sourceNodes.push(sourceID);
+					}
+				});
+				// 获取到所有连接节点的type
+				const types = getNodeTypeById(graph, sourceNodes);
+				// todo: >= 2
+				if (types.filter((v) => v !== IImageTypes.SQL).length < 2) {
+				}
+				// if (cell.isNode()) {
+				// 	const ports = cell.getPorts();
+				// 	ports.forEach(({ id }) => {
+				// 		console.log('port props', cell.getPortProp(id || ''));
+				// 	});
+				// }
 			});
 			graph.bindKey(['meta+a', 'ctrl+a'], () => {
 				const nodes = graph.getNodes();

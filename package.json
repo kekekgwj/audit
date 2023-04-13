@@ -11,6 +11,7 @@
 		"prepare": "husky install"
 	},
 	"dependencies": {
+		"@ant-design/icons": "^5.0.1",
 		"@antv/g6": "^4.8.8",
 		"@antv/graphin": "^2.7.13",
 		"@antv/graphin-components": "^2.4.0",
@@ -21,6 +22,7 @@
 		"@antv/x6-plugin-snapline": "^2.1.6",
 		"@antv/x6-plugin-stencil": "^2.0.2",
 		"@reduxjs/toolkit": "^1.9.3",
+		"@upsetjs/react": "^1.11.0",
 		"antd": "^5.3.2",
 		"eslint-plugin": "^1.0.1",
 		"insert-css": "^2.0.0",
