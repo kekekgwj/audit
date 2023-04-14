@@ -75,6 +75,23 @@ const mockData: GraphinData = {
 					fill: '#ff9f0ea6'
 				}
 			}
+		},
+		{
+			id: 'node-3',
+
+			style: {
+				label: {
+					value: '我是node3',
+					position: 'center',
+					offset: [20, 5],
+					fill: 'green'
+				},
+				keyshape: {
+					size: 40,
+					stroke: '#ff9f0f',
+					fill: '#ff9f0ea6'
+				}
+			}
 		}
 	],
 	edges: [
@@ -85,6 +102,16 @@ const mockData: GraphinData = {
 			style: {
 				label: {
 					value: '我是边1'
+				}
+			}
+		},
+		{
+			id: 'edge-0-4',
+			source: 'node-0',
+			target: 'node-3',
+			style: {
+				label: {
+					value: '我是边4'
 				}
 			}
 		},

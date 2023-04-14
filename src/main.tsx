@@ -14,11 +14,11 @@ const router = createBrowserRouter([
 	// 	element: <Graph />
 	// }
 	{
-		path: '/',
+		path: '/realtionShip',
 		element: <RealtionShip />
 	},
 	{
-		path: '/algorithmMining',
+		path: '/',
 		element: <AlgorithmMining />
 	}
 ]);

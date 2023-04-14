@@ -60,6 +60,39 @@ const mockData: GraphinData = {
 					fill: '#ff9f0ea6'
 				}
 			}
+		},
+		{
+			id: 'node-3',
+
+			style: {
+				label: {
+					value: '我是node3',
+					position: 'center',
+					offset: [20, 5],
+					fill: 'green'
+				},
+				keyshape: {
+					size: 40,
+					stroke: '#ff9f0f',
+					fill: '#ff9f0ea6'
+				}
+			}
+		},
+		{
+			id: 'node-4',
+			style: {
+				label: {
+					value: '我是node4',
+					position: 'center',
+					offset: [20, 5],
+					fill: 'green'
+				},
+				keyshape: {
+					size: 40,
+					stroke: '#ff9f0f',
+					fill: '#ff9f0ea6'
+				}
+			}
 		}
 	],
 	edges: [
@@ -70,6 +103,16 @@ const mockData: GraphinData = {
 			style: {
 				label: {
 					value: '我是边1'
+				}
+			}
+		},
+		{
+			id: 'edge-0-3',
+			source: 'node-0',
+			target: 'node-3',
+			style: {
+				label: {
+					value: '我是边4'
 				}
 			}
 		},
@@ -96,6 +139,16 @@ const mockData: GraphinData = {
 					value: '我是边3'
 				}
 			}
+		},
+		{
+			id: 'edge-3-4',
+			source: 'node-3',
+			target: 'node-4',
+			style: {
+				label: {
+					value: '我是边5'
+				}
+			}
 		}
 	]
 };
@@ -114,7 +167,7 @@ const Algorithm = () => {
 			</div>
 			<div class="graphin-box">
 				<div>
-					<GraphinCom data={data}></GraphinCom>
+					<GraphinCom data={data} updateData={updateData}></GraphinCom>
 				</div>
 				<div class="save-box">
 					<Button
