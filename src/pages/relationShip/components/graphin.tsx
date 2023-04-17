@@ -5,7 +5,8 @@ import Graphin, {
 	GraphinContext,
 	IG6GraphEvent,
 	Components,
-	ContextMenuValue
+	ContextMenuValue,
+	type GraphinData
 } from '@antv/graphin';
 import { Menu, message } from 'antd';
 
@@ -163,7 +164,7 @@ interface Props {
 	data: Object;
 	updateData: (layout: any) => void;
 	onClose: () => void;
-	id: String;
+	id?: string;
 }
 
 const MyMenu = React.memo((props: Props) => {
@@ -188,8 +189,8 @@ const MyMenu = React.memo((props: Props) => {
 	const showChildNode = () => {
 		//对象数组去重
 		const removeDuplicateObj = (arr) => {
-			let newArr = [];
-			let obj = {};
+			const newArr = [];
+			const obj = {};
 			for (let i = 0; i < arr.length; i++) {
 				if (!obj[arr[i].id]) {
 					newArr.push(arr[i]);

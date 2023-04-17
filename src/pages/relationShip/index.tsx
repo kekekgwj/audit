@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import './relationship.less';
+import { Button } from 'antd';
+import { type GraphinData } from '@antv/graphin';
 import GraphinCom from './components/graphin';
 import SideBar from './components/sideBar';
-import { Button } from 'antd';
+import './relationship.less';
 
 const mockData: GraphinData = {
 	nodes: [
@@ -107,16 +108,21 @@ const RelationShipCom = () => {
 		console.log(value, 107777);
 		setDate(value);
 	};
+
 	return (
-		<div class="main-content">
+		<div className="main-content">
 			<div className="filter-bar">
 				<SideBar updateData={updateData}></SideBar>
 			</div>
-			<div class="graphin-box">
+			<div className="graphin-box">
 				<div>
-					<GraphinCom data={data} updateData={updateData}></GraphinCom>
+					<GraphinCom
+						data={data}
+						updateData={updateData}
+						onClose={() => {}}
+					></GraphinCom>
 				</div>
-				<div class="save-box">
+				<div className="save-box">
 					<Button
 						htmlType="button"
 						style={{ background: '#23955C', color: '#fff' }}
