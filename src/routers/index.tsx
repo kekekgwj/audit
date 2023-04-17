@@ -1,14 +1,21 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Graph from '../pages/graph';
-import RealtionShip from '../pages/relationShip';
-import React from 'react';
+import RealtionShip from '@/pages/relationShip';
+import AlgorithmMining from '@/pages/algorithmMining';
 export default createBrowserRouter([
 	// {
 	// 	path: '/',
 	// 	element: <Graph />
 	// },
+	// {
+	// 	path: '/realtionShip',
+	// 	element: <RealtionShip />
+	// },
 	{
-		path: '/realtionShip',
+		path: '/',
 		element: <RealtionShip />
+	},
+	{
+		path: '/algorithmMining',
+		element: <AlgorithmMining />
 	}
 ]);
