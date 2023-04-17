@@ -1,27 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import './index.css';
-import Graph from './pages/graph';
-import RealtionShip from './pages/relationShip';
-import AlgorithmMining from './pages/algorithmMining';
-import { store } from './redux/store';
-// import router from './routes/index';
 import { Provider } from 'react-redux';
-const router = createBrowserRouter([
-	// {
-	// 	path: '/',
-	// 	element: <Graph />
-	// }
-	{
-		path: '/',
-		element: <RealtionShip />
-	},
-	{
-		path: '/algorithmMining',
-		element: <AlgorithmMining />
-	}
-]);
+import { RouterProvider } from 'react-router-dom';
+import { store } from './redux/store';
+import router from './routers/index';
+import './index.css';
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	// <React.StrictMode>
 	<Provider store={store}>
