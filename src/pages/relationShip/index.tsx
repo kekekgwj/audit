@@ -104,6 +104,7 @@ const RelationShipCom = () => {
 	const [data, setDate] = React.useState(mockData);
 	// 更新数据
 	const updateData = (value) => {
+		console.log(value, 107777);
 		setDate(value);
 	};
 	return (
@@ -113,7 +114,7 @@ const RelationShipCom = () => {
 			</div>
 			<div class="graphin-box">
 				<div>
-					<GraphinCom data={data}></GraphinCom>
+					<GraphinCom data={data} updateData={updateData}></GraphinCom>
 				</div>
 				<div class="save-box">
 					<Button
