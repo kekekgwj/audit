@@ -2,6 +2,8 @@ import { Button, Form, Input, Select } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
 import React, { useMemo, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
+import classes from './index.module.less';
+
 const JoinConfig: React.FC = () => {
 	return (
 		<div>
@@ -34,7 +36,7 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 	};
 
 	return (
-		<div>
+		<div className={classes.filterGroupWrapper}>
 			<Select
 				options={options.leftSelect}
 				value={value.left}
