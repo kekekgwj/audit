@@ -161,15 +161,15 @@ const Algorithm = () => {
 		setDate(value);
 	};
 	return (
-		<div class="main-content">
+		<div className="main-content">
 			<div className="filter-bar">
 				<SideBar updateData={updateData}></SideBar>
 			</div>
-			<div class="graphin-box">
+			<div className="graphin-box">
 				<div>
 					<GraphinCom data={data} updateData={updateData}></GraphinCom>
 				</div>
-				<div class="save-box">
+				<div className="save-box">
 					<Button
 						htmlType="button"
 						style={{ background: '#23955C', color: '#fff' }}

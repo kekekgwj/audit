@@ -1,15 +1,12 @@
 import React, { useContext, useEffect } from 'react';
 import '../relationship.less';
-import Graphin, {
-	Behaviors,
-	GraphinContext,
-	IG6GraphEvent,
-	Components,
-	ContextMenuValue,
-	type GraphinData
-} from '@antv/graphin';
+import Graphin, { Components, type GraphinData } from '@antv/graphin';
+import type { LegendChildrenProps } from '@antv/graphin';
 import { Menu, message, Checkbox, Col, Row } from 'antd';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
+
+// 图例
+const { Legend } = Components;
 
 // 原始数据
 const mockData: GraphinData = {
@@ -18,6 +15,9 @@ const mockData: GraphinData = {
 			id: 'node-0',
 			x: 100,
 			y: 100,
+			data: {
+				type: 'centerPointer'
+			},
 			style: {
 				label: {
 					value: '我是node0',
@@ -36,6 +36,9 @@ const mockData: GraphinData = {
 			id: 'node-1',
 			x: 200,
 			y: 200,
+			data: {
+				type: 'project'
+			},
 			style: {
 				label: {
 					value: '我是node1',
@@ -54,6 +57,9 @@ const mockData: GraphinData = {
 			id: 'node-2',
 			x: 100,
 			y: 300,
+			data: {
+				type: 'project'
+			},
 			style: {
 				label: {
 					value: '我是node2',
@@ -70,7 +76,9 @@ const mockData: GraphinData = {
 		},
 		{
 			id: 'node-3',
-
+			data: {
+				type: 'person'
+			},
 			style: {
 				label: {
 					value: '我是node3',
@@ -87,6 +95,9 @@ const mockData: GraphinData = {
 		},
 		{
 			id: 'node-4',
+			data: {
+				type: 'person'
+			},
 			style: {
 				label: {
 					value: '我是node4',
@@ -190,6 +201,8 @@ const MyMenu = React.memo((props: Props) => {
 		console.log(relArr, 18444444);
 		setshowRel(true);
 	};
+
+	//隐藏节点
 	const hideNode = () => {
 		console.log(data, updateData, 222222);
 		const nodes = data.nodes.filter((item) => {
@@ -207,6 +220,7 @@ const MyMenu = React.memo((props: Props) => {
 		onClose();
 	};
 
+	//显示子节点
 	const showChildNode = () => {
 		//对象数组去重
 		const removeDuplicateObj = (arr) => {
@@ -252,6 +266,7 @@ const MyMenu = React.memo((props: Props) => {
 		onClose();
 	};
 
+	//右键菜单触发筛选
 	const onChange = (checkedValues: CheckboxValueType[]) => {
 		console.log('checked = ', checkedValues);
 		setCheckedRel(checkedValues);
@@ -333,13 +348,40 @@ const MyMenu = React.memo((props: Props) => {
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData } = props;
 	console.log(data, updateData, 544444);
+
+	//渲染样式及图例
+	const Color = {
+		centerPointer: {
+			primaryColor: '#f00'
+		},
+		project: {
+			primaryColor: '#0f0'
+		},
+		person: {
+			primaryColor: '#00f'
+		}
+	};
+
+	data.nodes.forEach((node, index) => {
+		const nodeType = node.data.type;
+		const { primaryColor } = Color[nodeType];
+		node.style.keyshape = {
+			...node.style.keyshape,
+			stroke: primaryColor,
+			fill: primaryColor,
+			fillOpacity: 1
+		};
+	});
+
+	console.log(data, 3833333);
+
 	return (
 		<Graphin data={data}>
 			<Tooltip bindType="node" placement={'top'}>
 				{(value: TooltipValue) => {
 					if (value.model) {
 						const { model } = value;
-						console.log(model.id, 421111111);
+						console.log(model, 421111111);
 						return (
 							<div>
 								<li> {model.id}</li>
@@ -377,6 +419,12 @@ const GraphinCom = React.memo((props: Props) => {
 					);
 				}}
 			</ContextMenu>
+			<Legend bindType="node" sortKey="data.type">
+				{(renderProps: LegendChildrenProps) => {
+					console.log('renderProps', renderProps);
+					return <Legend.Node {...renderProps} />;
+				}}
+			</Legend>
 		</Graphin>
 	);
 });

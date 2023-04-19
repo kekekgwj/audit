@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import {
 	Table,
 	Space,
@@ -21,8 +22,11 @@ import './atlas.less';
 // });
 
 const MyTableCom = React.memo(() => {
+	const navigate = useNavigate();
 	// 查看
-	const handleDetail = () => {};
+	const handleDetail = (row) => {
+		navigate('/altasDetail', { state: { id: row.id } });
+	};
 
 	// 删除
 	const handleDelete = () => {};
@@ -47,7 +51,7 @@ const MyTableCom = React.memo(() => {
 				return (
 					<div>
 						<span
-							onClick={() => handleDetail(row, record.key)}
+							onClick={() => handleDetail(row)}
 							style={{ cursor: 'pointer', marginRight: '10px' }}
 						>
 							<Space>
@@ -73,12 +77,14 @@ const MyTableCom = React.memo(() => {
 		{
 			key: '1',
 			ruleName: '胡彦斌111',
-			ruleUse: '西湖区湖底公园1号'
+			ruleUse: '西湖区湖底公园1号',
+			id: '111'
 		},
 		{
 			key: '2',
 			ruleName: '胡彦祖1111',
-			ruleUse: '西湖区湖底公园1号'
+			ruleUse: '西湖区湖底公园1号',
+			id: '222'
 		}
 	];
 	return (
