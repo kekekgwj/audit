@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-// import './relationship.less';
+import '../relationship.less';
 import Graphin, {
 	Behaviors,
 	GraphinContext,
@@ -8,7 +8,8 @@ import Graphin, {
 	ContextMenuValue,
 	type GraphinData
 } from '@antv/graphin';
-import { Menu, message } from 'antd';
+import { Menu, message, Checkbox, Col, Row } from 'antd';
+import type { CheckboxValueType } from 'antd/es/checkbox/Group';
 
 // 原始数据
 const mockData: GraphinData = {
@@ -147,9 +148,9 @@ const mockData: GraphinData = {
 			}
 		},
 		{
-			id: 'edge-2-0',
-			source: 'node-2',
-			target: 'node-0',
+			id: 'edge-0-2',
+			source: 'node-0',
+			target: 'node-2',
 			style: {
 				label: {
 					value: '我是边3'
@@ -169,6 +170,26 @@ interface Props {
 
 const MyMenu = React.memo((props: Props) => {
 	const { data, id, onClose, updateData } = props;
+	const [showRel, setshowRel] = React.useState(false);
+	const [relArr, setRelArr] = React.useState([]);
+	const [checkedRel, setCheckedRel] = React.useState([]);
+
+	// 关系筛选
+	const showRelationShip = (e) => {
+		console.log(e, 173333);
+		// 获取节点对应关系
+		const edges = data.edges.filter((item) => {
+			return item.source == id;
+		});
+		const arr = [];
+		edges.forEach((el) => {
+			arr.push(el.style.label.value);
+		});
+		// console.log(relArr, 184444);
+		setRelArr(arr);
+		console.log(relArr, 18444444);
+		setshowRel(true);
+	};
 	const hideNode = () => {
 		console.log(data, updateData, 222222);
 		const nodes = data.nodes.filter((item) => {
@@ -231,25 +252,81 @@ const MyMenu = React.memo((props: Props) => {
 		onClose();
 	};
 
+	const onChange = (checkedValues: CheckboxValueType[]) => {
+		console.log('checked = ', checkedValues);
+		setCheckedRel(checkedValues);
+		const tedges = data.edges.filter((item) => {
+			return item.source == id;
+		});
+
+		const otherEdges = data.edges.filter((item) => {
+			return item.source != id;
+		});
+
+		const filterEdges = [];
+		checkedValues.forEach((el) => {
+			tedges.find((item) => {
+				if (item.style.label.value == el) {
+					filterEdges.push(item);
+				}
+			});
+		});
+
+		const edges = [...otherEdges, ...filterEdges];
+		const nodes = [...data.nodes];
+		const newData = {
+			edges,
+			nodes
+		};
+		console.log(data, 2766666);
+		updateData(newData);
+	};
+
 	return (
-		<Menu>
-			<Menu.Item>关系筛选</Menu.Item>
-			<Menu.Item>穿透下一层</Menu.Item>
-			<Menu.Item
-				onClick={() => {
-					showChildNode();
-				}}
-			>
-				显示子节点
-			</Menu.Item>
-			<Menu.Item
-				onClick={() => {
-					hideNode();
-				}}
-			>
-				隐藏该节点
-			</Menu.Item>
-		</Menu>
+		<div style={{ position: 'relative' }}>
+			<Menu>
+				<Menu.Item
+					style={{ position: 'relative' }}
+					onClick={(e) => {
+						showRelationShip(e);
+					}}
+				>
+					关系筛选
+				</Menu.Item>
+				<Menu.Item>穿透下一层</Menu.Item>
+				<Menu.Item
+					onClick={() => {
+						showChildNode();
+					}}
+				>
+					显示子节点
+				</Menu.Item>
+				<Menu.Item
+					onClick={() => {
+						hideNode();
+					}}
+				>
+					隐藏该节点
+				</Menu.Item>
+			</Menu>
+			{showRel ? (
+				<div className="relationShipTip">
+					<Checkbox.Group
+						style={{ width: '100%' }}
+						onChange={onChange}
+						className="relationGroup"
+					>
+						<Row>
+							{relArr.map((item, index) => (
+								<Col span={24} key={index} className="relationItem">
+									<Checkbox value={item}>{item}</Checkbox>
+								</Col>
+							))}
+						</Row>
+					</Checkbox.Group>
+				</div>
+			) : null}
+		</div>
 	);
 });
 

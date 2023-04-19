@@ -23,6 +23,21 @@ const SideBar = React.memo((props: Props) => {
 	const searchUpdate = (res) => {
 		// 调用接口 获取帅选数据
 		console.log(res);
+		const specialOne = {
+			mainType: res.mainType,
+			mainName: res.mainName
+		};
+
+		const mainFilter = [specialOne, ...res.moreMain];
+		console.log(mainFilter, 3222222);
+
+		const searchData = {
+			mainFilter: mainFilter,
+			level: res.level,
+			relationshipType: res.relationshipType
+		};
+
+		console.log(searchData, 4000000000);
 		// 获取之后，更新视图数据
 		if (updateData) {
 			updateData({
@@ -156,15 +171,15 @@ const SideBar = React.memo((props: Props) => {
 							</div>
 							<Form.Item name="mainType" label="主体类型">
 								<Select placeholder="请选择" allowClear>
-									<Option value="male">male</Option>
-									<Option value="female">female</Option>
-									<Option value="other">other</Option>
+									<Select.Option value="supplier">供应商</Select.Option>
+									<Select.Option value="enterprise">企业</Select.Option>
+									<Select.Option value="preson">人员</Select.Option>
 								</Select>
 							</Form.Item>
 							<Form.Item name="mainName" label="主体名称">
 								<Input />
 							</Form.Item>
-							<Form.List name="users">
+							<Form.List name="moreMain">
 								{(fields, { add, remove }) => (
 									<>
 										{fields.map(({ key, name, ...restField }) => (
@@ -172,18 +187,22 @@ const SideBar = React.memo((props: Props) => {
 												<Form.Item
 													label="主体类型"
 													{...restField}
-													name={[name, 'first']}
+													name={[name, 'mainType']}
 												>
 													<Select placeholder="请选择" allowClear>
-														<Option value="male">male</Option>
-														<Option value="female">female</Option>
-														<Option value="other">other</Option>
+														<Select.Option value="supplier">
+															供应商
+														</Select.Option>
+														<Select.Option value="enterprise">
+															企业
+														</Select.Option>
+														<Select.Option value="preson">人员</Select.Option>
 													</Select>
 												</Form.Item>
 												<Form.Item
 													label="主体名称"
 													{...restField}
-													name={[name, 'last']}
+													name={[name, 'mainName']}
 												>
 													<Input placeholder="主体名称" />
 												</Form.Item>
@@ -251,7 +270,7 @@ const SideBar = React.memo((props: Props) => {
 								<span>关系层级</span>
 							</div>
 							<Form.Item
-								name="hierarchy"
+								name="level"
 								label="展示层级"
 								rules={[{ required: true }]}
 							>
@@ -270,9 +289,9 @@ const SideBar = React.memo((props: Props) => {
 							</div>
 							<Form.Item name="relationshipType" label="关系类型">
 								<Select placeholder="请选择" allowClear>
-									<Option value="male">male</Option>
-									<Option value="female">female</Option>
-									<Option value="other">other</Option>
+									<Select.Option value="manage">负责</Select.Option>
+									<Select.Option value="join">参与</Select.Option>
+									<Select.Option value="invite">招标</Select.Option>
 								</Select>
 							</Form.Item>
 						</div>

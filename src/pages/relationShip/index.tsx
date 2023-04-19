@@ -15,7 +15,7 @@ const mockData: GraphinData = {
 				label: {
 					value: '我是node0',
 					position: 'center',
-					offset: [20, 5],
+					offset: [20, 0],
 					fill: 'green'
 				},
 				keyshape: {
@@ -60,6 +60,39 @@ const mockData: GraphinData = {
 					fill: '#ff9f0ea6'
 				}
 			}
+		},
+		{
+			id: 'node-3',
+
+			style: {
+				label: {
+					value: '我是node3',
+					position: 'center',
+					offset: [20, 5],
+					fill: 'green'
+				},
+				keyshape: {
+					size: 40,
+					stroke: '#ff9f0f',
+					fill: '#ff9f0ea6'
+				}
+			}
+		},
+		{
+			id: 'node-4',
+			style: {
+				label: {
+					value: '我是node4',
+					position: 'center',
+					offset: [20, 0],
+					fill: 'green'
+				},
+				keyshape: {
+					size: 40,
+					stroke: '#ff9f0f',
+					fill: '#ff9f0ea6'
+				}
+			}
 		}
 	],
 	edges: [
@@ -70,6 +103,26 @@ const mockData: GraphinData = {
 			style: {
 				label: {
 					value: '我是边1'
+				}
+			}
+		},
+		{
+			id: 'edge-0-3',
+			source: 'node-0',
+			target: 'node-3',
+			style: {
+				label: {
+					value: '我是边4'
+				}
+			}
+		},
+		{
+			id: 'edge-3-4',
+			source: 'node-3',
+			target: 'node-4',
+			style: {
+				label: {
+					value: '我是边5'
 				}
 			}
 		},
@@ -88,9 +141,9 @@ const mockData: GraphinData = {
 			}
 		},
 		{
-			id: 'edge-2-0',
-			source: 'node-2',
-			target: 'node-0',
+			id: 'edge-0-2',
+			source: 'node-0',
+			target: 'node-2',
 			style: {
 				label: {
 					value: '我是边3'

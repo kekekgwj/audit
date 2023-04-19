@@ -37,6 +37,8 @@
 .filter-form {
 	box-sizing: border-box;
 	padding: 20px 14px;
+	height: calc(100vh - 40px);
+	overflow-y: auto;
 }
 .filter-item {
 	height: 22px;
@@ -54,4 +56,22 @@
 .filter-bar {
 	width: 330px;
 	box-shadow: 4px 0px 12px 0px rgba(66, 81, 112, 0.15);
+}
+
+.relationShipTip {
+	position: absolute;
+	top: 0;
+	right: 0;
+	transform: translateX(100%);
+	.relationGroup {
+		box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 12px;
+		background: rgb(255, 255, 255);
+	}
+	.relationItem {
+		box-sizing: border-box;
+		height: 40px;
+		margin: 4px;
+		padding: 0 16px;
+		line-height: 40px;
+	}
 }
