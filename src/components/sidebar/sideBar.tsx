@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-	Form,
-	Input,
-	Button,
-	Select,
-	InputNumber,
-	Space,
-	type SelectProps
-} from 'antd';
+import { Form, Input, Button, Select, InputNumber, Space } from 'antd';
 import { type GraphinData } from '@antv/graphin';
 import {
 	ApartmentOutlined,
@@ -303,9 +295,10 @@ export default (props: Props) => {
 						<Form.Item
 							name="leval"
 							label="展示层级"
+							initialValue={4}
 							rules={[{ required: true }]}
 						>
-							<InputNumber min={0} max={6} defaultValue={4} />
+							<InputNumber min={0} max={6} />
 						</Form.Item>
 					</div>
 
