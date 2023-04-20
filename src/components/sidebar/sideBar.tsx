@@ -69,120 +69,116 @@ export default (props: Props) => {
 
 	// 初始化表单数据
 	const initForm = () => {
-		form.setFieldValue('bodys', [
-			{
-				bodyType: undefined,
-				bodyName: undefined
-			}
-		]);
+		// form.setFieldValue('bodys', [
+		// 	{
+		// 		bodyType: undefined,
+		// 		bodyName: undefined
+		// 	}
+		// ]);
+		form.setFieldsValue({
+			bodys: [
+				{
+					bodyType: undefined,
+					bodyName: undefined
+				}
+			],
+			leval: 4
+		});
 	};
 
 	// 提交表单 获取数据
 	const searchUpdate = (res) => {
 		// 调用接口 获取帅选数据
 		console.log(res);
-		const specialOne = {
-			mainType: res.mainType,
-			mainName: res.mainName
-		};
 
-		const mainFilter = [specialOne, ...res.moreMain];
-		console.log(mainFilter, 3222222);
-
-		const searchData = {
-			mainFilter: mainFilter,
-			level: res.level,
-			relationshipType: res.relationshipType
-		};
-
-		console.log(searchData, 4000000000);
 		// 获取之后，更新视图数据
-		if (updateData) {
-			updateData({
-				nodes: [
-					{
-						id: 'node-0',
-						x: 100,
-						y: 100,
-						style: {
-							label: {
-								value: '我是node0',
-								position: 'center',
-								offset: [20, 5],
-								fill: 'green'
-							},
-							keyshape: {
-								size: 80,
-								stroke: '#ff9f0f',
-								fill: '#ff9f0ea6'
-							}
-						}
-					},
-					{
-						id: 'node-1',
-						x: 200,
-						y: 200,
-						style: {
-							label: {
-								value: '我是node1',
-								position: 'center',
-								offset: [20, 5],
-								fill: 'green'
-							},
-							keyshape: {
-								size: 60,
-								stroke: '#ff9f0f',
-								fill: '#ff9f0ea6'
-							}
-						}
-					},
-					{
-						id: 'node-2',
-						x: 100,
-						y: 300,
-						style: {
-							label: {
-								value: '我是node2',
-								position: 'center',
-								offset: [20, 5],
-								fill: 'green'
-							},
-							keyshape: {
-								size: 40,
-								stroke: '#ff9f0f',
-								fill: '#ff9f0ea6'
-							}
-						}
-					}
-				],
-				edges: [
-					{
-						id: 'edge-0-1',
-						source: 'node-0',
-						target: 'node-1',
-						style: {
-							label: {
-								value: '我是边1'
-							}
-						}
-					},
-					{
-						id: 'edge-1-2',
-						source: 'node-1',
-						target: 'node-2',
-						style: {
-							label: {
-								value: '我是边2'
-							},
-							keyshape: {
-								lineWidth: 5,
-								stroke: '#00f'
-							}
-						}
-					}
-				]
-			});
-		}
+		// updateData(res.data)
+		// if (updateData) {
+		// 	updateData({
+		// 		nodes: [
+		// 			{
+		// 				id: 'node-0',
+		// 				x: 100,
+		// 				y: 100,
+		// 				style: {
+		// 					label: {
+		// 						value: '我是node0',
+		// 						position: 'center',
+		// 						offset: [20, 5],
+		// 						fill: 'green'
+		// 					},
+		// 					keyshape: {
+		// 						size: 80,
+		// 						stroke: '#ff9f0f',
+		// 						fill: '#ff9f0ea6'
+		// 					}
+		// 				}
+		// 			},
+		// 			{
+		// 				id: 'node-1',
+		// 				x: 200,
+		// 				y: 200,
+		// 				style: {
+		// 					label: {
+		// 						value: '我是node1',
+		// 						position: 'center',
+		// 						offset: [20, 5],
+		// 						fill: 'green'
+		// 					},
+		// 					keyshape: {
+		// 						size: 60,
+		// 						stroke: '#ff9f0f',
+		// 						fill: '#ff9f0ea6'
+		// 					}
+		// 				}
+		// 			},
+		// 			{
+		// 				id: 'node-2',
+		// 				x: 100,
+		// 				y: 300,
+		// 				style: {
+		// 					label: {
+		// 						value: '我是node2',
+		// 						position: 'center',
+		// 						offset: [20, 5],
+		// 						fill: 'green'
+		// 					},
+		// 					keyshape: {
+		// 						size: 40,
+		// 						stroke: '#ff9f0f',
+		// 						fill: '#ff9f0ea6'
+		// 					}
+		// 				}
+		// 			}
+		// 		],
+		// 		edges: [
+		// 			{
+		// 				id: 'edge-0-1',
+		// 				source: 'node-0',
+		// 				target: 'node-1',
+		// 				style: {
+		// 					label: {
+		// 						value: '我是边1'
+		// 					}
+		// 				}
+		// 			},
+		// 			{
+		// 				id: 'edge-1-2',
+		// 				source: 'node-1',
+		// 				target: 'node-2',
+		// 				style: {
+		// 					label: {
+		// 						value: '我是边2'
+		// 					},
+		// 					keyshape: {
+		// 						lineWidth: 5,
+		// 						stroke: '#00f'
+		// 					}
+		// 				}
+		// 			}
+		// 		]
+		// 	});
+		// }
 	};
 
 	// 重置表单
@@ -297,7 +293,7 @@ export default (props: Props) => {
 							<span>关系层级</span>
 						</div>
 						<Form.Item
-							name="hierarchy"
+							name="leval"
 							label="展示层级"
 							initialValue={4}
 							rules={[{ required: true }]}
