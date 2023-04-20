@@ -1,9 +1,15 @@
-import React, { useContext, useEffect } from 'react';
-import '../relationship.less';
-import Graphin, { Components, type GraphinData } from '@antv/graphin';
+import React from 'react';
+import Graphin, {
+	Components,
+	type TooltipValue,
+	type GraphinData,
+	IUserEdge,
+	IUserNode
+} from '@antv/graphin';
 import type { LegendChildrenProps } from '@antv/graphin';
-import { Menu, message, Checkbox, Col, Row } from 'antd';
+import { Menu, Checkbox, Col, Row } from 'antd';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
+import styles from './index.module.less';
 
 // 图例
 const { Legend } = Components;
@@ -173,7 +179,7 @@ const mockData: GraphinData = {
 
 const { Tooltip, ContextMenu } = Components;
 interface Props {
-	data: Object;
+	data: GraphinData;
 	updateData: (layout: any) => void;
 	onClose: () => void;
 	id?: string;
@@ -182,29 +188,28 @@ interface Props {
 const MyMenu = React.memo((props: Props) => {
 	const { data, id, onClose, updateData } = props;
 	const [showRel, setshowRel] = React.useState(false);
-	const [relArr, setRelArr] = React.useState([]);
+	const [relArr, setRelArr] = React.useState(
+		Array<string | number | undefined>
+	);
 	const [checkedRel, setCheckedRel] = React.useState([]);
 
 	// 关系筛选
-	const showRelationShip = (e) => {
-		console.log(e, 173333);
+	const showRelationShip = () => {
 		// 获取节点对应关系
 		const edges = data.edges.filter((item) => {
 			return item.source == id;
 		});
-		const arr = [];
+		const arr: Array<string | number | undefined> = [];
 		edges.forEach((el) => {
 			arr.push(el.style.label.value);
 		});
 		// console.log(relArr, 184444);
 		setRelArr(arr);
-		console.log(relArr, 18444444);
 		setshowRel(true);
 	};
 
 	//隐藏节点
 	const hideNode = () => {
-		console.log(data, updateData, 222222);
 		const nodes = data.nodes.filter((item) => {
 			return item.id != id;
 		});
@@ -215,7 +220,6 @@ const MyMenu = React.memo((props: Props) => {
 			edges,
 			nodes
 		};
-		console.log(newData, 3222222222);
 		updateData(newData);
 		onClose();
 	};
@@ -223,7 +227,7 @@ const MyMenu = React.memo((props: Props) => {
 	//显示子节点
 	const showChildNode = () => {
 		//对象数组去重
-		const removeDuplicateObj = (arr) => {
+		const removeDuplicateObj = (arr: IUserNode[]) => {
 			const newArr = [];
 			const obj = {};
 			for (let i = 0; i < arr.length; i++) {
@@ -241,14 +245,14 @@ const MyMenu = React.memo((props: Props) => {
 		const tedges = mockData.edges.filter((item) => {
 			return item.source == id;
 		});
-		const nodesArr = []; //需要添加的节点
+		const nodesArr: IUserNode[] = []; //需要添加的节点
 		if (tedges && tedges.length > 0) {
 			tedges.forEach((el) => {
 				nodesArr.push(el.target);
 			});
 		}
 		const edges = removeDuplicateObj([...data.edges, ...tedges]);
-		const tnodes = [];
+		const tnodes: IUserNode[] = [];
 		nodesArr.forEach((el) => {
 			mockData.nodes.find((item) => {
 				if (item.id == el) {
@@ -278,7 +282,7 @@ const MyMenu = React.memo((props: Props) => {
 			return item.source != id;
 		});
 
-		const filterEdges = [];
+		const filterEdges: IUserEdge[] = [];
 		checkedValues.forEach((el) => {
 			tedges.find((item) => {
 				if (item.style.label.value == el) {
@@ -300,22 +304,11 @@ const MyMenu = React.memo((props: Props) => {
 	return (
 		<div style={{ position: 'relative' }}>
 			<Menu>
-				<Menu.Item
-					style={{ position: 'relative' }}
-					onClick={(e) => {
-						showRelationShip(e);
-					}}
-				>
+				<Menu.Item style={{ position: 'relative' }} onClick={showRelationShip}>
 					关系筛选
 				</Menu.Item>
 				<Menu.Item>穿透下一层</Menu.Item>
-				<Menu.Item
-					onClick={() => {
-						showChildNode();
-					}}
-				>
-					显示子节点
-				</Menu.Item>
+				<Menu.Item onClick={showChildNode}>显示子节点</Menu.Item>
 				<Menu.Item
 					onClick={() => {
 						hideNode();
@@ -325,15 +318,15 @@ const MyMenu = React.memo((props: Props) => {
 				</Menu.Item>
 			</Menu>
 			{showRel ? (
-				<div className="relationShipTip">
+				<div className={styles['relationShipTip']}>
 					<Checkbox.Group
 						style={{ width: '100%' }}
 						onChange={onChange}
-						className="relationGroup"
+						className={styles['relationGroup']}
 					>
 						<Row>
 							{relArr.map((item, index) => (
-								<Col span={24} key={index} className="relationItem">
+								<Col span={24} key={index} className={styles['relationItem']}>
 									<Checkbox value={item}>{item}</Checkbox>
 								</Col>
 							))}
@@ -363,7 +356,7 @@ const GraphinCom = React.memo((props: Props) => {
 	};
 
 	data.nodes.forEach((node, index) => {
-		const nodeType = node.data.type;
+		const nodeType: 'centerPointer' | 'project' | 'person' = node.data.type;
 		const { primaryColor } = Color[nodeType];
 		node.style.keyshape = {
 			...node.style.keyshape,
@@ -372,8 +365,6 @@ const GraphinCom = React.memo((props: Props) => {
 			fillOpacity: 1
 		};
 	});
-
-	console.log(data, 3833333);
 
 	return (
 		<Graphin data={data}>
@@ -398,7 +389,7 @@ const GraphinCom = React.memo((props: Props) => {
 						console.log(model, 42222222222);
 						return (
 							<div>
-								<li> {model.id}</li>
+								<li>{model.id}</li>
 							</div>
 						);
 					}
@@ -421,7 +412,6 @@ const GraphinCom = React.memo((props: Props) => {
 			</ContextMenu>
 			<Legend bindType="node" sortKey="data.type">
 				{(renderProps: LegendChildrenProps) => {
-					console.log('renderProps', renderProps);
 					return <Legend.Node {...renderProps} />;
 				}}
 			</Legend>

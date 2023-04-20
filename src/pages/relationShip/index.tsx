@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { Button } from 'antd';
 import { type GraphinData } from '@antv/graphin';
-import GraphinCom from './components/graphin';
-import SideBar from './components/sideBar';
-import './relationship.less';
+import GraphinCom from '../../components/graphin';
+import SideBar from '../../components/sidebar/sideBar';
+import styles from './index.module.less';
 
 const mockData: GraphinData = {
 	nodes: [
@@ -177,19 +177,19 @@ const RelationShipCom = () => {
 	};
 
 	return (
-		<div className="main-content">
-			<div className="filter-bar">
+		<div className={styles['main-content']}>
+			<div className={styles['filter-bar']}>
 				<SideBar updateData={updateData}></SideBar>
 			</div>
-			<div className="graphin-box">
-				<div>
+			<div className={styles['graphin-box']}>
+				<div className={styles['graphin-box__com']}>
 					<GraphinCom
 						data={data}
 						updateData={updateData}
 						onClose={() => {}}
 					></GraphinCom>
 				</div>
-				<div className="save-box">
+				<div className={styles['graphin-box__btn']}>
 					<Button
 						htmlType="button"
 						style={{ background: '#23955C', color: '#fff' }}

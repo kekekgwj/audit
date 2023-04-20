@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import './algorithm.less';
-import GraphinCom from '../relationShip/components/graphin';
+// import './algorithm.less';
+import GraphinCom from '../../components/graphin';
 import SideBar from './components/sideBar';
 
 import { Button } from 'antd';

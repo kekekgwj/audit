@@ -1,0 +1,30 @@
+.relationShipTip {
+	position: absolute;
+	top: 0;
+	right: 0;
+	transform: translateX(100%);
+	.relationGroup {
+		box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 12px;
+		background: rgb(255, 255, 255);
+	}
+	.relationItem {
+		box-sizing: border-box;
+		height: 40px;
+		margin: 4px;
+		padding: 0 16px;
+		line-height: 40px;
+	}
+}
+
+:global {
+	.graphin-components-legend {
+		position: absolute !important;
+		top: auto !important;
+		right: auto !important;
+		left: 0 !important;
+		bottom: 0 !important;
+		ul.graphin-components-legend-content li.item {
+			display: block !important;
+		}
+	}
+}
