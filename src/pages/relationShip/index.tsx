@@ -11,11 +11,14 @@ const mockData: GraphinData = {
 			id: 'node-0',
 			x: 100,
 			y: 100,
+			data: {
+				type: 'centerPointer'
+			},
 			style: {
 				label: {
-					value: '我是node0',
+					value: '我是\nnode0',
 					position: 'center',
-					offset: [20, 5],
+					offset: [0, 0],
 					fill: 'green'
 				},
 				keyshape: {
@@ -29,11 +32,14 @@ const mockData: GraphinData = {
 			id: 'node-1',
 			x: 200,
 			y: 200,
+			data: {
+				type: 'project'
+			},
 			style: {
 				label: {
 					value: '我是node1',
 					position: 'center',
-					offset: [20, 5],
+					offset: [0, 5],
 					fill: 'green'
 				},
 				keyshape: {
@@ -47,11 +53,52 @@ const mockData: GraphinData = {
 			id: 'node-2',
 			x: 100,
 			y: 300,
+			data: {
+				type: 'project'
+			},
 			style: {
 				label: {
 					value: '我是node2',
 					position: 'center',
 					offset: [20, 5],
+					fill: 'green'
+				},
+				keyshape: {
+					size: 40,
+					stroke: '#ff9f0f',
+					fill: '#ff9f0ea6'
+				}
+			}
+		},
+		{
+			id: 'node-3',
+			data: {
+				type: 'person'
+			},
+			style: {
+				label: {
+					value: '我是node3',
+					position: 'center',
+					offset: [20, 5],
+					fill: 'green'
+				},
+				keyshape: {
+					size: 40,
+					stroke: '#ff9f0f',
+					fill: '#ff9f0ea6'
+				}
+			}
+		},
+		{
+			id: 'node-4',
+			data: {
+				type: 'person'
+			},
+			style: {
+				label: {
+					value: '我是node4',
+					position: 'center',
+					offset: [20, 0],
 					fill: 'green'
 				},
 				keyshape: {
@@ -74,6 +121,26 @@ const mockData: GraphinData = {
 			}
 		},
 		{
+			id: 'edge-0-3',
+			source: 'node-0',
+			target: 'node-3',
+			style: {
+				label: {
+					value: '我是边4'
+				}
+			}
+		},
+		{
+			id: 'edge-3-4',
+			source: 'node-3',
+			target: 'node-4',
+			style: {
+				label: {
+					value: '我是边5'
+				}
+			}
+		},
+		{
 			id: 'edge-1-2',
 			source: 'node-1',
 			target: 'node-2',
@@ -88,9 +155,9 @@ const mockData: GraphinData = {
 			}
 		},
 		{
-			id: 'edge-2-0',
-			source: 'node-2',
-			target: 'node-0',
+			id: 'edge-0-2',
+			source: 'node-0',
+			target: 'node-2',
 			style: {
 				label: {
 					value: '我是边3'

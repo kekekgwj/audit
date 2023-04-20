@@ -89,6 +89,21 @@ export default (props: Props) => {
 	const searchUpdate = (res) => {
 		// 调用接口 获取帅选数据
 		console.log(res);
+		const specialOne = {
+			mainType: res.mainType,
+			mainName: res.mainName
+		};
+
+		const mainFilter = [specialOne, ...res.moreMain];
+		console.log(mainFilter, 3222222);
+
+		const searchData = {
+			mainFilter: mainFilter,
+			level: res.level,
+			relationshipType: res.relationshipType
+		};
+
+		console.log(searchData, 4000000000);
 		// 获取之后，更新视图数据
 		if (updateData) {
 			updateData({

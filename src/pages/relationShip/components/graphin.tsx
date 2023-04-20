@@ -1,14 +1,12 @@
 import React, { useContext, useEffect } from 'react';
-// import './relationship.less';
-import Graphin, {
-	Behaviors,
-	GraphinContext,
-	IG6GraphEvent,
-	Components,
-	ContextMenuValue,
-	type GraphinData
-} from '@antv/graphin';
-import { Menu, message } from 'antd';
+import '../relationship.less';
+import Graphin, { Components, type GraphinData } from '@antv/graphin';
+import type { LegendChildrenProps } from '@antv/graphin';
+import { Menu, message, Checkbox, Col, Row } from 'antd';
+import type { CheckboxValueType } from 'antd/es/checkbox/Group';
+
+// 图例
+const { Legend } = Components;
 
 // 原始数据
 const mockData: GraphinData = {
@@ -17,6 +15,9 @@ const mockData: GraphinData = {
 			id: 'node-0',
 			x: 100,
 			y: 100,
+			data: {
+				type: 'centerPointer'
+			},
 			style: {
 				label: {
 					value: '我是node0',
@@ -35,6 +36,9 @@ const mockData: GraphinData = {
 			id: 'node-1',
 			x: 200,
 			y: 200,
+			data: {
+				type: 'project'
+			},
 			style: {
 				label: {
 					value: '我是node1',
@@ -53,6 +57,9 @@ const mockData: GraphinData = {
 			id: 'node-2',
 			x: 100,
 			y: 300,
+			data: {
+				type: 'project'
+			},
 			style: {
 				label: {
 					value: '我是node2',
@@ -69,7 +76,9 @@ const mockData: GraphinData = {
 		},
 		{
 			id: 'node-3',
-
+			data: {
+				type: 'person'
+			},
 			style: {
 				label: {
 					value: '我是node3',
@@ -86,6 +95,9 @@ const mockData: GraphinData = {
 		},
 		{
 			id: 'node-4',
+			data: {
+				type: 'person'
+			},
 			style: {
 				label: {
 					value: '我是node4',
@@ -147,9 +159,9 @@ const mockData: GraphinData = {
 			}
 		},
 		{
-			id: 'edge-2-0',
-			source: 'node-2',
-			target: 'node-0',
+			id: 'edge-0-2',
+			source: 'node-0',
+			target: 'node-2',
 			style: {
 				label: {
 					value: '我是边3'
@@ -169,6 +181,28 @@ interface Props {
 
 const MyMenu = React.memo((props: Props) => {
 	const { data, id, onClose, updateData } = props;
+	const [showRel, setshowRel] = React.useState(false);
+	const [relArr, setRelArr] = React.useState([]);
+	const [checkedRel, setCheckedRel] = React.useState([]);
+
+	// 关系筛选
+	const showRelationShip = (e) => {
+		console.log(e, 173333);
+		// 获取节点对应关系
+		const edges = data.edges.filter((item) => {
+			return item.source == id;
+		});
+		const arr = [];
+		edges.forEach((el) => {
+			arr.push(el.style.label.value);
+		});
+		// console.log(relArr, 184444);
+		setRelArr(arr);
+		console.log(relArr, 18444444);
+		setshowRel(true);
+	};
+
+	//隐藏节点
 	const hideNode = () => {
 		console.log(data, updateData, 222222);
 		const nodes = data.nodes.filter((item) => {
@@ -186,6 +220,7 @@ const MyMenu = React.memo((props: Props) => {
 		onClose();
 	};
 
+	//显示子节点
 	const showChildNode = () => {
 		//对象数组去重
 		const removeDuplicateObj = (arr) => {
@@ -231,38 +266,122 @@ const MyMenu = React.memo((props: Props) => {
 		onClose();
 	};
 
+	//右键菜单触发筛选
+	const onChange = (checkedValues: CheckboxValueType[]) => {
+		console.log('checked = ', checkedValues);
+		setCheckedRel(checkedValues);
+		const tedges = data.edges.filter((item) => {
+			return item.source == id;
+		});
+
+		const otherEdges = data.edges.filter((item) => {
+			return item.source != id;
+		});
+
+		const filterEdges = [];
+		checkedValues.forEach((el) => {
+			tedges.find((item) => {
+				if (item.style.label.value == el) {
+					filterEdges.push(item);
+				}
+			});
+		});
+
+		const edges = [...otherEdges, ...filterEdges];
+		const nodes = [...data.nodes];
+		const newData = {
+			edges,
+			nodes
+		};
+		console.log(data, 2766666);
+		updateData(newData);
+	};
+
 	return (
-		<Menu>
-			<Menu.Item>关系筛选</Menu.Item>
-			<Menu.Item>穿透下一层</Menu.Item>
-			<Menu.Item
-				onClick={() => {
-					showChildNode();
-				}}
-			>
-				显示子节点
-			</Menu.Item>
-			<Menu.Item
-				onClick={() => {
-					hideNode();
-				}}
-			>
-				隐藏该节点
-			</Menu.Item>
-		</Menu>
+		<div style={{ position: 'relative' }}>
+			<Menu>
+				<Menu.Item
+					style={{ position: 'relative' }}
+					onClick={(e) => {
+						showRelationShip(e);
+					}}
+				>
+					关系筛选
+				</Menu.Item>
+				<Menu.Item>穿透下一层</Menu.Item>
+				<Menu.Item
+					onClick={() => {
+						showChildNode();
+					}}
+				>
+					显示子节点
+				</Menu.Item>
+				<Menu.Item
+					onClick={() => {
+						hideNode();
+					}}
+				>
+					隐藏该节点
+				</Menu.Item>
+			</Menu>
+			{showRel ? (
+				<div className="relationShipTip">
+					<Checkbox.Group
+						style={{ width: '100%' }}
+						onChange={onChange}
+						className="relationGroup"
+					>
+						<Row>
+							{relArr.map((item, index) => (
+								<Col span={24} key={index} className="relationItem">
+									<Checkbox value={item}>{item}</Checkbox>
+								</Col>
+							))}
+						</Row>
+					</Checkbox.Group>
+				</div>
+			) : null}
+		</div>
 	);
 });
 
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData } = props;
 	console.log(data, updateData, 544444);
+
+	//渲染样式及图例
+	const Color = {
+		centerPointer: {
+			primaryColor: '#f00'
+		},
+		project: {
+			primaryColor: '#0f0'
+		},
+		person: {
+			primaryColor: '#00f'
+		}
+	};
+
+	data.nodes.forEach((node, index) => {
+		const nodeType = node.data.type;
+		const { primaryColor } = Color[nodeType];
+		node.style.keyshape = {
+			...node.style.keyshape,
+			stroke: primaryColor,
+			fill: primaryColor,
+			fillOpacity: 1
+		};
+	});
+
+	console.log(data, 3833333);
+
 	return (
 		<Graphin data={data}>
 			<Tooltip bindType="node" placement={'top'}>
 				{(value: TooltipValue) => {
 					if (value.model) {
 						const { model } = value;
-						console.log(model.id, 421111111);
+						console.log(model, 421111111);
 						return (
 							<div>
 								<li> {model.id}</li>
@@ -300,6 +419,12 @@ const GraphinCom = React.memo((props: Props) => {
 					);
 				}}
 			</ContextMenu>
+			<Legend bindType="node" sortKey="data.type">
+				{(renderProps: LegendChildrenProps) => {
+					console.log('renderProps', renderProps);
+					return <Legend.Node {...renderProps} />;
+				}}
+			</Legend>
 		</Graphin>
 	);
 });
