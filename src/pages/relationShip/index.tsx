@@ -171,7 +171,7 @@ const RelationShipCom = () => {
 	// 数据来源
 	const [data, setDate] = React.useState(mockData);
 	// 更新数据
-	const updateData = (value) => {
+	const updateData = (value: GraphinData) => {
 		console.log(value, 107777);
 		setDate(value);
 	};

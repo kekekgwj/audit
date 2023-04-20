@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, Store, Dispatch } from '@reduxjs/toolkit';
 import rootReducer from './reducers';
 
 function configureAppStore() {
@@ -7,8 +7,6 @@ function configureAppStore() {
 	});
 	return store;
 }
-import { Store } from '@reduxjs/toolkit';
-import { Dispatch } from '@reduxjs/toolkit';
 
 export const store: Store = configureAppStore();
 export const dispatch: Dispatch = store.dispatch;
