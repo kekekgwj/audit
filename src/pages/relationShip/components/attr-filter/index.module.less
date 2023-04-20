@@ -1,0 +1,42 @@
+.fillter-attr-box {
+	&__title {
+		margin-bottom: 10px;
+		font-size: 14px;
+		font-weight: bold;
+	}
+	.attr-item {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		margin-bottom: 10px;
+		&:last-child {
+			margin-bottom: 0;
+		}
+		&__checkbox {
+			flex: 0 0 auto;
+			margin-right: 10px;
+		}
+		&__value {
+			flex: 1 1 auto;
+		}
+	}
+}
+
+.fillter-dialog__top {
+	display: flex;
+
+	.fillter-tree {
+		flex: 1 1 auto;
+		padding-right: 10px;
+		border-right: 1px solid #ccc;
+		&-title {
+			display: flex;
+			align-items: center;
+			white-space: nowrap;
+		}
+	}
+	.fillter-attr {
+		width: 400px;
+		padding-left: 20px;
+	}
+}

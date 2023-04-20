@@ -28,5 +28,12 @@ export default defineConfig({
 		// 		rewrite: (p) => p.replace(/^\/dev-api/, '')
 		// 	},
 		// }
+	},
+	css: {
+		preprocessorOptions: {
+			less: {
+				javascriptEnbled: true
+			}
+		}
 	}
 });
