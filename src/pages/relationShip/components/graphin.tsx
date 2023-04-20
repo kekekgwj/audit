@@ -177,7 +177,20 @@ interface Props {
 	updateData: (layout: any) => void;
 	onClose: () => void;
 	id?: string;
+	nodeModel: Object;
 }
+
+const NodeDetail = React.memo((props: Props) => {
+	const { nodeModel } = props;
+	console.log(nodeModel, 18555555555555);
+	return (
+		<div>
+			<div>节点详情</div>
+			<div>节点id:{nodeModel.id}</div>
+			<div>节点id:{nodeModel.id}</div>
+		</div>
+	);
+});
 
 const MyMenu = React.memo((props: Props) => {
 	const { data, id, onClose, updateData } = props;
@@ -383,9 +396,10 @@ const GraphinCom = React.memo((props: Props) => {
 						const { model } = value;
 						console.log(model, 421111111);
 						return (
-							<div>
-								<li> {model.id}</li>
-							</div>
+							// <div>
+							// 	<li> {model.id}</li>
+							// </div>
+							<NodeDetail nodeModel={model} />
 						);
 					}
 					return null;
