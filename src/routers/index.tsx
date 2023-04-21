@@ -4,6 +4,7 @@ import AlgorithmMining from '@/pages/algorithmMining';
 import MyAtlas from '@/pages/myAtlas';
 import AltasDetail from '@/pages/myAtlas/detail';
 import SuspiciousRule from '@/pages/suspiciousRule';
+import WhiteList from '@/pages/whiteList';
 export default createBrowserRouter([
 	{
 		path: '/',
@@ -24,5 +25,9 @@ export default createBrowserRouter([
 	{
 		path: '/altasDetail',
 		element: <AltasDetail />
+	},
+	{
+		path: '/whiteList',
+		element: <WhiteList />
 	}
 ]);

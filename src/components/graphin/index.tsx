@@ -16,8 +16,8 @@ import { ModelConfig } from '@antv/g6';
 // 注册自定义节点
 registerNodes('all');
 
-// 图例
-const { Legend } = Components;
+//功能组件
+const { Tooltip, ContextMenu, Legend } = Components;
 
 // 原始数据
 const mockData: GraphinData = {
@@ -182,7 +182,6 @@ const mockData: GraphinData = {
 	]
 };
 
-const { Tooltip, ContextMenu } = Components;
 interface Props {
 	data: GraphinData;
 	updateData: (layout: any) => void;
@@ -197,147 +196,152 @@ interface NodeDetailProps {
 const NodeDetail = React.memo((props: NodeDetailProps) => {
 	const { nodeModel } = props;
 	return (
-		<div>
-			<div>节点详情</div>
-			<div>节点id:{nodeModel.id as string}</div>
-			<div>节点id:{nodeModel.id as string}</div>
+		<div className={styles['node-detail-box']}>
+			<div className={styles['node-detail-item']}>
+				<span className={styles['detail-item-title']}>节点id:</span>
+				{nodeModel.id as string}
+			</div>
+			<div className={styles['node-detail-item']}>
+				<span className={styles['detail-item-title']}>节点id:</span>
+				{nodeModel.id as string}
+			</div>
 		</div>
 	);
 });
 
 const MyMenu = React.memo((props: Props) => {
 	const { data, id, onClose, updateData } = props;
-	const [showRel, setshowRel] = React.useState(false);
-	const [relArr, setRelArr] = React.useState(
-		Array<string | number | undefined>
-	);
-	const [checkedRel, setCheckedRel] = React.useState([]);
+	// const [showRel, setshowRel] = React.useState(false);
+	// const [relArr, setRelArr] = React.useState(
+	// 	Array<string | number | undefined>
+	// );
+	// const [checkedRel, setCheckedRel] = React.useState([]);
 
 	// 关系筛选
-	const showRelationShip = () => {
-		// 获取节点对应关系
-		const edges = data.edges.filter((item) => {
-			return item.source == id;
-		});
-		const arr: Array<string | number | undefined> = [];
-		edges.forEach((el) => {
-			arr.push(el.style.label.value);
-		});
-		// console.log(relArr, 184444);
-		setRelArr(arr);
-		setshowRel(true);
-	};
+	// const showRelationShip = () => {
+	// 	// 获取节点对应关系
+	// 	const edges = data.edges.filter((item) => {
+	// 		return item.source == id;
+	// 	});
+	// 	const arr: Array<string | number | undefined> = [];
+	// 	edges.forEach((el) => {
+	// 		arr.push(el.style.label.value);
+	// 	});
+	// 	// console.log(relArr, 184444);
+	// 	setRelArr(arr);
+	// 	setshowRel(true);
+	// };
 
 	//隐藏节点
-	const hideNode = () => {
-		const nodes = data.nodes.filter((item) => {
-			return item.id != id;
-		});
-		const edges = data.edges.filter((item) => {
-			return item.source != id && item.target != id;
-		});
-		const newData = {
-			edges,
-			nodes
-		};
-		updateData(newData);
-		onClose();
-	};
+	// const hideNode = () => {
+	// 	const nodes = data.nodes.filter((item) => {
+	// 		return item.id != id;
+	// 	});
+	// 	const edges = data.edges.filter((item) => {
+	// 		return item.source != id && item.target != id;
+	// 	});
+	// 	const newData = {
+	// 		edges,
+	// 		nodes
+	// 	};
+	// 	updateData(newData);
+	// 	onClose();
+	// };
 
 	//显示子节点
-	const showChildNode = () => {
-		//对象数组去重
-		const removeDuplicateObj = (arr: IUserNode[]) => {
-			const newArr = [];
-			const obj = {};
-			for (let i = 0; i < arr.length; i++) {
-				if (!obj[arr[i].id]) {
-					newArr.push(arr[i]);
-					obj[arr[i].id] = true;
-				}
-			}
-			return newArr;
-		};
+	// const showChildNode = () => {
+	// 	//对象数组去重
+	// 	const removeDuplicateObj = (arr: IUserNode[]) => {
+	// 		const newArr = [];
+	// 		const obj = {};
+	// 		for (let i = 0; i < arr.length; i++) {
+	// 			if (!obj[arr[i].id]) {
+	// 				newArr.push(arr[i]);
+	// 				obj[arr[i].id] = true;
+	// 			}
+	// 		}
+	// 		return newArr;
+	// 	};
 
-		// 获取原始数据？要这么麻烦吗......
-		console.log(data, 13888888);
-		// 需要添加的边
-		const tedges = mockData.edges.filter((item) => {
-			return item.source == id;
-		});
-		const nodesArr: IUserNode[] = []; //需要添加的节点
-		if (tedges && tedges.length > 0) {
-			tedges.forEach((el) => {
-				nodesArr.push(el.target);
-			});
-		}
-		const edges = removeDuplicateObj([...data.edges, ...tedges]);
-		const tnodes: IUserNode[] = [];
-		nodesArr.forEach((el) => {
-			mockData.nodes.find((item) => {
-				if (item.id == el) {
-					tnodes.push(item);
-				}
-			});
-		});
+	// 	// 获取原始数据？要这么麻烦吗......
+	// 	console.log(data, 13888888);
+	// 	// 需要添加的边
+	// 	const tedges = mockData.edges.filter((item) => {
+	// 		return item.source == id;
+	// 	});
+	// 	const nodesArr: IUserNode[] = []; //需要添加的节点
+	// 	if (tedges && tedges.length > 0) {
+	// 		tedges.forEach((el) => {
+	// 			nodesArr.push(el.target);
+	// 		});
+	// 	}
+	// 	const edges = removeDuplicateObj([...data.edges, ...tedges]);
+	// 	const tnodes: IUserNode[] = [];
+	// 	nodesArr.forEach((el) => {
+	// 		mockData.nodes.find((item) => {
+	// 			if (item.id == el) {
+	// 				tnodes.push(item);
+	// 			}
+	// 		});
+	// 	});
 
-		const nodes = removeDuplicateObj([...data.nodes, ...tnodes]);
-		const newData = {
-			nodes,
-			edges
-		};
-		updateData(newData);
-		onClose();
-	};
+	// 	const nodes = removeDuplicateObj([...data.nodes, ...tnodes]);
+	// 	const newData = {
+	// 		nodes,
+	// 		edges
+	// 	};
+	// 	updateData(newData);
+	// 	onClose();
+	// };
 
 	//右键菜单触发筛选
-	const onChange = (checkedValues: CheckboxValueType[]) => {
-		console.log('checked = ', checkedValues);
-		setCheckedRel(checkedValues);
-		const tedges = data.edges.filter((item) => {
-			return item.source == id;
-		});
+	// const onChange = (checkedValues: CheckboxValueType[]) => {
+	// 	console.log('checked = ', checkedValues);
+	// 	setCheckedRel(checkedValues);
+	// 	const tedges = data.edges.filter((item) => {
+	// 		return item.source == id;
+	// 	});
 
-		const otherEdges = data.edges.filter((item) => {
-			return item.source != id;
-		});
+	// 	const otherEdges = data.edges.filter((item) => {
+	// 		return item.source != id;
+	// 	});
 
-		const filterEdges: IUserEdge[] = [];
-		checkedValues.forEach((el) => {
-			tedges.find((item) => {
-				if (item.style.label.value == el) {
-					filterEdges.push(item);
-				}
-			});
-		});
+	// 	const filterEdges: IUserEdge[] = [];
+	// 	checkedValues.forEach((el) => {
+	// 		tedges.find((item) => {
+	// 			if (item.style.label.value == el) {
+	// 				filterEdges.push(item);
+	// 			}
+	// 		});
+	// 	});
 
-		const edges = [...otherEdges, ...filterEdges];
-		const nodes = [...data.nodes];
-		const newData = {
-			edges,
-			nodes
-		};
-		console.log(data, 2766666);
-		updateData(newData);
-	};
+	// 	const edges = [...otherEdges, ...filterEdges];
+	// 	const nodes = [...data.nodes];
+	// 	const newData = {
+	// 		edges,
+	// 		nodes
+	// 	};
+	// 	console.log(data, 2766666);
+	// 	updateData(newData);
+	// };
 
 	return (
 		<div style={{ position: 'relative' }}>
 			<Menu>
-				<Menu.Item style={{ position: 'relative' }} onClick={showRelationShip}>
+				{/* <Menu.Item style={{ position: 'relative' }} onClick={showRelationShip}>
 					关系筛选
-				</Menu.Item>
+				</Menu.Item> */}
 				<Menu.Item>穿透下一层</Menu.Item>
-				<Menu.Item onClick={showChildNode}>显示子节点</Menu.Item>
+				{/* <Menu.Item onClick={showChildNode}>显示子节点</Menu.Item>
 				<Menu.Item
 					onClick={() => {
 						hideNode();
 					}}
 				>
 					隐藏该节点
-				</Menu.Item>
+				</Menu.Item> */}
 			</Menu>
-			{showRel ? (
+			{/* {showRel ? (
 				<div className={styles['relationShipTip']}>
 					<Checkbox.Group
 						style={{ width: '100%' }}
@@ -353,7 +357,7 @@ const MyMenu = React.memo((props: Props) => {
 						</Row>
 					</Checkbox.Group>
 				</div>
-			) : null}
+			) : null} */}
 		</div>
 	);
 });
@@ -368,12 +372,7 @@ const GraphinCom = React.memo((props: Props) => {
 					if (value.model) {
 						const { model } = value;
 						console.log(model, 421111111);
-						return (
-							// <div>
-							// 	<li> {model.id}</li>
-							// </div>
-							<NodeDetail nodeModel={model} />
-						);
+						return <NodeDetail nodeModel={model} />;
 					}
 					return null;
 				}}
@@ -383,11 +382,7 @@ const GraphinCom = React.memo((props: Props) => {
 					if (value.model) {
 						const { model } = value;
 						console.log(model, 42222222222);
-						return (
-							<div>
-								<li>{model.id}</li>
-							</div>
-						);
+						return <NodeDetail nodeModel={model} />;
 					}
 					return null;
 				}}
