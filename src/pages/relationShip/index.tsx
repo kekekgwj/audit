@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Button } from 'antd';
 import { type GraphinData } from '@antv/graphin';
-import GraphinCom from '../../components/graphin';
-import SideBar from '../../components/sidebar/sideBar';
+import GraphinCom from '@/components/graphin';
+import SideBar from '@/components/sidebar/sideBar';
 import styles from './index.module.less';
 import html2canvas from 'html2canvas';
 
@@ -10,24 +10,7 @@ const mockData: GraphinData = {
 	nodes: [
 		{
 			id: 'node-0',
-			x: 100,
-			y: 100,
-			data: {
-				type: 'centerPointer'
-			},
-			style: {
-				label: {
-					value: '我是\nnode0',
-					position: 'center',
-					offset: [0, 0],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 80,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
+			type: 'custom-node'
 		},
 		{
 			id: 'node-1',

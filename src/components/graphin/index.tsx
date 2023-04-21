@@ -3,13 +3,18 @@ import Graphin, {
 	Components,
 	type TooltipValue,
 	type GraphinData,
+	type LegendChildrenProps,
 	IUserEdge,
 	IUserNode
 } from '@antv/graphin';
-import type { LegendChildrenProps } from '@antv/graphin';
 import { Menu, Checkbox, Col, Row } from 'antd';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
+import registerNodes from './custom-node';
 import styles from './index.module.less';
+import { ModelConfig } from '@antv/g6';
+
+// 注册自定义节点
+registerNodes('all');
 
 // 图例
 const { Legend } = Components;
@@ -183,17 +188,19 @@ interface Props {
 	updateData: (layout: any) => void;
 	onClose: () => void;
 	id?: string;
-	nodeModel: Object;
 }
 
-const NodeDetail = React.memo((props: Props) => {
+interface NodeDetailProps {
+	nodeModel: ModelConfig;
+}
+
+const NodeDetail = React.memo((props: NodeDetailProps) => {
 	const { nodeModel } = props;
-	console.log(nodeModel, 18555555555555);
 	return (
 		<div>
 			<div>节点详情</div>
-			<div>节点id:{nodeModel.id}</div>
-			<div>节点id:{nodeModel.id}</div>
+			<div>节点id:{nodeModel.id as string}</div>
+			<div>节点id:{nodeModel.id as string}</div>
 		</div>
 	);
 });
@@ -353,31 +360,6 @@ const MyMenu = React.memo((props: Props) => {
 
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData } = props;
-	console.log(data, updateData, 544444);
-
-	//渲染样式及图例
-	const Color = {
-		centerPointer: {
-			primaryColor: '#f00'
-		},
-		project: {
-			primaryColor: '#0f0'
-		},
-		person: {
-			primaryColor: '#00f'
-		}
-	};
-
-	data.nodes.forEach((node, index) => {
-		const nodeType: 'centerPointer' | 'project' | 'person' = node.data.type;
-		const { primaryColor } = Color[nodeType];
-		node.style.keyshape = {
-			...node.style.keyshape,
-			stroke: primaryColor,
-			fill: primaryColor,
-			fillOpacity: 1
-		};
-	});
 
 	return (
 		<Graphin data={data}>
@@ -424,8 +406,9 @@ const GraphinCom = React.memo((props: Props) => {
 					);
 				}}
 			</ContextMenu>
-			<Legend bindType="node" sortKey="data.type">
+			<Legend bindType="node" sortKey="type">
 				{(renderProps: LegendChildrenProps) => {
+					console.log('renderProps', renderProps);
 					return <Legend.Node {...renderProps} />;
 				}}
 			</Legend>
