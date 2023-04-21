@@ -12,11 +12,10 @@ import {
 import {
 	PlayCircleOutlined,
 	MinusCircleOutlined,
-	PlusCircleOutlined
+	PlusCircleOutlined,
+	CloseCircleOutlined
 } from '@ant-design/icons';
-import { ConfigProvider } from 'antd';
-import zhCN from 'antd/lib/locale/zh_CN';
-import './rule.less';
+import styles from './index.module.less';
 
 // 使用弹框
 interface Props {
@@ -26,18 +25,52 @@ interface Props {
 	curRow: {};
 }
 
+interface ProjectIdOption {
+	label: string;
+	value: string | number;
+}
+
 const UseModal = React.memo((prop: Props) => {
 	const { open, onCreate, onCancel, curRow } = prop;
 	const [form] = Form.useForm();
+
+	const [projectOptions, setProjectOptions] = React.useState(
+		Array<ProjectIdOption>
+	);
+
+	useEffect(() => {
+		getProjectIdOptions();
+		initForm();
+	}, [open]);
+
+	const initForm = () => {
+		form.setFieldValue('projects', [
+			{
+				projectId: undefined,
+				projectMember: undefined
+			}
+		]);
+	};
+
+	const getProjectIdOptions = async () => {
+		setProjectOptions([
+			{ value: '001', label: 'ID1' },
+			{ value: '002', label: 'ID2' },
+			{ value: '003', label: 'ID3' }
+		]);
+	};
+
 	const selfCancel = () => {
 		form.resetFields();
 		onCancel();
 	};
+
 	return (
 		<Modal
-			className="centerModal"
+			className={styles.centerModal}
 			open={open}
 			title={<div style={{ textAlign: 'center' }}>使用规则</div>}
+			closeIcon={<CloseCircleOutlined />}
 			okText="确定"
 			cancelText="取消"
 			onCancel={() => {
@@ -61,21 +94,6 @@ const UseModal = React.memo((prop: Props) => {
 				name="form_in_modal"
 				initialValues={{ modifier: 'public' }}
 			>
-				<Form.Item
-					name="id"
-					label="项目ID"
-					rules={[{ required: true, message: '请选择' }]}
-				>
-					<Select placeholder="请选择" allowClear>
-						<Select.Option value="male">male</Select.Option>
-						<Select.Option value="female">female</Select.Option>
-						<Select.Option value="other">other</Select.Option>
-					</Select>
-				</Form.Item>
-				<Form.Item name="member" label="项目成员">
-					<Input />
-				</Form.Item>
-
 				<Form.List name="projects">
 					{(fields, { add, remove }) => (
 						<>
@@ -86,11 +104,11 @@ const UseModal = React.memo((prop: Props) => {
 										{...restField}
 										name={[name, 'projectId']}
 									>
-										<Select placeholder="请选择" allowClear>
-											<Select.Option value="male">male</Select.Option>
-											<Select.Option value="female">female</Select.Option>
-											<Select.Option value="other">other</Select.Option>
-										</Select>
+										<Select
+											placeholder="请选择"
+											allowClear
+											options={projectOptions}
+										></Select>
 									</Form.Item>
 									<Form.Item
 										label="项目成员"
@@ -233,7 +251,7 @@ const RuleCom = () => {
 
 	return (
 		<div>
-			<div className="searchForm">
+			<div className={styles.searchForm}>
 				<Form
 					form={form}
 					labelCol={{ span: 6 }}
