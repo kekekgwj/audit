@@ -10,11 +10,13 @@ import Graphin, {
 import { Menu, Checkbox, Col, Row } from 'antd';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
 import registerNodes from './custom-node';
+import registerEdges from './custom-edge';
 import styles from './index.module.less';
 import { ModelConfig } from '@antv/g6';
 
 // 注册自定义节点
 registerNodes('all');
+registerEdges('all');
 
 //功能组件
 const { Tooltip, ContextMenu, Legend } = Components;
@@ -366,7 +368,16 @@ const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData } = props;
 
 	return (
-		<Graphin data={data}>
+		<Graphin
+			data={data}
+			layout={{
+				type: 'force',
+				// linkDistance: 400,
+				preventOverlap: true,
+				nodeSize: 140,
+				nodeSpacing: 50
+			}}
+		>
 			<Tooltip bindType="node" placement={'top'}>
 				{(value: TooltipValue) => {
 					if (value.model) {
@@ -401,7 +412,7 @@ const GraphinCom = React.memo((props: Props) => {
 					);
 				}}
 			</ContextMenu>
-			<Legend bindType="node" sortKey="type">
+			<Legend bindType="node" sortKey="typeName">
 				{(renderProps: LegendChildrenProps) => {
 					console.log('renderProps', renderProps);
 					return <Legend.Node {...renderProps} />;

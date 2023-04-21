@@ -5,6 +5,7 @@
  */
 
 import Graphin from '@antv/graphin';
+import { getCanvasText } from '@/utils/graphin';
 
 export default () => {
 	Graphin.registerNode(
@@ -24,10 +25,13 @@ export default () => {
 					fill: 'red',
 					fillOpacity: 1
 				};
+
+				const [label] = getCanvasText(cfg.label, 12, 100);
+
 				const keyshape = group.addShape('circle', {
 					attrs: {
-						r: 40,
-						fill: 'red'
+						r: 60,
+						fill: '#E6697B'
 					},
 					draggable: true,
 					name: 'node1-body'
@@ -37,7 +41,9 @@ export default () => {
 						fontSize: 12,
 						x: 0,
 						y: 0,
-						text: cfg.id,
+						textAlign: 'center',
+						textBaseline: 'middle',
+						text: label,
 						fill: '#fff'
 					},
 					draggable: true,
