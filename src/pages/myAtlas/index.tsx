@@ -15,11 +15,8 @@ import {
 } from 'antd';
 const { RangePicker } = DatePicker;
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
-import './atlas.less';
-
-// const BlankCom = React.memo(() => {
-// 	return;
-// });
+// import './atlas.less';
+import styles from './index.module.less';
 
 const MyTableCom = React.memo(() => {
 	const navigate = useNavigate();
@@ -129,8 +126,8 @@ const MyAtlasCom = () => {
 	};
 
 	return (
-		<div className="altasContent">
-			<div className="searchForm">
+		<div className={styles.altasContent}>
+			<div className={styles.searchForm}>
 				<Form
 					form={form}
 					labelCol={{ span: 6 }}

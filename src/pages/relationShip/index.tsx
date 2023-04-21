@@ -4,6 +4,7 @@ import { type GraphinData } from '@antv/graphin';
 import GraphinCom from '../../components/graphin';
 import SideBar from '../../components/sidebar/sideBar';
 import styles from './index.module.less';
+import html2canvas from 'html2canvas';
 
 const mockData: GraphinData = {
 	nodes: [
@@ -167,6 +168,22 @@ const mockData: GraphinData = {
 	]
 };
 
+// **base64转图片文件方法**
+const toImgStyle = (base64Str, fileName) => {
+	let arr = base64Str.split(','),
+		mime = arr[0].match(/:(.*?);/)[1], //base64解析出来的图片类型
+		bstr = atob(arr[1]), //对base64串进行操作，去掉url头，并转换为byte   atob为window内置方法
+		len = bstr.length,
+		u8arr = new Uint8Array(len); //
+	while (len--) {
+		u8arr[len] = bstr.charCodeAt(len);
+	}
+	// 创建新的 File 对象实例[utf-8内容，文件名称或者路径，[可选参数，type：文件中的内容mime类型]]
+	return new File([u8arr], fileName, {
+		type: mime
+	});
+};
+
 const RelationShipCom = () => {
 	// 数据来源
 	const [data, setDate] = React.useState(mockData);
@@ -174,6 +191,28 @@ const RelationShipCom = () => {
 	const updateData = (value: GraphinData) => {
 		console.log(value, 107777);
 		setDate(value);
+	};
+
+	// 保存图谱
+	const saveGraph = () => {
+		console.log('1111');
+		window.pageYOffset = 0; //网页位置
+		document.documentElement.scrollTop = 0; //滚动条的位置
+		document.body.scrollTop = 0; //网页被卷去的高
+		//获取要生成图片的dom区域并转为canvas;
+		html2canvas(document.querySelector('#graphin-container')).then((canvas) => {
+			let base64Img = canvas.toDataURL('image/png'); //将canvas转为base64
+			// console.log(base64Img, 191111111);
+			// // 下载到本地
+			// const a = document.createElement('a');
+			// a.href = base64Img;
+			// a.download = true;
+			// document.body.append(a);
+			// a.click();
+			let file = toImgStyle(base64Img, Date.now() + '.png');
+			console.log(file, 2122222);
+			//调用后端接口，将文件传给后端
+		});
 	};
 
 	return (
@@ -193,6 +232,9 @@ const RelationShipCom = () => {
 					<Button
 						htmlType="button"
 						style={{ background: '#23955C', color: '#fff' }}
+						onClick={() => {
+							saveGraph();
+						}}
 					>
 						保存图谱
 					</Button>
