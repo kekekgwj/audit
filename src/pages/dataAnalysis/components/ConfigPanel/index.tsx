@@ -1,5 +1,6 @@
 import React from 'react';
 import JoinConfig from './JoinConfig';
+import { Table } from 'antd';
 interface IProps {
 	data?: any[];
 	children: React.ReactNode;

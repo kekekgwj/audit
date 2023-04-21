@@ -72,8 +72,8 @@ const X6Graph = () => {
 				<AddNodeBehavior />
 				<FromJSONBehavior />
 				<GraphExport />
-				<NodeDetailPanel />
 			</Graph>
+			<NodeDetailPanel />
 		</>
 	);
 };

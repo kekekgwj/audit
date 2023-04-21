@@ -1,7 +1,7 @@
 import { Button, Form, Input, Select } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
 import React, { useMemo, useState } from 'react';
-import { CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import classes from './index.module.less';
 
 const JoinConfig: React.FC = () => {
@@ -10,16 +10,26 @@ const JoinConfig: React.FC = () => {
 			<div>
 				<SelectGroup></SelectGroup>
 			</div>
+			<div>
+				<Button>重置</Button>
+				<Button>执行</Button>
+			</div>
 		</div>
 	);
 };
 interface ISelectRowProps {
 	value?: any;
 	onChange?: any;
+	handleOnclickAdd: () => void;
+	handleOnDelete: (key: number) => void;
+	key: number;
 }
 const SelectRow: React.FC<ISelectRowProps> = ({
 	value = { left: '', right: '', symbol: '' },
-	onChange
+	onChange,
+	handleOnDelete,
+	key,
+	handleOnclickAdd
 }) => {
 	if (!value || value.length < 3) {
 		return null;
@@ -52,7 +62,8 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 				value={value.right}
 				onChange={onRightChange}
 			></Select>
-			<CloseOutlined />
+			<CloseOutlined onClick={() => handleOnDelete(key)} />
+			<PlusOutlined onClick={() => handleOnclickAdd()} />
 		</div>
 	);
 };
@@ -97,6 +108,18 @@ const SelectGroup: React.FC = () => {
 	const onFinish = (value: any) => {
 		console.log(value);
 	};
+	const handleOnDelete = (key: number) => {
+		const list = form.getFieldValue('configs') || [];
+		if (list.length === 0) {
+			return;
+		}
+		const nextList = list.slice();
+
+		nextList.splice(key, 1);
+		form.setFieldsValue({
+			configs: nextList
+		});
+	};
 
 	return (
 		<div>
@@ -104,7 +127,9 @@ const SelectGroup: React.FC = () => {
 				name="customized_form_controls"
 				layout="inline"
 				onFinish={onFinish}
-				initialValues={{}}
+				initialValues={{
+					configs: [{ key: 0, fieldKey: 0 }]
+				}}
 				form={form}
 			>
 				<Form.List name="configs">
@@ -112,22 +137,17 @@ const SelectGroup: React.FC = () => {
 						<>
 							{fields.map(({ key, name }) => (
 								<Form.Item name={name} label={`筛选项` + key} key={key}>
-									<SelectRow key={key}></SelectRow>
+									<SelectRow
+										key={key}
+										handleOnclickAdd={handleOnclickAdd}
+										handleOnDelete={handleOnDelete}
+									></SelectRow>
 								</Form.Item>
 							))}
 						</>
 					)}
 				</Form.List>
-				<Form.Item>
-					<Button type="primary" htmlType="submit">
-						Submit
-					</Button>
-				</Form.Item>
 			</Form>
-
-			<div>
-				<Button onClick={handleOnclickAdd}>添加条件</Button>
-			</div>
 		</div>
 	);
 };

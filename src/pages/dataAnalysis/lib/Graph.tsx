@@ -526,7 +526,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 				dispatch(toDoubleClickNode({ id, showPanel: true }));
 				const cell = graph.getCellById(id);
 				const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
-				const { UNION, JOIN, FILTER, TABLE, SQL } = IImageTypes;
+				const { JOIN, FILTER, TABLE } = IImageTypes;
 				if ([UNION, JOIN].includes(clickNodeType)) {
 					console.log('union or join');
 				}
