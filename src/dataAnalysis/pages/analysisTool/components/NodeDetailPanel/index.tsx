@@ -2,7 +2,7 @@ import React from 'react';
 import { Collapse, Table } from 'antd';
 import { useSelector } from 'react-redux';
 import classes from './index.module.less';
-import { IGlobalState } from '../../../../redux/reducers';
+import { IGlobalState } from '../../../../../redux/reducers';
 import { JoinConfigPanel } from '../ConfigPanel';
 import { ColumnsType } from 'antd/es/table';
 const Panel: React.FC = () => {

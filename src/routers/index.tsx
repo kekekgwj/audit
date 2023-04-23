@@ -1,7 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Graph from '../pages/graph';
-import Data from '../pages/dataAnalysis';
+
+import Data from '..//dataAnalysis/pages/analysisTool';
 import React from 'react';
+import SQLEditor from '../dataAnalysis/pages/SQLEditor';
 export default createBrowserRouter([
 	{
 		path: '/',
@@ -10,5 +11,9 @@ export default createBrowserRouter([
 	{
 		path: '/data',
 		element: <Data />
+	},
+	{
+		path: '/editor',
+		element: <SQLEditor />
 	}
 ]);
