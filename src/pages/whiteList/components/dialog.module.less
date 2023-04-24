@@ -1,0 +1,72 @@
+.custom-dialog {
+	:global {
+		.ant-modal-content {
+			padding: 0;
+			border-radius: 4px;
+			overflow: hidden;
+			.ant-modal-close {
+				color: #23955c;
+			}
+			.ant-modal-body {
+				padding-bottom: 24px;
+			}
+		}
+	}
+}
+
+.ant-modal__header {
+	height: 50px;
+	margin-bottom: 0;
+	background: #23955c;
+	border-radius: 0;
+	.ant-modal__header_title {
+		line-height: 50px;
+		text-align: center;
+		font-size: 18px;
+		font-weight: bolder;
+		// color: #fff;
+	}
+}
+
+.ant-modal__main {
+	padding: 24px;
+	.delete-icon-box {
+		text-align: center;
+		margin-bottom: 10px;
+	}
+	.ant-modal-message {
+		height: 20px;
+		font-size: 16px;
+		font-family: Noto Sans-Regular, Noto Sans;
+		font-weight: 400;
+		color: rgba(0, 0, 0, 0.9);
+		line-height: 20px;
+		text-align: center;
+	}
+}
+
+.ant-modal__footer {
+	display: flex;
+	justify-content: center;
+	:global {
+		.ant-btn {
+			margin-right: 10px;
+		}
+	}
+	.cancel {
+		border-color: #23955c;
+		color: #23955c;
+		&:focus {
+			outline: none;
+		}
+	}
+	.submit {
+		background: #23955c;
+		&:hover {
+			border-color: transparent;
+		}
+		&:focus {
+			outline: none;
+		}
+	}
+}

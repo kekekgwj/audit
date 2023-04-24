@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import Graphin, {
+	Behaviors,
 	Components,
+	IG6GraphEvent,
+	Utils,
+	GraphinContext,
 	type TooltipValue,
 	type GraphinData,
 	type LegendChildrenProps,
@@ -21,168 +25,7 @@ registerEdges('all');
 //功能组件
 const { Tooltip, ContextMenu, Legend } = Components;
 
-// 原始数据
-const mockData: GraphinData = {
-	nodes: [
-		{
-			id: 'node-0',
-			x: 100,
-			y: 100,
-			data: {
-				type: 'centerPointer'
-			},
-			style: {
-				label: {
-					value: '我是node0',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 80,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-1',
-			x: 200,
-			y: 200,
-			data: {
-				type: 'project'
-			},
-			style: {
-				label: {
-					value: '我是node1',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 60,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-2',
-			x: 100,
-			y: 300,
-			data: {
-				type: 'project'
-			},
-			style: {
-				label: {
-					value: '我是node2',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 40,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-3',
-			data: {
-				type: 'person'
-			},
-			style: {
-				label: {
-					value: '我是node3',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 40,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-4',
-			data: {
-				type: 'person'
-			},
-			style: {
-				label: {
-					value: '我是node4',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 40,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		}
-	],
-	edges: [
-		{
-			id: 'edge-0-1',
-			source: 'node-0',
-			target: 'node-1',
-			style: {
-				label: {
-					value: '我是边1'
-				}
-			}
-		},
-		{
-			id: 'edge-0-3',
-			source: 'node-0',
-			target: 'node-3',
-			style: {
-				label: {
-					value: '我是边4'
-				}
-			}
-		},
-		{
-			id: 'edge-3-4',
-			source: 'node-3',
-			target: 'node-4',
-			style: {
-				label: {
-					value: '我是边5'
-				}
-			}
-		},
-		{
-			id: 'edge-1-2',
-			source: 'node-1',
-			target: 'node-2',
-			style: {
-				label: {
-					value: '我是边2'
-				},
-				keyshape: {
-					lineWidth: 5,
-					stroke: '#00f'
-				}
-			}
-		},
-		{
-			id: 'edge-0-2',
-			source: 'node-0',
-			target: 'node-2',
-			style: {
-				label: {
-					value: '我是边3'
-				}
-			}
-		}
-	]
-};
+const { Hoverable, ResizeCanvas } = Behaviors;
 
 interface Props {
 	data: GraphinData;
@@ -195,171 +38,118 @@ interface NodeDetailProps {
 	nodeModel: ModelConfig;
 }
 
-const NodeDetail = React.memo((props: NodeDetailProps) => {
+const EdgeDetail = React.memo((props: NodeDetailProps) => {
 	const { nodeModel } = props;
 	return (
 		<div className={styles['node-detail-box']}>
 			<div className={styles['node-detail-item']}>
-				<span className={styles['detail-item-title']}>节点id:</span>
+				<span className={styles['detail-item-title']}>边id:</span>
 				{nodeModel.id as string}
 			</div>
 			<div className={styles['node-detail-item']}>
-				<span className={styles['detail-item-title']}>节点id:</span>
+				<span className={styles['detail-item-title']}>边id:</span>
 				{nodeModel.id as string}
 			</div>
 		</div>
 	);
 });
 
+interface DetailProps {
+	detailData: ModelConfig;
+}
+const DetailInfo = React.memo((props: DetailProps) => {
+	const { detailData } = props;
+	return (
+		<div className={styles['detail-info-box']}>
+			<div className={styles['node-detail-box']}>
+				<div className={styles['node-detail-item']}>
+					<span className={styles['detail-item-title']}>节点id:</span>
+					{detailData.id as string}
+				</div>
+				<div className={styles['node-detail-item']}>
+					<span className={styles['detail-item-title']}>节点id:</span>
+					{detailData.id as string}
+				</div>
+			</div>
+		</div>
+	);
+});
+
+// 自定义左键点击事件
+const LeftEvent = () => {
+	const { graph, apis } = useContext(GraphinContext);
+	const [showDetail, setShowDetail] = React.useState(false);
+	const [detailData, setDetailData] = React.useState({});
+	useEffect(() => {
+		const handleNodeClick = (evt: IG6GraphEvent) => {
+			const node = evt.item as INode;
+			const model = node.getModel() as NodeConfig;
+			apis.focusNodeById(model.id);
+			setDetailData(model);
+			setShowDetail(true);
+			console.log(showDetail, 24111111);
+		};
+
+		const handleCanvasClick = (evt: IG6GraphEvent) => {
+			setShowDetail(false);
+			console.log(showDetail, 2466666);
+		};
+		// 点击节点
+		graph.on('node:click', handleNodeClick);
+		//点计画布
+		graph.on('canvas:click', handleCanvasClick);
+		return () => {
+			graph.off('node:click', handleNodeClick);
+			graph.off('canvas:click', handleCanvasClick);
+		};
+	}, []);
+	return <>{showDetail ? <DetailInfo detailData={detailData} /> : null}</>;
+};
+
 const MyMenu = React.memo((props: Props) => {
 	const { data, id, onClose, updateData } = props;
-	// const [showRel, setshowRel] = React.useState(false);
-	// const [relArr, setRelArr] = React.useState(
-	// 	Array<string | number | undefined>
-	// );
-	// const [checkedRel, setCheckedRel] = React.useState([]);
+	const relArr = ['同事', '朋友', '合作方'];
+	// 选中数据
+	const [checkedRel, setCheckedRel] = React.useState([]);
+	const onChange = (checkedValues: CheckboxValueType[]) => {
+		console.log('checked = ', checkedValues);
+		setCheckedRel(checkedValues);
+	};
 
-	// 关系筛选
-	// const showRelationShip = () => {
-	// 	// 获取节点对应关系
-	// 	const edges = data.edges.filter((item) => {
-	// 		return item.source == id;
-	// 	});
-	// 	const arr: Array<string | number | undefined> = [];
-	// 	edges.forEach((el) => {
-	// 		arr.push(el.style.label.value);
-	// 	});
-	// 	// console.log(relArr, 184444);
-	// 	setRelArr(arr);
-	// 	setshowRel(true);
-	// };
+	// 穿透到下一层
+	const showNextLeval = () => {
+		console.log(checkedRel, 2855555);
 
-	//隐藏节点
-	// const hideNode = () => {
-	// 	const nodes = data.nodes.filter((item) => {
-	// 		return item.id != id;
-	// 	});
-	// 	const edges = data.edges.filter((item) => {
-	// 		return item.source != id && item.target != id;
-	// 	});
-	// 	const newData = {
-	// 		edges,
-	// 		nodes
-	// 	};
-	// 	updateData(newData);
-	// 	onClose();
-	// };
-
-	//显示子节点
-	// const showChildNode = () => {
-	// 	//对象数组去重
-	// 	const removeDuplicateObj = (arr: IUserNode[]) => {
-	// 		const newArr = [];
-	// 		const obj = {};
-	// 		for (let i = 0; i < arr.length; i++) {
-	// 			if (!obj[arr[i].id]) {
-	// 				newArr.push(arr[i]);
-	// 				obj[arr[i].id] = true;
-	// 			}
-	// 		}
-	// 		return newArr;
-	// 	};
-
-	// 	// 获取原始数据？要这么麻烦吗......
-	// 	console.log(data, 13888888);
-	// 	// 需要添加的边
-	// 	const tedges = mockData.edges.filter((item) => {
-	// 		return item.source == id;
-	// 	});
-	// 	const nodesArr: IUserNode[] = []; //需要添加的节点
-	// 	if (tedges && tedges.length > 0) {
-	// 		tedges.forEach((el) => {
-	// 			nodesArr.push(el.target);
-	// 		});
-	// 	}
-	// 	const edges = removeDuplicateObj([...data.edges, ...tedges]);
-	// 	const tnodes: IUserNode[] = [];
-	// 	nodesArr.forEach((el) => {
-	// 		mockData.nodes.find((item) => {
-	// 			if (item.id == el) {
-	// 				tnodes.push(item);
-	// 			}
-	// 		});
-	// 	});
-
-	// 	const nodes = removeDuplicateObj([...data.nodes, ...tnodes]);
-	// 	const newData = {
-	// 		nodes,
-	// 		edges
-	// 	};
-	// 	updateData(newData);
-	// 	onClose();
-	// };
-
-	//右键菜单触发筛选
-	// const onChange = (checkedValues: CheckboxValueType[]) => {
-	// 	console.log('checked = ', checkedValues);
-	// 	setCheckedRel(checkedValues);
-	// 	const tedges = data.edges.filter((item) => {
-	// 		return item.source == id;
-	// 	});
-
-	// 	const otherEdges = data.edges.filter((item) => {
-	// 		return item.source != id;
-	// 	});
-
-	// 	const filterEdges: IUserEdge[] = [];
-	// 	checkedValues.forEach((el) => {
-	// 		tedges.find((item) => {
-	// 			if (item.style.label.value == el) {
-	// 				filterEdges.push(item);
-	// 			}
-	// 		});
-	// 	});
-
-	// 	const edges = [...otherEdges, ...filterEdges];
-	// 	const nodes = [...data.nodes];
-	// 	const newData = {
-	// 		edges,
-	// 		nodes
-	// 	};
-	// 	console.log(data, 2766666);
-	// 	updateData(newData);
-	// };
-
+		// onClose();
+	};
 	return (
-		<div style={{ position: 'relative' }}>
-			<Menu>
-				{/* <Menu.Item style={{ position: 'relative' }} onClick={showRelationShip}>
-					关系筛选
-				</Menu.Item> */}
-				<Menu.Item>穿透下一层</Menu.Item>
-				{/* <Menu.Item onClick={showChildNode}>显示子节点</Menu.Item>
-				<Menu.Item
+		<div className={styles['check-group-box']}>
+			<div className={styles['relation-title']}>穿透下一层</div>
+			<div className={styles['relationShipTip']}>
+				<Checkbox.Group
+					style={{ width: '100%' }}
+					onChange={onChange}
+					className={styles['relationGroup']}
+				>
+					<Row>
+						{relArr.map((item, index) => (
+							<Col span={24} key={index} className={styles['relationItem']}>
+								<Checkbox value={item}>{item}</Checkbox>
+							</Col>
+						))}
+					</Row>
+				</Checkbox.Group>
+			</div>
+			<div className={styles['relation-bottom']}>
+				<span
+					className={styles['sub-button']}
 					onClick={() => {
-						hideNode();
+						showNextLeval();
 					}}
 				>
-					隐藏该节点
-				</Menu.Item> */}
-			</Menu>
-			{/* {showRel ? (
-				<div className={styles['relationShipTip']}>
-					<Checkbox.Group
-						style={{ width: '100%' }}
-						onChange={onChange}
-						className={styles['relationGroup']}
-					>
-						<Row>
-							{relArr.map((item, index) => (
-								<Col span={24} key={index} className={styles['relationItem']}>
-									<Checkbox value={item}>{item}</Checkbox>
-								</Col>
-							))}
-						</Row>
-					</Checkbox.Group>
-				</div>
-			) : null} */}
+					确定
+				</span>
+			</div>
 		</div>
 	);
 });
@@ -378,7 +168,7 @@ const GraphinCom = React.memo((props: Props) => {
 				nodeSpacing: 50
 			}}
 		>
-			<Tooltip bindType="node" placement={'top'}>
+			{/* <Tooltip bindType="node" placement={'top'}>
 				{(value: TooltipValue) => {
 					if (value.model) {
 						const { model } = value;
@@ -387,13 +177,13 @@ const GraphinCom = React.memo((props: Props) => {
 					}
 					return null;
 				}}
-			</Tooltip>
+			</Tooltip> */}
 			<Tooltip bindType="edge" placement={'top'}>
 				{(value: TooltipValue) => {
 					if (value.model) {
 						const { model } = value;
 						console.log(model, 42222222222);
-						return <NodeDetail nodeModel={model} />;
+						return <EdgeDetail nodeModel={model} />;
 					}
 					return null;
 				}}
@@ -418,6 +208,9 @@ const GraphinCom = React.memo((props: Props) => {
 					return <Legend.Node {...renderProps} />;
 				}}
 			</Legend>
+			<LeftEvent></LeftEvent>
+			<Hoverable bindType="node" />
+			<ResizeCanvas></ResizeCanvas>
 		</Graphin>
 	);
 });
