@@ -24,8 +24,14 @@ const { Tooltip, ContextMenu, Legend } = Components;
 interface Props {
 	data: GraphinData;
 	refersh: boolean;
-	updateData: (layout: any) => void;
+	updateData: (data: GraphinData) => void;
 	onClose: () => void;
+	id?: string;
+}
+
+interface MenuProps {
+	onClose: () => void;
+	updateData: (data: GraphinData) => void;
 	id?: string;
 }
 
@@ -99,7 +105,7 @@ const LeftEvent = () => {
 	return <>{showDetail ? <DetailInfo detailData={detailData} /> : null}</>;
 };
 
-const MyMenu = React.memo((props: Props) => {
+const MyMenu = React.memo((props: MenuProps) => {
 	const { data, id, onClose, updateData } = props;
 	const relArr = ['同事', '朋友', '合作方'];
 	// 选中数据
@@ -178,7 +184,7 @@ const GraphinCom = React.memo((props: Props) => {
 					// animation: false
 				}}
 			>
-				<Tooltip bindType="node" placement={'top'}>
+				{/* <Tooltip bindType="node" placement={'top'}>
 					{(value: TooltipValue) => {
 						if (value.model) {
 							const { model } = value;
@@ -187,12 +193,12 @@ const GraphinCom = React.memo((props: Props) => {
 						}
 						return null;
 					}}
-				</Tooltip>
+				</Tooltip> */}
 				<Tooltip bindType="edge" placement={'top'}>
 					{(value: TooltipValue) => {
 						if (value.model) {
 							const { model } = value;
-							return <NodeDetail nodeModel={model} />;
+							return <EdgeDetail nodeModel={model} />;
 						}
 						return null;
 					}}
@@ -201,14 +207,7 @@ const GraphinCom = React.memo((props: Props) => {
 					{(value) => {
 						console.log(value, 101);
 						const { onClose, id } = value;
-						return (
-							<MyMenu
-								onClose={onClose}
-								id={id}
-								data={data}
-								updateData={updateData}
-							/>
-						);
+						return <MyMenu onClose={onClose} id={id} updateData={updateData} />;
 					}}
 				</ContextMenu>
 				<Legend bindType="node" sortKey="typeName">
@@ -216,6 +215,7 @@ const GraphinCom = React.memo((props: Props) => {
 						return <Legend.Node {...renderProps} />;
 					}}
 				</Legend>
+				<LeftEvent></LeftEvent>
 			</Graphin>
 		</div>
 	);
