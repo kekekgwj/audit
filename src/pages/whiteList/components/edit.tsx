@@ -94,7 +94,7 @@ export default (props: EditProps) => {
 				onOk={handleOk}
 				onCancel={handleCancel}
 			>
-				<Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+				<Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
 					<Form.Item name="type" label="类型">
 						<Select placeholder="请选择" onChange={onmainTypeChange} allowClear>
 							<Select.Option value="1">人</Select.Option>

@@ -16,11 +16,11 @@ import {
 	CloseCircleOutlined
 } from '@ant-design/icons';
 import styles from './index.module.less';
+import CustomDialog from '@/components/custom-dialog';
 
 // 使用弹框
 interface Props {
 	open: boolean;
-	onCreate: (values: Values) => void;
 	onCancel: () => void;
 	curRow: {};
 }
@@ -31,7 +31,7 @@ interface ProjectIdOption {
 }
 
 const UseModal = React.memo((prop: Props) => {
-	const { open, onCreate, onCancel, curRow } = prop;
+	const { open, onCancel, curRow } = prop;
 	const [form] = Form.useForm();
 
 	const [projectOptions, setProjectOptions] = React.useState(
@@ -60,40 +60,22 @@ const UseModal = React.memo((prop: Props) => {
 		]);
 	};
 
-	const selfCancel = () => {
-		form.resetFields();
+	// 提交表单
+	const onSubmit = () => {
+		const data = form.getFieldsValue();
+		console.log(data, 677777);
 		onCancel();
 	};
 
 	return (
-		<Modal
-			className={styles.centerModal}
+		<CustomDialog
 			open={open}
-			title={<div style={{ textAlign: 'center' }}>使用规则</div>}
-			closeIcon={<CloseCircleOutlined />}
-			okText="确定"
-			cancelText="取消"
-			onCancel={() => {
-				selfCancel();
-			}}
-			onOk={() => {
-				form
-					.validateFields()
-					.then((values) => {
-						form.resetFields();
-						onCreate(values);
-					})
-					.catch((info) => {
-						console.log('Validate Failed:', info);
-					});
-			}}
+			title="使用规则"
+			width={600}
+			onOk={onSubmit}
+			onCancel={onCancel}
 		>
-			<Form
-				form={form}
-				layout="vertical"
-				name="form_in_modal"
-				initialValues={{ modifier: 'public' }}
-			>
+			<Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
 				<Form.List name="projects">
 					{(fields, { add, remove }) => (
 						<>
@@ -126,7 +108,7 @@ const UseModal = React.memo((prop: Props) => {
 									width: '100%'
 								}}
 							>
-								{fields.length > 0 ? (
+								{fields.length > 1 ? (
 									<span
 										style={{ marginRight: '5px', cursor: 'pointer' }}
 										onClick={() => {
@@ -169,7 +151,7 @@ const UseModal = React.memo((prop: Props) => {
 					)}
 				</Form.List>
 			</Form>
-		</Modal>
+		</CustomDialog>
 	);
 });
 
@@ -202,11 +184,6 @@ const RuleCom = () => {
 		console.log(row);
 		setOpen(true);
 		setCurRow(row);
-	};
-
-	const onCreate = (values: any) => {
-		console.log('Received values of form: ', values);
-		setOpen(false);
 	};
 
 	const onReset = () => {
@@ -304,7 +281,6 @@ const RuleCom = () => {
 			<UseModal
 				open={open}
 				curRow={curRow}
-				onCreate={onCreate}
 				onCancel={() => {
 					setOpen(false);
 				}}

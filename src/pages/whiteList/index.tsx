@@ -24,7 +24,7 @@ import {
 import styles from './index.module.less';
 import Add from './components/add';
 import Edit from './components/edit';
-import Delete from './components/delete';
+import Delete from '@/components/delete-dialog';
 
 const MyTableCom = React.memo(() => {
 	const navigate = useNavigate();
@@ -63,6 +63,11 @@ const MyTableCom = React.memo(() => {
 	};
 
 	const handleCancleDel = () => {
+		setOpenDel(false);
+	};
+
+	const submitDel = () => {
+		console.log('delete:' + curId);
 		setOpenDel(false);
 	};
 
@@ -168,7 +173,11 @@ const MyTableCom = React.memo(() => {
 				cRef={editRef}
 				id={curId}
 			></Edit>
-			<Delete open={openDel} handleCancle={handleCancleDel} id={curId}></Delete>
+			<Delete
+				open={openDel}
+				handleCancle={handleCancleDel}
+				onOk={submitDel}
+			></Delete>
 		</div>
 	);
 });

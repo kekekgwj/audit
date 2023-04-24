@@ -15,7 +15,7 @@ import {
 } from 'antd';
 const { RangePicker } = DatePicker;
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
-// import './atlas.less';
+import DeleteDialog from '@/components/delete-dialog';
 import styles from './index.module.less';
 
 const MyTableCom = React.memo(() => {
@@ -25,8 +25,21 @@ const MyTableCom = React.memo(() => {
 		navigate('/altasDetail', { state: { id: row.id } });
 	};
 
+	const [openDel, setOpenDel] = React.useState(false);
+
 	// 删除
-	const handleDelete = () => {};
+	const handleDelete = (row) => {
+		setOpenDel(true);
+	};
+
+	const handleCancleDel = () => {
+		setOpenDel(false);
+	};
+
+	const submitDel = () => {
+		console.log('delete');
+		setOpenDel(false);
+	};
 
 	const colums = [
 		{
@@ -57,7 +70,7 @@ const MyTableCom = React.memo(() => {
 							<span style={{ marginLeft: '2px' }}>查看</span>
 						</span>
 						<span
-							onClick={() => handleDelete(row, record.key)}
+							onClick={() => handleDelete(row)}
 							style={{ cursor: 'pointer' }}
 						>
 							<Space>
@@ -106,6 +119,11 @@ const MyTableCom = React.memo(() => {
 				</div>
 				<Pagination total={85} showSizeChanger showQuickJumper />
 			</div>
+			<DeleteDialog
+				open={openDel}
+				handleCancle={handleCancleDel}
+				onOk={submitDel}
+			></DeleteDialog>
 		</div>
 	);
 });
