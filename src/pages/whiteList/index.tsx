@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import {
 	Table,
@@ -14,33 +14,57 @@ import {
 	Empty
 } from 'antd';
 const { RangePicker } = DatePicker;
-import { EyeOutlined, DeleteOutlined, FormOutlined } from '@ant-design/icons';
+const { confirm } = Modal;
+import {
+	EyeOutlined,
+	DeleteOutlined,
+	FormOutlined,
+	ExclamationCircleFilled
+} from '@ant-design/icons';
 import styles from './index.module.less';
-import Add from './add';
+import Add from './components/add';
+import Edit from './components/edit';
+import Delete from './components/delete';
 
 const MyTableCom = React.memo(() => {
 	const navigate = useNavigate();
-	const [open, setOpen] = React.useState(false);
+	const [curId, setCurId] = React.useState();
+	const [openAdd, setOpenAdd] = React.useState(false);
+	const addRef = useRef();
+	const [openEdit, setOpenEdit] = React.useState(false);
+	const editRef = useRef();
+	const [openDel, setOpenDel] = React.useState(false);
+
 	//添加
 	const add = () => {
-		setOpen(true);
+		setOpenAdd(true);
 	};
 
-	const handleCancel = () => {
-		setOpen(false);
-	};
-	// 查看
-	const handleDetail = (row) => {
-		navigate('/altasDetail', { state: { id: row.id } });
+	const handleCancelAdd = () => {
+		addRef.current.resetForm();
+		setOpenAdd(false);
 	};
 
 	//编辑
 	const handleEdit = (row) => {
-		console.log(row);
+		setCurId(row.id);
+		setOpenEdit(true);
+	};
+
+	const handleCancelEdit = () => {
+		editRef.current.resetForm();
+		setOpenEdit(false);
 	};
 
 	// 删除
-	const handleDelete = () => {};
+	const handleDelete = (row) => {
+		setCurId(row.id);
+		setOpenDel(true);
+	};
+
+	const handleCancleDel = () => {
+		setOpenDel(false);
+	};
 
 	const colums = [
 		{
@@ -66,15 +90,6 @@ const MyTableCom = React.memo(() => {
 				return (
 					<div>
 						<span
-							onClick={() => handleDetail(row)}
-							style={{ cursor: 'pointer', marginRight: '10px' }}
-						>
-							<Space>
-								<EyeOutlined style={{ color: '#23955C' }} />
-							</Space>
-							<span style={{ marginLeft: '2px' }}>查看</span>
-						</span>
-						<span
 							onClick={() => handleEdit(row)}
 							style={{ cursor: 'pointer', marginRight: '10px' }}
 						>
@@ -84,7 +99,7 @@ const MyTableCom = React.memo(() => {
 							<span style={{ marginLeft: '2px' }}>编辑</span>
 						</span>
 						<span
-							onClick={() => handleDelete(row, record.key)}
+							onClick={() => handleDelete(row)}
 							style={{ cursor: 'pointer' }}
 						>
 							<Space>
@@ -102,13 +117,15 @@ const MyTableCom = React.memo(() => {
 			key: '1',
 			name: '图谱一',
 			type: '关联关系图普',
-			createTime: '2023-04-021'
+			createTime: '2023-04-021',
+			id: '1'
 		},
 		{
 			key: '2',
 			name: '图谱二',
 			type: '关联关系图普',
-			createTime: '2023-04-021'
+			createTime: '2023-04-021',
+			id: '2'
 		}
 	];
 	return (
@@ -144,7 +161,14 @@ const MyTableCom = React.memo(() => {
 				</div>
 				<Pagination total={85} showSizeChanger showQuickJumper />
 			</div>
-			<Add open={open} handleCancel={handleCancel}></Add>
+			<Add open={openAdd} handleCancel={handleCancelAdd} cRef={addRef}></Add>
+			<Edit
+				open={openEdit}
+				handleCancel={handleCancelEdit}
+				cRef={editRef}
+				id={curId}
+			></Edit>
+			<Delete open={openDel} handleCancle={handleCancleDel} id={curId}></Delete>
 		</div>
 	);
 });
