@@ -13,6 +13,7 @@ import styles from './index.module.less';
 
 interface Props {
 	updateData: (layout: GraphinData) => void;
+	toggleLayout: (isOpen: boolean) => void;
 }
 
 interface bodyTypeOption {
@@ -21,9 +22,9 @@ interface bodyTypeOption {
 }
 
 export default (props: Props) => {
+	const { updateData, toggleLayout } = props;
 	const [configVisibile, setconfigVisibile] = useState(true);
 	const [bodyTypeOptions, setBodyTypeOptions] = useState(Array<bodyTypeOption>);
-	const { updateData } = props;
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
 
@@ -45,6 +46,7 @@ export default (props: Props) => {
 	// 顶部筛选条件下拉切换
 	const changeVisibile = (val: boolean) => {
 		setconfigVisibile(!val);
+		toggleLayout(!val);
 	};
 
 	// 渲染顶部
@@ -189,148 +191,153 @@ export default (props: Props) => {
 	// 渲染表单
 	const renderForm = () => {
 		return (
-			<div className={styles['filter-form']}>
-				<Form
-					form={form}
-					labelCol={{ span: 6 }}
-					wrapperCol={{ span: 18 }}
-					layout="horizontal"
-					onFinish={searchUpdate}
-				>
-					<div className="main-filter">
-						<div className={styles['filter-item']}>
-							<Space>
-								<ApartmentOutlined
-									style={{ fontSize: '14px', color: '#E6697B' }}
-								/>
-							</Space>
-							<span>主体筛选</span>
-						</div>
-						<Form.List name="bodys">
-							{(fields, { add, remove }) => (
-								<>
-									{fields.map(({ key, name, ...restField }) => (
-										<div key={key}>
-											<Form.Item
-												label="主体类型"
-												{...restField}
-												name={[name, 'bodyType']}
-											>
-												<Select
-													placeholder="请选择"
-													allowClear
-													options={bodyTypeOptions}
-												></Select>
-											</Form.Item>
-											<Form.Item
-												label="主体名称"
-												{...restField}
-												name={[name, 'bodyName']}
-											>
-												<Input placeholder="主体名称" />
-											</Form.Item>
-											{/* <MinusCircleOutlined onClick={() => remove(name)} /> */}
-										</div>
-									))}
-									<Space
-										style={{
-											textAlign: 'right',
-											justifyContent: 'right',
-											width: '100%'
-										}}
-									>
-										{fields.length > 1 ? (
-											<span
-												style={{ marginRight: '5px', cursor: 'pointer' }}
-												onClick={() => {
-													remove(fields[fields.length - 1].name);
-												}}
-											>
-												<MinusCircleOutlined
-													style={{ fontSize: '14px', color: '#FF8683' }}
-												/>
-												<span
-													style={{
-														fontSize: '14px',
-														color: '#FF8683',
-														marginLeft: '4px'
-													}}
-												>
-													删除
-												</span>
-											</span>
-										) : (
-											<></>
-										)}
-										<span onClick={() => add()} style={{ cursor: 'pointer' }}>
-											<PlusCircleOutlined
-												style={{ fontSize: '14px', color: '#23955C' }}
-											/>
-											<span
-												style={{
-													fontSize: '14px',
-													color: '#23955C',
-													marginLeft: '4px',
-													cursor: 'pointer'
-												}}
-											>
-												添加
-											</span>
-										</span>
-									</Space>
-								</>
-							)}
-						</Form.List>
-					</div>
-
-					<div>
-						<div className="filter-item">
-							<Space>
-								<ApartmentOutlined
-									style={{ fontSize: '14px', color: '#E6697B' }}
-								/>
-							</Space>
-							<span>关系层级</span>
-						</div>
-						<Form.Item
-							name="leval"
-							label="展示层级"
-							initialValue={4}
-							rules={[{ required: true }]}
-						>
-							<InputNumber min={0} max={6} />
-						</Form.Item>
-					</div>
-
-					{bodys?.length === 1 && (
-						<div>
+			<div
+				style={{ height: configVisibile ? '100%' : '0' }}
+				className={styles['filter-form-box']}
+			>
+				<div className={styles['filter-form']}>
+					<Form
+						form={form}
+						labelCol={{ span: 6 }}
+						wrapperCol={{ span: 18 }}
+						layout="horizontal"
+						onFinish={searchUpdate}
+					>
+						<div className="main-filter">
 							<div className={styles['filter-item']}>
 								<Space>
 									<ApartmentOutlined
 										style={{ fontSize: '14px', color: '#E6697B' }}
 									/>
 								</Space>
-								<span>链路筛选</span>
+								<span>主体筛选</span>
 							</div>
-							<Form.Item name="hierarchy" label="链路筛选">
-								<AttrFillter data={{}}></AttrFillter>
+							<Form.List name="bodys">
+								{(fields, { add, remove }) => (
+									<>
+										{fields.map(({ key, name, ...restField }) => (
+											<div key={key}>
+												<Form.Item
+													label="主体类型"
+													{...restField}
+													name={[name, 'bodyType']}
+												>
+													<Select
+														placeholder="请选择"
+														allowClear
+														options={bodyTypeOptions}
+													></Select>
+												</Form.Item>
+												<Form.Item
+													label="主体名称"
+													{...restField}
+													name={[name, 'bodyName']}
+												>
+													<Input placeholder="主体名称" />
+												</Form.Item>
+												{/* <MinusCircleOutlined onClick={() => remove(name)} /> */}
+											</div>
+										))}
+										<Space
+											style={{
+												textAlign: 'right',
+												justifyContent: 'right',
+												width: '100%'
+											}}
+										>
+											{fields.length > 1 ? (
+												<span
+													style={{ marginRight: '5px', cursor: 'pointer' }}
+													onClick={() => {
+														remove(fields[fields.length - 1].name);
+													}}
+												>
+													<MinusCircleOutlined
+														style={{ fontSize: '14px', color: '#FF8683' }}
+													/>
+													<span
+														style={{
+															fontSize: '14px',
+															color: '#FF8683',
+															marginLeft: '4px'
+														}}
+													>
+														删除
+													</span>
+												</span>
+											) : (
+												<></>
+											)}
+											<span onClick={() => add()} style={{ cursor: 'pointer' }}>
+												<PlusCircleOutlined
+													style={{ fontSize: '14px', color: '#23955C' }}
+												/>
+												<span
+													style={{
+														fontSize: '14px',
+														color: '#23955C',
+														marginLeft: '4px',
+														cursor: 'pointer'
+													}}
+												>
+													添加
+												</span>
+											</span>
+										</Space>
+									</>
+								)}
+							</Form.List>
+						</div>
+
+						<div>
+							<div className="filter-item">
+								<Space>
+									<ApartmentOutlined
+										style={{ fontSize: '14px', color: '#E6697B' }}
+									/>
+								</Space>
+								<span>关系层级</span>
+							</div>
+							<Form.Item
+								name="leval"
+								label="展示层级"
+								initialValue={4}
+								rules={[{ required: true }]}
+							>
+								<InputNumber min={0} max={6} />
 							</Form.Item>
 						</div>
-					)}
 
-					<div className={styles['filter-form__btns']}>
-						<Button
-							htmlType="button"
-							onClick={onReset}
-							style={{ marginRight: '10px' }}
-						>
-							重置
-						</Button>
-						<Button type="primary" htmlType="submit">
-							查询
-						</Button>
-					</div>
-				</Form>
+						{bodys?.length === 1 && (
+							<div>
+								<div className={styles['filter-item']}>
+									<Space>
+										<ApartmentOutlined
+											style={{ fontSize: '14px', color: '#E6697B' }}
+										/>
+									</Space>
+									<span>链路筛选</span>
+								</div>
+								<Form.Item name="hierarchy" label="链路筛选">
+									<AttrFillter data={{}}></AttrFillter>
+								</Form.Item>
+							</div>
+						)}
+
+						<div className={styles['filter-form__btns']}>
+							<Button
+								htmlType="button"
+								onClick={onReset}
+								style={{ marginRight: '10px' }}
+							>
+								重置
+							</Button>
+							<Button type="primary" htmlType="submit">
+								查询
+							</Button>
+						</div>
+					</Form>
+				</div>
 			</div>
 		);
 	};
@@ -338,7 +345,7 @@ export default (props: Props) => {
 	return (
 		<div>
 			{renderTpggleTab()}
-			{configVisibile && renderForm()}
+			{renderForm()}
 		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Ref, useEffect, useRef, useState } from 'react';
 import { Button } from 'antd';
 import { type GraphinData } from '@antv/graphin';
 import html2canvas from 'html2canvas';
@@ -9,9 +9,15 @@ import styles from './index.module.less';
 
 import { getBodyGraphin } from '@/api/graphin';
 
+interface GraphinRef {
+	refersh: () => void;
+}
+
 const RelationShipCom = () => {
 	// 数据来源
 	const [data, setDate] = useState<GraphinData>();
+	const [barOpen, setBarOpen] = useState(true);
+	const graphinRef = useRef<GraphinRef>();
 
 	useEffect(() => {
 		getGraphinData();
@@ -43,17 +49,32 @@ const RelationShipCom = () => {
 		});
 	};
 
+	const toggleBarLayout = (isOpen: boolean) => {
+		setBarOpen(isOpen);
+		// graphinRef?.current?.refersh();
+	};
+
 	return (
-		<div className={styles['main-content']}>
+		<div
+			style={{
+				paddingLeft: barOpen ? '330px' : '0'
+			}}
+			className={styles['main-content']}
+		>
 			<div className={styles['filter-bar']}>
-				<SideBar updateData={updateData}></SideBar>
+				<SideBar
+					updateData={updateData}
+					toggleLayout={toggleBarLayout}
+				></SideBar>
 			</div>
 			<div className={styles['graphin-box']}>
 				{data && (
 					<>
 						<div className={styles['graphin-box__com']}>
 							<GraphinCom
+								// ref={graphinRef}
 								data={data}
+								refersh={barOpen}
 								updateData={updateData}
 								onClose={() => {}}
 							></GraphinCom>

@@ -1,14 +1,11 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Graphin, {
 	Components,
 	type TooltipValue,
 	type GraphinData,
-	type LegendChildrenProps,
-	IUserEdge,
-	IUserNode
+	type LegendChildrenProps
 } from '@antv/graphin';
-import { Menu, Checkbox, Col, Row } from 'antd';
-import type { CheckboxValueType } from 'antd/es/checkbox/Group';
+import { Menu } from 'antd';
 import registerNodes from './custom-node';
 import registerEdges from './custom-edge';
 import styles from './index.module.less';
@@ -21,171 +18,9 @@ registerEdges('all');
 //功能组件
 const { Tooltip, ContextMenu, Legend } = Components;
 
-// 原始数据
-const mockData: GraphinData = {
-	nodes: [
-		{
-			id: 'node-0',
-			x: 100,
-			y: 100,
-			data: {
-				type: 'centerPointer'
-			},
-			style: {
-				label: {
-					value: '我是node0',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 80,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-1',
-			x: 200,
-			y: 200,
-			data: {
-				type: 'project'
-			},
-			style: {
-				label: {
-					value: '我是node1',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 60,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-2',
-			x: 100,
-			y: 300,
-			data: {
-				type: 'project'
-			},
-			style: {
-				label: {
-					value: '我是node2',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 40,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-3',
-			data: {
-				type: 'person'
-			},
-			style: {
-				label: {
-					value: '我是node3',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 40,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-4',
-			data: {
-				type: 'person'
-			},
-			style: {
-				label: {
-					value: '我是node4',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 40,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		}
-	],
-	edges: [
-		{
-			id: 'edge-0-1',
-			source: 'node-0',
-			target: 'node-1',
-			style: {
-				label: {
-					value: '我是边1'
-				}
-			}
-		},
-		{
-			id: 'edge-0-3',
-			source: 'node-0',
-			target: 'node-3',
-			style: {
-				label: {
-					value: '我是边4'
-				}
-			}
-		},
-		{
-			id: 'edge-3-4',
-			source: 'node-3',
-			target: 'node-4',
-			style: {
-				label: {
-					value: '我是边5'
-				}
-			}
-		},
-		{
-			id: 'edge-1-2',
-			source: 'node-1',
-			target: 'node-2',
-			style: {
-				label: {
-					value: '我是边2'
-				},
-				keyshape: {
-					lineWidth: 5,
-					stroke: '#00f'
-				}
-			}
-		},
-		{
-			id: 'edge-0-2',
-			source: 'node-0',
-			target: 'node-2',
-			style: {
-				label: {
-					value: '我是边3'
-				}
-			}
-		}
-	]
-};
-
 interface Props {
 	data: GraphinData;
+	refersh: boolean;
 	updateData: (layout: any) => void;
 	onClose: () => void;
 	id?: string;
@@ -365,60 +200,77 @@ const MyMenu = React.memo((props: Props) => {
 });
 
 const GraphinCom = React.memo((props: Props) => {
-	const { data, updateData } = props;
+	const { data, updateData, refersh } = props;
+	const [key, setKey] = useState('');
+	const [width, setWidth] = useState(600);
+	const graphinRef = useRef<HTMLDivElement>();
+
+	useEffect(() => {
+		const rect = graphinRef?.current?.getBoundingClientRect();
+		setWidth(rect?.width as number);
+	}, []);
+
+	useEffect(() => {
+		const rect = graphinRef?.current?.getBoundingClientRect();
+		setKey(`${rect?.width}`);
+		setWidth(rect?.width as number);
+	}, [refersh]);
 
 	return (
-		<Graphin
-			data={data}
-			layout={{
-				type: 'force',
-				// linkDistance: 400,
-				preventOverlap: true,
-				nodeSize: 140,
-				nodeSpacing: 50
-			}}
-		>
-			<Tooltip bindType="node" placement={'top'}>
-				{(value: TooltipValue) => {
-					if (value.model) {
-						const { model } = value;
-						console.log(model, 421111111);
-						return <NodeDetail nodeModel={model} />;
-					}
-					return null;
+		<div ref={graphinRef} className={styles['graphin-box']}>
+			<Graphin
+				key={key}
+				data={data}
+				width={width}
+				layout={{
+					type: 'force',
+					// linkDistance: 400,
+					preventOverlap: true,
+					nodeSize: 140,
+					nodeSpacing: 50
+					// animation: false
 				}}
-			</Tooltip>
-			<Tooltip bindType="edge" placement={'top'}>
-				{(value: TooltipValue) => {
-					if (value.model) {
-						const { model } = value;
-						console.log(model, 42222222222);
-						return <NodeDetail nodeModel={model} />;
-					}
-					return null;
-				}}
-			</Tooltip>
-			<ContextMenu style={{ background: '#fff' }} bindType="node">
-				{(value) => {
-					console.log(value, 101);
-					const { onClose, id } = value;
-					return (
-						<MyMenu
-							onClose={onClose}
-							id={id}
-							data={data}
-							updateData={updateData}
-						/>
-					);
-				}}
-			</ContextMenu>
-			<Legend bindType="node" sortKey="typeName">
-				{(renderProps: LegendChildrenProps) => {
-					console.log('renderProps', renderProps);
-					return <Legend.Node {...renderProps} />;
-				}}
-			</Legend>
-		</Graphin>
+			>
+				<Tooltip bindType="node" placement={'top'}>
+					{(value: TooltipValue) => {
+						if (value.model) {
+							const { model } = value;
+							console.log(model, 421111111);
+							return <NodeDetail nodeModel={model} />;
+						}
+						return null;
+					}}
+				</Tooltip>
+				<Tooltip bindType="edge" placement={'top'}>
+					{(value: TooltipValue) => {
+						if (value.model) {
+							const { model } = value;
+							return <NodeDetail nodeModel={model} />;
+						}
+						return null;
+					}}
+				</Tooltip>
+				<ContextMenu style={{ background: '#fff' }} bindType="node">
+					{(value) => {
+						console.log(value, 101);
+						const { onClose, id } = value;
+						return (
+							<MyMenu
+								onClose={onClose}
+								id={id}
+								data={data}
+								updateData={updateData}
+							/>
+						);
+					}}
+				</ContextMenu>
+				<Legend bindType="node" sortKey="typeName">
+					{(renderProps: LegendChildrenProps) => {
+						return <Legend.Node {...renderProps} />;
+					}}
+				</Legend>
+			</Graphin>
+		</div>
 	);
 });
 
