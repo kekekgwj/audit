@@ -1,17 +1,87 @@
-import React, { useRef } from 'react';
+import React, {
+	createContext,
+	useContext,
+	useEffect,
+	useRef,
+	useState
+} from 'react';
 import AceEditor from 'react-ace';
-// https://github.com/securingsincity/react-ace/blob/master/docs/FAQ.md
+
+// import 'ace-builds/src-noconflict/mode-javascript';
+// import 'ace-builds/src-noconflict/snippets/javascript';
+import 'ace-builds/src-noconflict/mode-sql';
+import 'ace-builds/src-noconflict/snippets/sql';
+import 'ace-builds/src-min-noconflict/ext-searchbox';
+import 'ace-builds/src-min-noconflict/ext-language_tools';
+import SearchBox from './components/SearchBox';
+import ReactAce from 'react-ace/lib/ace';
+
+export const EditorContext = createContext({});
+
+export enum BoxType {
+	SQL,
+	TABLE,
+	COLUMN,
+	NONE
+}
+
 const SQLEditor: React.FC = () => {
+	useEffect(() => {
+		if (editorRef && editorRef.current) {
+			editorRef.current.editor.addEventListener('blur', () =>
+				setShowSearchBox(BoxType.NONE)
+			);
+			return () => {
+				editorRef?.current?.editor.removeEventListener('blur', () => {});
+			};
+		}
+	}, []);
 	const onChange = (...args) => {
-		console.log(args);
+		setShowSearchBox(BoxType.NONE);
+		// 获得焦点
+
+		if (editorRef && editorRef.current) {
+			const editorCur = editorRef.current;
+			editorCur.editor.focus();
+		}
 	};
-	const editorRef = useRef(null);
+	const getCursorPosition = () => {
+		if (editorRef && editorRef.current) {
+			const editor = editorRef.current.editor;
+			const renderer = editor.renderer;
+
+			const { row, column } = editor.getCursorPosition();
+			const session = editor.getSession();
+			const base = session.doc.createAnchor(row, column);
+			const pos = renderer.$cursorLayer.getPixelPosition(base, true);
+
+			setPos(pos);
+			return pos;
+		}
+	};
+	const insertText = (text: string) => {
+		if (!editorRef || !editorRef.current) {
+			return;
+		}
+		editorRef.current.editor.insert(text);
+	};
+	const editorRef = useRef<ReactAce>(null);
+	interface IPos {
+		top: number;
+		left: number;
+	}
+	const [pos, setPos] = useState<IPos>({ top: 0, left: 0 });
+	const [showSearchBox, setShowSearchBox] = useState<BoxType>(BoxType.NONE);
+	const triggerSearchBox = (type: BoxType) => {
+		getCursorPosition();
+		setShowSearchBox(type);
+	};
 	return (
 		<div>
 			<AceEditor
 				id="editor"
 				aria-label="editor"
-				mode="mysql"
+				mode="sql"
 				theme="github"
 				name="editor"
 				ref={editorRef}
@@ -22,32 +92,32 @@ const SQLEditor: React.FC = () => {
 				showPrintMargin={false}
 				showGutter
 				placeholder="Write your Query here..."
-				editorProps={{ $blockScrolling: true }}
+				// editorProps={{ $blockScrolling: true }}
 				setOptions={{
 					enableBasicAutocompletion: true,
-					enableLiveAutocompletion: true,
-					enableSnippets: true
+					enableSnippets: true,
+					enableLiveAutocompletion: true
 				}}
 				commands={[
 					{
 						name: '选择SQL语句',
 						bindKey: { win: '#', mac: '#' },
 						exec: () => {
-							console.log('选择SQL语句');
+							triggerSearchBox(BoxType.SQL);
 						}
 					},
 					{
-						name: '',
+						name: '选择表名',
 						bindKey: { win: '$', mac: '$' },
 						exec: () => {
-							console.log('选择数据表');
+							triggerSearchBox(BoxType.TABLE);
 						}
 					},
 					{
-						name: '',
+						name: '选择字段',
 						bindKey: { win: '!', mac: '!' },
 						exec: () => {
-							console.log('选择表字段');
+							triggerSearchBox(BoxType.COLUMN);
 						}
 					}
 				]}
@@ -55,6 +125,11 @@ const SQLEditor: React.FC = () => {
 				onChange={onChange}
 				showLineNumbers
 			/>
+			<EditorContext.Provider value={{ insertText }}>
+				{showSearchBox !== BoxType.NONE && (
+					<SearchBox pos={pos} type={showSearchBox} />
+				)}
+			</EditorContext.Provider>
 		</div>
 	);
 };
