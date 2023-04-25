@@ -61,10 +61,16 @@ const RelationShipCom = () => {
 			}}
 			className={styles['main-content']}
 		>
-			<div className={styles['filter-bar']}>
+			<div
+				style={{
+					height: barOpen ? '100%' : '0'
+				}}
+				className={styles['filter-bar']}
+			>
 				<SideBar
 					updateData={updateData}
 					toggleLayout={toggleBarLayout}
+					canAdd={true}
 				></SideBar>
 			</div>
 			<div className={styles['graphin-box']}>

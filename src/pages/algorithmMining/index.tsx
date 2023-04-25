@@ -3,7 +3,9 @@ import { type GraphinData } from '@antv/graphin';
 import GraphinCom from '../../components/graphin';
 import SideBar from '../../components/sidebar/sideBar';
 import { Button } from 'antd';
+import html2canvas from 'html2canvas';
 import styles from './index.module.less';
+import { toImgStyle } from '@/utils/other';
 
 const mockData: GraphinData = {
 	nodes: [
@@ -170,25 +172,63 @@ const mockData: GraphinData = {
 const Algorithm = () => {
 	// 数据来源
 	const [data, setDate] = React.useState(mockData);
+	const [barOpen, setBarOpen] = React.useState(true);
 	// 更新数据
 	const updateData = (value) => {
 		setDate(value);
 	};
+
+	// 保存图谱
+	const saveGraph = () => {
+		console.log('1111');
+		window.pageYOffset = 0; //网页位置
+		document.documentElement.scrollTop = 0; //滚动条的位置
+		document.body.scrollTop = 0; //网页被卷去的高
+		//获取要生成图片的dom区域并转为canvas;
+		html2canvas(document.querySelector('#graphin-container')).then((canvas) => {
+			const base64Img = canvas.toDataURL('image/png'); //将canvas转为base64
+			const file = toImgStyle(base64Img, Date.now() + '.png');
+			//调用后端接口，将文件传给后端
+		});
+	};
+
+	const toggleBarLayout = (isOpen: boolean) => {
+		setBarOpen(isOpen);
+	};
+
 	return (
-		<div className={styles['main-content']}>
-			<div className={styles['filter-bar']}>
-				<SideBar updateData={updateData}></SideBar>
+		<div
+			style={{
+				paddingLeft: barOpen ? '330px' : '0'
+			}}
+			className={styles['main-content']}
+		>
+			<div
+				style={{
+					height: barOpen ? '100%' : '0'
+				}}
+				className={styles['filter-bar']}
+			>
+				<SideBar
+					updateData={updateData}
+					toggleLayout={toggleBarLayout}
+					canAdd={false}
+				></SideBar>
 			</div>
 			<div className={styles['graphin-box']}>
 				<div className={styles['graphin-box__com']}>
 					<GraphinCom
 						data={data}
 						updateData={updateData}
+						refersh={barOpen}
 						onClose={() => {}}
 					></GraphinCom>
 				</div>
 				<div className={styles['graphin-box__btn']}>
 					<Button
+						onClick={() => {
+							saveGraph();
+						}}
 						htmlType="button"
 						style={{ background: '#23955C', color: '#fff' }}
 					>
