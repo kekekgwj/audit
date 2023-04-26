@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import emptyPage from '@/assets/img/empty.png';
 import {
 	Table,
 	Space,
@@ -18,7 +19,13 @@ import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import DeleteDialog from '@/components/delete-dialog';
 import styles from './index.module.less';
 
-const MyTableCom = React.memo(() => {
+import { getMyAltasList } from '@/api/myAltas';
+
+interface TableProps {
+	data: [];
+}
+const MyTableCom = React.memo((props: TableProps) => {
+	const { data } = props;
 	const navigate = useNavigate();
 	// 查看
 	const handleDetail = (row) => {
@@ -47,12 +54,12 @@ const MyTableCom = React.memo(() => {
 			dataIndex: 'key'
 		},
 		{
-			title: '规则名称',
-			dataIndex: 'ruleName'
+			title: '图谱名称',
+			dataIndex: 'name'
 		},
 		{
-			title: '规则用途',
-			dataIndex: 'ruleUse'
+			title: '创建时间',
+			dataIndex: 'createTime'
 		},
 		{
 			title: '操作',
@@ -83,20 +90,7 @@ const MyTableCom = React.memo(() => {
 			}
 		}
 	];
-	const data = [
-		{
-			key: '1',
-			ruleName: '胡彦斌111',
-			ruleUse: '西湖区湖底公园1号',
-			id: '111'
-		},
-		{
-			key: '2',
-			ruleName: '胡彦祖1111',
-			ruleUse: '西湖区湖底公园1号',
-			id: '222'
-		}
-	];
+
 	return (
 		<div>
 			<Table
@@ -129,18 +123,22 @@ const MyTableCom = React.memo(() => {
 });
 
 const MyAtlasCom = () => {
-	// 是否显示表
-	const [showTable, setShowTable] = React.useState(false);
-
+	const [tableData, setTableData] = React.useState([]);
 	const [form] = Form.useForm();
+	useEffect(() => {
+		getList();
+	}, []);
+
+	const getList = async () => {
+		const res = await getMyAltasList();
+		setTableData(res);
+	};
 
 	const onReset = () => {
 		form.resetFields();
-		setShowTable(false);
 	};
 	const search = (res) => {
 		console.log(res);
-		setShowTable(true);
 	};
 
 	return (
@@ -178,7 +176,15 @@ const MyAtlasCom = () => {
 					</Form.Item>
 				</Form>
 			</div>
-			{showTable ? <MyTableCom /> : <Empty />}
+			{tableData?.length > 0 ? (
+				<MyTableCom data={tableData} />
+			) : (
+				<Empty
+					image={emptyPage}
+					description={false}
+					imageStyle={{ height: '193px' }}
+				/>
+			)}
 		</div>
 	);
 };
