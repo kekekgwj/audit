@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { routes, CustomRoute } from '@/routers/routes';
 import SvgIcon from '@graph/components/svg-icon';
 import styles from './index.module.less';
+import React from 'react';
 
 interface MenuItem {
 	path?: string;
@@ -33,26 +34,28 @@ const initMenu = (routes: CustomRoute[], parentPath = '') => {
 export default () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const [menu] = useState<MenuItem[]>(initMenu(routes));
+	const [menus] = useState<MenuItem[]>(initMenu(routes));
 
 	const handleNavigate = (path: string | undefined) => {
 		if (path) {
 			navigate(path);
 		}
 	};
+	const menu = menus[1];
+
 	return (
 		<div>
 			<div className={`${styles['parent-menu']} ${styles['menu-item']}`}>
-				{menu[0]?.icon && (
+				{menu?.icon && (
 					<SvgIcon
-						name={menu[0]?.icon}
+						name={menu?.icon}
 						className={styles['menu-item__icon']}
 					></SvgIcon>
 				)}
-				<div>{menu[0]?.title}</div>
+				<div>{menu?.title}</div>
 			</div>
 			<div className="menu-list">
-				{menu[0].children?.map((m) => (
+				{menu.children?.map((m) => (
 					<div
 						key={m.path}
 						onClick={() => {

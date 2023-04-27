@@ -1,10 +1,52 @@
-.container {
-	width: 240px;
-	height: 100%;
-	box-shadow: 4px 0px 12px 0px rgba(66, 81, 112, 0.15);
+.drawerWrapper {
 	position: relative;
-	z-index: 1000;
-	padding: 17px 0 0 14px;
+	.container {
+		width: 240px;
+		height: 100%;
+		box-shadow: 4px 0px 12px 0px rgba(66, 81, 112, 0.15);
+		position: relative;
+		z-index: 1000;
+		padding: 17px 0 0 14px;
+
+		.tableItemWrapper {
+			.itemTitle {
+				.iconGroup {
+					display: inline-block;
+					width: 16px;
+					height: 16px;
+					background-image: url('../../../../../assets//SQLEditor/group.png');
+					background-size: cover;
+				}
+				.title {
+					font-size: 14px;
+					font-weight: bold;
+					color: #18181f;
+					margin-left: 8px;
+				}
+			}
+			.textWrapper {
+				margin-top: 20px;
+				margin-left: 8px;
+				.iconTable {
+					display: inline-block;
+					width: 16px;
+					height: 16px;
+					background-image: url('../../../../../assets//SQLEditor/table.png');
+					background-size: cover;
+				}
+				.tableName {
+					margin-left: 8px;
+					font-size: 14px;
+					font-weight: 400;
+					color: #767676;
+				}
+			}
+		}
+		.tableItemWrapper:not(:first-child) {
+			width: 200px;
+			margin-top: 20px;
+		}
+	}
 	.switch {
 		position: absolute;
 		right: -19px;
@@ -19,42 +61,5 @@
 		transform: translateY(-50%);
 		font-size: 10px;
 		z-index: 9999;
-	}
-	.tableItemWrapper {
-		.itemTitle {
-			.iconGroup {
-				display: inline-block;
-				width: 16px;
-				height: 16px;
-				background-image: url('../../../../../assets//SQLEditor/group.png');
-				background-size: cover;
-			}
-			.title {
-				font-size: 14px;
-				font-weight: bold;
-				color: #18181f;
-				margin-left: 8px;
-			}
-		}
-		.textWrapper {
-			margin-top: 20px;
-			margin-left: 8px;
-			.iconTable {
-				display: inline-block;
-				width: 16px;
-				height: 16px;
-				background-image: url('../../../../../assets//SQLEditor/table.png');
-				background-size: cover;
-			}
-			.tableName {
-				margin-left: 8px;
-				font-size: 14px;
-				font-weight: 400;
-				color: #767676;
-			}
-		}
-	}
-	.tableItemWrapper:not(:first-child) {
-		margin-top: 20px;
 	}
 }

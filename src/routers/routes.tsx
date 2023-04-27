@@ -17,7 +17,7 @@ export type CustomRoute = {
 
 export const routes: CustomRoute[] = [
 	{
-		path: '/graph',
+		path: '/',
 		component: lazy(() => import('@graph/layout')),
 		meta: { title: '供应商关系图谱', icon: 'atlas' },
 		children: [
@@ -55,6 +55,24 @@ export const routes: CustomRoute[] = [
 	},
 	{
 		path: '/sql',
-		component: lazy(() => import('@graph/layout'))
+		component: lazy(() => import('@sql/layout')),
+		meta: { title: '数据分析工具', icon: 'atlas' },
+		children: [
+			{
+				path: 'analysis',
+				component: lazy(() => import('@sql/pages/analysisTool')),
+				meta: { title: '数据可视化', icon: 'body' }
+			},
+			{
+				path: 'editor',
+				component: lazy(() => import('@sql/pages/SQLEditor')),
+				meta: { title: 'SQL查询', icon: 'body' }
+			},
+			{
+				path: 'data',
+				component: lazy(() => import('@sql/pages/SQLEditor')),
+				meta: { title: '我的数据管理', icon: 'body' }
+			}
+		]
 	}
 ];

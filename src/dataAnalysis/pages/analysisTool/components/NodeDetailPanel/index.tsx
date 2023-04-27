@@ -7,7 +7,8 @@ import { JoinConfigPanel } from '../ConfigPanel';
 import { ColumnsType } from 'antd/es/table';
 const Panel: React.FC = () => {
 	const state = useSelector((state: IGlobalState) => state.dataAnaylsis);
-	const { curSelectedNode: id, showPanel } = state;
+
+	const { curSelectedNode: id, showPanel } = state || {};
 	interface DataType {
 		key: React.Key;
 		name: string;

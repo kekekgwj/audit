@@ -51,11 +51,15 @@ const SQLEditor: React.FC = () => {
 		if (editorRef && editorRef.current) {
 			const editor = editorRef.current.editor;
 			const renderer = editor.renderer;
-
+			const rect = editor.container.getBoundingClientRect();
 			const { row, column } = editor.getCursorPosition();
 			const session = editor.getSession();
 			const base = session.doc.createAnchor(row, column);
 			const pos = renderer.$cursorLayer.getPixelPosition(base, true);
+
+			pos.top += rect.top - renderer.layerConfig.offset;
+			pos.left += rect.left - editor.renderer.scrollLeft;
+			// pos.left += renderer.gutterWidth;
 
 			setPos(pos);
 			return pos;

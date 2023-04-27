@@ -181,7 +181,7 @@ const ColumnBox: FC = () => {
 	);
 };
 const SearchBox: FC<IProps> = ({ pos, type }) => {
-	const offsetLeft = (pos?.left || 0) + 30;
+	const offsetLeft = (pos?.left || 0) - 150;
 	const offsetTop = (pos?.top || 0) + 30;
 	return (
 		<div

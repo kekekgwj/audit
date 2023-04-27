@@ -1,0 +1,31 @@
+.parent-menu {
+	background: #f8f9fa;
+	&.menu-item {
+		font-size: 16px;
+		padding-left: 16px;
+		color: #767676;
+		&__icon {
+			font-size: 24px;
+			margin-right: 8px;
+		}
+	}
+}
+
+.menu-item {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 50px;
+	padding: 0 20px;
+	border-left: 6px solid transparent;
+	cursor: pointer;
+	&.active {
+		border-color: #23955c;
+		color: #23955c;
+		fill: #23955c;
+	}
+	&__icon {
+		font-size: 16px;
+		margin-right: 12px;
+	}
+}

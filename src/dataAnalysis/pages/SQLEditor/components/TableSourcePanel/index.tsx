@@ -1,30 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classes from './index.module.less';
+import { Collapse } from 'antd';
+const { Panel } = Collapse;
 
 const TableItem: React.FC = ({ data }) => {
 	if (!data) {
 		return null;
 	}
 	return (
-		<div className={classes.tableItemWrapper}>
-			<div className={classes.itemTitle}>
-				<image className={classes.iconGroup}></image>
-				<span className={classes.title}>{data.title}</span>
-			</div>
-			{data.tables &&
-				data.tables.map((table) => {
-					return (
-						<div className={classes.textWrapper}>
-							<span className={classes.iconTable}></span>
-							<span className={classes.tableName}>{table.tableName}</span>
-						</div>
-					);
-				})}
-		</div>
+		<Collapse
+			className={classes.tableItemWrapper}
+			expandIconPosition={'start'}
+			ghost={true}
+		>
+			<Panel
+				header={
+					<>
+						<image className={classes.iconGroup}></image>
+						<span className={classes.title}>{data.title}</span>
+					</>
+				}
+				className={classes.itemTitle}
+			>
+				{data.tables &&
+					data.tables.map((table) => {
+						return (
+							<div className={classes.textWrapper}>
+								<span className={classes.iconTable}></span>
+								<span className={classes.tableName}>{table.tableName}</span>
+							</div>
+						);
+					})}
+			</Panel>
+		</Collapse>
 	);
 };
 
 const TableSourcePanel: React.FC = () => {
+	const [open, setOpen] = useState<boolean>(true);
+	const onClickSwitch = () => {
+		setOpen(!open);
+	};
 	const data1 = {
 		title: '系统数据',
 		tables: [
@@ -60,14 +76,17 @@ const TableSourcePanel: React.FC = () => {
 		]
 	};
 	return (
-		<div
-			// onClose={onClose}
-			// open={open}
-			className={classes.container}
-		>
-			<TableItem data={data1}></TableItem>
-			<TableItem data={data2}></TableItem>
-			<div className={classes.switch}>{'<<'}</div>
+		<div className={classes.drawerWrapper}>
+			{open && (
+				<div className={classes.container}>
+					<TableItem data={data1}></TableItem>
+					<TableItem data={data2}></TableItem>
+				</div>
+			)}
+
+			<div className={classes.switch} onClick={onClickSwitch}>
+				{open ? '<<' : '>>'}
+			</div>
 		</div>
 	);
 };
