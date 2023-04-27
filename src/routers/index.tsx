@@ -1,33 +1,50 @@
-import { createBrowserRouter } from 'react-router-dom';
-import RealtionShip from '@/pages/relationShip';
-import AlgorithmMining from '@/pages/algorithmMining';
-import MyAtlas from '@/pages/myAtlas';
-import AltasDetail from '@/pages/myAtlas/detail';
-import SuspiciousRule from '@/pages/suspiciousRule';
-import WhiteList from '@/pages/whiteList';
-export default createBrowserRouter([
-	{
-		path: '/',
-		element: <RealtionShip />
-	},
-	{
-		path: '/algorithmMining',
-		element: <AlgorithmMining />
-	},
-	{
-		path: '/myAtlas',
-		element: <MyAtlas />
-	},
-	{
-		path: '/suspiciousRule',
-		element: <SuspiciousRule />
-	},
-	{
-		path: '/altasDetail',
-		element: <AltasDetail />
-	},
-	{
-		path: '/whiteList',
-		element: <WhiteList />
+import { Suspense } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+
+import { CustomRoute, routes } from './routes';
+
+const Loading = () => {
+	return <div>loading...</div>;
+};
+
+const rotuerViews = (routerItems: CustomRoute[]) => {
+	if (routerItems && routerItems.length) {
+		return routerItems.map(
+			({ path, component: Component, children, redirect }) => {
+				return children && children.length ? (
+					<Route
+						path={path}
+						key={path}
+						element={
+							<Suspense fallback={<Loading />}>
+								<Component />
+							</Suspense>
+						}
+					>
+						{rotuerViews(children)}
+						{redirect ? (
+							<Route path={path} element={<Navigate to={redirect} />}></Route>
+						) : (
+							<Route
+								path={path}
+								element={<Navigate to={children[0].path} />}
+							></Route>
+						)}
+					</Route>
+				) : (
+					<Route
+						key={path}
+						path={path}
+						element={
+							<Suspense fallback={<Loading />}>
+								<Component />
+							</Suspense>
+						}
+					></Route>
+				);
+			}
+		);
 	}
-]);
+};
+
+export default () => <Routes>{rotuerViews(routes)}</Routes>;
