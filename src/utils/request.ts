@@ -1,26 +1,47 @@
-import axios from 'axios';
-
-const http = axios.create({
-	baseURL: import.meta.env.VITE_APP_BASE_API,
-	timeout: 1000
-});
-
-http.interceptors.request.use(
-	(config) => {
-		return config;
-	},
-	(error) => {
-		console.log(error);
+// http request
+export async function http<T>(request: RequestInfo): Promise<T> {
+	const response = await fetch(request);
+	try {
+		const body = await response.json();
+		// if (response.ok) {
+		// 	return body;
+		// } else {
+		// 	return body;
+		// }
+		return body.data;
+	} catch (e) {
+		console.error(e);
+		return Promise.reject(e);
 	}
-);
+}
 
-http.interceptors.response.use(
-	(res) => {
-		return res.data;
-	},
-	(error) => {
-		console.log(error);
+export async function get<T>(
+	path: string,
+	args: RequestInit = { method: 'get' }
+): Promise<T> {
+	return await http<T>(new Request(path, args));
+}
+export async function post<T>(
+	path: string,
+	body: any,
+	args: RequestInit = {
+		method: 'post',
+		body: JSON.stringify(body),
+		headers: {
+			'Content-Type': 'application/json'
+		}
 	}
-);
+): Promise<T> {
+	return await http<T>(new Request(path, args));
+}
 
-export default http;
+export const appendQueryParams: (
+	url: string,
+	params: { [key: string]: string | number }
+) => string = (url, params) => {
+	let queryParams = '';
+	Object.keys(params).forEach((key) => {
+		queryParams = queryParams.concat(key, '=', String(params[key]), '&');
+	});
+	return `${url}?${queryParams}`.slice(0, -1);
+};
