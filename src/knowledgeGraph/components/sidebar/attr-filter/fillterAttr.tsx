@@ -1,6 +1,7 @@
 import { Checkbox, Input, Radio, DatePicker } from 'antd';
 
 import styles from './index.module.less';
+import React from 'react';
 
 export default () => {
 	const { RangePicker } = DatePicker;

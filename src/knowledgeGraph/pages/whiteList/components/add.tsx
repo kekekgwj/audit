@@ -1,5 +1,5 @@
 import React, { useState, useImperativeHandle } from 'react';
-import CustomDialog from '@/components/custom-dialog';
+import CustomDialog from '@graph/components/custom-dialog';
 import { Space, Pagination, Form, Input, Button, Select } from 'antd';
 
 interface Props {

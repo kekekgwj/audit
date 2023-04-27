@@ -17,40 +17,44 @@ export type CustomRoute = {
 
 export const routes: CustomRoute[] = [
 	{
-		path: '/',
-		component: lazy(() => import('@/layout')),
+		path: '/graph',
+		component: lazy(() => import('@graph/layout')),
 		meta: { title: '供应商关系图谱', icon: 'atlas' },
 		children: [
 			{
 				path: 'relationShip',
-				component: lazy(() => import('@/pages/relationShip')),
+				component: lazy(() => import('@graph/pages/relationShip')),
 				meta: { title: '主体查询', icon: 'body' }
 			},
 			{
 				path: 'algorithmMining',
-				component: lazy(() => import('@/pages/algorithmMining')),
+				component: lazy(() => import('@graph/pages/algorithmMining')),
 				meta: { title: '算法挖掘', icon: 'algorithm' }
 			},
 			{
 				path: 'myAtlas',
-				component: lazy(() => import('@/pages/myAtlas')),
+				component: lazy(() => import('@graph/pages/myAtlas')),
 				meta: { title: '我的图谱', icon: 'my-atlas' }
 			},
 			{
 				path: 'suspiciousRule',
-				component: lazy(() => import('@/pages/suspiciousRule')),
+				component: lazy(() => import('@graph/pages/suspiciousRule')),
 				meta: { title: '可疑规则', icon: 'rule' }
 			},
 			{
 				path: 'altasDetail',
-				component: lazy(() => import('@/pages/myAtlas/detail')),
+				component: lazy(() => import('@graph/pages/myAtlas/detail')),
 				meta: { title: 'altasDetail', hidden: true }
 			},
 			{
 				path: 'whiteList',
-				component: lazy(() => import('@/pages/whiteList')),
+				component: lazy(() => import('@graph/pages/whiteList')),
 				meta: { title: '白名单', icon: 'white' }
 			}
 		]
+	},
+	{
+		path: '/sql',
+		component: lazy(() => import('@graph/layout'))
 	}
 ];

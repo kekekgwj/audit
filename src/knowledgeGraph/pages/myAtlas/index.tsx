@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import emptyPage from '@/assets/img/empty.png';
 import {
 	Table,
 	Space,
@@ -13,61 +14,28 @@ import {
 	DatePicker,
 	Empty
 } from 'antd';
-import emptyPage from '@/assets/img/empty.png';
 const { RangePicker } = DatePicker;
-const { confirm } = Modal;
-import {
-	EyeOutlined,
-	DeleteOutlined,
-	FormOutlined,
-	ExclamationCircleFilled
-} from '@ant-design/icons';
+import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import DeleteDialog from '@graph/components/delete-dialog';
 import styles from './index.module.less';
-import Add from './components/add';
-import Edit from './components/edit';
-import Delete from '@/components/delete-dialog';
 
-import { getWhiteList } from '@/api/whiteList';
+import { getMyAltasList } from '@/api/knowledgeGraph/myAltas';
 
-interface TanbleProps {
+interface TableProps {
 	data: [];
 }
-
-const MyTableCom = React.memo((props: TanbleProps) => {
-	const navigate = useNavigate();
-	const [curId, setCurId] = React.useState();
-	const [openAdd, setOpenAdd] = React.useState(false);
-	const addRef = useRef();
-	const [openEdit, setOpenEdit] = React.useState(false);
-	const editRef = useRef();
-	const [openDel, setOpenDel] = React.useState(false);
-
+const MyTableCom = React.memo((props: TableProps) => {
 	const { data } = props;
-
-	//添加
-	const add = () => {
-		setOpenAdd(true);
+	const navigate = useNavigate();
+	// 查看
+	const handleDetail = (row) => {
+		navigate('/altasDetail', { state: { id: row.id } });
 	};
 
-	const handleCancelAdd = () => {
-		addRef.current.resetForm();
-		setOpenAdd(false);
-	};
-
-	//编辑
-	const handleEdit = (row) => {
-		setCurId(row.id);
-		setOpenEdit(true);
-	};
-
-	const handleCancelEdit = () => {
-		editRef.current.resetForm();
-		setOpenEdit(false);
-	};
+	const [openDel, setOpenDel] = React.useState(false);
 
 	// 删除
 	const handleDelete = (row) => {
-		setCurId(row.id);
 		setOpenDel(true);
 	};
 
@@ -76,7 +44,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	};
 
 	const submitDel = () => {
-		console.log('delete:' + curId);
+		console.log('delete');
 		setOpenDel(false);
 	};
 
@@ -86,12 +54,8 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 			dataIndex: 'key'
 		},
 		{
-			title: '名称',
+			title: '图谱名称',
 			dataIndex: 'name'
-		},
-		{
-			title: '类型',
-			dataIndex: 'type'
 		},
 		{
 			title: '创建时间',
@@ -104,13 +68,13 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 				return (
 					<div>
 						<span
-							onClick={() => handleEdit(row)}
+							onClick={() => handleDetail(row)}
 							style={{ cursor: 'pointer', marginRight: '10px' }}
 						>
 							<Space>
-								<FormOutlined style={{ color: '#23955C' }} />
+								<EyeOutlined style={{ color: '#23955C' }} />
 							</Space>
-							<span style={{ marginLeft: '2px' }}>编辑</span>
+							<span style={{ marginLeft: '2px' }}>查看</span>
 						</span>
 						<span
 							onClick={() => handleDelete(row)}
@@ -129,17 +93,6 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 
 	return (
 		<div>
-			<div className={styles['handle-table-box']}>
-				<Button
-					htmlType="button"
-					onClick={() => {
-						add();
-					}}
-					className={styles['add-button']}
-				>
-					新增
-				</Button>
-			</div>
 			<Table
 				columns={colums}
 				dataSource={data}
@@ -160,34 +113,24 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 				</div>
 				<Pagination total={85} showSizeChanger showQuickJumper />
 			</div>
-			<Add open={openAdd} handleCancel={handleCancelAdd} cRef={addRef}></Add>
-			<Edit
-				open={openEdit}
-				handleCancel={handleCancelEdit}
-				cRef={editRef}
-				id={curId}
-			></Edit>
-			<Delete
+			<DeleteDialog
 				open={openDel}
 				handleCancle={handleCancleDel}
 				onOk={submitDel}
-			></Delete>
+			></DeleteDialog>
 		</div>
 	);
 });
 
-const WhiteListCom = () => {
-	// 是否显示表
-	// const [showTable, setShowTable] = React.useState(false);
-	const [form] = Form.useForm();
+const MyAtlasCom = () => {
 	const [tableData, setTableData] = React.useState([]);
-
+	const [form] = Form.useForm();
 	useEffect(() => {
 		getList();
 	}, []);
 
 	const getList = async () => {
-		const res = await getWhiteList();
+		const res = await getMyAltasList();
 		setTableData(res);
 	};
 
@@ -199,7 +142,7 @@ const WhiteListCom = () => {
 	};
 
 	return (
-		<div>
+		<div className={styles.altasContent}>
 			<div className={styles.searchForm}>
 				<Form
 					form={form}
@@ -210,11 +153,7 @@ const WhiteListCom = () => {
 						search(res);
 					}}
 				>
-					<Form.Item name="mainType" label="名称">
-						<Input />
-					</Form.Item>
-
-					<Form.Item name="type" label="类型">
+					<Form.Item name="mainType" label="图谱名称">
 						<Input />
 					</Form.Item>
 
@@ -249,4 +188,4 @@ const WhiteListCom = () => {
 		</div>
 	);
 };
-export default WhiteListCom;
+export default MyAtlasCom;

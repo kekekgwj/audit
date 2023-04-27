@@ -2,12 +2,12 @@ import React, { Ref, useEffect, useRef, useState } from 'react';
 import { Button } from 'antd';
 import { type GraphinData } from '@antv/graphin';
 import html2canvas from 'html2canvas';
-import GraphinCom from '@/components/graphin';
-import SideBar from '@/components/sidebar/sideBar';
+import GraphinCom from '@graph/components/graphin';
+import SideBar from '@graph/components/sidebar/sideBar';
 import { toImgStyle } from '@/utils/other';
 import styles from './index.module.less';
 
-import { getBodyGraphin } from '@/api/graphin';
+import { getBodyGraphin } from '@/api/knowledgeGraph/graphin';
 
 interface GraphinRef {
 	refersh: () => void;

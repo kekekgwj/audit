@@ -13,9 +13,9 @@ const { DragCanvas, ZoomCanvas, DragNode, ActivateRelations } = Behaviors;
 import {
 	toClickNode,
 	initialStateGraph
-} from '../../redux/reducers/knowLedgeGraphSlice';
+} from '@/redux/reducers/knowLedgeGraphSlice';
 import { useSelector, useDispatch } from 'react-redux';
-import { store } from '../../redux/store';
+import { store } from '@/redux/store';
 import { render } from 'react-dom';
 import LayoutStyle from '../layoutStyle';
 import { Tabs } from 'antd';
