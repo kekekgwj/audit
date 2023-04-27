@@ -1,8 +1,8 @@
-import http from '@/utils/request';
+// import http from '@/utils/request';
 
 export function getMyAltasList() {
-	return http({
-		url: '/myAltasList',
-		method: 'get'
-	});
+	// return http({
+	// 	url: '/myAltasList',
+	// 	method: 'get'
+	// });
 }

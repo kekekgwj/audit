@@ -14,7 +14,8 @@ export default defineConfig(({ mode, command }) => {
 				'~': path.resolve(__dirname, './'),
 				'@': path.resolve(__dirname, './src/'),
 				// 设置别名
-				'@graph': path.resolve(__dirname, './src/knowLedgeGraph')
+				'@graph': path.resolve(__dirname, './src/knowledgeGraph'),
+				'@sql': path.resolve(__dirname, './src/dataAnalysis')
 			},
 			// https://cn.vitejs.dev/config/#resolve-extensions
 			extensions: ['.js', '.ts', '.jsx', '.tsx', '.json']
@@ -22,7 +23,13 @@ export default defineConfig(({ mode, command }) => {
 		server: {
 			host: true,
 			port: 80,
-			open: true
+			open: true,
+			proxy: {
+				'^/api/.*': {
+					target: 'http://10.101.104.2:18000/',
+					rewrite: (path) => path.replace(/^\/api/, '')
+				}
+			}
 		},
 		css: {
 			modules: {

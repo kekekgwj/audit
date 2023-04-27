@@ -1,8 +1,8 @@
-import http from '@/utils/request';
+// import http from '@/utils/request';
 
 export function getBodyGraphin() {
-	return http({
-		url: '/getBodyGraphin',
-		method: 'get'
-	});
+	// return http({
+	// 	url: '/getBodyGraphin',
+	// 	method: 'get'
+	// });
 }

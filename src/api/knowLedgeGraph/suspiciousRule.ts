@@ -1,8 +1,8 @@
-import http from '@/utils/request';
+// import http from '@/utils/request';
 
 export function getSuspiciousRule() {
-	return http({
-		url: '/getRuleList',
-		method: 'get'
-	});
+	// return http({
+	// 	url: '/getRuleList',
+	// 	method: 'get'
+	// });
 }
