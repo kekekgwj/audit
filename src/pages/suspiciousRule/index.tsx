@@ -6,17 +6,18 @@ import {
 	Form,
 	Input,
 	Button,
-	Modal,
-	Select
+	Select,
+	Empty
 } from 'antd';
 import {
 	PlayCircleOutlined,
 	MinusCircleOutlined,
-	PlusCircleOutlined,
-	CloseCircleOutlined
+	PlusCircleOutlined
 } from '@ant-design/icons';
+import emptyPage from '@/assets/img/empty.png';
 import styles from './index.module.less';
 import CustomDialog from '@/components/custom-dialog';
+import { getSuspiciousRule } from '@/api/suspiciousRule';
 
 // 使用弹框
 interface Props {
@@ -155,45 +156,19 @@ const UseModal = React.memo((prop: Props) => {
 	);
 });
 
-const RuleCom = () => {
-	const [data, setData] = React.useState();
+interface TableProps {
+	data: [];
+}
+const MyTableCom = React.memo((props: TableProps) => {
 	//使用弹框
 	const [open, setOpen] = React.useState(false);
-	const [form] = Form.useForm();
-	//当前选中数据
 	const [curRow, setCurRow] = React.useState({});
-	useEffect(() => {
-		const getData = async () => {
-			setData([
-				{
-					key: '1',
-					ruleName: '胡彦斌111',
-					ruleUse: '西湖区湖底公园1号'
-				},
-				{
-					key: '2',
-					ruleName: '胡彦祖1111',
-					ruleUse: '西湖区湖底公园1号'
-				}
-			]);
-		};
-		getData();
-	}, []);
-
 	const handleUse = (row, key) => {
 		console.log(row);
 		setOpen(true);
 		setCurRow(row);
 	};
-
-	const onReset = () => {
-		form.resetFields();
-	};
-
-	const searchRule = (res) => {
-		console.log(res);
-	};
-
+	const { data } = props;
 	const colums = [
 		{
 			title: '序号',
@@ -225,6 +200,62 @@ const RuleCom = () => {
 			}
 		}
 	];
+	return (
+		<div>
+			<div>
+				<Table
+					columns={colums}
+					dataSource={data}
+					pagination={{ position: ['none'] }}
+				></Table>
+			</div>
+			<div
+				style={{
+					textAlign: 'center',
+					marginTop: '20px',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between'
+				}}
+			>
+				<div>
+					<span style={{ marginRight: '10px' }}>共85条记录</span>
+					<span>第1/50页</span>
+				</div>
+				<Pagination total={85} showSizeChanger showQuickJumper />
+			</div>
+			<UseModal
+				open={open}
+				curRow={curRow}
+				onCancel={() => {
+					setOpen(false);
+				}}
+			></UseModal>
+		</div>
+	);
+});
+
+const RuleCom = () => {
+	const [data, setData] = React.useState();
+	const [form] = Form.useForm();
+	//当前选中数据
+
+	useEffect(() => {
+		getList();
+	}, []);
+
+	const getList = async () => {
+		const res = await getSuspiciousRule();
+		setData(res);
+	};
+
+	const onReset = () => {
+		form.resetFields();
+	};
+
+	const searchRule = (res) => {
+		console.log(res);
+	};
 
 	return (
 		<div>
@@ -256,35 +287,16 @@ const RuleCom = () => {
 					</Form.Item>
 				</Form>
 			</div>
-			<div>
-				<Table
-					columns={colums}
-					dataSource={data}
-					pagination={{ position: ['none'] }}
-				></Table>
-			</div>
-			<div
-				style={{
-					textAlign: 'center',
-					marginTop: '20px',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between'
-				}}
-			>
-				<div>
-					<span style={{ marginRight: '10px' }}>共85条记录</span>
-					<span>第1/50页</span>
-				</div>
-				<Pagination total={85} showSizeChanger showQuickJumper />
-			</div>
-			<UseModal
-				open={open}
-				curRow={curRow}
-				onCancel={() => {
-					setOpen(false);
-				}}
-			></UseModal>
+
+			{data?.length > 0 ? (
+				<MyTableCom data={data} />
+			) : (
+				<Empty
+					image={emptyPage}
+					description={false}
+					imageStyle={{ height: '193px' }}
+				/>
+			)}
 		</div>
 	);
 };

@@ -13,6 +13,7 @@ import {
 	DatePicker,
 	Empty
 } from 'antd';
+import emptyPage from '@/assets/img/empty.png';
 const { RangePicker } = DatePicker;
 const { confirm } = Modal;
 import {
@@ -26,7 +27,13 @@ import Add from './components/add';
 import Edit from './components/edit';
 import Delete from '@/components/delete-dialog';
 
-const MyTableCom = React.memo(() => {
+import { getWhiteList } from '@/api/whiteList';
+
+interface TanbleProps {
+	data: [];
+}
+
+const MyTableCom = React.memo((props: TanbleProps) => {
 	const navigate = useNavigate();
 	const [curId, setCurId] = React.useState();
 	const [openAdd, setOpenAdd] = React.useState(false);
@@ -34,6 +41,8 @@ const MyTableCom = React.memo(() => {
 	const [openEdit, setOpenEdit] = React.useState(false);
 	const editRef = useRef();
 	const [openDel, setOpenDel] = React.useState(false);
+
+	const { data } = props;
 
 	//添加
 	const add = () => {
@@ -117,22 +126,7 @@ const MyTableCom = React.memo(() => {
 			}
 		}
 	];
-	const data = [
-		{
-			key: '1',
-			name: '图谱一',
-			type: '关联关系图普',
-			createTime: '2023-04-021',
-			id: '1'
-		},
-		{
-			key: '2',
-			name: '图谱二',
-			type: '关联关系图普',
-			createTime: '2023-04-021',
-			id: '2'
-		}
-	];
+
 	return (
 		<div>
 			<div className={styles['handle-table-box']}>
@@ -184,16 +178,24 @@ const MyTableCom = React.memo(() => {
 
 const WhiteListCom = () => {
 	// 是否显示表
-	const [showTable, setShowTable] = React.useState(false);
+	// const [showTable, setShowTable] = React.useState(false);
 	const [form] = Form.useForm();
+	const [tableData, setTableData] = React.useState([]);
+
+	useEffect(() => {
+		getList();
+	}, []);
+
+	const getList = async () => {
+		const res = await getWhiteList();
+		setTableData(res);
+	};
 
 	const onReset = () => {
 		form.resetFields();
-		setShowTable(false);
 	};
 	const search = (res) => {
 		console.log(res);
-		setShowTable(true);
 	};
 
 	return (
@@ -235,7 +237,15 @@ const WhiteListCom = () => {
 					</Form.Item>
 				</Form>
 			</div>
-			{showTable ? <MyTableCom /> : <Empty />}
+			{tableData?.length > 0 ? (
+				<MyTableCom data={tableData} />
+			) : (
+				<Empty
+					image={emptyPage}
+					description={false}
+					imageStyle={{ height: '193px' }}
+				/>
+			)}
 		</div>
 	);
 };
