@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { CustomRoute, routes } from './routes';
+import React from 'react';
 
 const Loading = () => {
 	return <div>loading...</div>;

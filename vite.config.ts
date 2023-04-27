@@ -24,6 +24,9 @@ export default defineConfig(({ mode, command }) => {
 			open: true
 		},
 		css: {
+			modules: {
+				scopeBehaviour: 'local'
+			},
 			preprocessorOptions: {
 				less: {
 					javascriptEnbled: true
