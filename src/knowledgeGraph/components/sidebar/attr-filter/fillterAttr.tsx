@@ -2,6 +2,7 @@ import React from 'react';
 import { Checkbox, Input, Radio, DatePicker, Form } from 'antd';
 import styles from './index.module.less';
 const { RangePicker } = DatePicker;
+import SpecialCom from '../../luoji/index';
 
 interface Option {
 	key: string;
@@ -52,9 +53,20 @@ const getComponent = (option: Option, props) => {
 			}
 		};
 	}
+	if (component === 'custom') {
+		return {
+			component: SpecialCom,
+			props: {
+				// onChange: (e) => {
+				// 	onChange(key, e.target.value);
+				// }
+			}
+		};
+	}
 };
 
 export default () => {
+	const [form] = Form.useForm();
 	const [newFormData, setFormData] = React.useState({});
 	const Options = [
 		{
@@ -79,15 +91,14 @@ export default () => {
 			key: 'time',
 			defaultValue: [],
 			component: 'RangePicker'
+		},
+		{
+			label: '自定义',
+			key: 'number',
+			condition: 3,
+			component: 'custom',
+			defaultValue: {}
 		}
-		// {
-		// 	label: '自定义',
-		// 	key: 'time',
-		// 	condition: 3,
-		// 	component: 'custom',
-		// 	defaultValue: []
-		// 	// component: 'RangePicker'
-		// }
 	];
 
 	const onChange = (key, val) => {
@@ -97,6 +108,15 @@ export default () => {
 		};
 		setFormData(data);
 		console.log(data, 9888888);
+	};
+
+	const initForm = (data) => {
+		form.setFieldsValue(data);
+	};
+
+	const getData = () => {
+		let data = form.getFieldsValue();
+		console.log(data, 119119119);
 	};
 
 	return (
@@ -133,6 +153,7 @@ export default () => {
 				style={{ maxWidth: 600 }}
 				initialValues={{ remember: true }}
 				autoComplete="off"
+				form={form}
 			>
 				{Options.map((item) => {
 					const { label, defaultValue, key } = item;
@@ -143,15 +164,31 @@ export default () => {
 							value: defaultValue
 						}
 					);
-					return (
-						<>
-							<Form.Item label={label} name={key}>
-								<Component {...ComponentProps} />
-							</Form.Item>
-						</>
-					);
+					if (item.component == 'custom') {
+						return (
+							<>
+								<SpecialCom
+									form={form}
+									initForm={initForm}
+									label={label}
+									ikey={key}
+								></SpecialCom>
+							</>
+						);
+					} else {
+						return (
+							<>
+								<Form.Item label={label} name={key}>
+									<Component {...ComponentProps} />
+								</Form.Item>
+							</>
+						);
+					}
 				})}
 			</Form>
+			<div className="fillter-attr-box__title" onClick={() => getData()}>
+				OK
+			</div>
 		</div>
 	);
 };

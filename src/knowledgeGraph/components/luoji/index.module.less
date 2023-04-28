@@ -1,0 +1,35 @@
+.logical-main-box {
+	display: flex;
+	.logical-left {
+		width: 50px;
+		position: relative;
+		height: 96px;
+		margin-right: 10px;
+		overflow: hidden;
+		:global {
+			.ant-select-single.ant-select-show-arrow .ant-select-selection-item {
+				padding-inline-end: 0;
+				text-align: center;
+			}
+			.ant-select .ant-select-arrow {
+				display: none;
+			}
+		}
+		.vertical-line {
+			width: 1px;
+			height: 100%;
+			box-sizing: border-box;
+			border-left: 1px solid #ccc;
+			margin: auto;
+		}
+		.left-logical-select {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+	}
+	.logical-right {
+		flex: 0 0 auto;
+	}
+}
