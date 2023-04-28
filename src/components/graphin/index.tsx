@@ -85,6 +85,7 @@ const LeftEvent = () => {
 		const handleNodeClick = (evt: IG6GraphEvent) => {
 			const node = evt.item as INode;
 			const model = node.getModel() as NodeConfig;
+			console.log(node, 8888888888888);
 			apis.focusNodeById(model.id);
 			setDetailData(model);
 			setShowDetail(true);

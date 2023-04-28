@@ -1,12 +1,107 @@
-import { Checkbox, Input, Radio, DatePicker } from 'antd';
-
+import React from 'react';
+import { Checkbox, Input, Radio, DatePicker, Form } from 'antd';
 import styles from './index.module.less';
+const { RangePicker } = DatePicker;
+
+interface Option {
+	key: string;
+	label: string;
+	defaultValue: number | string | boolean | Array;
+	component: 'Input' | 'Radio' | 'RangePicker';
+	enums?: any[];
+}
+
+const getComponent = (option: Option, props) => {
+	const { onChange, value } = props;
+
+	const { component, key, enums } = option;
+
+	if (component === 'Input') {
+		return {
+			component: Input,
+			props: {
+				onChange: (e) => {
+					onChange(key, e.target.value);
+				}
+			}
+		};
+	}
+
+	if (component === 'Radio') {
+		return {
+			component: Radio.Group,
+			props: {
+				options: enums,
+				onChange: (e) => {
+					onChange(key, e.target.value);
+				}
+			}
+		};
+	}
+	if (component === 'RangePicker') {
+		return {
+			component: RangePicker,
+			props: {
+				format: 'YYYY-MM-DD',
+				onChange: (val) => {
+					onChange(key, [
+						val[0].format('YYYY-MM-DD'),
+						val[1].format('YYYY-MM-DD')
+					]);
+				}
+			}
+		};
+	}
+};
 
 export default () => {
-	const { RangePicker } = DatePicker;
+	const [newFormData, setFormData] = React.useState({});
+	const Options = [
+		{
+			label: '籍贯',
+			defaultValue: '杭州',
+			condition: 1,
+			component: 'Input',
+			key: 'native'
+		},
+		{
+			label: '性别',
+			defaultValue: '1',
+			component: 'Radio',
+			key: 'gender',
+			enums: [
+				{ label: '男', value: '1' },
+				{ label: '女', value: '2' }
+			]
+		},
+		{
+			label: '时间',
+			key: 'time',
+			defaultValue: [],
+			component: 'RangePicker'
+		}
+		// {
+		// 	label: '自定义',
+		// 	key: 'time',
+		// 	condition: 3,
+		// 	component: 'custom',
+		// 	defaultValue: []
+		// 	// component: 'RangePicker'
+		// }
+	];
+
+	const onChange = (key, val) => {
+		const data = {
+			...newFormData,
+			[key]: val
+		};
+		setFormData(data);
+		console.log(data, 9888888);
+	};
+
 	return (
 		<div className={styles['fillter-attr-box']}>
-			<div className="fillter-attr-box__title">供应商</div>
+			{/* <div className="fillter-attr-box__title">供应商</div>
 			<div className="fillter-attr-box__attrs">
 				<div className={styles['attr-item']}>
 					<Checkbox className={styles['attr-item__checkbox']}>籍贯</Checkbox>
@@ -29,7 +124,34 @@ export default () => {
 						<RangePicker placeholder={['开始时间', '结束时间']} />
 					</div>
 				</div>
-			</div>
+			</div> */}
+			<div className="fillter-attr-box__title">供应商</div>
+			<Form
+				name="basic"
+				labelCol={{ span: 4 }}
+				wrapperCol={{ span: 20 }}
+				style={{ maxWidth: 600 }}
+				initialValues={{ remember: true }}
+				autoComplete="off"
+			>
+				{Options.map((item) => {
+					const { label, defaultValue, key } = item;
+					const { component: Component, props: ComponentProps } = getComponent(
+						item,
+						{
+							onChange,
+							value: defaultValue
+						}
+					);
+					return (
+						<>
+							<Form.Item label={label} name={key}>
+								<Component {...ComponentProps} />
+							</Form.Item>
+						</>
+					);
+				})}
+			</Form>
 		</div>
 	);
 };

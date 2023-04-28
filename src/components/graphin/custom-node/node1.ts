@@ -44,7 +44,8 @@ export default () => {
 				const keyshape = group.addShape('circle', {
 					attrs: {
 						r: 60,
-						fill: '#E6697B'
+						fill: '#E6697B',
+						cursor: 'pointer'
 					},
 					draggable: true,
 					name: 'node1-body'
@@ -57,7 +58,8 @@ export default () => {
 						textAlign: 'center',
 						textBaseline: 'middle',
 						text: label,
-						fill: '#fff'
+						fill: '#fff',
+						cursor: 'pointer'
 					},
 					draggable: true,
 					name: 'node1-name'

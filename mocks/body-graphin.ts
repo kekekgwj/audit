@@ -62,14 +62,14 @@ export default [
 						id: 'edge-1-2',
 						source: 'node-1',
 						target: 'node-2',
-						type: 'custom-edge',
+						type: 'special-edge',
 						label: '我是边6'
 					},
 					{
 						id: 'edge-0-2',
 						source: 'node-0',
 						target: 'node-2',
-						type: 'custom-edge',
+						type: 'special-edge',
 						label: '我是边7'
 					}
 				]
