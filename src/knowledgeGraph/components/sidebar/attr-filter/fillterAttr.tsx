@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Checkbox, Input, Radio, DatePicker, Form } from 'antd';
 import styles from './index.module.less';
 const { RangePicker } = DatePicker;
@@ -68,6 +68,7 @@ const getComponent = (option: Option, props) => {
 export default () => {
 	const [form] = Form.useForm();
 	const [newFormData, setFormData] = React.useState({});
+
 	const Options = [
 		{
 			label: '籍贯',
@@ -110,13 +111,17 @@ export default () => {
 		console.log(data, 9888888);
 	};
 
-	const initForm = (data) => {
-		form.setFieldsValue(data);
-	};
+	useEffect(() => {
+		console.log(newFormData, 115115);
+	}, [newFormData]);
 
-	const getData = () => {
-		let data = form.getFieldsValue();
-		console.log(data, 119119119);
+	const setOperator = (target, data) => {
+		console.log(target, data, 118118);
+		const formData = {
+			...newFormData,
+			[target]: data
+		};
+		setFormData(formData);
 	};
 
 	return (
@@ -168,10 +173,9 @@ export default () => {
 						return (
 							<>
 								<SpecialCom
-									form={form}
-									initForm={initForm}
 									label={label}
 									ikey={key}
+									setOperator={setOperator}
 								></SpecialCom>
 							</>
 						);
@@ -186,9 +190,6 @@ export default () => {
 					}
 				})}
 			</Form>
-			<div className="fillter-attr-box__title" onClick={() => getData()}>
-				OK
-			</div>
 		</div>
 	);
 };
