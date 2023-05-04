@@ -16,7 +16,10 @@
 		"noEmit": true,
 		"jsx": "react-jsx",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"~/*": ["./*"],
+			"@graph/*": ["./src/knowledgeGraph/*"],
+			"@sql": ["./src/dataAnalysis/*"]
 		}
 	},
 	"include": ["src"],

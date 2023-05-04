@@ -53,6 +53,7 @@ import FromJSONBehavior from './FromJSONBehavior';
 import NodeDetailPanel from './components/NodeDetailPanel';
 import { Graph, useGraphInstance, useGraphState } from './lib/index';
 import React, { useEffect, useCallback, useState, useRef } from 'react';
+
 const X6Graph = () => {
 	const { nodes, setNodes, edges, setEdges, graph: gRef } = useGraphState();
 	const [messageApi, contextHolder] = message.useMessage();
