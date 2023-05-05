@@ -39,7 +39,7 @@ const GraphBehavior = () => {
 
 			// 使用Promise模拟异步获取数据
 			Promise.resolve(data).then((data) => {
-				graph.fromJSON(data);
+				graph && graph.fromJSON && graph.fromJSON(data);
 			});
 			return () => graph && graph.clearCells();
 		}

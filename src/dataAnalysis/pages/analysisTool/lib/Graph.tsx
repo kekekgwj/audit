@@ -9,18 +9,27 @@ import React, {
 } from 'react';
 import type { ReactNode } from 'react';
 import ASSETS from '../assets/index';
-import { Stencil } from '@antv/x6-plugin-stencil';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Keyboard } from '@antv/x6-plugin-keyboard';
 import { dispatch } from '../../../../redux/store';
 import { toDoubleClickNode } from '../../../../redux/reducers/dataAnalysis';
 import { Options } from '@antv/x6/lib/graph/options';
-import { message } from 'antd';
+import { Divider, message } from 'antd';
 import { JoinConfigPanel } from '../components/ConfigPanel';
-const { SQL, UNION, JOIN, FILTER, TABLE, GROUP, ORDER, END } = ASSETS;
-const GraphContext = createContext<X6.Graph | null>(null);
+import { Dnd } from '@antv/x6-plugin-dnd';
 
+const { FILTER, CONNECT, GROUP, ORDER, END } = ASSETS;
+interface IGraphContext {
+	graph: X6.Graph;
+	startDrag: (
+		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+		{ label, image, type }: IImageShapes
+	) => void;
+}
+export const GraphContext = createContext<IGraphContext | null>(null);
+import classes from './graph.module.less';
+import TableSourcePanel from '../components/TableSourcePanel';
 interface Props {
 	className?: string;
 	container?: HTMLDivElement;
@@ -106,15 +115,13 @@ const ports = {
 	]
 };
 
-enum IImageTypes {
-	// SQL = 'SQL',
-	// UNION = 'UNION',
-	JOIN = 'JOIN',
-	TABLE = 'TABLE',
+export enum IImageTypes {
+	CONNECT = 'CONNECT',
 	FILTER = 'FILTER',
 	GROUP = 'GROUP',
 	ORDER = 'ORDER',
-	END = 'END'
+	END = 'END',
+	TABLE = 'TABLE'
 }
 
 interface IImageShapes {
@@ -123,43 +130,28 @@ interface IImageShapes {
 	type: IImageTypes;
 }
 const imageShapes: IImageShapes[] = [
-	// {
-	// 	label: 'SQL',
-	// 	image: SQL,
-	// 	type: IImageTypes.SQL
-	// },
-	// {
-	// 	label: 'UNION',
-	// 	image: UNION,
-	// 	type: IImageTypes.UNION
-	// },
 	{
-		label: 'JOIN',
-		image: JOIN,
-		type: IImageTypes.JOIN
+		label: '连接',
+		image: CONNECT,
+		type: IImageTypes.CONNECT
 	},
 	{
-		label: 'TABLE',
-		image: TABLE,
-		type: IImageTypes.TABLE
-	},
-	{
-		label: 'FILTER',
+		label: '筛选',
 		image: FILTER,
 		type: IImageTypes.FILTER
 	},
 	{
-		label: 'GROUP',
+		label: '分组',
 		image: GROUP,
 		type: IImageTypes.GROUP
 	},
 	{
-		label: 'END',
+		label: '结束',
 		image: END,
 		type: IImageTypes.END
 	},
 	{
-		label: 'ORDER',
+		label: '排序',
 		image: ORDER,
 		type: IImageTypes.ORDER
 	}
@@ -169,6 +161,7 @@ const handleValidateNode: (
 	droppingNode: X6.Node
 ) => boolean = (graph, droppingNode) => {
 	const type = getNodeTypeByCell(droppingNode);
+
 	if (!type) {
 		return false;
 	}
@@ -341,6 +334,8 @@ const getAllNodeOfGraph = (graph: X6.Graph): Set<string | null> => {
 export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 	(props, ref) => {
 		const [graph, setGraph] = useState<X6.Graph | null>(null);
+		const [dnd, setDnd] = useState<Dnd | null>(null);
+		const [panelDnd, setPanelDnd] = useState<Dnd | null>(null);
 		const {
 			container,
 			children,
@@ -349,17 +344,20 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			...other
 		} = props;
 		const containerRef = useRef<HTMLDivElement>(container || null);
-		const stencilRef = useRef<HTMLDivElement>(null);
+		const DndContainerRef = useRef<HTMLDivElement>(null);
+		const panelDndContainerRef = useRef<HTMLDivElement>(null);
 
 		const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
 			for (let i = 0, len = ports.length; i < len; i += 1) {
 				ports[i].style.visibility = show ? 'visible' : 'hidden';
 			}
 		};
+		// 初始化画布和dnd
 		useEffect(() => {
 			if (containerRef.current && !graph) {
 				const graph = new X6.Graph({
 					container: containerRef.current,
+					autoResize: true,
 					grid: true,
 					connecting: {
 						router: 'manhattan',
@@ -394,19 +392,19 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 						validateConnection(args) {
 							return validateConnectionRule(graph, args, openMessage);
 						}
-					},
-					highlighting: {
-						magnetAdsorbed: {
-							name: 'stroke',
-							args: {
-								attrs: {
-									fill: '#5F95FF',
-									stroke: '#5F95FF'
-								}
-							}
-						}
-					},
-					...other
+					}
+					// highlighting: {
+					// 	magnetAdsorbed: {
+					// 		name: 'stroke',
+					// 		args: {
+					// 			attrs: {
+					// 				fill: '#5F95FF',
+					// 				stroke: '#5F95FF'
+					// 			}
+					// 		}
+					// 	}
+					// },
+					// ...other
 				});
 				graph
 					.use(
@@ -429,80 +427,28 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 				} else if (ref) {
 					ref.current = graph;
 				}
-				if (stencilRef.current) {
-					const stencil = new Stencil({
-						target: graph,
-						collapsable: true,
-						stencilGraphWidth: 180,
-						stencilGraphHeight: 320,
-						groups: [
-							{
-								name: 'group1'
-							}
-						],
-						validateNode: (node) => handleValidateNode(graph, node)
-					});
-					X6.Graph.registerNode(
-						'custom-image',
-						{
-							inherit: 'rect',
-							width: 52,
-							height: 52,
-							markup: [
-								{
-									tagName: 'rect',
-									selector: 'body'
-								},
-								{
-									tagName: 'image'
-								},
-								{
-									tagName: 'text',
-									selector: 'label'
-								}
-							],
-							attrs: {
-								body: {
-									stroke: '#5F95FF',
-									fill: '#5F95FF'
-								},
-								image: {
-									width: 26,
-									height: 26,
-									refX: 13,
-									refY: 16
-								},
-								label: {
-									refX: 3,
-									refY: 2,
-									textAnchor: 'left',
-									textVerticalAnchor: 'top',
-									fontSize: 12,
-									fill: '#fff'
-								}
-							},
-							ports: { ...ports }
-						},
-						true
-					);
-					const imageNodes = imageShapes.map((item) =>
-						graph.createNode({
-							shape: 'custom-image',
-							label: item.label,
-							attrs: {
-								image: {
-									'xlink:href': item.image
-								},
-								custom: { type: item.type }
-							}
-						})
-					);
 
-					stencil.load(imageNodes, 'group1');
-					stencilRef?.current?.appendChild(stencil.container);
+				// 初始化SQL组件
+				if (DndContainerRef.current) {
+					const dnd = new Dnd({
+						target: graph,
+						validateNode: (node) => handleValidateNode(graph, node),
+						dndContainer: DndContainerRef.current
+					});
+					setDnd(dnd);
+				}
+				// 初始化左侧表单列表
+				if (panelDndContainerRef.current) {
+					const dnd = new Dnd({
+						target: graph,
+						validateNode: (node) => handleValidateNode(graph, node),
+						dndContainer: panelDndContainerRef.current
+					});
+					setPanelDnd(dnd);
 				}
 			}
 		}, [graph, other, ref]);
+		// 监听事件
 		useEffect(() => {
 			if (!graph) {
 				return;
@@ -526,17 +472,17 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 				dispatch(toDoubleClickNode({ id, showPanel: true }));
 				const cell = graph.getCellById(id);
 				const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
-				const { JOIN, FILTER, TABLE } = IImageTypes;
-				if ([UNION, JOIN].includes(clickNodeType)) {
+				const { CONNECT, FILTER, TABLE } = IImageTypes;
+				if ([CONNECT].includes(clickNodeType)) {
 					console.log('union or join');
 				}
-				if ([FILTER].includes(clickNodeType)) {
-				}
-				if (TABLE === clickNodeType) {
-				}
+				// if ([FILTER].includes(clickNodeType)) {
+				// }
+				// if (TABLE === clickNodeType) {
+				// }
 
-				if (SQL === clickNodeType) {
-				}
+				// if (SQL === clickNodeType) {
+				// }
 				const edges = graph.getEdges();
 				const sourceNodes: string[] = [];
 				// 找到节点的所有连接节点
@@ -582,27 +528,122 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 				graph.unbindKey(['meta+a', 'ctrl+a']);
 			};
 		}, [graph]);
-		return (
-			<div
-				className={className}
-				style={{
-					width: '100%',
-					height: '100%',
-					position: 'relative',
-					display: 'flex'
-				}}
-			>
-				<GraphContext.Provider value={graph}>
-					<div
-						className="x6-stencil"
-						ref={stencilRef}
-						style={{ position: 'relative', width: '200px', height: '400px' }}
-					></div>
-					<div className="x6-content" id="x6-graph" ref={containerRef}></div>
 
-					{!!graph && children}
-				</GraphContext.Provider>
-			</div>
+		const startDrag = (
+			e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+			{ label, image, type }: IImageShapes
+		) => {
+			if (!graph) {
+				return;
+			}
+			const node = graph?.createNode({
+				inherit: 'rect',
+				width: type === IImageTypes.TABLE ? label.length * 14 + 40 : 72,
+				height: 38,
+				label: label,
+				markup: [
+					{
+						tagName: 'rect',
+						selector: 'body'
+					},
+					{
+						tagName: 'image',
+						selector: 'img'
+					},
+					{
+						tagName: 'text',
+						selector: 'label'
+					}
+				],
+				attrs: {
+					body: {
+						stroke: '#ccc',
+						fill: '#fff',
+						strokeWidth: 1,
+						rx: 4,
+						ry: 4,
+						overflow: 'auto'
+					},
+					img: {
+						'xlink:href': image,
+						width: 20,
+						height: 20,
+						y: 10,
+						x: 6
+					},
+					label: {
+						refX: 22,
+						refY: 6,
+						fontWeight: 400,
+						color: '#18181F',
+						lineHeight: '22px',
+						textAnchor: 'left',
+						textVerticalAnchor: 'top',
+						fontSize: 14,
+						y: 10,
+						x: 12,
+						fill: '#18181F'
+					},
+					custom: {
+						type: type
+					}
+				},
+				ports: { ...ports }
+			});
+			dnd?.start(node, e.nativeEvent as any);
+		};
+		return (
+			<GraphContext.Provider value={{ graph, startDrag }}>
+				<div className={classes.container}>
+					<div className="x6-panel" ref={panelDndContainerRef}>
+						<TableSourcePanel startDrag={startDrag} />
+					</div>
+					<div className={classes['right-container']}>
+						<div className={classes['control-wrapper']}>
+							<div className={classes['save-btn']}>保存为审计模板</div>
+							<div
+								className="x6-dnd"
+								ref={DndContainerRef}
+								style={{
+									position: 'relative',
+									width: '380px',
+									height: '44px',
+									display: 'flex'
+								}}
+							>
+								{imageShapes.map(({ label, image, type }, index) => {
+									return (
+										<div
+											style={{ display: 'flex', alignItems: 'center' }}
+											key={type}
+											onMouseDown={(e) => startDrag(e, { label, image, type })}
+										>
+											<img src={image}></img>
+											<span
+												style={{ marginLeft: '8px', pointerEvents: 'none' }}
+											>
+												{label}
+											</span>
+											{index + 1 !== imageShapes.length && (
+												<Divider type="vertical" />
+											)}
+										</div>
+									);
+								})}
+							</div>
+						</div>
+						<div style={{ width: '100%', height: '100%' }}>
+							<div
+								className="x6-content"
+								id="x6-graph"
+								ref={containerRef}
+							></div>
+						</div>
+
+						{!!graph && children}
+					</div>
+				</div>
+			</GraphContext.Provider>
 		);
 	}
 );
