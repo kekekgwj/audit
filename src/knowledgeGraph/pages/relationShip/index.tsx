@@ -7,7 +7,7 @@ import SideBar from '@graph/components/sidebar/sideBar';
 import { toImgStyle } from '@/utils/other';
 import styles from './index.module.less';
 
-import { getBodyGraphin } from '@/api/knowledgeGraph/graphin';
+// import { getBodyGraphin } from '@/api/knowledgeGraph/graphin';
 
 interface GraphinRef {
 	refersh: () => void;
@@ -24,7 +24,8 @@ const RelationShipCom = () => {
 	}, []);
 
 	const getGraphinData = async () => {
-		const data = await getBodyGraphin();
+		// const data = await getBodyGraphin();
+		const data = {};
 		updateData(data);
 	};
 

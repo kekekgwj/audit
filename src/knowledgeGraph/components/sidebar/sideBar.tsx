@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import AttrFillter from './attr-filter';
 import styles from './index.module.less';
-
+import { getMainNodes, getGraph } from '@/api/knowledgeGraph/graphin';
 interface Props {
 	updateData: (layout: GraphinData) => void;
 	toggleLayout: (isOpen: boolean) => void;
@@ -21,7 +21,19 @@ interface bodyTypeOption {
 	label: string;
 	value: string | number;
 }
-
+interface IBody {
+	// 主体类型对应的id
+	bodyType: string;
+	// 主体名称
+	bodyName: string;
+}
+interface IFormData {
+	bodyFilter: string[];
+	// 主体类型ID
+	bodys: IBody[];
+	level: number;
+	hierarchy: any;
+}
 export default (props: Props) => {
 	const { updateData, toggleLayout, canAdd } = props;
 	const [configVisibile, setconfigVisibile] = useState(true);
@@ -36,12 +48,15 @@ export default (props: Props) => {
 
 	// 获取主体类型下拉选项
 	const getBodyTypeOptions = async () => {
-		// todo 调用获取主体类型下拉选项接口
-		setBodyTypeOptions([
-			{ value: '001', label: '类型一' },
-			{ value: '002', label: '类型二' },
-			{ value: '003', label: '类型三' }
-		]);
+		const nodes = await getMainNodes();
+		const options = nodes.map(({ id, name }) => {
+			return {
+				label: name,
+				value: name
+			};
+		});
+
+		setBodyTypeOptions(options);
 	};
 
 	// 顶部筛选条件下拉切换
@@ -79,15 +94,28 @@ export default (props: Props) => {
 					bodyName: undefined
 				}
 			],
-			leval: 4
+			level: 4
 		});
 	};
 
 	// 提交表单 获取数据
-	const searchUpdate = (res) => {
+	const searchUpdate = async (res: IFormData) => {
 		// 调用接口 获取帅选数据
+		const { bodyFilter, bodys, level, hierarchy } = res;
 		console.log(res);
-
+		const data = await getGraph({
+			algorithmName: '',
+			depth: level,
+			nodeFilter: bodyFilter,
+			nodes: Object.values(bodys).map(({ bodyType, bodyName }) => {
+				return {
+					type: bodyType,
+					value: bodyName
+				};
+			}),
+			paths: hierarchy
+		});
+		console.log(data);
 		// 获取之后，更新视图数据
 		// updateData(res.data)
 		// if (updateData) {
@@ -188,7 +216,7 @@ export default (props: Props) => {
 					bodyName: undefined
 				}
 			],
-			leval: 4
+			level: 4
 		});
 	};
 
@@ -327,7 +355,7 @@ export default (props: Props) => {
 								<span>关系层级</span>
 							</div>
 							<Form.Item
-								name="leval"
+								name="level"
 								label="展示层级"
 								initialValue={4}
 								rules={[{ required: true }]}

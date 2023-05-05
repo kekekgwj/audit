@@ -3,12 +3,11 @@ export async function http<T>(request: RequestInfo): Promise<T> {
 	const response = await fetch(request);
 	try {
 		const body = await response.json();
-		// if (response.ok) {
-		// 	return body;
-		// } else {
-		// 	return body;
-		// }
-		return body.data;
+		if (response.ok) {
+			return body.data;
+		} else {
+			throw 'request failed';
+		}
 	} catch (e) {
 		console.error(e);
 		return Promise.reject(e);
