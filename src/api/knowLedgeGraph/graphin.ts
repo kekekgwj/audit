@@ -1,8 +1,34 @@
-// import http from '@/utils/request';
+import { appendQueryParams, get, post } from '@/utils/request';
+const env = import.meta.env;
+const { VITE_API_PREFIX: API_PREFIX } = env;
+// interface IResponse<T> {
+// 	code: string | number;
+// 	data: T;
+// 	success: string;
+// 	msg: string;
+// }
 
-export function getBodyGraphin() {
-	// return http({
-	// 	url: '/getBodyGraphin',
-	// 	method: 'get'
-	// });
+interface INodes {
+	id: number;
+	name: string;
+	// "type": null,
+	// "hasWhiteList": null,
+	// "status": null
 }
+export const getMainNodes = () => {
+	return get<INodes[]>(API_PREFIX + '/blade-tool/graphAnalysis/getNodes');
+};
+interface IFilterNode {
+	type: string;
+	value: string;
+}
+interface IFilters {
+	algorithmName: string;
+	depth: number;
+	nodeFilter: string[];
+	nodes: IFilterNode[];
+	paths: any;
+}
+export const getGraph = (filters: IFilters) => {
+	return post(API_PREFIX + '/blade-tool/graphAnalysis/getGraph', filters);
+};
