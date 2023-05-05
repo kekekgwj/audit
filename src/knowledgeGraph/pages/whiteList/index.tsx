@@ -11,11 +11,14 @@ import {
 	Select,
 	ConfigProvider,
 	DatePicker,
-	Empty
+	Empty,
+	message
 } from 'antd';
+import type { PaginationProps } from 'antd';
 import emptyPage from '@/assets/img/empty.png';
 const { RangePicker } = DatePicker;
 const { confirm } = Modal;
+
 import {
 	EyeOutlined,
 	DeleteOutlined,
@@ -27,22 +30,41 @@ import Add from './components/add';
 import Edit from './components/edit';
 import Delete from '@graph/components/delete-dialog';
 
-import { getWhiteList } from '@/api/knowledgeGraph/whiteList';
+import {
+	getWhiteList,
+	getWhiteListType,
+	deleteWhiteList
+} from '@/api/knowledgeGraph/whiteList';
 
 interface TanbleProps {
 	data: [];
+	listType: [];
+	total: number;
+	current: number;
+	size: number; //每页数量
+	onShowSizeChange: (current: any, size: any) => void;
+	onChange: (pageNumber: Number) => void;
+	refresh: () => void;
 }
 
 const MyTableCom = React.memo((props: TanbleProps) => {
-	const navigate = useNavigate();
+	const [messageApi, contextHolder] = message.useMessage();
 	const [curId, setCurId] = React.useState();
 	const [openAdd, setOpenAdd] = React.useState(false);
 	const addRef = useRef();
 	const [openEdit, setOpenEdit] = React.useState(false);
 	const editRef = useRef();
 	const [openDel, setOpenDel] = React.useState(false);
-
-	const { data } = props;
+	const {
+		data,
+		total,
+		current,
+		size,
+		onShowSizeChange,
+		onChange,
+		listType,
+		refresh
+	} = props;
 
 	//添加
 	const add = () => {
@@ -76,8 +98,14 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	};
 
 	const submitDel = () => {
-		console.log('delete:' + curId);
-		setOpenDel(false);
+		deleteWhiteList({ id: curId }).then((res) => {
+			setOpenDel(false);
+			messageApi.open({
+				type: 'success',
+				content: '删除成功'
+			});
+			refresh();
+		});
 	};
 
 	const colums = [
@@ -95,7 +123,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 		},
 		{
 			title: '创建时间',
-			dataIndex: 'createTime'
+			dataIndex: 'gmtCreated'
 		},
 		{
 			title: '操作',
@@ -155,17 +183,33 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 				}}
 			>
 				<div>
-					<span style={{ marginRight: '10px' }}>共85条记录</span>
-					<span>第1/50页</span>
+					<span style={{ marginRight: '10px' }}>共{total}条记录</span>
+					<span>
+						第{current}/{Math.ceil(total / size)}页
+					</span>
 				</div>
-				<Pagination total={85} showSizeChanger showQuickJumper />
+				<Pagination
+					total={total}
+					showSizeChanger
+					onShowSizeChange={onShowSizeChange}
+					onChange={onChange}
+					showQuickJumper
+				/>
 			</div>
-			<Add open={openAdd} handleCancel={handleCancelAdd} cRef={addRef}></Add>
+			<Add
+				open={openAdd}
+				handleCancel={handleCancelAdd}
+				cRef={addRef}
+				listType={listType}
+				refresh={refresh}
+			></Add>
 			<Edit
 				open={openEdit}
 				handleCancel={handleCancelEdit}
 				cRef={editRef}
 				id={curId}
+				listType={listType}
+				refresh={refresh}
 			></Edit>
 			<Delete
 				open={openDel}
@@ -178,24 +222,69 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 
 const WhiteListCom = () => {
 	// 是否显示表
-	// const [showTable, setShowTable] = React.useState(false);
 	const [form] = Form.useForm();
 	const [tableData, setTableData] = React.useState([]);
+	const [current, setCurrent] = React.useState(1);
+	const [size, setSize] = React.useState(10);
+	const [total, setTotal] = React.useState(0);
+	const [listType, setListType] = React.useState([]);
 
 	useEffect(() => {
 		getList();
+	}, [current, size]);
+
+	useEffect(() => {
+		getWhiteListType().then((res) => {
+			const options = [];
+			res?.forEach((item: any) => {
+				options.push({ label: item, value: item });
+			});
+			setListType(options);
+		});
 	}, []);
 
 	const getList = async () => {
-		const res = await getWhiteList();
-		setTableData(res);
+		const searchFormData = form.getFieldsValue();
+		const searchData = {
+			name: searchFormData.name || '',
+			type: searchFormData.type || '',
+			startTime: '',
+			endTime: ''
+		};
+		if (searchFormData.gmtCreated && searchFormData.gmtCreated.length > 0) {
+			searchData.startTime = searchFormData.gmtCreated[0].format('YYYY-MM-DD');
+			searchData.endTime = searchFormData.gmtCreated[1].format('YYYY-MM-DD');
+		}
+		console.log(searchData, 246246);
+		const data = {
+			current: current,
+			size: size,
+			...searchData
+		};
+		const res = await getWhiteList(data);
+		setTableData(res.records);
+		setTotal(res.total);
 	};
 
 	const onReset = () => {
 		form.resetFields();
+		getList();
 	};
-	const search = (res) => {
-		console.log(res);
+	const search = () => {
+		setCurrent(1);
+		getList();
+	};
+
+	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
+		current: number,
+		pageSize: number
+	) => {
+		setSize(pageSize);
+	};
+
+	const onChange: PaginationProps['onChange'] = (pageNumber: number) => {
+		console.log('Page: ', pageNumber);
+		setCurrent(pageNumber);
 	};
 
 	return (
@@ -210,15 +299,15 @@ const WhiteListCom = () => {
 						search(res);
 					}}
 				>
-					<Form.Item name="mainType" label="名称">
+					<Form.Item name="name" label="名称">
 						<Input />
 					</Form.Item>
 
 					<Form.Item name="type" label="类型">
-						<Input />
+						<Select options={listType} style={{ width: 170 }} allowClear />
 					</Form.Item>
 
-					<Form.Item name="range-picker" label="创建时间">
+					<Form.Item name="gmtCreated" label="创建时间">
 						<RangePicker format="YYYY-MM-DD" />
 					</Form.Item>
 
@@ -238,7 +327,16 @@ const WhiteListCom = () => {
 				</Form>
 			</div>
 			{tableData?.length > 0 ? (
-				<MyTableCom data={tableData} />
+				<MyTableCom
+					data={tableData}
+					onShowSizeChange={onShowSizeChange}
+					onChange={onChange}
+					total={total}
+					size={size}
+					current={current}
+					listType={listType}
+					refresh={getList}
+				/>
 			) : (
 				<Empty
 					image={emptyPage}

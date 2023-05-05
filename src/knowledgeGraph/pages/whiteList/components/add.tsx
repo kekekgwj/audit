@@ -1,18 +1,37 @@
-import React, { useState, useImperativeHandle } from 'react';
+import React, { useState, useImperativeHandle, useEffect } from 'react';
 import CustomDialog from '@graph/components/custom-dialog';
-import { Space, Pagination, Form, Input, Button, Select } from 'antd';
+import { Space, Pagination, Form, Input, Button, Select, message } from 'antd';
+import {
+	getPrimaryProperties,
+	saveWhiteList
+} from '@/api/knowledgeGraph/whiteList';
 
 interface Props {
 	open: boolean;
 	id: string;
 	handleCancel: () => void;
-	cRef;
+	listType: []; //类型
+	cRef: any;
+	refresh: () => void;
 }
 
 const AddCom = React.memo((props: Props) => {
+	const [messageApi, contextHolder] = message.useMessage();
 	const [form] = Form.useForm();
-	const { open, handleCancel, cRef } = props;
+	const { open, handleCancel, cRef, listType, refresh } = props;
 	const type = Form.useWatch('type', form);
+	const [formArr, setFormArr] = React.useState([]);
+
+	useEffect(() => {
+		if (type) {
+			//根据类型获取需要渲染表单项
+			getPrimaryProperties({ type }).then((res) => {
+				setFormArr(res);
+			});
+		} else {
+			setFormArr([]);
+		}
+	}, [type]);
 
 	useImperativeHandle(cRef, () => ({
 		resetForm: () => {
@@ -20,57 +39,40 @@ const AddCom = React.memo((props: Props) => {
 		}
 	}));
 
-	const arr = [
-		{
-			label: '姓名',
-			value: 'name',
-			data: '小明'
-		},
-		{
-			label: '工号',
-			value: 'workId',
-			data: '18'
-		},
-		{
-			label: '身份证号',
-			value: 'idCard',
-			data: '123456789112222'
-		}
-	];
-
 	// 提交表单
 	const handleOk = () => {
-		const data = form.getFieldsValue();
-		console.log(data, 15151555555);
+		const formdata = form.getFieldsValue();
+		delete formdata.type;
+		console.log(formdata, 15151555555);
+		const data = {
+			type,
+			propertyJson: formdata
+		};
+		console.log(data, 466666);
+		saveWhiteList(data).then((res) => {
+			console.log('ok', 511111);
+			messageApi.open({
+				type: 'success',
+				content: '新增成功'
+			});
+			handleCancel(); //关闭弹窗
+			refresh();
+		});
 	};
 
-	// 根据类型 后台获取需要渲染的表单项
+	// 根据类型渲染的表单项
 	const renderItem = () => {
-		if (type == '1') {
-			return (
-				<>
-					{arr.map((item) => (
-						<Form.Item key={item.value} label={item.label} name={item.value}>
-							<Input />
-						</Form.Item>
-					))}
-				</>
-			);
-		} else if (type == '2') {
-			return (
-				<>
-					<Form.Item label="名称" name="proName">
+		return (
+			<>
+				{formArr.map((item) => (
+					<Form.Item key={item.key} label={item.label} name={item.key}>
 						<Input />
 					</Form.Item>
-				</>
-			);
-		} else {
-			return null;
-		}
+				))}
+			</>
+		);
 	};
-	const onmainTypeChange = (val) => {
-		console.log(val);
-	};
+	const onmainTypeChange = () => {};
 
 	return (
 		<div>
@@ -83,12 +85,14 @@ const AddCom = React.memo((props: Props) => {
 			>
 				<Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
 					<Form.Item name="type" label="类型">
-						<Select placeholder="请选择" onChange={onmainTypeChange} allowClear>
-							<Select.Option value="1">人</Select.Option>
-							<Select.Option value="2">法人</Select.Option>
-						</Select>
+						<Select
+							placeholder="请选择"
+							onChange={onmainTypeChange}
+							options={listType}
+							allowClear
+						></Select>
 					</Form.Item>
-					{renderItem()}
+					{formArr && formArr.length > 0 && renderItem()}
 				</Form>
 			</CustomDialog>
 		</div>

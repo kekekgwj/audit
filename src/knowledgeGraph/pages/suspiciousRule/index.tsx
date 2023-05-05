@@ -245,8 +245,12 @@ const RuleCom = () => {
 	}, []);
 
 	const getList = async () => {
-		const res = await getSuspiciousRule();
-		setData(res);
+		const data = {
+			current: 1,
+			size: 10
+		};
+		const res = await getSuspiciousRule(data);
+		// setData(res);
 	};
 
 	const onReset = () => {
