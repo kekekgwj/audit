@@ -12,23 +12,34 @@ import {
 	Select,
 	ConfigProvider,
 	DatePicker,
-	Empty
+	Empty,
+	message
 } from 'antd';
+import type { PaginationProps } from 'antd';
 const { RangePicker } = DatePicker;
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import DeleteDialog from '@graph/components/delete-dialog';
 import styles from './index.module.less';
 
-import { getMyAltasList } from '@/api/knowledgeGraph/myAltas';
+import { getMyAltasList, deleteGraph } from '@/api/knowledgeGraph/myAltas';
 
 interface TableProps {
 	data: [];
+	total: number;
+	current: number;
+	size: number; //每页数量
+	onShowSizeChange: (current: any, size: any) => void;
+	onChange: (pageNumber: Number) => void;
+	refresh: () => void;
 }
 const MyTableCom = React.memo((props: TableProps) => {
-	const { data } = props;
+	const [messageApi, contextHolder] = message.useMessage();
+	const [curId, setCurId] = React.useState();
+	const { data, total, current, size, onShowSizeChange, onChange, refresh } =
+		props;
 	const navigate = useNavigate();
 	// 查看
-	const handleDetail = (row) => {
+	const handleDetail = (row: any) => {
 		navigate('/altasDetail', { state: { id: row.id } });
 	};
 
@@ -36,6 +47,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 
 	// 删除
 	const handleDelete = (row) => {
+		setCurId(row.id);
 		setOpenDel(true);
 	};
 
@@ -44,8 +56,14 @@ const MyTableCom = React.memo((props: TableProps) => {
 	};
 
 	const submitDel = () => {
-		console.log('delete');
-		setOpenDel(false);
+		deleteGraph({ id: curId }).then((res) => {
+			setOpenDel(false);
+			messageApi.open({
+				type: 'success',
+				content: '删除成功'
+			});
+			refresh();
+		});
 	};
 
 	const colums = [
@@ -59,7 +77,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 		},
 		{
 			title: '创建时间',
-			dataIndex: 'createTime'
+			dataIndex: 'gmtCreated'
 		},
 		{
 			title: '操作',
@@ -108,10 +126,18 @@ const MyTableCom = React.memo((props: TableProps) => {
 				}}
 			>
 				<div>
-					<span style={{ marginRight: '10px' }}>共85条记录</span>
-					<span>第1/50页</span>
+					<span style={{ marginRight: '10px' }}>共{total}条记录</span>
+					<span>
+						第{current}/{Math.ceil(total / size)}页
+					</span>
 				</div>
-				<Pagination total={85} showSizeChanger showQuickJumper />
+				<Pagination
+					total={total}
+					showSizeChanger
+					onShowSizeChange={onShowSizeChange}
+					onChange={onChange}
+					showQuickJumper
+				/>
 			</div>
 			<DeleteDialog
 				open={openDel}
@@ -125,20 +151,54 @@ const MyTableCom = React.memo((props: TableProps) => {
 const MyAtlasCom = () => {
 	const [tableData, setTableData] = React.useState([]);
 	const [form] = Form.useForm();
+	const [current, setCurrent] = React.useState(1);
+	const [size, setSize] = React.useState(10);
+	const [total, setTotal] = React.useState(0);
 	useEffect(() => {
 		getList();
 	}, []);
 
 	const getList = async () => {
-		const res = await getMyAltasList();
-		setTableData(res);
+		const searchFormData = form.getFieldsValue();
+		const searchData = {
+			name: searchFormData.name || '',
+			beginTime: '',
+			endTime: ''
+		};
+		if (searchFormData.gmtCreated && searchFormData.gmtCreated.length > 0) {
+			searchData.beginTime = searchFormData.gmtCreated[0].format('YYYY-MM-DD');
+			searchData.endTime = searchFormData.gmtCreated[1].format('YYYY-MM-DD');
+		}
+
+		const data = {
+			current: current,
+			size: size,
+			...searchData
+		};
+		const res = await getMyAltasList(data);
+		setTableData(res.records);
+		setTotal(res.total);
 	};
 
 	const onReset = () => {
 		form.resetFields();
+		getList();
 	};
-	const search = (res) => {
-		console.log(res);
+	const search = () => {
+		setCurrent(1);
+		getList();
+	};
+
+	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
+		current: number,
+		pageSize: number
+	) => {
+		setSize(pageSize);
+	};
+
+	const onChange: PaginationProps['onChange'] = (pageNumber: number) => {
+		console.log('Page: ', pageNumber);
+		setCurrent(pageNumber);
 	};
 
 	return (
@@ -153,11 +213,11 @@ const MyAtlasCom = () => {
 						search(res);
 					}}
 				>
-					<Form.Item name="mainType" label="图谱名称">
+					<Form.Item name="name" label="图谱名称">
 						<Input />
 					</Form.Item>
 
-					<Form.Item name="range-picker" label="创建时间">
+					<Form.Item name="gmtCreated" label="创建时间">
 						<RangePicker format="YYYY-MM-DD" />
 					</Form.Item>
 
@@ -177,7 +237,15 @@ const MyAtlasCom = () => {
 				</Form>
 			</div>
 			{tableData?.length > 0 ? (
-				<MyTableCom data={tableData} />
+				<MyTableCom
+					data={tableData}
+					onShowSizeChange={onShowSizeChange}
+					onChange={onChange}
+					total={total}
+					size={size}
+					current={current}
+					refresh={getList}
+				/>
 			) : (
 				<Empty
 					image={emptyPage}

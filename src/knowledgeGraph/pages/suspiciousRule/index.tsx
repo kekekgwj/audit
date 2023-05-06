@@ -262,7 +262,7 @@ const RuleCom = () => {
 	};
 
 	return (
-		<div>
+		<div style={{ padding: '20px' }}>
 			<div className={styles.searchForm}>
 				<Form
 					form={form}

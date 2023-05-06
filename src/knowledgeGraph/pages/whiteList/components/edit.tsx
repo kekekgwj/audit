@@ -25,8 +25,6 @@ export default (props: EditProps) => {
 	const [originData, setOriginData] = useState([]); //原始数据表单
 	const [formArr, setFormArr] = React.useState([]); //渲染表单项数据
 
-	const originDataRef = React.useRef([]);
-
 	useEffect(() => {
 		if (open) {
 			getWhiteDetail({ whiteListId: id }).then((res) => {
