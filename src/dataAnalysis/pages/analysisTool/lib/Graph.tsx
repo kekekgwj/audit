@@ -5,7 +5,8 @@ import React, {
 	useContext,
 	forwardRef,
 	useEffect,
-	useState
+	useState,
+	useCallback
 } from 'react';
 import type { ReactNode } from 'react';
 import ASSETS from '../assets/index';
@@ -336,6 +337,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 		const [graph, setGraph] = useState<X6.Graph | null>(null);
 		const [dnd, setDnd] = useState<Dnd | null>(null);
 		const [panelDnd, setPanelDnd] = useState<Dnd | null>(null);
+		const [openLeftPanel, setOpenLeftPanel] = useState<boolean>(true);
 		const {
 			container,
 			children,
@@ -344,6 +346,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			...other
 		} = props;
 		const containerRef = useRef<HTMLDivElement>(container || null);
+		const graphWrapperRef = useRef<HTMLDivElement>(null);
 		const DndContainerRef = useRef<HTMLDivElement>(null);
 		const panelDndContainerRef = useRef<HTMLDivElement>(null);
 
@@ -354,11 +357,13 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 		};
 		// 初始化画布和dnd
 		useEffect(() => {
-			if (containerRef.current && !graph) {
+			if (graphWrapperRef.current && containerRef.current && !graph) {
 				const graph = new X6.Graph({
 					container: containerRef.current,
-					autoResize: true,
+					autoResize: false,
 					grid: true,
+					width: graphWrapperRef.current.offsetWidth,
+					height: graphWrapperRef.current.offsetHeight,
 					connecting: {
 						router: 'manhattan',
 						connector: {
@@ -528,7 +533,31 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 				graph.unbindKey(['meta+a', 'ctrl+a']);
 			};
 		}, [graph]);
+		const handleResize = () => {
+			if (graphWrapperRef && graphWrapperRef.current && graph) {
+				const wrapperWidth = graphWrapperRef.current.offsetWidth;
+				const wrapperHeight = graphWrapperRef.current?.offsetHeight;
 
+				const { cells } = graph.toJSON();
+
+				let maxOffsetWidth = wrapperWidth,
+					maxoffsetHeight = wrapperHeight;
+				cells.forEach((cell) => {
+					console.log(cell);
+					const { x, y } = cell.position;
+					maxOffsetWidth = Math.max(x + 100, maxOffsetWidth);
+					maxoffsetHeight = Math.max(y + 100, maxoffsetHeight);
+				});
+				console.log(maxOffsetWidth, maxoffsetHeight);
+				graph.resize(maxOffsetWidth, maxoffsetHeight);
+				// graph?.resize(containWidth, containHeight);
+			}
+		};
+
+		useEffect(() => {
+			window.addEventListener('resize', handleResize);
+			return () => window.removeEventListener('resize', handleResize);
+		}, [graph]);
 		const startDrag = (
 			e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 			{ label, image, type }: IImageShapes
@@ -596,11 +625,21 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			<GraphContext.Provider value={{ graph, startDrag }}>
 				<div className={classes.container}>
 					<div className="x6-panel" ref={panelDndContainerRef}>
-						<TableSourcePanel startDrag={startDrag} />
+						<TableSourcePanel setOpen={setOpenLeftPanel} open={openLeftPanel} />
 					</div>
-					<div className={classes['right-container']}>
+					<div
+						className={classes['right-container']}
+						style={{ width: `calc(100% - ${openLeftPanel ? 200 : 0}px)` }}
+					>
 						<div className={classes['control-wrapper']}>
-							<div className={classes['save-btn']}>保存为审计模板</div>
+							<div
+								className={classes['save-btn']}
+								onClick={() => {
+									graph?.centerContent();
+								}}
+							>
+								保存为审计模板
+							</div>
 							<div
 								className="x6-dnd"
 								ref={DndContainerRef}
@@ -632,7 +671,14 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 								})}
 							</div>
 						</div>
-						<div style={{ width: '100%', height: '100%' }}>
+						<div
+							ref={graphWrapperRef}
+							style={{
+								width: '100%',
+								height: 'calc(100% - 50px)',
+								overflow: 'auto'
+							}}
+						>
 							<div
 								className="x6-content"
 								id="x6-graph"

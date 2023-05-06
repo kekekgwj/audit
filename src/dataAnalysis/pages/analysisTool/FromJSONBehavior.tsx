@@ -38,10 +38,10 @@ const GraphBehavior = () => {
 			};
 
 			// 使用Promise模拟异步获取数据
-			Promise.resolve(data).then((data) => {
-				graph && graph.fromJSON && graph.fromJSON(data);
-			});
-			return () => graph && graph.clearCells();
+			// Promise.resolve(data).then((data) => {
+			// 	graph && graph.fromJSON && graph.fromJSON(data);
+			// });
+			// return () => graph && graph.clearCells();
 		}
 		console.log('graph instance', graph);
 	}, [graph]);

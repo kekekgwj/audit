@@ -50,9 +50,11 @@ const TableItem: React.FC = ({ data }) => {
 		</Collapse>
 	);
 };
-
-const TableSourcePanel: React.FC = () => {
-	const [open, setOpen] = useState<boolean>(true);
+interface IProps {
+	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	open: boolean;
+}
+const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 	const onClickSwitch = () => {
 		setOpen(!open);
 	};
