@@ -7,6 +7,11 @@ function configureAppStore() {
 	});
 	return store;
 }
-
+import { INodeDetailPanel } from './reducers/dataAnalysis';
+import { IStoreGraph } from './reducers/knowLedgeGraphSlice';
+export interface IRootState {
+	dataAnalysis: INodeDetailPanel;
+	knowledgeGraph: IStoreGraph;
+}
 export const store: Store = configureAppStore();
 export const dispatch: Dispatch = store.dispatch;

@@ -6,4 +6,5 @@ import END from './end.png';
 import GROUP from './group.png';
 import ORDER from './order.png';
 
-export default { FILTER, CONNECT, END, GROUP, ORDER };
+import DOWNLOAD from './download.png';
+export default { FILTER, CONNECT, END, GROUP, ORDER, DOWNLOAD };

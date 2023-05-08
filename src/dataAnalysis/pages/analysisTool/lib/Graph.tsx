@@ -539,16 +539,16 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 				const wrapperHeight = graphWrapperRef.current?.offsetHeight;
 
 				const { cells } = graph.toJSON();
-
+				// 给边缘留的距离
+				const graphOffsetWidth = 200;
+				const graphOffsetHeight = 100;
 				let maxOffsetWidth = wrapperWidth,
 					maxoffsetHeight = wrapperHeight;
 				cells.forEach((cell) => {
-					console.log(cell);
 					const { x, y } = cell.position;
-					maxOffsetWidth = Math.max(x + 100, maxOffsetWidth);
-					maxoffsetHeight = Math.max(y + 100, maxoffsetHeight);
+					maxOffsetWidth = Math.max(x + graphOffsetWidth, maxOffsetWidth);
+					maxoffsetHeight = Math.max(y + graphOffsetHeight, maxoffsetHeight);
 				});
-				console.log(maxOffsetWidth, maxoffsetHeight);
 				graph.resize(maxOffsetWidth, maxoffsetHeight);
 				// graph?.resize(containWidth, containHeight);
 			}
@@ -629,7 +629,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 					</div>
 					<div
 						className={classes['right-container']}
-						style={{ width: `calc(100% - ${openLeftPanel ? 200 : 0}px)` }}
+						style={{ width: `calc(100% - ${openLeftPanel ? 240 : 0}px)` }}
 					>
 						<div className={classes['control-wrapper']}>
 							<div

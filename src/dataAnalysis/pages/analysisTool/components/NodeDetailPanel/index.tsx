@@ -1,13 +1,18 @@
 import React from 'react';
-import { Collapse, Table } from 'antd';
+import { Table } from 'antd';
 import { useSelector } from 'react-redux';
 import classes from './index.module.less';
-import { IGlobalState } from '../../../../../redux/reducers';
 import { JoinConfigPanel } from '../ConfigPanel';
 import { ColumnsType } from 'antd/es/table';
+import ASSETS from '../../assets/index';
+import { IRootState } from '@/redux/store';
+import { CloseOutlined } from '@ant-design/icons';
+import { dispatch } from '@/redux/store';
+import { toClosePanel } from '@/redux/reducers/dataAnalysis';
+const { DOWNLOAD } = ASSETS;
 const Panel: React.FC = () => {
-	const state = useSelector((state: IGlobalState) => state.dataAnaylsis);
-
+	const state = useSelector((state: IRootState) => state.dataAnalysis);
+	console.log('useSelector', state);
 	const { curSelectedNode: id, showPanel } = state || {};
 	interface DataType {
 		key: React.Key;
@@ -39,13 +44,37 @@ const Panel: React.FC = () => {
 			address: `London, Park Lane no. ${i}`
 		});
 	}
+	if (!showPanel) {
+		return null;
+	}
+	const closePanel = () => {
+		dispatch(toClosePanel());
+	};
 	return (
 		<div className={classes.container}>
-			<div className={classes.configPanel}>
-				<JoinConfigPanel />
-			</div>
 			<div className={classes.data}>
-				<Table columns={columns} dataSource={data} />;
+				<div className={classes.download}>
+					<img src={DOWNLOAD} className={classes.download_icon}></img>
+					<span className={classes.download_text}>下载</span>
+					<CloseOutlined className={classes.closeIcon} onClick={closePanel} />
+				</div>
+				<div className={classes.tableWrapper}>
+					<Table
+						columns={columns}
+						dataSource={data}
+						pagination={{ defaultPageSize: 4 }}
+					/>
+				</div>
+			</div>
+			{/* <div className={classes.divider}></div> */}
+			<div className={classes.configPanel}>
+				<div className={classes.configPanel_title}>
+					<span className={classes.configPanel_title_text}>参数配置</span>
+					<CloseOutlined className={classes.closeIcon} onClick={closePanel} />
+				</div>
+				<div className={classes.configWrapper}>
+					<JoinConfigPanel />
+				</div>
 			</div>
 		</div>
 	);
