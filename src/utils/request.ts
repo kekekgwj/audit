@@ -34,6 +34,18 @@ export async function post<T>(
 	return await http<T>(new Request(path, args));
 }
 
+export async function postFormData<T>(
+	path: string,
+	formData: any,
+	args: RequestInit = {
+		method: 'post',
+		body: formData
+	}
+	// 不设置Content-Type 浏览器自动识别
+): Promise<T> {
+	return await http<T>(new Request(path, args));
+}
+
 export const appendQueryParams: (
 	url: string,
 	params: { [key: string]: string | number }

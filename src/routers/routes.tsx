@@ -70,7 +70,7 @@ export const routes: CustomRoute[] = [
 			},
 			{
 				path: 'data',
-				component: lazy(() => import('@sql/pages/SQLEditor')),
+				component: lazy(() => import('@sql/pages/dataManage')),
 				meta: { title: '我的数据管理', icon: 'body' }
 			}
 		]

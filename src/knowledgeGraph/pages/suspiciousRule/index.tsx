@@ -158,6 +158,11 @@ const UseModal = React.memo((prop: Props) => {
 
 interface TableProps {
 	data: [];
+	total: number;
+	current: number;
+	size: number; //每页数量
+	onShowSizeChange: (current: any, size: any) => void;
+	onChange: (pageNumber: Number) => void;
 }
 const MyTableCom = React.memo((props: TableProps) => {
 	//使用弹框
@@ -168,7 +173,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 		setOpen(true);
 		setCurRow(row);
 	};
-	const { data } = props;
+	const { data, total, current, size, onShowSizeChange, onChange } = props;
 	const colums = [
 		{
 			title: '序号',
@@ -176,11 +181,11 @@ const MyTableCom = React.memo((props: TableProps) => {
 		},
 		{
 			title: '规则名称',
-			dataIndex: 'ruleName'
+			dataIndex: 'name'
 		},
 		{
 			title: '规则用途',
-			dataIndex: 'ruleUse'
+			dataIndex: 'description'
 		},
 		{
 			title: '操作',
@@ -219,10 +224,18 @@ const MyTableCom = React.memo((props: TableProps) => {
 				}}
 			>
 				<div>
-					<span style={{ marginRight: '10px' }}>共85条记录</span>
-					<span>第1/50页</span>
+					<span style={{ marginRight: '10px' }}>共{total}条记录</span>
+					<span>
+						第{current}/{Math.ceil(total / size)}页
+					</span>
 				</div>
-				<Pagination total={85} showSizeChanger showQuickJumper />
+				<Pagination
+					total={total}
+					showSizeChanger
+					onShowSizeChange={onShowSizeChange}
+					onChange={onChange}
+					showQuickJumper
+				/>
 			</div>
 			<UseModal
 				open={open}
@@ -238,19 +251,25 @@ const MyTableCom = React.memo((props: TableProps) => {
 const RuleCom = () => {
 	const [data, setData] = React.useState();
 	const [form] = Form.useForm();
+	const [current, setCurrent] = React.useState(1);
+	const [size, setSize] = React.useState(10);
+	const [total, setTotal] = React.useState(0);
 	//当前选中数据
-
 	useEffect(() => {
 		getList();
 	}, []);
 
 	const getList = async () => {
+		const searchFormData = form.getFieldsValue();
 		const data = {
-			current: 1,
-			size: 10
+			name: searchFormData.name || '',
+			current: current,
+			size: size
 		};
 		const res = await getSuspiciousRule(data);
-		// setData(res);
+		console.log(res, 253253);
+		setData(res.records);
+		setTotal(res.total);
 	};
 
 	const onReset = () => {
@@ -259,6 +278,18 @@ const RuleCom = () => {
 
 	const searchRule = (res) => {
 		console.log(res);
+	};
+
+	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
+		current: number,
+		pageSize: number
+	) => {
+		setSize(pageSize);
+	};
+
+	const onChange: PaginationProps['onChange'] = (pageNumber: number) => {
+		console.log('Page: ', pageNumber);
+		setCurrent(pageNumber);
 	};
 
 	return (
@@ -273,7 +304,7 @@ const RuleCom = () => {
 						searchRule(res);
 					}}
 				>
-					<Form.Item name="mainType" label="规则名称">
+					<Form.Item name="name" label="规则名称">
 						<Input />
 					</Form.Item>
 					<Form.Item>
@@ -293,7 +324,14 @@ const RuleCom = () => {
 			</div>
 
 			{data?.length > 0 ? (
-				<MyTableCom data={data} />
+				<MyTableCom
+					data={data}
+					onShowSizeChange={onShowSizeChange}
+					onChange={onChange}
+					total={total}
+					size={size}
+					current={current}
+				/>
 			) : (
 				<Empty
 					image={emptyPage}

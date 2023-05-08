@@ -1,0 +1,182 @@
+import React, { useState, useImperativeHandle, useEffect } from 'react';
+import axios from 'axios';
+import CustomDialog from '@graph/components/custom-dialog';
+import styles from './dialog.module.less';
+import {
+	Space,
+	Pagination,
+	Form,
+	Input,
+	Button,
+	Select,
+	message,
+	Upload,
+	Radio
+} from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+interface Props {
+	open: boolean;
+	cRef: any;
+	handleCancel: () => void;
+}
+const { TextArea } = Input;
+import { importTable } from '@/api/dataAnalysis/dataManage.ts';
+const ImportCom = React.memo((props: Props) => {
+	const [form] = Form.useForm();
+	const [overLimit, setOverLimit] = React.useState(false);
+	const { open, cRef, handleCancel } = props;
+	const type = Form.useWatch('type', form);
+
+	useImperativeHandle(cRef, () => ({
+		resetForm: () => {
+			form.resetFields();
+		}
+	}));
+
+	useEffect(() => {
+		initForm();
+	}, [open]);
+
+	const initForm = () => {
+		form.setFieldValue('type', 1);
+	};
+
+	const optionsType = [
+		{
+			label: '表格文件',
+			value: 1
+		},
+		{
+			label: '数据库备份文件',
+			value: 2
+		}
+	];
+	const changeType = (e: Event) => {
+		form.setFieldValue('type', e.target.value);
+	};
+
+	const normFile = (e: any) => {
+		console.log(e, 565656);
+		return e.fileList[0];
+	};
+
+	const handleOk = () => {
+		const data = form.getFieldsValue();
+		if (overLimit) {
+			return false;
+		}
+		console.log(data, 66666666);
+		form.validateFields().then(() => {
+			const formData = new FormData();
+			formData.append('tableName', data.tableName);
+			formData.append('file', data.file.originFileObj);
+			formData.append('description', data.description);
+			importTable(formData).then((res) => {
+				console.log(res, 727272);
+				// 接口未通，待完善
+			});
+		});
+	};
+
+	const beforeUpload = (file: any) => {
+		console.log(file.size, 787878);
+		const isFile200M = file.size / 1024 / 1024 > 200;
+		if (isFile200M) {
+			message.error('文件大小超出限制，请修改后重新上传');
+			setOverLimit(true);
+			return false;
+		} else {
+			setOverLimit(false);
+			return false;
+		}
+	};
+
+	const showInfo = () => {
+		if (type == 1) {
+			return (
+				<div className={styles['tip-box']}>
+					<p>说明：1、支持表格文件格式：excel；</p>
+					<p>2、文件大小限制：不超过200M；</p>
+					<p>
+						3、表格第一行必须为中文列名，不支持多级标题，不支持处理超过1个sheet的excel文件；
+					</p>
+				</div>
+			);
+		} else {
+			return (
+				<div className={styles['tip-box']}>
+					<p>说明：1、支持表格文件格式：SQL；</p>
+					<p>2、文件大小限制：不超过200M；</p>
+				</div>
+			);
+		}
+	};
+
+	return (
+		<div>
+			<CustomDialog
+				open={open}
+				title="导入数据"
+				width={600}
+				onOk={handleOk}
+				onCancel={handleCancel}
+			>
+				<Form
+					form={form}
+					labelCol={{ span: 4 }}
+					wrapperCol={{ span: 20 }}
+					labelAlign="left"
+				>
+					<Form.Item label="数据类型" name="type">
+						<Radio.Group
+							options={optionsType}
+							optionType="button"
+							buttonStyle="solid"
+							value={type}
+							onChange={changeType}
+						/>
+						{type && showInfo()}
+					</Form.Item>
+					<Form.Item
+						label="导入文件"
+						name="file"
+						getValueFromEvent={normFile}
+						rules={[{ required: true, message: '请选择文件' }]}
+					>
+						{type == 1 ? (
+							<Upload
+								maxCount={1}
+								accept=".xls,.xlsx"
+								beforeUpload={beforeUpload}
+							>
+								<Button icon={<UploadOutlined />}>选择文件</Button>
+							</Upload>
+						) : (
+							<Upload
+								maxCount={1}
+								accept=".sql"
+								beforeUpload={() => {
+									return false;
+								}}
+							>
+								<Button icon={<UploadOutlined />}>选择文件</Button>
+							</Upload>
+						)}
+					</Form.Item>
+					<Form.Item
+						label="表名称"
+						name="tableName"
+						rules={[{ required: true, message: '请输入名称' }]}
+					>
+						<Input />
+					</Form.Item>
+					<Form.Item label="描述" name="description">
+						<TextArea rows={2} />
+					</Form.Item>
+				</Form>
+			</CustomDialog>
+		</div>
+	);
+});
+
+export default ImportCom;
