@@ -16,13 +16,13 @@ const dataAnalysisSlice = createSlice({
 	initialState: initialState,
 	reducers: {
 		toDoubleClickNode(state, action) {
-			console.log(state, action);
 			const payload: INodePaylod = action.payload;
 			state.curSelectedNode = payload.id;
 			state.showPanel = true;
 		},
-		toClosePanel(state, action) {
+		toClosePanel(state) {
 			state.showPanel = false;
+			state.curSelectedNode = null;
 		}
 	}
 });

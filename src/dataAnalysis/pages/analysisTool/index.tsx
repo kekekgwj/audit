@@ -69,12 +69,12 @@ const X6Graph = () => {
 	return (
 		<>
 			{contextHolder}
-			<Graph openMessage={openMessage} width={800} height={600}>
-				<AddNodeBehavior />
-				<FromJSONBehavior />
-				<GraphExport />
+			<Graph openMessage={openMessage}>
+				{/* <AddNodeBehavior /> */}
+				{/* <FromJSONBehavior />
+				<GraphExport /> */}
+				<NodeDetailPanel />
 			</Graph>
-			<NodeDetailPanel />
 		</>
 	);
 };

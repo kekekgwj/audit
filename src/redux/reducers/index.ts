@@ -1,34 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit';
-// interface IStoreGraph {}
-export interface IStoreGraph {
-	id: string | null;
-	type: string | null;
-}
-export const initialStateGraph: IStoreGraph = {
-	id: null,
-	type: null
-};
-// const initialStateGraph: IStoreGraph = {
-// 	id: '',
-// 	x: '',
-// 	y: ''
-// };
-const graphSlice = createSlice({
-	name: 'graph',
-	initialState: initialStateGraph,
-	reducers: {
-		toClickNode(state, action) {
-			state.id = action.payload.id;
-			state.type = action.payload.type;
-			console.log(state.id, 122222);
-		},
-		toClickEdge(state, action) {
-			state.id = action.payload.id;
-			state.type = action.payload.type;
-		}
-	}
+import { combineReducers } from '@reduxjs/toolkit';
+import dataAnalysisReducer from './dataAnalysis';
+import knowledgeGraphReducer from './knowLedgeGraphSlice';
+
+const rootReducer = combineReducers({
+	dataAnalysis: dataAnalysisReducer,
+	knowledgeGraph: knowledgeGraphReducer
 });
 
-export const { toClickNode, toClickEdge } = graphSlice.actions;
-
-export default graphSlice.reducer;
+export default rootReducer;
