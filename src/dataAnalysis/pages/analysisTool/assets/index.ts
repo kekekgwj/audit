@@ -1,10 +1,10 @@
-import SQL from './file-SQL.png';
-import UNION from './lianjie.png';
-import JOIN from './shujujihebing.png';
-import FILTER from './shaixuan.png';
-import TABLE from './shujuku.png';
+import CONNECT from './connect.png';
+
+import FILTER from './filter.png';
+
 import END from './end.png';
 import GROUP from './group.png';
 import ORDER from './order.png';
 
-export default { SQL, UNION, JOIN, FILTER, TABLE, END, GROUP, ORDER };
+import DOWNLOAD from './download.png';
+export default { FILTER, CONNECT, END, GROUP, ORDER, DOWNLOAD };

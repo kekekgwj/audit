@@ -1,11 +1,75 @@
 .container {
-	bottom: 0px;
-	width: 1000px;
-	max-height: 500px;
-	overflow: auto;
-	border: 1px solid red;
+	width: 100%;
+	position: absolute;
+	bottom: 0;
+	overflow: hidden;
+	height: 400px;
 	display: flex;
+	background-color: #fff;
+	.data {
+		position: relative;
+		flex: 1;
+		.download {
+			padding-left: 40px;
+			height: 50px;
+			background: #f8f9fa;
+			display: flex;
+			align-items: center;
+			&_icon {
+				width: 20px;
+				height: 20px;
+			}
+			&_text {
+				font-size: 14px;
+				line-height: 22px;
+				margin-left: 8px;
+			}
+		}
+		.tableWrapper {
+			padding: 21px;
+			overflow: auto;
+			height: calc(100% - 21px - 50px + 15px);
+		}
+		&::after {
+			content: '';
+			height: 100%;
+			width: 1px;
+			position: absolute;
+			top: 0;
+			right: 0;
+			background: rgba(24, 24, 31, 0.1);
+		}
+	}
+	// .divider {
+	// 	height: 413px;
+	// 	width: 1px;
+	// 	background: rgba(24, 24, 31, 0.1);
+	// 	opacity: 1;
+	// }
 	.configPanel {
-		flex: 0 0 500px;
+		flex: 0 1 600px;
+		background-color: #fff;
+		position: relative;
+
+		&_title {
+			position: relative;
+			height: 50px;
+			background: #f8f9fa;
+			line-height: 50px;
+			padding-left: 20px;
+			display: flex;
+			align-items: center;
+			&_text {
+				font-size: 14px;
+				font-weight: bold;
+			}
+		}
+		.configWrapper {
+			padding: 20px;
+		}
+	}
+	.closeIcon {
+		position: absolute;
+		right: 40px;
 	}
 }
