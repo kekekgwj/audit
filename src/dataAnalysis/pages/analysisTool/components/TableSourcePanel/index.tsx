@@ -4,7 +4,7 @@ import { Collapse } from 'antd';
 const { Panel } = Collapse;
 import { GraphContext } from '../../lib';
 import TABLE from '@/assets/SQLEditor/table.png';
-import { IImageTypes } from '../../lib';
+import { IImageTypes } from '../../lib/utils';
 const TableItem: React.FC = ({ data }) => {
 	if (!data) {
 		return null;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Table } from 'antd';
 import { useSelector } from 'react-redux';
 import classes from './index.module.less';
@@ -9,17 +9,25 @@ import { IRootState } from '@/redux/store';
 import { CloseOutlined } from '@ant-design/icons';
 import { dispatch } from '@/redux/store';
 import { toClosePanel } from '@/redux/reducers/dataAnalysis';
+import { GraphContext } from '../../lib/Graph';
+import { IImageTypes, getNodeTypeById } from '../../lib/utils';
 const { DOWNLOAD } = ASSETS;
 const Panel: React.FC = () => {
 	const state = useSelector((state: IRootState) => state.dataAnalysis);
-	console.log('useSelector', state);
+	const { graph } = useContext(GraphContext) || {};
+
 	const { curSelectedNode: id, showPanel } = state || {};
+	if (!showPanel || !graph) {
+		return null;
+	}
 	interface DataType {
 		key: React.Key;
 		name: string;
 		age: number;
 		address: string;
 	}
+	const { CONNECT, FILTER, TABLE } = IImageTypes;
+	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
 
 	const columns: ColumnsType<DataType> = [
 		{
@@ -44,9 +52,7 @@ const Panel: React.FC = () => {
 			address: `London, Park Lane no. ${i}`
 		});
 	}
-	if (!showPanel) {
-		return null;
-	}
+
 	const closePanel = () => {
 		dispatch(toClosePanel());
 	};
