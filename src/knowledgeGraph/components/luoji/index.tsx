@@ -120,7 +120,6 @@ const SpecialCom = (props: Props) => {
 											>
 												<Input placeholder="" style={{ width: 100 }} />
 											</Form.Item>
-											{/* <MinusCircleOutlined onClick={() => remove(name)} /> */}
 											{index == bodys.length - 1 ? (
 												<PlusCircleOutlined
 													onClick={() => {

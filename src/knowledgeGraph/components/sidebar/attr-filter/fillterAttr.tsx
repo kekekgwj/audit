@@ -16,7 +16,7 @@ interface Option {
 	label: string;
 	defaultValue: number | string | boolean | Array;
 	type: any;
-	enums?: any[];
+	dict?: any[];
 }
 interface Props {
 	properties: any[];
@@ -24,14 +24,14 @@ interface Props {
 }
 const getComponent = (option: Option, props) => {
 	const { onChange, value } = props;
-	const { type, key, enums } = option;
+	const { type, key, dict } = option;
 	if (type == '1') {
 		return {
-			component: Input,
+			component: MyTag,
 			props: {
-				onChange: (e) => {
-					onChange(key, e.target.value);
-				}
+				// onChange: (e) => {
+				// 	onChange(key, e.target.value);
+				// }
 			}
 		};
 	}
@@ -40,7 +40,7 @@ const getComponent = (option: Option, props) => {
 		return {
 			component: Radio.Group,
 			props: {
-				options: enums,
+				options: dict,
 				onChange: (e) => {
 					onChange(key, e.target.value);
 				}
@@ -179,9 +179,30 @@ const FillterAttr: FC<Props> = forwardRef(
 			}
 		];
 		const [Options, setOptions] = useState([]);
+		//  测试数据
+		const myData = [
+			{ key: 'person', label: '人员', value: null, type: 1 },
+			{ key: 'range', label: '范围', value: null, type: 2 },
+			{
+				label: '性别',
+				value: null,
+				type: '4',
+				key: 'gender',
+				dict: [
+					{ label: '男', value: '1' },
+					{ label: '女', value: '2' }
+				]
+			},
+			{
+				label: '日期',
+				value: null,
+				key: 'date',
+				type: '3'
+			}
+		];
 		useEffect(() => {
 			console.log(properties);
-			setOptions(properties);
+			setOptions(myData);
 		}, [properties]);
 		// useEffect(() => {
 		// 	//fromType改变后筛选出对应的表单结构
@@ -207,7 +228,8 @@ const FillterAttr: FC<Props> = forwardRef(
 			fromChange(newFormData);
 		}, [newFormData]);
 
-		const setOperator = (target, data) => {
+		// 自定义组件传值
+		const setData = (target, data) => {
 			const formData = {
 				...newFormData,
 				[target]: data
@@ -217,30 +239,6 @@ const FillterAttr: FC<Props> = forwardRef(
 
 		return (
 			<div className={styles['fillter-attr-box']}>
-				{/* <div className="fillter-attr-box__title">供应商</div>
-			<div className="fillter-attr-box__attrs">
-				<div className={styles['attr-item']}>
-					<Checkbox className={styles['attr-item__checkbox']}>籍贯</Checkbox>
-					<div className={styles['attr-item__value']}>
-						<Input placeholder="请输入" />
-					</div>
-				</div>
-				<div className={styles['attr-item']}>
-					<Checkbox className={styles['attr-item__checkbox']}>性别</Checkbox>
-					<div className={styles['attr-item__value']}>
-						<Radio.Group>
-							<Radio value={1}>男</Radio>
-							<Radio value={2}>女</Radio>
-						</Radio.Group>
-					</div>
-				</div>
-				<div className={styles['attr-item']}>
-					<Checkbox className={styles['attr-item__checkbox']}>时间</Checkbox>
-					<div className={styles['attr-item__value']}>
-						<RangePicker placeholder={['开始时间', '结束时间']} />
-					</div>
-				</div>
-			</div> */}
 				<div className="fillter-attr-box__title">供应商</div>
 				<Form
 					name="basic"
@@ -251,19 +249,25 @@ const FillterAttr: FC<Props> = forwardRef(
 					form={form}
 				>
 					{Options.map((item) => {
-						const { label, value, key } = item;
+						const { label, value, key, type } = item;
 						const { component: Component, props: ComponentProps } =
 							getComponent(item, {
 								onChange,
 								value: value
 							});
-						if (item.type == '2') {
+						if (type == '1') {
+							return (
+								<div key={key}>
+									<MyTag label={label} ikey={key} setData={setData}></MyTag>
+								</div>
+							);
+						} else if (type == '2') {
 							return (
 								<div key={key}>
 									<SpecialCom
 										label={label}
 										ikey={key}
-										setOperator={setOperator}
+										setOperator={setData}
 									></SpecialCom>
 								</div>
 							);

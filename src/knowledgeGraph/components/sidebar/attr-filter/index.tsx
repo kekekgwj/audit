@@ -9,7 +9,6 @@ import styles from './index.module.less';
 import { chownSync } from 'fs';
 
 import { getNextPaths } from '@/api/knowledgeGraph/graphin';
-import Item from 'antd/es/list/Item';
 
 interface Props {
 	data: object;
