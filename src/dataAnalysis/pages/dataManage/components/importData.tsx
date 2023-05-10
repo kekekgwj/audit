@@ -1,5 +1,4 @@
 import React, { useState, useImperativeHandle, useEffect } from 'react';
-import axios from 'axios';
 import CustomDialog from '@graph/components/custom-dialog';
 import styles from './dialog.module.less';
 import {

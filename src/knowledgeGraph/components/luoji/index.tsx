@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, Select, Button, Space, Divider } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import styles from './index.module.less';
@@ -29,10 +29,16 @@ const SpecialCom = (props: Props) => {
 	}, []);
 
 	// 逻辑运算符处理
-	const [symbol, setSymbol] = React.useState('1');
+	const [symbol, setSymbol] = React.useState<string[]>([]);
+	const [formRenderKey, setFormRenderKey] = useState(Date.now()); // 初始渲染键
+	const handleReset = () => {
+		setFormRenderKey(Date.now()); // 生成新的渲染键，强制重新渲染
+	};
 
-	const handleChange = (val: any) => {
-		setSymbol(val);
+	const handleChange = (val: any, index: number) => {
+		const newSymbol = symbol;
+		newSymbol[index] = val;
+		setSymbol(newSymbol);
 	};
 
 	// 传值
@@ -54,19 +60,32 @@ const SpecialCom = (props: Props) => {
 			<Form.Item label={label}>
 				<div className={styles['logical-main-box']}>
 					{bodys?.length > 1 ? (
-						<div className={styles['logical-left']}>
-							<div className={styles['vertical-line']}></div>
-							<div className={styles['left-logical-select']}>
-								<Select
-									defaultValue="1"
-									style={{ width: 50 }}
-									onChange={handleChange}
-									options={[
-										{ value: '1', label: '且' },
-										{ value: '2', label: '或' }
-									]}
-								/>
-							</div>
+						<div key={formRenderKey}>
+							{symbol.map((item, index) => {
+								return (
+									<div
+										key={index}
+										className={`${index > 0 && styles['halfLogical']} ${
+											styles['logical-left']
+										}`}
+									>
+										<div className={styles['vertical-line']}></div>
+										<div className={styles['left-logical-select']}>
+											<Select
+												defaultValue={item}
+												style={{ width: 50 }}
+												onChange={(e) => {
+													handleChange(e, index);
+												}}
+												options={[
+													{ value: '1', label: '且' },
+													{ value: '2', label: '或' }
+												]}
+											/>
+										</div>
+									</div>
+								);
+							})}
 						</div>
 					) : null}
 					<div className={styles['logical-right']}>
@@ -102,7 +121,24 @@ const SpecialCom = (props: Props) => {
 												<Input placeholder="" style={{ width: 100 }} />
 											</Form.Item>
 											{/* <MinusCircleOutlined onClick={() => remove(name)} /> */}
-											{index == 0 ? (
+											{index == bodys.length - 1 ? (
+												<PlusCircleOutlined
+													onClick={() => {
+														add();
+														setSymbol(symbol.concat(['1']));
+													}}
+												/>
+											) : (
+												<MinusCircleOutlined
+													onClick={() => {
+														remove(name);
+														symbol.splice(index, 1);
+														setSymbol(symbol);
+														handleReset();
+													}}
+												/>
+											)}
+											{/* {index == 0 ? (
 												bodys.length > 1 ? (
 													''
 												) : (
@@ -110,7 +146,7 @@ const SpecialCom = (props: Props) => {
 												)
 											) : (
 												<MinusCircleOutlined onClick={() => remove(name)} />
-											)}
+											)} */}
 										</Space>
 									))}
 								</>

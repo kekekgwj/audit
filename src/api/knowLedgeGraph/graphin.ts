@@ -32,3 +32,8 @@ interface IFilters {
 export const getGraph = (filters: IFilters) => {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/getGraph', filters);
 };
+
+// 链路查询
+export const getNextPaths = (data: any) => {
+	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextPaths', data);
+};
