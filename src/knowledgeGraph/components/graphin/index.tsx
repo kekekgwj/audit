@@ -13,6 +13,7 @@ import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { Checkbox, Col, Row } from 'antd';
+import { getNextGraph } from '@/api/knowledgeGraph/graphin';
 
 // 注册自定义节点
 registerNodes('all');
@@ -108,6 +109,16 @@ const LeftEvent = () => {
 
 const MyMenu = React.memo((props: MenuProps) => {
 	const { data, id, onClose, updateData } = props;
+	console.log(id, 112112);
+	useEffect(() => {
+		getNext();
+	}, []);
+
+	const getNext = () => {
+		getNextGraph({ nodeId: id }).then((res) => {
+			console.log(res, 119119);
+		});
+	};
 	const relArr = ['同事', '朋友', '合作方'];
 	// 选中数据
 	const [checkedRel, setCheckedRel] = React.useState([]);
@@ -185,16 +196,6 @@ const GraphinCom = React.memo((props: Props) => {
 					// animation: false
 				}}
 			>
-				{/* <Tooltip bindType="node" placement={'top'}>
-					{(value: TooltipValue) => {
-						if (value.model) {
-							const { model } = value;
-							console.log(model, 421111111);
-							return <NodeDetail nodeModel={model} />;
-						}
-						return null;
-					}}
-				</Tooltip> */}
 				<Tooltip bindType="edge" placement={'top'}>
 					{(value: TooltipValue) => {
 						if (value.model) {

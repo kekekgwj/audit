@@ -310,6 +310,7 @@ const DataManageCom = () => {
 				open={openImport}
 				cRef={importRef}
 				handleCancel={handleCancel}
+				refresh={getList}
 			></ImportDialog>
 		</div>
 	);

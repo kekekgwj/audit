@@ -11,14 +11,14 @@ interface Props {
 const SpecialCom = (props: Props) => {
 	const { label, ikey, setOperator } = props;
 	const [form] = Form.useForm();
-	const bodys = Form.useWatch(ikey, form);
+	const operations = Form.useWatch(ikey, form);
 
 	const initForm = () => {
 		form.setFieldsValue({
 			[ikey]: [
 				{
-					bodyType: undefined,
-					bodyName: undefined
+					operatorType: undefined,
+					value: undefined
 				}
 			]
 		});
@@ -29,23 +29,23 @@ const SpecialCom = (props: Props) => {
 	}, []);
 
 	// 逻辑运算符处理
-	const [symbol, setSymbol] = React.useState<string[]>([]);
+	const [operationLinks, setSymbol] = React.useState<string[]>([]);
 	const [formRenderKey, setFormRenderKey] = useState(Date.now()); // 初始渲染键
 	const handleReset = () => {
 		setFormRenderKey(Date.now()); // 生成新的渲染键，强制重新渲染
 	};
 
 	const handleChange = (val: any, index: number) => {
-		const newSymbol = symbol;
+		const newSymbol = operationLinks;
 		newSymbol[index] = val;
 		setSymbol(newSymbol);
 	};
 
 	// 传值
 	useEffect(() => {
-		console.log(bodys, 38888888888);
-		setOperator(ikey, { symbol, bodys });
-	}, [bodys, symbol]);
+		console.log(operations, 38888888888);
+		setOperator(ikey, { operationLinks, operations, type: 2, key: ikey });
+	}, [operations, operationLinks]);
 
 	return (
 		<Form
@@ -59,9 +59,9 @@ const SpecialCom = (props: Props) => {
 		>
 			<Form.Item label={label}>
 				<div className={styles['logical-main-box']}>
-					{bodys?.length > 1 ? (
+					{operations?.length > 1 ? (
 						<div key={formRenderKey}>
-							{symbol.map((item, index) => {
+							{operationLinks.map((item, index) => {
 								return (
 									<div
 										key={index}
@@ -100,7 +100,7 @@ const SpecialCom = (props: Props) => {
 										>
 											<Form.Item
 												{...restField}
-												name={[name, 'bodyType']}
+												name={[name, 'operatorType']}
 												rules={[
 													{ required: true, message: 'Missing first name' }
 												]}
@@ -115,30 +115,30 @@ const SpecialCom = (props: Props) => {
 											</Form.Item>
 											<Form.Item
 												{...restField}
-												name={[name, 'bodyName']}
+												name={[name, 'value']}
 												rules={[{ required: true, message: '' }]}
 											>
 												<Input placeholder="" style={{ width: 100 }} />
 											</Form.Item>
-											{index == bodys.length - 1 ? (
+											{index == operations.length - 1 ? (
 												<PlusCircleOutlined
 													onClick={() => {
 														add();
-														setSymbol(symbol.concat(['1']));
+														setSymbol(operationLinks.concat(['1']));
 													}}
 												/>
 											) : (
 												<MinusCircleOutlined
 													onClick={() => {
 														remove(name);
-														symbol.splice(index, 1);
-														setSymbol(symbol);
+														operationLinks.splice(index, 1);
+														setSymbol(operationLinks);
 														handleReset();
 													}}
 												/>
 											)}
 											{/* {index == 0 ? (
-												bodys.length > 1 ? (
+												operations.length > 1 ? (
 													''
 												) : (
 													<PlusCircleOutlined onClick={() => add()} />

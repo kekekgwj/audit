@@ -37,3 +37,8 @@ export const getGraph = (filters: IFilters) => {
 export const getNextPaths = (data: any) => {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextPaths', data);
 };
+
+// 穿透下一层
+export const getNextGraph = (data: any) => {
+	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph', data);
+};

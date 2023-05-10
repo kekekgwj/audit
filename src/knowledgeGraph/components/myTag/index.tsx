@@ -12,13 +12,20 @@ interface Props {
 const MyTag = (props: Props) => {
 	const { label, ikey, setData } = props;
 	const { token } = theme.useToken();
-	const [tags, setTags] = useState(['Unremovable']);
+	const [tags, setTags] = useState([]);
 	const [inputVisible, setInputVisible] = useState(false);
 	const [inputValue, setInputValue] = useState('');
 	const [editInputIndex, setEditInputIndex] = useState(-1);
 	const [editInputValue, setEditInputValue] = useState('');
 	const inputRef = useRef<InputRef>(null);
 	const editInputRef = useRef<InputRef>(null);
+
+	useEffect(() => {
+		console.log(tags); //改变时触发传值
+		// 需要保存type，反显的时候用
+		const type = '2';
+		setData(ikey, { value: tags, type: 1 });
+	}, [tags]);
 
 	useEffect(() => {
 		if (inputVisible) {
