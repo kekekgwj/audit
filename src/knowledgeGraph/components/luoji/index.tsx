@@ -43,7 +43,6 @@ const SpecialCom = (props: Props) => {
 
 	// 传值
 	useEffect(() => {
-		console.log(bodys, 38888888888);
 		setOperator(ikey, { symbol, bodys });
 	}, [bodys, symbol]);
 

@@ -3,36 +3,34 @@ import React, {
 	useEffect,
 	useState,
 	forwardRef,
-	useImperativeHandle
+	useImperativeHandle,
+	useRef
 } from 'react';
 import { Checkbox, Input, Radio, DatePicker, Form } from 'antd';
 import styles from './index.module.less';
 const { RangePicker } = DatePicker;
 import SpecialCom from '../../luoji/index';
 import MyTag from '../../myTag/index';
+import { INodeConfigNProps } from './index';
 
 interface Option {
 	key: string;
 	label: string;
-	defaultValue: number | string | boolean | Array;
+	defaultValue: number | string | boolean | Array<any>;
 	type: any;
 	dict?: any[];
 }
-interface Props {
-	properties: any[];
-	fromChange: Function; //表单改变之后返回的值
+interface IProps {
+	initValues: INodeConfigNProps;
+	formChange: (key: string, allValues: any) => void; //表单改变之后返回的值
+	id: string;
 }
 const getComponent = (option: Option, props) => {
-	const { onChange, value } = props;
+	const { value } = props;
 	const { type, key, dict } = option;
 	if (type == '1') {
 		return {
-			component: MyTag,
-			props: {
-				// onChange: (e) => {
-				// 	onChange(key, e.target.value);
-				// }
-			}
+			component: MyTag
 		};
 	}
 
@@ -40,10 +38,7 @@ const getComponent = (option: Option, props) => {
 		return {
 			component: Radio.Group,
 			props: {
-				options: dict,
-				onChange: (e) => {
-					onChange(key, e.target.value);
-				}
+				options: dict
 			}
 		};
 	}
@@ -51,134 +46,26 @@ const getComponent = (option: Option, props) => {
 		return {
 			component: RangePicker,
 			props: {
-				format: 'YYYY-MM-DD',
-				onChange: (val) => {
-					onChange(key, [val[0], val[1]]);
-				}
+				format: 'YYYY-MM-DD'
 			}
 		};
 	}
 	if (type == '2') {
 		return {
 			component: SpecialCom,
-			props: {
-				// onChange: (e) => {
-				// 	onChange(key, e.target.value);
-				// }
-			}
+			props: {}
 		};
 	}
 };
 
-const FillterAttr: FC<Props> = forwardRef(
-	({ fromChange, properties }: Props, ref: any) => {
+const FillterAttr: FC<IProps> = forwardRef(
+	({ formChange, initValues, id }, ref: any) => {
+		const { configInfo, properties } = initValues;
+		console.log('configInfo', configInfo);
 		const [form] = Form.useForm();
 		useImperativeHandle(ref, () => ({
 			form: form
 		}));
-		const [newFormData, setFormData] = useState({});
-		const dataList = [
-			{
-				key: 'input1',
-				data: [
-					{
-						label: '籍贯',
-						defaultValue: '杭州',
-						condition: 1,
-						component: 'Input',
-						key: 'native'
-					},
-					{
-						label: '性别',
-						defaultValue: '1',
-						component: 'Radio',
-						key: 'gender',
-						enums: [
-							{ label: '男', value: '1' },
-							{ label: '女', value: '2' }
-						]
-					},
-					{
-						label: '时间',
-						key: 'time',
-						defaultValue: [],
-						component: 'RangePicker'
-					},
-					{
-						label: '自定义',
-						key: 'number',
-						condition: 3,
-						component: 'custom',
-						defaultValue: {}
-					}
-				]
-			},
-			{
-				key: 'input2',
-				data: [
-					{
-						label: '姓名',
-						defaultValue: '',
-						condition: 1,
-						component: 'Input',
-						key: 'native'
-					},
-					{
-						label: '性别',
-						defaultValue: '1',
-						component: 'Radio',
-						key: 'gender',
-						enums: [
-							{ label: '男', value: '1' },
-							{ label: '女', value: '2' }
-						]
-					},
-					{
-						label: '自定义',
-						key: 'number',
-						condition: 3,
-						component: 'custom',
-						defaultValue: {}
-					}
-				]
-			},
-			{
-				key: 'input3',
-				data: [
-					{
-						label: '籍贯3',
-						defaultValue: '杭州',
-						condition: 1,
-						component: 'Input',
-						key: 'native'
-					},
-					{
-						label: '性别3',
-						defaultValue: '1',
-						component: 'Radio',
-						key: 'gender',
-						enums: [
-							{ label: '男', value: '1' },
-							{ label: '女', value: '2' }
-						]
-					},
-					{
-						label: '时间3',
-						key: 'time',
-						defaultValue: [],
-						component: 'RangePicker'
-					},
-					{
-						label: '自定义',
-						key: 'number',
-						condition: 3,
-						component: 'custom',
-						defaultValue: {}
-					}
-				]
-			}
-		];
-		const [Options, setOptions] = useState([]);
 		//  测试数据
 		const myData = [
 			{ key: 'person', label: '人员', value: null, type: 1 },
@@ -200,41 +87,16 @@ const FillterAttr: FC<Props> = forwardRef(
 				type: '3'
 			}
 		];
-		useEffect(() => {
-			console.log(properties);
-			setOptions(myData);
-		}, [properties]);
-		// useEffect(() => {
-		// 	//fromType改变后筛选出对应的表单结构
-		// 	if (fromType) {
-		// 		const newData = dataList.find((res) => {
-		// 			return res.key == fromType;
-		// 		});
-		// 		setOptions(newData.data);
-		// 	} else {
-		// 		setOptions([]);
-		// 	}
-		// }, [fromType]);
-		const onChange = (key, val) => {
-			const data = {
-				...newFormData,
-				[key]: val
-			};
-			setFormData(data);
-		};
-
-		useEffect(() => {
-			console.log(newFormData, 115115);
-			fromChange(newFormData);
-		}, [newFormData]);
-
+		const latestFormData = useRef<object>({});
 		// 自定义组件传值
 		const setData = (target, data) => {
 			const formData = {
-				...newFormData,
+				...latestFormData.current,
 				[target]: data
 			};
-			setFormData(formData);
+
+			latestFormData.current = formData;
+			console.log('formDta', formData);
 		};
 
 		return (
@@ -247,12 +109,17 @@ const FillterAttr: FC<Props> = forwardRef(
 					style={{ maxWidth: 600 }}
 					autoComplete="off"
 					form={form}
+					onValuesChange={(changedValues, allValues) => {
+						const updateFormData = { ...latestFormData.current, ...allValues };
+
+						formChange(id, updateFormData);
+						latestFormData.current = updateFormData;
+					}}
 				>
-					{Options.map((item) => {
+					{myData.map((item) => {
 						const { label, value, key, type } = item;
 						const { component: Component, props: ComponentProps } =
 							getComponent(item, {
-								onChange,
 								value: value
 							});
 						if (type == '1') {
