@@ -80,8 +80,11 @@ const MyTag = (props: Props) => {
 		background: token.colorBgContainer,
 		borderStyle: 'dashed'
 	};
+	useEffect(() => {
+		setData('person', tags);
+	}, [tags]);
 	return (
-		<Form.Item label={label} name={ikey}>
+		<Form.Item label={label}>
 			<div
 				style={{
 					border: '1px solid #ccc',
