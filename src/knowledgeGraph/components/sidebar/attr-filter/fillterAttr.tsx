@@ -96,6 +96,7 @@ const FillterAttr: FC<IProps> = forwardRef(
 			};
 
 			latestFormData.current = formData;
+			formChange(id, latestFormData);
 			console.log('formDta', formData);
 		};
 

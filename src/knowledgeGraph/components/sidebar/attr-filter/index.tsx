@@ -198,6 +198,7 @@ export default () => {
 			...curValues,
 			configInfo: formAllValues
 		});
+		console.info('nodeConfigNProperties', nodeConfigNProperties.current);
 	};
 
 	return (
