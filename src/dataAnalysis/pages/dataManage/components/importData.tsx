@@ -17,13 +17,14 @@ interface Props {
 	open: boolean;
 	cRef: any;
 	handleCancel: () => void;
+	refresh: () => void;
 }
 const { TextArea } = Input;
 import { importTable } from '@/api/dataAnalysis/dataManage.ts';
 const ImportCom = React.memo((props: Props) => {
 	const [form] = Form.useForm();
 	const [overLimit, setOverLimit] = React.useState(false);
-	const { open, cRef, handleCancel } = props;
+	const { open, cRef, handleCancel, refresh } = props;
 	const type = Form.useWatch('type', form);
 
 	useImperativeHandle(cRef, () => ({
@@ -72,7 +73,8 @@ const ImportCom = React.memo((props: Props) => {
 			formData.append('description', data.description);
 			importTable(formData).then((res) => {
 				console.log(res, 727272);
-				// 接口未通，待完善
+				message.success('导入成功');
+				refresh();
 			});
 		});
 	};

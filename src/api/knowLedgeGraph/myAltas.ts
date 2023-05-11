@@ -2,8 +2,15 @@ import { appendQueryParams, get, post } from '@/utils/request';
 const env = import.meta.env;
 const { VITE_API_PREFIX: API_PREFIX } = env;
 
+interface SearchData {
+	current: number;
+	size: number;
+	name: string;
+	beginTime: string;
+	endTime: string;
+}
 // 图谱列表
-export function getMyAltasList(data: object) {
+export function getMyAltasList(data: SearchData) {
 	return get(
 		appendQueryParams(
 			API_PREFIX + '/blade-tool/graphAnalysis/getMyGraphs',
@@ -13,14 +20,20 @@ export function getMyAltasList(data: object) {
 }
 
 //删除
-export function deleteGraph(data: any) {
+interface DeleteData {
+	id: string;
+}
+export function deleteGraph(data: DeleteData) {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/deleteGraph', {
 		...data
 	});
 }
 
 //查看图谱
-export function getDeatil(data: object) {
+interface DetailData {
+	graphId: string;
+}
+export function getDeatil(data: DetailData) {
 	return get(
 		appendQueryParams(API_PREFIX + '/blade-tool/graphAnalysis/getMyGraph', data)
 	);

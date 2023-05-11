@@ -1,17 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import type { InputRef } from 'antd';
-import { Space, Input, Tag, Tooltip, theme } from 'antd';
+import { Space, Input, Tag, Tooltip, theme, Form } from 'antd';
 
-const MyTag = () => {
+interface Props {
+	label: string;
+	ikey: string;
+	setData: (target: any, data: any) => void;
+}
+
+const MyTag = (props: Props) => {
+	const { label, ikey, setData } = props;
 	const { token } = theme.useToken();
-	const [tags, setTags] = useState(['Unremovable']);
+	const [tags, setTags] = useState([]);
 	const [inputVisible, setInputVisible] = useState(false);
 	const [inputValue, setInputValue] = useState('');
 	const [editInputIndex, setEditInputIndex] = useState(-1);
 	const [editInputValue, setEditInputValue] = useState('');
 	const inputRef = useRef<InputRef>(null);
 	const editInputRef = useRef<InputRef>(null);
+
+	useEffect(() => {
+		console.log(tags); //改变时触发传值
+		// 需要保存type，反显的时候用
+		const type = '2';
+		setData(ikey, { value: tags, type: 1 });
+	}, [tags]);
 
 	useEffect(() => {
 		if (inputVisible) {
@@ -66,71 +80,84 @@ const MyTag = () => {
 		background: token.colorBgContainer,
 		borderStyle: 'dashed'
 	};
+	useEffect(() => {
+		setData('person', tags);
+	}, [tags]);
 	return (
-		<Space size={[0, 8]} wrap>
-			<Space size={[0, 8]} wrap>
-				{tags.map((tag, index) => {
-					if (editInputIndex === index) {
-						return (
-							<Input
-								ref={editInputRef}
-								key={tag}
-								size="small"
-								style={tagInputStyle}
-								value={editInputValue}
-								onChange={handleEditInputChange}
-								onBlur={handleEditInputConfirm}
-								onPressEnter={handleEditInputConfirm}
-							/>
-						);
-					}
-					const isLongTag = tag.length > 20;
-					const tagElem = (
-						<Tag
-							key={tag}
-							closable={index !== 0}
-							style={{ userSelect: 'none' }}
-							onClose={() => handleClose(tag)}
-						>
-							<span
-								onDoubleClick={(e) => {
-									if (index !== 0) {
-										setEditInputIndex(index);
-										setEditInputValue(tag);
-										e.preventDefault();
-									}
-								}}
-							>
-								{isLongTag ? `${tag.slice(0, 20)}...` : tag}
-							</span>
-						</Tag>
-					);
-					return isLongTag ? (
-						<Tooltip title={tag} key={tag}>
-							{tagElem}
-						</Tooltip>
+		<Form.Item label={label}>
+			<div
+				style={{
+					border: '1px solid #ccc',
+					boxSizing: 'border-box',
+					padding: '2px'
+				}}
+			>
+				<Space size={[0, 8]} wrap>
+					<Space size={[0, 8]} wrap>
+						{tags.map((tag, index) => {
+							if (editInputIndex === index) {
+								return (
+									<Input
+										ref={editInputRef}
+										key={tag}
+										size="small"
+										style={tagInputStyle}
+										value={editInputValue}
+										onChange={handleEditInputChange}
+										onBlur={handleEditInputConfirm}
+										onPressEnter={handleEditInputConfirm}
+									/>
+								);
+							}
+							const isLongTag = tag.length > 20;
+							const tagElem = (
+								<Tag
+									key={tag}
+									closable={index !== 0}
+									style={{ userSelect: 'none' }}
+									onClose={() => handleClose(tag)}
+								>
+									<span
+										onDoubleClick={(e) => {
+											if (index !== 0) {
+												setEditInputIndex(index);
+												setEditInputValue(tag);
+												e.preventDefault();
+											}
+										}}
+									>
+										{isLongTag ? `${tag.slice(0, 20)}...` : tag}
+									</span>
+								</Tag>
+							);
+							return isLongTag ? (
+								<Tooltip title={tag} key={tag}>
+									{tagElem}
+								</Tooltip>
+							) : (
+								tagElem
+							);
+						})}
+					</Space>
+					{inputVisible ? (
+						<Input
+							ref={inputRef}
+							type="text"
+							size="small"
+							style={tagInputStyle}
+							value={inputValue}
+							onChange={handleInputChange}
+							onBlur={handleInputConfirm}
+							onPressEnter={handleInputConfirm}
+						/>
 					) : (
-						tagElem
-					);
-				})}
-			</Space>
-			{inputVisible ? (
-				<Input
-					ref={inputRef}
-					type="text"
-					size="small"
-					style={tagInputStyle}
-					value={inputValue}
-					onChange={handleInputChange}
-					onBlur={handleInputConfirm}
-					onPressEnter={handleInputConfirm}
-				/>
-			) : (
-				<Tag style={tagPlusStyle} onClick={showInput}>
-					<PlusOutlined /> New Tag
-				</Tag>
-			)}
-		</Space>
+						<Tag style={tagPlusStyle} onClick={showInput}>
+							<PlusOutlined /> New Tag
+						</Tag>
+					)}
+				</Space>
+			</div>
+		</Form.Item>
 	);
 };
 

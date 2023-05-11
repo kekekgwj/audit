@@ -1,157 +1,125 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button, Tree } from 'antd';
 import CustomDialog from '@graph/components/custom-dialog';
-import { DataNode } from 'antd/es/tree';
 import { CaretDownOutlined } from '@ant-design/icons';
 import SvgIcon from '@graph/components/svg-icon';
 import FillterAttr from './fillterAttr';
 import styles from './index.module.less';
-import { chownSync } from 'fs';
 
 import { getNextPaths } from '@/api/knowledgeGraph/graphin';
-import Item from 'antd/es/list/Item';
 
-interface Props {
-	data: object;
+interface IProperty {
+	key: string;
+	label: string;
+	type: number;
 }
-interface treeDataNode {
+export interface INextPathResponse {
+	name: string;
+	path?: string[];
+	properties: IProperty[];
+}
+// 处理过的TreeData
+interface ITreeData {
+	path: string[];
 	title: string;
 	key: string;
-	children?: treeDataNode[];
-	isLeaf?: boolean;
-	path: string[];
-	properties?: any[];
+	children: ITreeData[];
+	isLeaf: boolean;
+	properties: IProperty[];
 }
-export default (props: Props) => {
-	const [dataList, setDataList] = useState([
-		// {
-		// 	title: 'parent 1-0',
-		// 	key: '0-0-0',
-		// 	type: 'input1',
-		// 	children: [
-		// 		{
-		// 			title: 'leaf',
-		// 			key: '0-0-0-0',
-		// 			type: 'input2'
-		// 		},
-		// 		{
-		// 			title: 'leaf',
-		// 			key: '0-0-0-1',
-		// 			type: 'input1'
-		// 		},
-		// 		{
-		// 			title: 'leaf',
-		// 			key: '0-0-0-2',
-		// 			type: 'input3'
-		// 		}
-		// 	]
-		// },
-		// {
-		// 	title: 'parent 1-1',
-		// 	key: '0-0-1',
-		// 	type: 'input1',
-		// 	children: [
-		// 		{
-		// 			title: 'leaf',
-		// 			key: '0-0-1-0',
-		// 			type: 'input2'
-		// 		}
-		// 	]
-		// },
-		// {
-		// 	title: 'parent 1-2',
-		// 	key: '0-0-2',
-		// 	type: 'input3',
-		// 	children: [
-		// 		{
-		// 			title: 'leaf',
-		// 			key: '0-0-2-0',
-		// 			type: 'input1'
-		// 		},
-		// 		{
-		// 			title: 'leaf',
-		// 			key: '0-0-2-1',
-		// 			type: 'input1'
-		// 		}
-		// 	]
-		// }
-	]);
-
-	const [options, setOptions] = useState([]);
-	const fillterAttrRef = useRef();
-	const [clickData, setClickData] = useState<{ fromType: string; key: string }>(
-		{ fromType: '', key: '' }
-	);
+export interface INodeConfigNProps {
+	properties: IProperty[];
+	configInfo: any;
+}
+export default () => {
+	const fillterAttrRef = useRef(null);
 	const [open, setOpen] = useState(false);
-	const [saveNodes, setSaveNodes] = useState<string[]>(); //需要保存的节点内容
-	const { data } = props;
+	const [saveNodes, setSaveNodes] = useState<string[]>([]); //需要保存的节点内容
+	const [treeData, setTreeData] = useState<ITreeData[]>([]); //树结构渲染用的数据
 
-	const [treeData, setTreeData] = useState<treeDataNode[]>(); //树结构渲染用的数据
+	const nodeConfigNProperties = useRef(new Map<string, INodeConfigNProps>());
 
+	const [selectNodeID, setSelectedNodeID] = useState<string | null>(null);
 	// 打开/关闭设置弹框
-	const changeDialogOpen = (isOpen = true) => {
+	const changeDialogOpen = async (isOpen = true) => {
 		setOpen(isOpen);
-		if (isOpen) {
-			getNextPaths({
+		if (!isOpen) {
+			return;
+		}
+		try {
+			// todo: context -> nodeFilter & parentPaths
+			const res = await getNextPaths({
 				nodeFilter: [],
 				parentPaths: [],
 				type: 'Company',
 				value: '07225997'
-			}).then((res) => {
-				console.log(res, 101);
-				res.forEach((item) => {
-					item.path = [];
-				});
-				// 设表单初始值
-				setOptions(res[0].properties);
-				setTreeData(changeDataTree(res));
 			});
+
+			setTreeData(changeDataTree(res));
+		} catch (e) {
+			console.error(e);
 		}
+		// 设表单初始值
 	};
 	//把原始数据改成dataTree能用的数据
-	const changeDataTree = (list: any[]) => {
+	const changeDataTree = (list: INextPathResponse[]): ITreeData[] => {
 		return list.map((item) => {
-			console.log(item.path);
+			const key = new Date().getTime() + item.name;
+			const properties = item.properties;
+			nodeConfigNProperties.current.set(key, {
+				properties,
+				configInfo: {}
+			});
 			return {
-				path: [...item.path, item.name],
+				path: item.path ? [...item.path, item.name] : [item.name],
 				title: item.name,
-				key: new Date().getTime() + item.name,
+				key,
 				children: [],
 				isLeaf: false,
-				properties: item.properties
+				properties
 			};
 		});
 	};
 
 	//	展开节点 加载数据
-	const onLoadData = (node: any) =>
-		new Promise<void>((resolve) => {
-			if (node.children?.length > 0) {
-				resolve();
-				return;
-			}
-			console.log(node, 124124124);
-			getNextPaths({
+	const onLoadData = async (node: ITreeData) => {
+		// 已经加载子节点
+		if (node.children?.length > 0) {
+			return Promise.resolve();
+		}
+		try {
+			const res = await getNextPaths({
 				nodeFilter: [],
 				parentPaths: node.path,
 				type: 'Company',
 				value: '07225997'
-			}).then((res) => {
-				res.forEach((item) => {
-					item.path = node.path;
-				});
-				setTreeData((origin) =>
-					updateTreeData(origin, node.key, changeDataTree(res))
-				);
-				resolve();
 			});
-		});
+
+			const nodesWithPath = res.map((item) => {
+				return {
+					...item,
+					// 父节点path
+					path: node.path
+				};
+			});
+
+			const childrenTreeNode = changeDataTree(nodesWithPath);
+
+			setTreeData((treeData) =>
+				updateTreeData(treeData, node.key, childrenTreeNode)
+			);
+
+			return Promise.resolve();
+		} catch (e) {
+			return Promise.reject();
+		}
+	};
 
 	const updateTreeData = (
-		list: DataNode[],
+		list: ITreeData[],
 		key: React.Key,
-		children: DataNode[]
-	): DataNode[] =>
+		children: ITreeData[]
+	): ITreeData[] =>
 		list.map((node) => {
 			if (node.key === key) {
 				return {
@@ -170,39 +138,21 @@ export default (props: Props) => {
 
 	// 点击确定
 	const handleOk = () => {
-		console.log('ok', saveNodes);
 		//通过需要保存的节点去筛选原数组
 		if (saveNodes) {
-			const newData: any[] = [];
-			saveNodes.forEach((res) => {
-				newData.push(findNodeItem(res, dataList));
+			const newData = saveNodes.map((id: string) => {
+				return nodeConfigNProperties.current.get(id)?.configInfo;
 			});
 			console.log('最终提交的数据：', newData);
 		}
 	};
-	//通过key查找node节点
-	const findNodeItem = (key: string, dataList: any[]): any | undefined => {
-		for (const item of dataList) {
-			if (item.key === key) {
-				return item;
-			}
-			if (item.children) {
-				const child = findNodeItem(key, item.children);
-				if (child) {
-					return child;
-				}
-			}
-		}
-		return undefined;
-	};
-
 	// 关闭设置弹框
 	const handleCancel = () => {
 		changeDialogOpen(false);
 	};
 
 	// 自定义树形节点
-	const customTreeTitle = (nodeData: DataNode) => {
+	const customTreeTitle = (nodeData: ITreeData) => {
 		return (
 			<div className={styles['fillter-tree-title']}>
 				<SvgIcon name="line"></SvgIcon>
@@ -212,14 +162,18 @@ export default (props: Props) => {
 	};
 
 	//点击复选框触发筛选出确认保存的节点
-	const checkedNodes = (checkedKeys: any, e: any) => {
+	const checkedNodes = (checkedKeys: any) => {
 		setSaveNodes(checkedKeys.checked);
 	};
 
 	//点击树节点触发
-	const selectNodes = (checkedKeys: any, e: any) => {
-		console.log(checkedKeys, e);
-		setOptions(e.node.properties);
+	const selectNodes = (
+		checkedKeys: any,
+		{ selected, node }: { selected: boolean; node: ITreeData }
+	) => {
+		// todo: selected反选
+		setSelectedNodeID(node.key);
+		// setOptions(node.properties);
 		// setClickData({
 		// 	fromType: e.node.type,
 		// 	key: e.node.key
@@ -236,29 +190,17 @@ export default (props: Props) => {
 		// }
 	};
 	//右边表单改变时触发
-	const onFromChange = (res: any) => {
-		console.log(res);
-		//改变原数组中的值
-		setDataList(findTreeItemByKey(clickData.key, dataList, res));
+	const onFormChange = (key: string, formAllValues: any) => {
+		const curValues = nodeConfigNProperties.current.get(
+			key
+		) as INodeConfigNProps;
+		nodeConfigNProperties.current.set(key, {
+			...curValues,
+			configInfo: formAllValues
+		});
+		console.info('nodeConfigNProperties', nodeConfigNProperties.current);
 	};
 
-	//添加对应node节点中的数据
-	const findTreeItemByKey = (
-		key: string,
-		list: any[],
-		data: any
-	): any | undefined => {
-		return list.map((res) => {
-			if (res.children) {
-				res.children = findTreeItemByKey(key, res.children, data); // 递归调用changeDataTree，并将返回的新数据列表赋值给res.children
-			}
-			if (res.key == key) {
-				return { ...res, value: data };
-			} else {
-				return res;
-			}
-		});
-	};
 	return (
 		<>
 			<Button onClick={() => changeDialogOpen(true)}>点我</Button>
@@ -283,14 +225,22 @@ export default (props: Props) => {
 						/>
 					</div>
 					<div className={styles['fillter-attr']}>
-						<FillterAttr
-							ref={fillterAttrRef}
-							fromChange={onFromChange}
-							properties={options}
-						></FillterAttr>
+						{selectNodeID &&
+							nodeConfigNProperties.current.get(selectNodeID) !== undefined && (
+								<FillterAttr
+									key={selectNodeID}
+									id={selectNodeID}
+									ref={fillterAttrRef}
+									formChange={onFormChange}
+									initValues={
+										nodeConfigNProperties.current.get(
+											selectNodeID
+										) as INodeConfigNProps
+									}
+								></FillterAttr>
+							)}
 					</div>
 				</div>
-				{/* <FillterBox title="测试"></FillterBox> */}
 			</CustomDialog>
 		</>
 	);
