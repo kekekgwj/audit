@@ -34,7 +34,6 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
 	const [optionList, setOptionList] = useState<List[]>(
 		JSON.parse(JSON.stringify(option))
 	);
-	const [activeKey, setActiveKey] = useState<string>(''); //控制表单开关
 	//通过传入的状态值和下标修改dataList的排序状态
 	const setSortStatus = (
 		data: { isUp: boolean; isDown: boolean },
@@ -61,7 +60,7 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
 	return (
 		<Collapse
 			collapsible="icon"
-			activeKey={activeKey}
+			activeKey={'1'}
 			className={classes.wrapBoxCollapse}
 			ghost
 			expandIcon={() => <div></div>}
@@ -71,43 +70,41 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
 					<div className={classes.inputWrap}>
 						<div>排序</div>
 						<div className={classes.rightInput}>
-							<div className={classes.left}>
-								{optionList.map((item, index) => {
-									return item.list.map((items, childrenIndex) => {
-										return (
-											(items.isUp || items.isDown) && (
-												<div className={classes.label} key={items.title}>
-													{items.title}
-													<div style={{ marginLeft: '6px' }}>
-														{items.isUp && <UpIcon />}
-														{items.isDown && <Downicon />}
+							{optionList.every((res) => {
+								return res.list.every((ress) => {
+									return !ress.isDown && !ress.isUp;
+								});
+							}) ? (
+								<div className={classes.defaultTxt}>请选择</div>
+							) : (
+								<div className={classes.left}>
+									{optionList.map((item, index) => {
+										return item.list.map((items, childrenIndex) => {
+											return (
+												(items.isUp || items.isDown) && (
+													<div className={classes.label} key={items.title}>
+														{items.title}
+														<div style={{ marginLeft: '6px' }}>
+															{items.isUp && <UpIcon />}
+															{items.isDown && <Downicon />}
+														</div>
+														<DelIcon
+															onClick={() => {
+																setSortStatus(
+																	{ isUp: false, isDown: false },
+																	index,
+																	childrenIndex
+																);
+															}}
+															className={classes.delIcon}
+														></DelIcon>
 													</div>
-													<DelIcon
-														onClick={() => {
-															setSortStatus(
-																{ isUp: false, isDown: false },
-																index,
-																childrenIndex
-															);
-														}}
-														className={classes.delIcon}
-													></DelIcon>
-												</div>
-											)
-										);
-									});
-								})}
-							</div>
-							<DownOutlined
-								onClick={() => {
-									if (activeKey) {
-										setActiveKey('');
-									} else {
-										setActiveKey('1');
-									}
-								}}
-								className={classes.downOutlined}
-							/>
+												)
+											);
+										});
+									})}
+								</div>
+							)}
 						</div>
 					</div>
 				}
@@ -115,7 +112,6 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
 			>
 				<Collapse
 					className={classes.boxCollapse}
-					defaultActiveKey={['1']}
 					ghost
 					expandIcon={({ isActive }) => (
 						<HeartIcon
@@ -178,6 +174,7 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
 
 const Sort: FC = () => {
 	const [form] = Form.useForm();
+
 	const [dataList, setDataList] = useState<List[]>([
 		{
 			title: '数据表1',
@@ -194,7 +191,7 @@ const Sort: FC = () => {
 				{ title: '字段02文字', isUp: false, isDown: false }
 			]
 		}
-	]);
+	]); //默认值
 
 	const onFinish = (values: any) => {
 		console.log(values);

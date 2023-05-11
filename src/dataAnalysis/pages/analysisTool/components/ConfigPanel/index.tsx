@@ -19,8 +19,8 @@ const ConfigPanel: React.FC<IProps> = ({ children }) => {
 export const JoinConfigPanel = () => (
 	<ConfigPanel>
 		{/* <JoinConfig></JoinConfig> */}
-		{/* <Grouping></Grouping> */}
-		<Sort></Sort>
+		<Grouping></Grouping>
+		{/* <Sort></Sort> */}
 	</ConfigPanel>
 );
 export default ConfigPanel;

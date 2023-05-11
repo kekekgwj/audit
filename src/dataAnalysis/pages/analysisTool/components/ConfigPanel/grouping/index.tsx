@@ -1,11 +1,25 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import classes from './index.module.less';
 import { Button, Form, Select, Collapse } from 'antd';
+import { DelIcon } from '../sort/icon';
 import Icon, {
 	CustomIconComponentProps
 } from '@ant-design/icons/lib/components/Icon';
 const { Panel } = Collapse;
 const { Option } = Select;
+interface SortProps {
+	option?: List[];
+	value?: string[];
+	onChange?: (value: string[]) => void;
+}
+interface List {
+	title: string;
+	key: string;
+	list: {
+		title: string;
+		key: string;
+	}[];
+}
 
 const layout = {
 	labelCol: { span: 3 },
@@ -36,9 +50,121 @@ const HeartIcon = (props: Partial<CustomIconComponentProps>) => (
 	<Icon component={HeartSvg} {...props} />
 );
 
+const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
+	const [optionList, setOptionList] = useState<List[]>(
+		JSON.parse(JSON.stringify(option))
+	);
+
+	const [dataList, setDataList] = useState<{ key: string; title: string }[]>(
+		[]
+	);
+
+	const setData = (item: { key: string; title: string }) => {
+		if (
+			!dataList.some((res) => {
+				return res.key == item.key;
+			})
+		) {
+			setDataList([...dataList, item]);
+		}
+	};
+
+	return (
+		<Collapse
+			collapsible="icon"
+			activeKey={'1'}
+			className={classes.wrapBoxCollapse}
+			ghost
+			expandIcon={() => <div></div>}
+		>
+			<Panel
+				header={
+					<div className={classes.inputWrap}>
+						<div className={classes.inputLabel}>排序</div>
+						<div className={classes.rightInput}>
+							<div className={classes.left}>
+								{dataList.map((item, index) => {
+									return (
+										<div className={classes.label} key={item.key}>
+											{item.title}
+											<DelIcon
+												onClick={() => {
+													const newData = JSON.parse(JSON.stringify(dataList));
+													newData.splice(index, 1);
+													setDataList(newData);
+												}}
+												className={classes.delIcon}
+											></DelIcon>
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					</div>
+				}
+				key="1"
+			>
+				<Collapse
+					className={classes.boxCollapse}
+					ghost
+					expandIcon={({ isActive }) => (
+						<HeartIcon
+							style={{
+								transform: isActive ? 'rotate(0deg)' : 'rotate(-90deg)',
+								transition: 'all linear .25s'
+							}}
+						/>
+					)}
+				>
+					{optionList.map((item, index) => {
+						return (
+							<Panel header={item.title} key={index + 1}>
+								{item.list.map((items, childrenIndex) => {
+									return (
+										<div
+											key={items.title}
+											className={classes.sortTxt}
+											onClick={() => {
+												setData(items);
+											}}
+										>
+											<span>{items.title}</span>
+										</div>
+									);
+								})}
+							</Panel>
+						);
+					})}
+				</Collapse>
+			</Panel>
+		</Collapse>
+	);
+};
+
 const Grouping: FC = () => {
 	const [form] = Form.useForm();
 
+	const [accordingData, setAccordingData] = useState<List[]>([
+		//分组依据列表数据
+		{
+			title: '数据表1',
+			key: '0',
+			list: [
+				{ title: '字段1', key: '0-1' },
+				{ title: '字段2', key: '0-2' }
+			]
+		},
+		{
+			title: '数据表2',
+			key: '1',
+			list: [{ title: '字段2', key: '1-1' }]
+		},
+		{
+			title: '数据表3',
+			key: '2',
+			list: [{ title: '字段3', key: '2-1' }]
+		}
+	]);
 	const onGenderChange = (value: string) => {
 		switch (value) {
 			case 'male':
@@ -75,37 +201,8 @@ const Grouping: FC = () => {
 			className={classes.fromWrap}
 		>
 			<div className={classes.formList}>
-				<Form.Item name="according" label="分组依据">
-					<Select placeholder="请选择" onChange={onGenderChange} allowClear>
-						<Option value="male">male</Option>
-						<Option value="female">female</Option>
-						<Option value="other">other</Option>
-					</Select>
-				</Form.Item>
-				<Collapse
-					className={classes.boxCollapse}
-					defaultActiveKey={['1']}
-					onChange={onChange}
-					ghost
-					expandIcon={({ isActive }) => (
-						<HeartIcon
-							style={{
-								transform: isActive ? 'rotate(0deg)' : 'rotate(-90deg)',
-								transition: 'all linear .25s'
-							}}
-						/>
-					)}
-				>
-					<Panel header="数据表1" key="1">
-						字段1
-					</Panel>
-					<Panel header="数据表2" key="2">
-						字段2
-					</Panel>
-					<Panel header="数据表3" key="3">
-						字段3
-					</Panel>
-				</Collapse>
+				<SortInput option={accordingData}></SortInput>
+
 				<Form.Item name="type" label="函数类型">
 					<Select placeholder="请选择" onChange={onGenderChange} allowClear>
 						<Option value="male">male</Option>

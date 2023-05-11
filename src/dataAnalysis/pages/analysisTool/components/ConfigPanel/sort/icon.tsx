@@ -83,27 +83,27 @@ const delSvg = () => (
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<g id="icon/close" clip-path="url(#clip0_825_26722)">
+		<g id="icon/close" clipPath="url(#clip0_825_26722)">
 			<path
 				id="Vector"
 				d="M7 13C10.3137 13 13 10.3137 13 7C13 3.68629 10.3137 1 7 1C3.68629 1 1 3.68629 1 7C1 10.3137 3.68629 13 7 13Z"
 				fill="#FF8683"
 				stroke="#FF8683"
-				stroke-linejoin="round"
+				strokeLinejoin="round"
 			/>
 			<path
 				id="Vector_2"
 				d="M9 5L5 9"
 				stroke="white"
-				stroke-linecap="round"
-				stroke-linejoin="round"
+				strokeLinecap="round"
+				strokeLinejoin="round"
 			/>
 			<path
 				id="Vector_3"
 				d="M5 5L9 9"
 				stroke="white"
-				stroke-linecap="round"
-				stroke-linejoin="round"
+				strokeLinecap="round"
+				strokeLinejoin="round"
 			/>
 		</g>
 		<defs>
