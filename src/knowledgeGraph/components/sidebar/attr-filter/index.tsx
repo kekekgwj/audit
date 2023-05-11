@@ -20,6 +20,7 @@ export interface INextPathResponse {
 	path?: string[];
 	properties: IProperty[];
 }
+
 // 处理过的TreeData
 interface ITreeData {
 	path: string[];
@@ -154,24 +155,22 @@ export default () => {
 	const handleOk = () => {
 		//通过需要保存的节点去筛选原数组
 		if (saveNodes) {
-			const newData = saveNodes.map((id: string) => {
-				// return nodeConfigNProperties.current.get(id)?.configInfo;
-				return {
-					id,
-					data: nodeConfigNProperties.current.get(id)?.configInfo
-				};
-			});
-
 			// 转换数据形式 通过id在树形数据中查找对应位置
 			console.log('树形数据', treeData);
 			// 根据树数据,生成提交数据形式
 			const configData = transData(treeData);
 			console.log(configData, 168168);
-			console.log('最终提交的数据：', newData);
-			const submitData = handleSubmitData(configData, newData);
+			console.log('最终提交的数据：', configData);
 		}
 	};
-
+	const getNodeDataConverted = (id: string) => {
+		const rawDta = nodeConfigNProperties.current.get(id)?.configInfo;
+		if (saveNodes.includes(id)) {
+			return rawDta;
+		} else {
+			return null;
+		}
+	};
 	//转成后台需要的数据形式
 	const transData = (list: any) => {
 		// console.log(list, 174174);
@@ -180,28 +179,8 @@ export default () => {
 				name: item.title,
 				nextPath: transData(item.children),
 				key: item.key,
-				properties: item.properties
+				properties: getNodeDataConverted(item.key)
 			};
-		});
-	};
-
-	// 树形数据中查找某一个值的方法
-	const searchFromFormat = (list, item) => {
-		return list.map((res) => {
-			if (res.key == item.id) {
-				res.properties = item.data.current;
-			}
-			if (res.nextPath && res.nextPath.length > 0) {
-				res.nextPath = searchFromFormat(res.nextPath, item);
-			}
-			return res;
-		});
-	};
-
-	//将选中数据填入
-	const handleSubmitData = (configData, newData) => {
-		newData.forEach((item) => {
-			searchFromFormat(configData, item);
 		});
 	};
 
