@@ -11,6 +11,7 @@ interface SortProps {
 	option?: List[];
 	value?: string[];
 	onChange?: (value: string[]) => void;
+	label: string;
 }
 interface List {
 	title: string;
@@ -50,7 +51,7 @@ const HeartIcon = (props: Partial<CustomIconComponentProps>) => (
 	<Icon component={HeartSvg} {...props} />
 );
 
-const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
+const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 	const [optionList, setOptionList] = useState<List[]>(
 		JSON.parse(JSON.stringify(option))
 	);
@@ -69,6 +70,11 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
 		}
 	};
 
+	//监听dataList改变触发onChange
+	useEffect(() => {
+		onChange?.(dataList);
+	}, [dataList]);
+
 	return (
 		<Collapse
 			collapsible="icon"
@@ -80,7 +86,7 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
 			<Panel
 				header={
 					<div className={classes.inputWrap}>
-						<div className={classes.inputLabel}>排序</div>
+						<div className={classes.inputLabel}>{label}</div>
 						<div className={classes.rightInput}>
 							<div className={classes.left}>
 								{dataList.map((item, index) => {
@@ -144,7 +150,7 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
 const Grouping: FC = () => {
 	const [form] = Form.useForm();
 
-	const [accordingData, setAccordingData] = useState<List[]>([
+	const [groupData, setGroupData] = useState<List[]>([
 		//分组依据列表数据
 		{
 			title: '数据表1',
@@ -165,6 +171,29 @@ const Grouping: FC = () => {
 			list: [{ title: '字段3', key: '2-1' }]
 		}
 	]);
+
+	const [accordData, setAccordData] = useState<List[]>([
+		//列数据
+		{
+			title: '数据表1',
+			key: '0',
+			list: [
+				{ title: '字段1', key: '0-1' },
+				{ title: '字段2', key: '0-2' }
+			]
+		},
+		{
+			title: '数据表2',
+			key: '1',
+			list: [{ title: '字段2', key: '1-1' }]
+		},
+		{
+			title: '数据表3',
+			key: '2',
+			list: [{ title: '字段3', key: '2-1' }]
+		}
+	]);
+
 	const onGenderChange = (value: string) => {
 		switch (value) {
 			case 'male':
@@ -188,10 +217,6 @@ const Grouping: FC = () => {
 		form.resetFields();
 	};
 
-	const onChange = (key: string | string[]) => {
-		console.log(key);
-	};
-
 	return (
 		<Form
 			{...layout}
@@ -201,8 +226,9 @@ const Grouping: FC = () => {
 			className={classes.fromWrap}
 		>
 			<div className={classes.formList}>
-				<SortInput option={accordingData}></SortInput>
-
+				<Form.Item wrapperCol={{ offset: 0, span: 24 }} name="group" label="">
+					<SortInput label="分组依据" option={groupData}></SortInput>
+				</Form.Item>
 				<Form.Item name="type" label="函数类型">
 					<Select placeholder="请选择" onChange={onGenderChange} allowClear>
 						<Option value="male">male</Option>
@@ -210,12 +236,8 @@ const Grouping: FC = () => {
 						<Option value="other">other</Option>
 					</Select>
 				</Form.Item>
-				<Form.Item name="arrange" label="列">
-					<Select placeholder="请选择" onChange={onGenderChange} allowClear>
-						<Option value="male">male</Option>
-						<Option value="female">female</Option>
-						<Option value="other">other</Option>
-					</Select>
+				<Form.Item wrapperCol={{ offset: 0, span: 24 }} name="arrange" label="">
+					<SortInput label="列" option={accordData}></SortInput>
 				</Form.Item>
 			</div>
 
