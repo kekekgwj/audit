@@ -1,0 +1,62 @@
+.fromWrap {
+	:global {
+		.ant-form-item-label > label::after {
+			display: none;
+		}
+		.ant-form-item {
+			margin-bottom: 20px;
+		}
+	}
+    .formList{
+        height: 260px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin-bottom: 10px;
+    }
+}
+.boxCollapse {
+	:global {
+		.ant-collapse-item {
+			padding-bottom: 20px;
+		}
+		.ant-collapse-header {
+			padding: 0px !important;
+		}
+		.ant-collapse-content-box {
+			padding-left: 24px !important;
+			padding-bottom: 0px !important;
+		}
+	}
+}
+.btn {
+	width: 66px;
+	height: 34px;
+	border-radius: 4px;
+	font-size: 14px;
+	font-family: Roboto-Regular, Roboto;
+	font-weight: 400;
+	color: #18181f;
+}
+.reset {
+	margin-right: 10px;
+	border: 1px solid #cccccc;
+	&:hover {
+		color: #000 !important;
+		border-color: #1d7b4c !important;
+	}
+}
+.submit {
+	background: #23955c;
+	color: #ffffff;
+	&:hover {
+		background: #23955c !important;
+		border-color: #1d7b4c !important;
+	}
+	&:active {
+		background: #23955c !important;
+		border-color: #1d7b4c !important;
+	}
+	&:focus {
+		outline: none;
+	}
+}
