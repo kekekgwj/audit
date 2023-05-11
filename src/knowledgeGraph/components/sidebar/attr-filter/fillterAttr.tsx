@@ -61,8 +61,8 @@ const getComponent = (option: Option, props) => {
 const FillterAttr: FC<IProps> = forwardRef(
 	({ formChange, initValues, id }, ref: any) => {
 		const { configInfo, properties } = initValues;
-		console.log('configInfo', configInfo);
 		const [form] = Form.useForm();
+		// const [curProperties,setCurProp] = useState()
 		useImperativeHandle(ref, () => ({
 			form: form
 		}));
@@ -97,7 +97,6 @@ const FillterAttr: FC<IProps> = forwardRef(
 
 			latestFormData.current = formData;
 			formChange(id, latestFormData);
-			console.log('formDta', formData);
 		};
 
 		return (
@@ -117,8 +116,9 @@ const FillterAttr: FC<IProps> = forwardRef(
 						latestFormData.current = updateFormData;
 					}}
 				>
-					{myData.map((item) => {
+					{properties.map((item) => {
 						const { label, value, key, type } = item;
+						const curData = configInfo.current ? configInfo.current : '';
 						const { component: Component, props: ComponentProps } =
 							getComponent(item, {
 								value: value
@@ -126,7 +126,12 @@ const FillterAttr: FC<IProps> = forwardRef(
 						if (type == '1') {
 							return (
 								<div key={key}>
-									<MyTag label={label} ikey={key} setData={setData}></MyTag>
+									<MyTag
+										label={label}
+										ikey={key}
+										setData={setData}
+										value={curData ? curData[key] : []}
+									></MyTag>
 								</div>
 							);
 						} else if (type == '2') {
@@ -136,6 +141,7 @@ const FillterAttr: FC<IProps> = forwardRef(
 										label={label}
 										ikey={key}
 										setOperator={setData}
+										value={curData ? curData[key] : {}}
 									></SpecialCom>
 								</div>
 							);

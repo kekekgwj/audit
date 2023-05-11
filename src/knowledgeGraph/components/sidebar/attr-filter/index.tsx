@@ -7,6 +7,8 @@ import FillterAttr from './fillterAttr';
 import styles from './index.module.less';
 
 import { getNextPaths } from '@/api/knowledgeGraph/graphin';
+import { listenerCancelled } from '@reduxjs/toolkit/dist/listenerMiddleware/exceptions';
+import { format } from 'url';
 
 interface IProperty {
 	key: string;
@@ -55,6 +57,17 @@ export default () => {
 				value: '07225997'
 			});
 
+			// 自己添加
+			res[0].properties = [
+				...res[0].properties,
+				{
+					key: 'range',
+					label: '范围',
+					value: null,
+					type: 2
+				}
+			];
+
 			setTreeData(changeDataTree(res));
 		} catch (e) {
 			console.error(e);
@@ -70,6 +83,7 @@ export default () => {
 				properties,
 				configInfo: {}
 			});
+
 			return {
 				path: item.path ? [...item.path, item.name] : [item.name],
 				title: item.name,
@@ -141,11 +155,56 @@ export default () => {
 		//通过需要保存的节点去筛选原数组
 		if (saveNodes) {
 			const newData = saveNodes.map((id: string) => {
-				return nodeConfigNProperties.current.get(id)?.configInfo;
+				// return nodeConfigNProperties.current.get(id)?.configInfo;
+				return {
+					id,
+					data: nodeConfigNProperties.current.get(id)?.configInfo
+				};
 			});
+
+			// 转换数据形式 通过id在树形数据中查找对应位置
+			console.log('树形数据', treeData);
+			// 根据树数据,生成提交数据形式
+			const configData = transData(treeData);
+			console.log(configData, 168168);
 			console.log('最终提交的数据：', newData);
+			const submitData = handleSubmitData(configData, newData);
 		}
 	};
+
+	//转成后台需要的数据形式
+	const transData = (list: any) => {
+		// console.log(list, 174174);
+		return list.map((item) => {
+			return {
+				name: item.title,
+				nextPath: transData(item.children),
+				key: item.key,
+				properties: item.properties
+			};
+		});
+	};
+
+	// 树形数据中查找某一个值的方法
+	const searchFromFormat = (list, item) => {
+		return list.map((res) => {
+			if (res.key == item.id) {
+				res.properties = item.data.current;
+			}
+			if (res.nextPath && res.nextPath.length > 0) {
+				res.nextPath = searchFromFormat(res.nextPath, item);
+			}
+			return res;
+		});
+	};
+
+	//将选中数据填入
+	const handleSubmitData = (configData, newData) => {
+		newData.forEach((item) => {
+			searchFromFormat(configData, item);
+		});
+	};
+
 	// 关闭设置弹框
 	const handleCancel = () => {
 		changeDialogOpen(false);
@@ -178,16 +237,8 @@ export default () => {
 		// 	fromType: e.node.type,
 		// 	key: e.node.key
 		// });
-
-		//重置并设置默认值
-		// fillterAttrRef.current && fillterAttrRef.current.form.resetFields();
-		// const defaultValue = findNodeItem(e.node.key, dataList).value;
-		// if (defaultValue) {
-		// 	for (let key in defaultValue) {
-		// 		fillterAttrRef.current &&
-		// 			fillterAttrRef.current.form.setFieldValue(key, defaultValue[key]);
-		// 	}
-		// }
+		// 重置
+		fillterAttrRef.current && fillterAttrRef.current.form.resetFields();
 	};
 	//右边表单改变时触发
 	const onFormChange = (key: string, formAllValues: any) => {
