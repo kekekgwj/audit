@@ -211,7 +211,6 @@ const GraphinCom = React.memo((props: Props) => {
 				</Tooltip>
 				<ContextMenu style={{ background: '#fff' }} bindType="node">
 					{(value) => {
-						console.log(value, 101);
 						const { onClose, id } = value;
 						return <MyMenu onClose={onClose} id={id} updateData={updateData} />;
 					}}
