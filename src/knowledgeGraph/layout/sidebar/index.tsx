@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { routes, CustomRoute } from '@/routers/routes';
-import SvgIcon from '@graph/components/svg-icon';
+import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 
 interface MenuItem {
