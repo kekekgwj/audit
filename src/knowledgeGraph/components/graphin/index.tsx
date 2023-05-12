@@ -109,7 +109,6 @@ const LeftEvent = () => {
 
 const MyMenu = React.memo((props: MenuProps) => {
 	const { data, id, onClose, updateData } = props;
-	console.log(id, 112112);
 	useEffect(() => {
 		getNext();
 	}, []);
@@ -207,7 +206,6 @@ const GraphinCom = React.memo((props: Props) => {
 				</Tooltip>
 				<ContextMenu style={{ background: '#fff' }} bindType="node">
 					{(value) => {
-						console.log(value, 101);
 						const { onClose, id } = value;
 						return <MyMenu onClose={onClose} id={id} updateData={updateData} />;
 					}}

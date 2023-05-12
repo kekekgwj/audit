@@ -19,19 +19,59 @@ interface INodes {
 export const getMainNodes = () => {
 	return get<INodes[]>(API_PREFIX + '/blade-tool/graphAnalysis/getNodes');
 };
-interface IFilterNode {
+export interface IFilterNode {
 	type: string;
 	value: string;
+}
+interface IPath {
+	name: string;
+	nextPaths: IPath[];
+	// todo: properties
+	properties: object[];
 }
 interface IFilters {
 	algorithmName: string;
 	depth: number;
 	nodeFilter: string[];
 	nodes: IFilterNode[];
-	paths: any;
+	paths: IPath;
 }
+interface IGraphData {
+	edges: IResEdge[];
+	nodes: IResNode[];
+}
+
+interface IResNode {
+	attrs: {
+		key: string;
+		label: string;
+		value: string | null;
+	};
+	communityId: string | null;
+	id: string;
+	label: string;
+	score: number | null;
+	type: string;
+}
+
+interface IResEdge {
+	attrs: {
+		key: string;
+		label: string;
+		value: string | null;
+	};
+	id: string;
+	similarity: null;
+	source: string;
+	target: string;
+	type: string;
+}
+
 export const getGraph = (filters: IFilters) => {
-	return post(API_PREFIX + '/blade-tool/graphAnalysis/getGraph', filters);
+	return post<IGraphData>(
+		API_PREFIX + '/blade-tool/graphAnalysis/getGraph',
+		filters
+	);
 };
 
 // 链路查询
@@ -42,7 +82,14 @@ export const getNextPaths = (data: any) => {
 	);
 };
 
+interface IGetNextPath {
+	nodeId: number;
+	relationships: string[];
+}
 // 穿透下一层
-export const getNextGraph = (data: any) => {
-	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph', data);
+export const getNextGraph = (data: IGetNextPath) => {
+	return post<IGraphData>(
+		API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph',
+		data
+	);
 };

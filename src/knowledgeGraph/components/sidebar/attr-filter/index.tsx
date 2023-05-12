@@ -178,7 +178,6 @@ export default () => {
 			return {
 				name: item.title,
 				nextPath: transData(item.children),
-				key: item.key,
 				properties: getNodeDataConverted(item.key)
 			};
 		});

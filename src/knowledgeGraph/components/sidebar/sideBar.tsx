@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Select, InputNumber, Space, Divider } from 'antd';
+import {
+	Form,
+	Input,
+	Button,
+	Select,
+	InputNumber,
+	Space,
+	Divider,
+	message
+} from 'antd';
 import { type GraphinData } from '@antv/graphin';
 import {
 	ApartmentOutlined,
@@ -10,7 +19,11 @@ import {
 } from '@ant-design/icons';
 import AttrFillter from './attr-filter';
 import styles from './index.module.less';
-import { getMainNodes, getGraph } from '@/api/knowledgeGraph/graphin';
+import {
+	getMainNodes,
+	getGraph,
+	IFilterNode
+} from '@/api/knowledgeGraph/graphin';
 interface Props {
 	updateData: (layout: GraphinData) => void;
 	toggleLayout: (isOpen: boolean) => void;
@@ -100,40 +113,54 @@ export default (props: Props) => {
 
 	// 提交表单 获取数据
 	const searchUpdate = async (res: IFormData) => {
-		// 调用接口 获取帅选数据
+		// 调用接口 获取筛选数据
 		const { bodyFilter, bodys, level, hierarchy } = res;
-		console.log(res);
-		const data = await getGraph({
-			algorithmName: '',
-			depth: level,
-			nodeFilter: bodyFilter,
-			nodes: Object.values(bodys).map(({ bodyType, bodyName }) => {
-				return {
+		const nodes: IFilterNode[] = [];
+		bodys.forEach(({ bodyType, bodyName }) => {
+			if (bodyType && bodyName) {
+				nodes.push({
 					type: bodyType,
 					value: bodyName
-				};
-			}),
-			paths: hierarchy
+				});
+			}
 		});
-		console.log(data);
-		// 数据转换
-		if (data) {
-			if (data.nodes) {
-				data.nodes.forEach((item) => {
-					item.id = item.id + '';
-				});
-			}
-			if (data.edges) {
-				data.edges.forEach((item) => {
-					item.id = item.id + '';
-					item.source = item.source + '';
-					item.target = item.target + '';
-				});
-			}
+		if (nodes.length === 0) {
+			message.error('未选择主体');
+			return;
 		}
-		console.log(data, 127);
-		// 获取之后，更新视图数据
-		updateData(data);
+		try {
+			const data = await getGraph({
+				algorithmName: '',
+				depth: level,
+				nodeFilter: bodyFilter,
+				nodes,
+				paths: hierarchy
+			});
+
+			// 数据转换
+			// if (data) {
+			// 	if (data.nodes) {
+			// 		data.nodes.forEach((item) => {
+			// 			item.id = item.id + '';
+			// 		});
+			// 	}
+			// 	if (data.edges) {
+			// 		data.edges.forEach((item) => {
+			// 			item.id = item.id + '';
+			// 			item.source = item.source + '';
+			// 			item.target = item.target + '';
+			// 		});
+			// 	}
+			// }
+
+			// 获取之后，更新视图数据
+			updateData({
+				nodes: data.nodes || [],
+				edges: data.edges || []
+			});
+		} catch (e) {
+			console.error(e);
+		}
 	};
 
 	// 重置表单
@@ -317,7 +344,7 @@ export default (props: Props) => {
 								<span>链路筛选</span>
 							</div>
 							<Form.Item name="hierarchy" label="链路筛选">
-								<AttrFillter data={{}}></AttrFillter>
+								<AttrFillter></AttrFillter>
 							</Form.Item>
 						</div>
 						{!canAdd ? (
