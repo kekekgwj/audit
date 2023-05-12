@@ -84,7 +84,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	const colums = [
 		{
 			title: '序号',
-			dataIndex: 'key'
+			render: (text, record, index) => `${index + 1}`
 		},
 		{
 			title: '数据表名称',
@@ -131,6 +131,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 
 	return (
 		<div>
+			{contextHolder}
 			<Table
 				columns={colums}
 				dataSource={data}

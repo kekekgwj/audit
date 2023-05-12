@@ -45,16 +45,17 @@ interface NodeDetailProps {
 
 const EdgeDetail = React.memo((props: NodeDetailProps) => {
 	const { nodeModel } = props;
+	const attrArr = nodeModel.attrs ? nodeModel.attrs : [];
 	return (
 		<div className={styles['node-detail-box']}>
-			<div className={styles['node-detail-item']}>
-				<span className={styles['detail-item-title']}>边id:</span>
-				{nodeModel.id as string}
-			</div>
-			<div className={styles['node-detail-item']}>
-				<span className={styles['detail-item-title']}>边id:</span>
-				{nodeModel.id as string}
-			</div>
+			{attrArr.map((item) => {
+				return (
+					<div className={styles['node-detail-item']}>
+						<span className={styles['detail-item-title']}>{item.label}:</span>
+						{item.value}
+					</div>
+				);
+			})}
 		</div>
 	);
 });

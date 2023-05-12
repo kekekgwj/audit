@@ -1,5 +1,5 @@
 import { INextPathResponse } from '@/knowledgeGraph/components/sidebar/attr-filter';
-import { appendQueryParams, get, post } from '@/utils/request';
+import { appendQueryParams, get, post, postFormData } from '@/utils/request';
 const env = import.meta.env;
 const { VITE_API_PREFIX: API_PREFIX } = env;
 // interface IResponse<T> {
@@ -103,3 +103,11 @@ interface NextGraph {
 export const getNextGraph = (data: any) => {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph', data);
 };
+
+//保存图谱
+export function saveGraph(formData: FormData) {
+	return postFormData(
+		API_PREFIX + '/blade-tool/graphAnalysis/saveGraph',
+		formData
+	);
+}

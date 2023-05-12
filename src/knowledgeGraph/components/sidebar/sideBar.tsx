@@ -28,6 +28,7 @@ interface Props {
 	updateData: (layout: GraphinData) => void;
 	toggleLayout: (isOpen: boolean) => void;
 	canAdd: boolean;
+	setdefaultName: (name: string) => void;
 }
 
 interface bodyTypeOption {
@@ -48,7 +49,7 @@ interface IFormData {
 	hierarchy: any;
 }
 export default (props: Props) => {
-	const { updateData, toggleLayout, canAdd } = props;
+	const { updateData, toggleLayout, canAdd, setdefaultName } = props;
 	const [configVisibile, setconfigVisibile] = useState(true);
 	const [bodyTypeOptions, setBodyTypeOptions] = useState(Array<bodyTypeOption>);
 	const [form] = Form.useForm();
@@ -115,6 +116,9 @@ export default (props: Props) => {
 	const searchUpdate = async (res: IFormData) => {
 		// 调用接口 获取筛选数据
 		const { bodyFilter, bodys, level, hierarchy } = res;
+		// 用第一个主体名当默认图谱名称
+		setdefaultName(bodys[0]?.bodyName);
+		console.log(bodys, 119119);
 		const nodes: IFilterNode[] = [];
 		bodys.forEach(({ bodyType, bodyName }) => {
 			if (bodyType && bodyName) {
