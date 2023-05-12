@@ -12,8 +12,9 @@ interface Props {
 
 const MyTag = (props: Props) => {
 	const { label, ikey, setData, value } = props;
+	console.log(value, 151515);
 	const { token } = theme.useToken();
-	const [tags, setTags] = useState(value);
+	const [tags, setTags] = useState([]);
 	const [inputVisible, setInputVisible] = useState(false);
 	const [inputValue, setInputValue] = useState('');
 	const [editInputIndex, setEditInputIndex] = useState(-1);
@@ -21,10 +22,15 @@ const MyTag = (props: Props) => {
 	const inputRef = useRef<InputRef>(null);
 	const editInputRef = useRef<InputRef>(null);
 
+	// const defaultValue = value?
+
 	useEffect(() => {
 		// 需要保存type，后端传值的时候用
-		const type = '2';
-		setData(ikey, { value: tags, type: 1 });
+		const operations = tags.map((item: string) => {
+			return { operatorType: 1, value: item };
+		});
+		console.log(operations, 292929);
+		setData(ikey, { operationLinks: [], operations, type: 1, key: ikey });
 	}, [tags]);
 
 	useEffect(() => {

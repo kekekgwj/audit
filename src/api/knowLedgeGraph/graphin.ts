@@ -42,7 +42,24 @@ export const getNextPaths = (data: any) => {
 	);
 };
 
+// 获取下一层关系
+interface Relationships {
+	nodeId: string;
+}
+export const getNextRelationships = (data: Relationships) => {
+	return get(
+		appendQueryParams(
+			API_PREFIX + '/blade-tool/graphAnalysis/getNextRelationships',
+			data
+		)
+	);
+};
+
 // 穿透下一层
+interface NextGraph {
+	nodeId: string;
+	relationships: string[];
+}
 export const getNextGraph = (data: any) => {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph', data);
 };

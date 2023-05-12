@@ -155,21 +155,32 @@ export default () => {
 	const handleOk = () => {
 		//通过需要保存的节点去筛选原数组
 		if (saveNodes) {
-			// 转换数据形式 通过id在树形数据中查找对应位置
-			console.log('树形数据', treeData);
 			// 根据树数据,生成提交数据形式
 			const configData = transData(treeData);
-			console.log(configData, 168168);
 			console.log('最终提交的数据：', configData);
 		}
 	};
 	const getNodeDataConverted = (id: string) => {
-		const rawDta = nodeConfigNProperties.current.get(id)?.configInfo;
+		const rawDta = nodeConfigNProperties.current.get(id)?.configInfo.current;
 		if (saveNodes.includes(id)) {
 			return rawDta;
 		} else {
 			return null;
 		}
+	};
+
+	// 转数据形式
+	const transArr = (data: object) => {
+		let arr = [];
+		for (let k in data) {
+			arr.push({
+				key: k,
+				operationLinks: data[k].operationLinks ? data[k].operationLinks : [],
+				operations: data[k].operations,
+				type: data[k].type
+			});
+		}
+		return arr;
 	};
 	//转成后台需要的数据形式
 	const transData = (list: any) => {
@@ -179,7 +190,7 @@ export default () => {
 				name: item.title,
 				nextPath: transData(item.children),
 				key: item.key,
-				properties: getNodeDataConverted(item.key)
+				properties: transArr(getNodeDataConverted(item.key))
 			};
 		});
 	};

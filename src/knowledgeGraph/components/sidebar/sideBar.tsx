@@ -115,23 +115,6 @@ export default (props: Props) => {
 			}),
 			paths: hierarchy
 		});
-		console.log(data);
-		// 数据转换
-		if (data) {
-			if (data.nodes) {
-				data.nodes.forEach((item) => {
-					item.id = item.id + '';
-				});
-			}
-			if (data.edges) {
-				data.edges.forEach((item) => {
-					item.id = item.id + '';
-					item.source = item.source + '';
-					item.target = item.target + '';
-				});
-			}
-		}
-		console.log(data, 127);
 		// 获取之后，更新视图数据
 		updateData(data);
 	};

@@ -130,7 +130,7 @@ const FillterAttr: FC<IProps> = forwardRef(
 										label={label}
 										ikey={key}
 										setData={setData}
-										value={curData ? curData[key] : []}
+										value={curData ? curData[key] : {}}
 									></MyTag>
 								</div>
 							);
