@@ -7,6 +7,8 @@ import FillterAttr from './fillterAttr';
 import styles from './index.module.less';
 
 import { getNextPaths } from '@/api/knowledgeGraph/graphin';
+import { listenerCancelled } from '@reduxjs/toolkit/dist/listenerMiddleware/exceptions';
+import { format } from 'url';
 
 interface IProperty {
 	key: string;
@@ -18,6 +20,7 @@ export interface INextPathResponse {
 	path?: string[];
 	properties: IProperty[];
 }
+
 // 处理过的TreeData
 interface ITreeData {
 	path: string[];
@@ -55,6 +58,17 @@ export default () => {
 				value: '07225997'
 			});
 
+			// 自己添加
+			res[0].properties = [
+				...res[0].properties,
+				{
+					key: 'range',
+					label: '范围',
+					value: null,
+					type: 2
+				}
+			];
+
 			setTreeData(changeDataTree(res));
 		} catch (e) {
 			console.error(e);
@@ -70,6 +84,7 @@ export default () => {
 				properties,
 				configInfo: {}
 			});
+
 			return {
 				path: item.path ? [...item.path, item.name] : [item.name],
 				title: item.name,
@@ -140,12 +155,46 @@ export default () => {
 	const handleOk = () => {
 		//通过需要保存的节点去筛选原数组
 		if (saveNodes) {
-			const newData = saveNodes.map((id: string) => {
-				return nodeConfigNProperties.current.get(id)?.configInfo;
-			});
-			console.log('最终提交的数据：', newData);
+			// 根据树数据,生成提交数据形式
+			const configData = transData(treeData);
+			console.log('最终提交的数据：', configData);
 		}
 	};
+	const getNodeDataConverted = (id: string) => {
+		const rawDta = nodeConfigNProperties.current.get(id)?.configInfo.current;
+		if (saveNodes.includes(id)) {
+			return rawDta;
+		} else {
+			return null;
+		}
+	};
+
+	// 转数据形式
+	const transArr = (data: object) => {
+		let arr = [];
+		for (let k in data) {
+			arr.push({
+				key: k,
+				operationLinks: data[k].operationLinks ? data[k].operationLinks : [],
+				operations: data[k].operations,
+				type: data[k].type
+			});
+		}
+		return arr;
+	};
+	//转成后台需要的数据形式
+	const transData = (list: any) => {
+		// console.log(list, 174174);
+		return list.map((item) => {
+			return {
+				name: item.title,
+				nextPath: transData(item.children),
+				key: item.key,
+				properties: transArr(getNodeDataConverted(item.key))
+			};
+		});
+	};
+
 	// 关闭设置弹框
 	const handleCancel = () => {
 		changeDialogOpen(false);
@@ -178,16 +227,8 @@ export default () => {
 		// 	fromType: e.node.type,
 		// 	key: e.node.key
 		// });
-
-		//重置并设置默认值
-		// fillterAttrRef.current && fillterAttrRef.current.form.resetFields();
-		// const defaultValue = findNodeItem(e.node.key, dataList).value;
-		// if (defaultValue) {
-		// 	for (let key in defaultValue) {
-		// 		fillterAttrRef.current &&
-		// 			fillterAttrRef.current.form.setFieldValue(key, defaultValue[key]);
-		// 	}
-		// }
+		// 重置
+		fillterAttrRef.current && fillterAttrRef.current.form.resetFields();
 	};
 	//右边表单改变时触发
 	const onFormChange = (key: string, formAllValues: any) => {

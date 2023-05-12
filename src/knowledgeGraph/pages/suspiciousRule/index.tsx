@@ -177,7 +177,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 	const colums = [
 		{
 			title: '序号',
-			dataIndex: 'key'
+			render: (text, record, index) => `${index + 1}`
 		},
 		{
 			title: '规则名称',

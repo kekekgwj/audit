@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Select, InputNumber, Space, Divider } from 'antd';
+import {
+	Form,
+	Input,
+	Button,
+	Select,
+	InputNumber,
+	Space,
+	Divider,
+	message
+} from 'antd';
 import { type GraphinData } from '@antv/graphin';
 import {
 	ApartmentOutlined,
@@ -10,11 +19,16 @@ import {
 } from '@ant-design/icons';
 import AttrFillter from './attr-filter';
 import styles from './index.module.less';
-import { getMainNodes, getGraph } from '@/api/knowledgeGraph/graphin';
+import {
+	getMainNodes,
+	getGraph,
+	IFilterNode
+} from '@/api/knowledgeGraph/graphin';
 interface Props {
 	updateData: (layout: GraphinData) => void;
 	toggleLayout: (isOpen: boolean) => void;
 	canAdd: boolean;
+	setdefaultName: (name: string) => void;
 }
 
 interface bodyTypeOption {
@@ -35,7 +49,7 @@ interface IFormData {
 	hierarchy: any;
 }
 export default (props: Props) => {
-	const { updateData, toggleLayout, canAdd } = props;
+	const { updateData, toggleLayout, canAdd, setdefaultName } = props;
 	const [configVisibile, setconfigVisibile] = useState(true);
 	const [bodyTypeOptions, setBodyTypeOptions] = useState(Array<bodyTypeOption>);
 	const [form] = Form.useForm();
@@ -100,110 +114,57 @@ export default (props: Props) => {
 
 	// 提交表单 获取数据
 	const searchUpdate = async (res: IFormData) => {
-		// 调用接口 获取帅选数据
+		// 调用接口 获取筛选数据
 		const { bodyFilter, bodys, level, hierarchy } = res;
-		console.log(res);
-		const data = await getGraph({
-			algorithmName: '',
-			depth: level,
-			nodeFilter: bodyFilter,
-			nodes: Object.values(bodys).map(({ bodyType, bodyName }) => {
-				return {
+		// 用第一个主体名当默认图谱名称
+		setdefaultName(bodys[0]?.bodyName);
+		console.log(bodys, 119119);
+		const nodes: IFilterNode[] = [];
+		bodys.forEach(({ bodyType, bodyName }) => {
+			if (bodyType && bodyName) {
+				nodes.push({
 					type: bodyType,
 					value: bodyName
-				};
-			}),
-			paths: hierarchy
+				});
+			}
 		});
-		console.log(data);
-		// 获取之后，更新视图数据
-		// updateData(res.data)
-		// if (updateData) {
-		// 	updateData({
-		// 		nodes: [
-		// 			{
-		// 				id: 'node-0',
-		// 				x: 100,
-		// 				y: 100,
-		// 				style: {
-		// 					label: {
-		// 						value: '我是node0',
-		// 						position: 'center',
-		// 						offset: [20, 5],
-		// 						fill: 'green'
-		// 					},
-		// 					keyshape: {
-		// 						size: 80,
-		// 						stroke: '#ff9f0f',
-		// 						fill: '#ff9f0ea6'
-		// 					}
-		// 				}
-		// 			},
-		// 			{
-		// 				id: 'node-1',
-		// 				x: 200,
-		// 				y: 200,
-		// 				style: {
-		// 					label: {
-		// 						value: '我是node1',
-		// 						position: 'center',
-		// 						offset: [20, 5],
-		// 						fill: 'green'
-		// 					},
-		// 					keyshape: {
-		// 						size: 60,
-		// 						stroke: '#ff9f0f',
-		// 						fill: '#ff9f0ea6'
-		// 					}
-		// 				}
-		// 			},
-		// 			{
-		// 				id: 'node-2',
-		// 				x: 100,
-		// 				y: 300,
-		// 				style: {
-		// 					label: {
-		// 						value: '我是node2',
-		// 						position: 'center',
-		// 						offset: [20, 5],
-		// 						fill: 'green'
-		// 					},
-		// 					keyshape: {
-		// 						size: 40,
-		// 						stroke: '#ff9f0f',
-		// 						fill: '#ff9f0ea6'
-		// 					}
-		// 				}
-		// 			}
-		// 		],
-		// 		edges: [
-		// 			{
-		// 				id: 'edge-0-1',
-		// 				source: 'node-0',
-		// 				target: 'node-1',
-		// 				style: {
-		// 					label: {
-		// 						value: '我是边1'
-		// 					}
-		// 				}
-		// 			},
-		// 			{
-		// 				id: 'edge-1-2',
-		// 				source: 'node-1',
-		// 				target: 'node-2',
-		// 				style: {
-		// 					label: {
-		// 						value: '我是边2'
-		// 					},
-		// 					keyshape: {
-		// 						lineWidth: 5,
-		// 						stroke: '#00f'
-		// 					}
-		// 				}
-		// 			}
-		// 		]
-		// 	});
-		// }
+		if (nodes.length === 0) {
+			message.error('未选择主体');
+			return;
+		}
+		try {
+			const data = await getGraph({
+				algorithmName: '',
+				depth: level,
+				nodeFilter: bodyFilter,
+				nodes,
+				paths: hierarchy
+			});
+
+			// 数据转换
+			// if (data) {
+			// 	if (data.nodes) {
+			// 		data.nodes.forEach((item) => {
+			// 			item.id = item.id + '';
+			// 		});
+			// 	}
+			// 	if (data.edges) {
+			// 		data.edges.forEach((item) => {
+			// 			item.id = item.id + '';
+			// 			item.source = item.source + '';
+			// 			item.target = item.target + '';
+			// 		});
+			// 	}
+			// }
+
+			// 获取之后，更新视图数据
+			updateData({
+				nodes: data.nodes || [],
+				edges: data.edges || []
+			});
+		} catch (e) {
+			console.error(e);
+		}
 	};
 
 	// 重置表单
@@ -387,7 +348,7 @@ export default (props: Props) => {
 								<span>链路筛选</span>
 							</div>
 							<Form.Item name="hierarchy" label="链路筛选">
-								<AttrFillter data={{}}></AttrFillter>
+								<AttrFillter></AttrFillter>
 							</Form.Item>
 						</div>
 						{!canAdd ? (

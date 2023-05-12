@@ -5,22 +5,25 @@ import styles from './index.module.less';
 interface Props {
 	label: string;
 	ikey: string;
-	initForm: () => void;
 	setOperator: (target: any, data: any) => void;
+	value: any;
 }
 const SpecialCom = (props: Props) => {
-	const { label, ikey, setOperator } = props;
+	const { label, ikey, setOperator, value } = props;
 	const [form] = Form.useForm();
 	const operations = Form.useWatch(ikey, form);
 
-	const initForm = () => {
-		form.setFieldsValue({
-			[ikey]: [
+	const defaultList = value.operations
+		? value.operations
+		: [
 				{
 					operatorType: undefined,
 					value: undefined
 				}
-			]
+		  ];
+	const initForm = () => {
+		form.setFieldsValue({
+			[ikey]: defaultList
 		});
 	};
 
@@ -29,7 +32,8 @@ const SpecialCom = (props: Props) => {
 	}, []);
 
 	// 逻辑运算符处理
-	const [operationLinks, setSymbol] = React.useState<string[]>([]);
+	const defaultSymbol = value.operationLinks ? value.operationLinks : [];
+	const [operationLinks, setSymbol] = React.useState<string[]>(defaultSymbol);
 	const [formRenderKey, setFormRenderKey] = useState(Date.now()); // 初始渲染键
 	const handleReset = () => {
 		setFormRenderKey(Date.now()); // 生成新的渲染键，强制重新渲染

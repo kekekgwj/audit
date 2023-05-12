@@ -123,6 +123,7 @@ export default (props: EditProps) => {
 					{renderItem()}
 				</Form>
 			</CustomDialog>
+			{contextHolder}
 		</div>
 	);
 };

@@ -21,12 +21,15 @@ export function getMyAltasList(data: SearchData) {
 
 //删除
 interface DeleteData {
-	id: string;
+	graphId: string;
 }
 export function deleteGraph(data: DeleteData) {
-	return post(API_PREFIX + '/blade-tool/graphAnalysis/deleteGraph', {
-		...data
-	});
+	return get(
+		appendQueryParams(
+			API_PREFIX + '/blade-tool/graphAnalysis/deleteGraph',
+			data
+		)
+	);
 }
 
 //查看图谱

@@ -1,5 +1,5 @@
 import { INextPathResponse } from '@/knowledgeGraph/components/sidebar/attr-filter';
-import { appendQueryParams, get, post } from '@/utils/request';
+import { appendQueryParams, get, post, postFormData } from '@/utils/request';
 const env = import.meta.env;
 const { VITE_API_PREFIX: API_PREFIX } = env;
 // interface IResponse<T> {
@@ -19,19 +19,59 @@ interface INodes {
 export const getMainNodes = () => {
 	return get<INodes[]>(API_PREFIX + '/blade-tool/graphAnalysis/getNodes');
 };
-interface IFilterNode {
+export interface IFilterNode {
 	type: string;
 	value: string;
+}
+interface IPath {
+	name: string;
+	nextPaths: IPath[];
+	// todo: properties
+	properties: object[];
 }
 interface IFilters {
 	algorithmName: string;
 	depth: number;
 	nodeFilter: string[];
 	nodes: IFilterNode[];
-	paths: any;
+	paths: IPath;
 }
+interface IGraphData {
+	edges: IResEdge[];
+	nodes: IResNode[];
+}
+
+interface IResNode {
+	attrs: {
+		key: string;
+		label: string;
+		value: string | null;
+	};
+	communityId: string | null;
+	id: string;
+	label: string;
+	score: number | null;
+	type: string;
+}
+
+interface IResEdge {
+	attrs: {
+		key: string;
+		label: string;
+		value: string | null;
+	};
+	id: string;
+	similarity: null;
+	source: string;
+	target: string;
+	type: string;
+}
+
 export const getGraph = (filters: IFilters) => {
-	return post(API_PREFIX + '/blade-tool/graphAnalysis/getGraph', filters);
+	return post<IGraphData>(
+		API_PREFIX + '/blade-tool/graphAnalysis/getGraph',
+		filters
+	);
 };
 
 // 链路查询
@@ -42,7 +82,32 @@ export const getNextPaths = (data: any) => {
 	);
 };
 
+// 获取下一层关系
+interface Relationships {
+	nodeId: string;
+}
+export const getNextRelationships = (data: Relationships) => {
+	return get(
+		appendQueryParams(
+			API_PREFIX + '/blade-tool/graphAnalysis/getNextRelationships',
+			data
+		)
+	);
+};
+
 // 穿透下一层
+interface NextGraph {
+	nodeId: string;
+	relationships: string[];
+}
 export const getNextGraph = (data: any) => {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph', data);
 };
+
+//保存图谱
+export function saveGraph(formData: FormData) {
+	return postFormData(
+		API_PREFIX + '/blade-tool/graphAnalysis/saveGraph',
+		formData
+	);
+}

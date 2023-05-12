@@ -7,10 +7,12 @@ interface Props {
 	label: string;
 	ikey: string;
 	setData: (target: any, data: any) => void;
+	value: any; //反显传入值
 }
 
 const MyTag = (props: Props) => {
-	const { label, ikey, setData } = props;
+	const { label, ikey, setData, value } = props;
+	console.log(value, 151515);
 	const { token } = theme.useToken();
 	const [tags, setTags] = useState([]);
 	const [inputVisible, setInputVisible] = useState(false);
@@ -20,11 +22,15 @@ const MyTag = (props: Props) => {
 	const inputRef = useRef<InputRef>(null);
 	const editInputRef = useRef<InputRef>(null);
 
+	// const defaultValue = value?
+
 	useEffect(() => {
-		console.log(tags); //改变时触发传值
-		// 需要保存type，反显的时候用
-		const type = '2';
-		setData(ikey, { value: tags, type: 1 });
+		// 需要保存type，后端传值的时候用
+		const operations = tags.map((item: string) => {
+			return { operatorType: 1, value: item };
+		});
+		console.log(operations, 292929);
+		setData(ikey, { operationLinks: [], operations, type: 1, key: ikey });
 	}, [tags]);
 
 	useEffect(() => {
@@ -81,7 +87,7 @@ const MyTag = (props: Props) => {
 		borderStyle: 'dashed'
 	};
 	useEffect(() => {
-		setData('person', tags);
+		setData([ikey], tags);
 	}, [tags]);
 	return (
 		<Form.Item label={label}>

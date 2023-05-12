@@ -56,7 +56,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 	};
 
 	const submitDel = () => {
-		deleteGraph({ id: curId }).then((res) => {
+		deleteGraph({ graphId: curId }).then((res) => {
 			setOpenDel(false);
 			messageApi.open({
 				type: 'success',
@@ -69,7 +69,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 	const colums = [
 		{
 			title: '序号',
-			dataIndex: 'key'
+			render: (text, record, index) => `${index + 1}`
 		},
 		{
 			title: '图谱名称',
@@ -111,6 +111,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 
 	return (
 		<div>
+			{contextHolder}
 			<Table
 				columns={colums}
 				dataSource={data}
