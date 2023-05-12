@@ -13,7 +13,14 @@ import '@/assets/styles/index.less';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	// <React.StrictMode>
-	<ConfigProvider locale={zhCN}>
+	<ConfigProvider
+		locale={zhCN}
+		theme={{
+			token: {
+				colorPrimary: '#24A36F'
+			}
+		}}
+	>
 		<Provider store={store}>
 			<BrowserRouter>
 				<Router></Router>
