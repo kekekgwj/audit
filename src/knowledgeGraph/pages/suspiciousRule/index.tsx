@@ -18,6 +18,7 @@ import emptyPage from '@/assets/img/empty.png';
 import styles from './index.module.less';
 import CustomDialog from '@graph/components/custom-dialog';
 import { getSuspiciousRule } from '@/api/knowledgeGraph/suspiciousRule';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // 使用弹框
 interface Props {
@@ -34,31 +35,61 @@ interface ProjectIdOption {
 const UseModal = React.memo((prop: Props) => {
 	const { open, onCancel, curRow } = prop;
 	const [form] = Form.useForm();
+	const navigate = useNavigate();
 
 	const [projectOptions, setProjectOptions] = React.useState(
 		Array<ProjectIdOption>
 	);
 
-	useEffect(() => {
-		getProjectIdOptions();
-		initForm();
-	}, [open]);
+	// useEffect(() => {
+	// 	getProjectIdOptions();
+	// 	initForm();
+	// }, [open]);
 
-	const initForm = () => {
-		form.setFieldValue('projects', [
-			{
-				projectId: undefined,
-				projectMember: undefined
-			}
-		]);
-	};
+	// const initForm = () => {
+	// 	form.setFieldValue('projects', [
+	// 		{
+	// 			projectId: undefined,
+	// 			projectMember: undefined
+	// 		}
+	// 	]);
+	// };
 
-	const getProjectIdOptions = async () => {
-		setProjectOptions([
-			{ value: '001', label: 'ID1' },
-			{ value: '002', label: 'ID2' },
-			{ value: '003', label: 'ID3' }
-		]);
+	// const getProjectIdOptions = async () => {
+	// 	setProjectOptions([
+	// 		{ value: '001', label: 'ID1' },
+	// 		{ value: '002', label: 'ID2' },
+	// 		{ value: '003', label: 'ID3' }
+	// 	]);
+	// };
+
+	// 根据类型展示表单项 curRow.type
+	const renderItem = (type: string) => {
+		if (type == '1') {
+			return (
+				<>
+					<Form.Item label="科研项目名称" name="name">
+						<Input />
+					</Form.Item>
+				</>
+			);
+		} else if (type == '2') {
+			return (
+				<>
+					<Form.Item label="项目负责人" name="person">
+						<Input />
+					</Form.Item>
+				</>
+			);
+		} else if (type == '3') {
+			return (
+				<>
+					{/* <Form.Item key={item.key} label={item.label} name={item.key}>
+						<Input />
+					</Form.Item> */}
+				</>
+			);
+		}
 	};
 
 	// 提交表单
@@ -66,6 +97,8 @@ const UseModal = React.memo((prop: Props) => {
 		const data = form.getFieldsValue();
 		console.log(data, 677777);
 		onCancel();
+		// 跳转到查询结果界面
+		navigate('/ruleResult', { state: { data: data } });
 	};
 
 	return (
@@ -76,7 +109,7 @@ const UseModal = React.memo((prop: Props) => {
 			onOk={onSubmit}
 			onCancel={onCancel}
 		>
-			<Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+			{/* <Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
 				<Form.List name="projects">
 					{(fields, { add, remove }) => (
 						<>
@@ -151,6 +184,17 @@ const UseModal = React.memo((prop: Props) => {
 						</>
 					)}
 				</Form.List>
+			</Form> */}
+			<Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+				{/* <Form.Item name="type" label="类型">
+						<Select
+							placeholder="请选择"
+							onChange={onmainTypeChange}
+							options={listType}
+							allowClear
+						></Select>
+					</Form.Item> */}
+				{curRow && renderItem(curRow)}
 			</Form>
 		</CustomDialog>
 	);
@@ -161,7 +205,7 @@ interface TableProps {
 	total: number;
 	current: number;
 	size: number; //每页数量
-	onShowSizeChange: (current: any, size: any) => void;
+	onShowSizeChange: (current: number, size: number) => void;
 	onChange: (pageNumber: Number) => void;
 }
 const MyTableCom = React.memo((props: TableProps) => {

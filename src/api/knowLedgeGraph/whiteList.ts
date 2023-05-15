@@ -41,7 +41,7 @@ export function getPrimaryProperties(data: PropertiesData) {
 //新增白名单
 interface AddData {
 	type: string;
-	propertyJson: object;
+	propertyJson: any;
 }
 export function saveWhiteList(data: AddData) {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/saveWhiteList', {
@@ -76,7 +76,7 @@ export function updateWhiteList(data: UpdateData) {
 
 //删除白名单
 interface DeleteData {
-	id: string;
+	id: number;
 }
 export function deleteWhiteList(data: any) {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/deleteWhiteList', {
