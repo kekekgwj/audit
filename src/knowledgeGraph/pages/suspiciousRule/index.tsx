@@ -221,18 +221,22 @@ const MyTableCom = React.memo((props: TableProps) => {
 	const colums = [
 		{
 			title: '序号',
-			render: (text, record, index) => `${index + 1}`
+			render: (text, record, index) => `${index + 1}`,
+			width: 100
 		},
 		{
 			title: '规则名称',
-			dataIndex: 'name'
+			dataIndex: 'name',
+			ellipsis: true
 		},
 		{
 			title: '规则用途',
-			dataIndex: 'description'
+			dataIndex: 'description',
+			ellipsis: true
 		},
 		{
 			title: '操作',
+			width: 150,
 			key: 'operaion',
 			render: (row, record) => {
 				return (
@@ -320,8 +324,8 @@ const RuleCom = () => {
 		form.resetFields();
 	};
 
-	const searchRule = (res) => {
-		console.log(res);
+	const search = () => {
+		// console.log(res);
 	};
 
 	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
@@ -344,27 +348,22 @@ const RuleCom = () => {
 					labelCol={{ span: 6 }}
 					wrapperCol={{ span: 18 }}
 					layout="inline"
-					onFinish={(res: any) => {
-						searchRule(res);
-					}}
 				>
 					<Form.Item name="name" label="规则名称">
-						<Input />
-					</Form.Item>
-					<Form.Item>
-						<Button htmlType="button" onClick={onReset}>
-							重置
-						</Button>
-					</Form.Item>
-					<Form.Item>
-						<Button
-							htmlType="submit"
-							style={{ background: '#23955C', color: '#fff' }}
-						>
-							查询
-						</Button>
+						<Input placeholder="请输入" />
 					</Form.Item>
 				</Form>
+				<div className={styles['search-handle-box']}>
+					<Button htmlType="button" onClick={onReset}>
+						重置
+					</Button>
+					<Button
+						onClick={search}
+						style={{ background: '#23955C', color: '#fff', marginLeft: '10px' }}
+					>
+						查询
+					</Button>
+				</div>
 			</div>
 
 			{data?.length > 0 ? (

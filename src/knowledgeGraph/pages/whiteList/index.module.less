@@ -1,9 +1,15 @@
 .searchForm {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	height: 64px;
 	background: #f8f9fa;
 	// margin-bottom: 10px;
+	padding: 0 20px;
+	.search-handle-box {
+		width: 138px;
+		display: flex;
+	}
 }
 :global {
 	.ant-empty-image {
@@ -22,5 +28,13 @@
 		border-radius: 4px 4px 4px 4px;
 		color: #fff;
 		opacity: 1;
+	}
+}
+.operate-box {
+	display: flex;
+	.operate-item {
+		display: flex;
+		align-items: center;
+		cursor: pointer;
 	}
 }
