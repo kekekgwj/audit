@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import emptyPage from '@/assets/img/empty.png';
+import SvgIcon from '@/components/svg-icon';
 import {
 	Table,
 	Space,
@@ -13,7 +14,8 @@ import {
 	ConfigProvider,
 	DatePicker,
 	Empty,
-	message
+	message,
+	Divider
 } from 'antd';
 import type { PaginationProps } from 'antd';
 const { RangePicker } = DatePicker;
@@ -84,23 +86,22 @@ const MyTableCom = React.memo((props: TableProps) => {
 			key: 'operaion',
 			render: (row, record) => {
 				return (
-					<div>
+					<div className={styles['operate-box']}>
 						<span
+							className={styles['operate-item']}
 							onClick={() => handleDetail(row)}
-							style={{ cursor: 'pointer', marginRight: '10px' }}
 						>
-							<Space>
-								<EyeOutlined style={{ color: '#23955C' }} />
-							</Space>
+							<SvgIcon name="see" color="#23955C"></SvgIcon>
 							<span style={{ marginLeft: '2px' }}>查看</span>
 						</span>
+						<span>
+							<Divider type="vertical" />
+						</span>
 						<span
+							className={styles['operate-item']}
 							onClick={() => handleDelete(row)}
-							style={{ cursor: 'pointer' }}
 						>
-							<Space>
-								<DeleteOutlined style={{ color: '#23955C' }} />
-							</Space>
+							<SvgIcon name="delete" color="#23955C"></SvgIcon>
 							<span style={{ marginLeft: '2px' }}>删除</span>
 						</span>
 					</div>
@@ -210,32 +211,26 @@ const MyAtlasCom = () => {
 					labelCol={{ span: 6 }}
 					wrapperCol={{ span: 18 }}
 					layout="inline"
-					onFinish={(res: any) => {
-						search(res);
-					}}
 				>
 					<Form.Item name="name" label="图谱名称">
-						<Input />
+						<Input placeholder="请输入" />
 					</Form.Item>
 
 					<Form.Item name="gmtCreated" label="创建时间">
 						<RangePicker format="YYYY-MM-DD" />
 					</Form.Item>
-
-					<Form.Item>
-						<Button htmlType="button" onClick={onReset}>
-							重置
-						</Button>
-					</Form.Item>
-					<Form.Item>
-						<Button
-							htmlType="submit"
-							style={{ background: '#23955C', color: '#fff' }}
-						>
-							查询
-						</Button>
-					</Form.Item>
 				</Form>
+				<div className={styles['search-handle-box']}>
+					<Button htmlType="button" onClick={onReset}>
+						重置
+					</Button>
+					<Button
+						onClick={search}
+						style={{ background: '#23955C', color: '#fff', marginLeft: '10px' }}
+					>
+						查询
+					</Button>
+				</div>
 			</div>
 			{tableData?.length > 0 ? (
 				<MyTableCom
