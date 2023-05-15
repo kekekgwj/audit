@@ -17,6 +17,7 @@ import {
 	CaretUpOutlined,
 	CaretDownOutlined
 } from '@ant-design/icons';
+import SvgIcon from '@/components/svg-icon';
 import AttrFillter from './attr-filter';
 import styles from './index.module.less';
 import {
@@ -106,17 +107,21 @@ export default (props: Props) => {
 		<div className={styles['toggle-tab']}>
 			<div className={styles['tab-title']}>筛选条件</div>
 			<div
+				className={
+					configVisibile
+						? `${styles['tab-icon']} ${styles['visibile']}`
+						: styles['tab-icon']
+				}
 				onClick={() => {
 					changeVisibile(configVisibile);
 				}}
 			>
-				<span>
-					{configVisibile ? (
+				<SvgIcon name="arrow-down"></SvgIcon>
+				{/* {configVisibile ? (
 						<CaretUpOutlined style={{ fontSize: '14px', color: '#E6697B' }} />
 					) : (
 						<CaretDownOutlined style={{ fontSize: '14px', color: '#E6697B' }} />
-					)}
-				</span>
+					)} */}
 			</div>
 		</div>
 	);
@@ -212,16 +217,13 @@ export default (props: Props) => {
 						form={form}
 						labelCol={{ span: 6 }}
 						wrapperCol={{ span: 18 }}
+						labelAlign="left"
 						layout="horizontal"
 						onFinish={searchUpdate}
 					>
 						<div className="main-filter">
 							<div className={styles['filter-item']}>
-								<Space>
-									<ApartmentOutlined
-										style={{ fontSize: '14px', color: '#E6697B' }}
-									/>
-								</Space>
+								<SvgIcon name="filter"></SvgIcon>
 								<span>主体筛选</span>
 							</div>
 							<Form.List name="bodys">
@@ -233,6 +235,7 @@ export default (props: Props) => {
 													label="主体类型"
 													{...restField}
 													name={[name, 'bodyType']}
+													className={styles['filter-form-item']}
 												>
 													<Select
 														placeholder="请选择"
@@ -244,6 +247,7 @@ export default (props: Props) => {
 													label="主体名称"
 													{...restField}
 													name={[name, 'bodyName']}
+													className={styles['filter-form-item']}
 												>
 													<Input placeholder="主体名称" />
 												</Form.Item>
@@ -310,14 +314,14 @@ export default (props: Props) => {
 
 						<div>
 							<div className={styles['filter-item']}>
-								<Space>
-									<ApartmentOutlined
-										style={{ fontSize: '14px', color: '#E6697B' }}
-									/>
-								</Space>
+								<SvgIcon name="filter"></SvgIcon>
 								<span>主体过滤</span>
 							</div>
-							<Form.Item name="bodyFilter" label="主体类型">
+							<Form.Item
+								name="bodyFilter"
+								label="主体类型"
+								className={styles['filter-form-item']}
+							>
 								<Select
 									mode="multiple"
 									allowClear
@@ -330,18 +334,14 @@ export default (props: Props) => {
 
 						<div>
 							<div className={styles['filter-item']}>
-								<Space>
-									<ApartmentOutlined
-										style={{ fontSize: '14px', color: '#E6697B' }}
-									/>
-								</Space>
+								<SvgIcon name="filter"></SvgIcon>
 								<span>关系层级</span>
 							</div>
 							<Form.Item
 								name="level"
 								label="展示层级"
 								initialValue={4}
-								rules={[{ required: true }]}
+								className={styles['filter-form-item']}
 							>
 								<InputNumber min={0} max={6} />
 							</Form.Item>
@@ -362,11 +362,7 @@ export default (props: Props) => {
 						<Divider dashed />
 						<div>
 							<div className={styles['filter-item']}>
-								<Space>
-									<ApartmentOutlined
-										style={{ fontSize: '14px', color: '#E6697B' }}
-									/>
-								</Space>
+								<SvgIcon name="filter"></SvgIcon>
 								<span>链路筛选</span>
 							</div>
 							<Form.Item name="hierarchy" label="链路筛选">
@@ -376,14 +372,14 @@ export default (props: Props) => {
 						{!canAdd ? (
 							<div>
 								<div className={styles['filter-item']}>
-									<Space>
-										<ApartmentOutlined
-											style={{ fontSize: '14px', color: '#E6697B' }}
-										/>
-									</Space>
+									<SvgIcon name="filter"></SvgIcon>
 									<span>挖掘算法</span>
 								</div>
-								<Form.Item name="algorithmName" label="算法">
+								<Form.Item
+									name="algorithmName"
+									label="算法"
+									className={styles['filter-form-item']}
+								>
 									<Select
 										allowClear
 										style={{ width: '100%' }}

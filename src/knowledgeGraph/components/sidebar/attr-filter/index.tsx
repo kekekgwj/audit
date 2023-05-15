@@ -171,8 +171,8 @@ export default () => {
 
 	// 转数据形式
 	const transArr = (data: object) => {
-		let arr = [];
-		for (let k in data) {
+		const arr = [];
+		for (const k in data) {
 			arr.push({
 				key: k,
 				operationLinks: data[k].operationLinks ? data[k].operationLinks : [],
@@ -249,6 +249,7 @@ export default () => {
 				open={open}
 				title="链路筛选"
 				width={600}
+				height={400}
 				onOk={handleOk}
 				onCancel={handleCancel}
 			>
