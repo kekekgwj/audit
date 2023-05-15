@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Button, Tree } from 'antd';
 import CustomDialog from '@graph/components/custom-dialog';
 import { CaretDownOutlined } from '@ant-design/icons';
-import SvgIcon from '@graph/components/svg-icon';
+import SvgIcon from '@/components/svg-icon';
 import FillterAttr from './fillterAttr';
 import styles from './index.module.less';
 
