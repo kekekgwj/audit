@@ -1,11 +1,53 @@
-import { useState } from 'react';
+import { createContext, useContext, useReducer, useState } from 'react';
 import { Button, Checkbox, Form, Input, Select } from 'antd';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
+type RowGroupItme = {
+	_key: string;
+	value1: string;
+	value2: string;
+	value3: string;
+};
+
+type FormData = {
+	row: Array<Array<RowGroupItme>>;
+	col: Array<CheckboxValueType>;
+};
+
+type setRowData = (
+	rowGroupIndex: number,
+	itemIndex: number,
+	data: RowGroupItme
+) => void;
+
+type delGroup = (rowGroupIndex: number) => void;
+type delRow = (rowGroupIndex: number, rowIndex: number) => void;
+type addRow = (rowGroupIndex: number, rowIndex: number) => void;
+
+interface GroupProps {
+	index: number;
+	rowGroup: Array<RowGroupItme>;
+}
+
+interface RowProps {
+	groupIndex: number;
+	index: number;
+	defaultValue: RowGroupItme;
+	delRow: delRow;
+}
+
+interface FilterateContext {
+	setRowData: setRowData;
+	delGroup: delGroup;
+	delRow: delRow;
+	addRow: addRow;
+}
+
 const CheckboxGroup = Checkbox.Group;
+const FilterateContext = createContext<FilterateContext | null>(null);
 
 // 生成hash
 const getHash = () => {
@@ -20,18 +62,6 @@ const getHash = () => {
 
 	const uuid = s.join('');
 	return uuid;
-};
-
-type RowGroupItme = {
-	_key: string;
-	value1: string;
-	value2: string;
-	value3: string;
-};
-
-type FormData = {
-	row: Array<Array<RowGroupItme>>;
-	col: Array<CheckboxValueType>;
 };
 
 const data: FormData = {
@@ -49,47 +79,19 @@ const data: FormData = {
 	col: []
 };
 
-type setRowData = (
-	rowGroupIndex: number,
-	itemIndex: number,
-	data: RowGroupItme
-) => void;
-
-type delGroup = (rowGroupIndex: number) => void;
-type delRow = (rowGroupIndex: number, rowIndex: number) => void;
-type addRow = (rowGroupIndex: number, rowIndex: number) => void;
-
-interface GroupProps {
-	index: number;
-	rowGroup: Array<RowGroupItme>;
-	setRowData: setRowData;
-	delGroup: delGroup;
-	delRow: delRow;
-	addRow: addRow;
-}
-
-interface RowProps {
-	groupIndex: number;
-	index: number;
-	defaultValue: RowGroupItme;
-	setRowData: setRowData;
-	delRow: delRow;
-	addRow: addRow;
-}
-
 const Group = (props: GroupProps) => {
+	const filterateContext = useContext(FilterateContext);
 	const handleDelGroup = () => {
-		console.log('ddd');
-		props.delGroup(props.index);
+		filterateContext?.delGroup(props.index);
 	};
 
 	const delRow = (groupIndex: number, rowIndex: number) => {
 		if (props.rowGroup.length === 1) {
-			props.delGroup(groupIndex);
+			filterateContext?.delGroup(groupIndex);
 			return;
 		}
 
-		props.delRow(groupIndex, rowIndex);
+		filterateContext?.delRow(groupIndex, rowIndex);
 	};
 
 	return (
@@ -102,9 +104,7 @@ const Group = (props: GroupProps) => {
 							groupIndex={props.index}
 							index={itemIndex}
 							defaultValue={item}
-							setRowData={props.setRowData}
 							delRow={delRow}
-							addRow={props.addRow}
 						></Row>
 					);
 				})}
@@ -117,8 +117,10 @@ const Group = (props: GroupProps) => {
 };
 
 const Row = (props: RowProps) => {
+	const filterateContext = useContext(FilterateContext);
+
 	const handleChange = (key: string, val: string) => {
-		props.setRowData(props.groupIndex, props.index, {
+		filterateContext?.setRowData(props.groupIndex, props.index, {
 			...props.defaultValue,
 			[key]: val
 		});
@@ -129,7 +131,7 @@ const Row = (props: RowProps) => {
 	};
 
 	const handleAdd = () => {
-		props.addRow(props.groupIndex, props.index);
+		filterateContext?.addRow(props.groupIndex, props.index);
 	};
 
 	return (
@@ -171,8 +173,49 @@ const Row = (props: RowProps) => {
 	);
 };
 
+const reducer = (state: FormData, action: any) => {
+	switch (action.type) {
+		case 'setRowData':
+			state.row[action.groupIndex][action.rowIndex] = action.data;
+			break;
+		case 'delGroup':
+			state.row.splice(action.groupIndex, 1);
+			break;
+		case 'addGroup':
+			state.row.push([
+				{
+					_key: getHash(),
+					value1: '',
+					value2: '',
+					value3: ''
+				}
+			]);
+			break;
+		case 'addRow':
+			state.row[action.groupIndex].splice(action.rowIndex + 1, 0, {
+				_key: getHash(),
+				value1: '',
+				value2: '',
+				value3: ''
+			});
+			break;
+		case 'delRow':
+			state.row[action.groupIndex].splice(action.rowIndex, 1);
+			break;
+
+		case 'setCol':
+			state.col = action.data;
+			break;
+		default:
+			break;
+	}
+
+	return { ...state };
+};
+
 export default () => {
-	const [formData, setFormData] = useState(data);
+	const [formData, dispatch] = useReducer(reducer, data);
+	// const [formData, setFormData] = useState(data);
 	const [indeterminate, setIndeterminate] = useState(false);
 	const [checkAll, setCheckAll] = useState(false);
 
@@ -188,126 +231,96 @@ export default () => {
 		rowIndex: number,
 		data: RowGroupItme
 	) => {
-		formData.row[groupIndex][rowIndex] = data;
-		setFormData({
-			...formData
-		});
+		dispatch({ type: 'setRowData', groupIndex, rowIndex, data });
 	};
 
 	// 删除组
-	const delGroup = (rowGroup: number) => {
-		formData.row.splice(rowGroup, 1);
-		setFormData({
-			...formData
-		});
+	const delGroup = (groupIndex: number) => {
+		dispatch({ type: 'delGroup', groupIndex });
 	};
 
 	// 增加组
 	const addGroup = () => {
-		formData.row.push([
-			{
-				_key: getHash(),
-				value1: '',
-				value2: '',
-				value3: ''
-			}
-		]);
-
-		setFormData({
-			...formData
-		});
+		dispatch({ type: 'addGroup' });
 	};
 
 	// 删除行
 	const delRow = (groupIndex: number, rowIndex: number) => {
-		formData.row[groupIndex].splice(rowIndex, 1);
-		setFormData({
-			...formData
-		});
+		dispatch({ type: 'delRow', groupIndex, rowIndex });
 	};
 
 	// 新增行
 	const addRow = (groupIndex: number, rowIndex: number) => {
-		formData.row[groupIndex].splice(rowIndex + 1, 0, {
-			_key: getHash(),
-			value1: '',
-			value2: '',
-			value3: ''
-		});
-
-		setFormData({
-			...formData
-		});
+		dispatch({ type: 'addRow', groupIndex, rowIndex });
 	};
 
 	const onCheckAllChange = (e: CheckboxChangeEvent) => {
-		formData.col = e.target.checked ? plainOptions : [];
-		setFormData({
-			...formData
-		});
+		dispatch({ type: 'setCol', data: e.target.checked ? plainOptions : [] });
 		setIndeterminate(false);
 		setCheckAll(e.target.checked);
 	};
 
 	const onChange = (list: CheckboxValueType[]) => {
-		formData.col = list;
-		setFormData({
-			...formData
-		});
+		dispatch({ type: 'setCol', data: list });
 		setIndeterminate(!!list.length && list.length < plainOptions.length);
 		setCheckAll(list.length === plainOptions.length);
 	};
 
 	return (
 		<>
-			<div className={styles['filter-box']}>
-				<div className={styles['filter-box__title']}>
-					<div className={styles['label']}>行筛选</div>
-					<div>同一组内为且，不同组间为或</div>
-				</div>
+			<FilterateContext.Provider
+				value={{
+					setRowData,
+					delGroup,
+					delRow,
+					addRow
+				}}
+			>
+				<div className={styles['filter-box']}>
+					<div className={styles['filter-box__title']}>
+						<div className={styles['label']}>行筛选</div>
+						<div>同一组内为且，不同组间为或</div>
+					</div>
 
-				{formData.row.map((rowGroup, rowGroupIndex) => {
-					return (
-						<Group
-							key={rowGroupIndex}
-							index={rowGroupIndex}
-							rowGroup={rowGroup}
-							setRowData={setRowData}
-							delGroup={delGroup}
-							addRow={addRow}
-							delRow={delRow}
-						></Group>
-					);
-				})}
-				<div className={styles['add-group']} onClick={addGroup}>
-					<SvgIcon
-						name="add-circle"
-						className={styles['add-group__icon']}
-					></SvgIcon>
-					<span>添加行筛选</span>
-				</div>
-			</div>
-
-			<div className={styles['filter-box']}>
-				<div className={styles['filter-box__title']}>
-					<div className={styles['label']}>列筛选</div>
-					<div>
-						<Checkbox
-							indeterminate={indeterminate}
-							onChange={onCheckAllChange}
-							checked={checkAll}
-						>
-							全选
-						</Checkbox>
+					{formData.row.map((rowGroup, rowGroupIndex) => {
+						return (
+							<Group
+								key={rowGroupIndex}
+								index={rowGroupIndex}
+								rowGroup={rowGroup}
+							></Group>
+						);
+					})}
+					<div className={styles['add-group']} onClick={addGroup}>
+						<SvgIcon
+							name="add-circle"
+							className={styles['add-group__icon']}
+						></SvgIcon>
+						<span>添加行筛选</span>
 					</div>
 				</div>
 
-				<CheckboxGroup
-					options={plainOptions}
-					value={formData.col}
-					onChange={onChange}
-				/>
-			</div>
+				<div className={styles['filter-box']}>
+					<div className={styles['filter-box__title']}>
+						<div className={styles['label']}>列筛选</div>
+						<div>
+							<Checkbox
+								indeterminate={indeterminate}
+								onChange={onCheckAllChange}
+								checked={checkAll}
+							>
+								全选
+							</Checkbox>
+						</div>
+					</div>
+
+					<CheckboxGroup
+						options={plainOptions}
+						value={formData.col}
+						onChange={onChange}
+					/>
+				</div>
+			</FilterateContext.Provider>
 		</>
 	);
 };
