@@ -1,19 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { Button, Tree } from 'antd';
+import { Button, Tree, message } from 'antd';
 import CustomDialog from '@graph/components/custom-dialog';
 import { CaretDownOutlined } from '@ant-design/icons';
 import SvgIcon from '@graph/components/svg-icon';
 import FillterAttr from './fillterAttr';
 import styles from './index.module.less';
 
-import { getNextPaths } from '@/api/knowledgeGraph/graphin';
-import { listenerCancelled } from '@reduxjs/toolkit/dist/listenerMiddleware/exceptions';
-import { format } from 'url';
+import { IPath, getGraph, getNextPaths } from '@/api/knowledgeGraph/graphin';
+import { FormItems } from '../sideBar';
 
 interface IProperty {
 	key: string;
 	label: string;
-	type: number;
+	type: string;
 }
 export interface INextPathResponse {
 	name: string;
@@ -34,7 +33,13 @@ export interface INodeConfigNProps {
 	properties: IProperty[];
 	configInfo: any;
 }
-export default () => {
+interface IProps {
+	getFormItemValue: (name: FormItems) => any;
+	setFormItemValue: (name: FormItems, value: any) => any;
+	updateGraph: (paths: IPath[]) => void;
+}
+export default (props: IProps) => {
+	const { getFormItemValue, setFormItemValue, updateGraph } = props;
 	const fillterAttrRef = useRef(null);
 	const [open, setOpen] = useState(false);
 	const [saveNodes, setSaveNodes] = useState<string[]>([]); //需要保存的节点内容
@@ -43,6 +48,21 @@ export default () => {
 	const nodeConfigNProperties = useRef(new Map<string, INodeConfigNProps>());
 
 	const [selectNodeID, setSelectedNodeID] = useState<string | null>(null);
+	const nodeFilter = getFormItemValue(FormItems.bodyFilter);
+	const curNode: {
+		bodyType: string;
+		bodyName: string;
+	}[] = getFormItemValue(FormItems.bodys);
+	let curNodeType: string | undefined, curNodeVaule: string | undefined;
+	if (
+		curNode &&
+		Array.isArray(curNode) &&
+		curNode[0].bodyName &&
+		curNode[0].bodyType
+	) {
+		curNodeType = curNode[0].bodyType as string;
+		curNodeVaule = curNode[0].bodyName as string;
+	}
 	// 打开/关闭设置弹框
 	const changeDialogOpen = async (isOpen = true) => {
 		setOpen(isOpen);
@@ -50,24 +70,16 @@ export default () => {
 			return;
 		}
 		try {
-			// todo: context -> nodeFilter & parentPaths
+			if (!curNodeType || !curNodeVaule) {
+				message.error('未选择主体');
+				return;
+			}
 			const res = await getNextPaths({
-				nodeFilter: [],
+				nodeFilter,
 				parentPaths: [],
-				type: 'Company',
-				value: '07225997'
+				type: curNodeType,
+				value: curNodeVaule
 			});
-
-			// 自己添加
-			res[0].properties = [
-				...res[0].properties,
-				{
-					key: 'range',
-					label: '范围',
-					value: null,
-					type: 2
-				}
-			];
 
 			setTreeData(changeDataTree(res));
 		} catch (e) {
@@ -104,7 +116,7 @@ export default () => {
 		}
 		try {
 			const res = await getNextPaths({
-				nodeFilter: [],
+				nodeFilter,
 				parentPaths: node.path,
 				type: 'Company',
 				value: '07225997'
@@ -152,32 +164,31 @@ export default () => {
 		});
 
 	// 点击确定
-	const handleOk = () => {
+	const handleOk = async () => {
 		//通过需要保存的节点去筛选原数组
 		if (saveNodes) {
-			// 转换数据形式 通过id在树形数据中查找对应位置
-			console.log('树形数据', treeData);
 			// 根据树数据,生成提交数据形式
 			const configData = transData(treeData);
-			console.log(configData, 168168);
-			console.log('最终提交的数据：', configData);
+			console.log('configData', configData);
+
+			updateGraph(configData);
 		}
 	};
 	const getNodeDataConverted = (id: string) => {
-		const rawDta = nodeConfigNProperties.current.get(id)?.configInfo;
+		const rawData = nodeConfigNProperties.current.get(id)?.configInfo;
+		// const formattedData = rawData.forEach();
 		if (saveNodes.includes(id)) {
-			return rawDta;
+			return rawData;
 		} else {
-			return null;
+			return [];
 		}
 	};
 	//转成后台需要的数据形式
-	const transData = (list: any) => {
-		// console.log(list, 174174);
-		return list.map((item) => {
+	const transData = (list: ITreeData[]): IPath[] => {
+		return list.map((item: ITreeData) => {
 			return {
 				name: item.title,
-				nextPath: transData(item.children),
+				nextPaths: transData(item.children),
 				properties: getNodeDataConverted(item.key)
 			};
 		});
@@ -223,11 +234,11 @@ export default () => {
 		const curValues = nodeConfigNProperties.current.get(
 			key
 		) as INodeConfigNProps;
+		console.log(formAllValues);
 		nodeConfigNProperties.current.set(key, {
 			...curValues,
 			configInfo: formAllValues
 		});
-		console.info('nodeConfigNProperties', nodeConfigNProperties.current);
 	};
 
 	return (

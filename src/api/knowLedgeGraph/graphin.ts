@@ -23,18 +23,30 @@ export interface IFilterNode {
 	type: string;
 	value: string;
 }
-interface IPath {
+export interface IPath {
 	name: string;
 	nextPaths: IPath[];
-	// todo: properties
-	properties: object[];
+	properties: IProperty[];
+}
+
+interface IOperation {
+	// 运算符 1-等于 2-大于 3-大于等于 4-小于 5-小于等于
+	operatorType: number;
+	value: string;
+}
+interface IProperty {
+	key: string;
+	operations: IOperation[];
+	type: number;
+	// 运算条件之间的连接符 1-且 2-或
+	operationLinks: number[];
 }
 interface IFilters {
-	algorithmName: string;
-	depth: number;
-	nodeFilter: string[];
+	algorithmName?: string;
+	depth?: number;
+	nodeFilter?: string[];
 	nodes: IFilterNode[];
-	paths: IPath;
+	paths?: IPath | null;
 }
 interface IGraphData {
 	edges: IResEdge[];
@@ -67,15 +79,29 @@ interface IResEdge {
 	type: string;
 }
 
-export const getGraph = (filters: IFilters) => {
-	return post<IGraphData>(
-		API_PREFIX + '/blade-tool/graphAnalysis/getGraph',
-		filters
-	);
+export const getGraph: (filters: IFilters) => Promise<IGraphData> = ({
+	algorithmName = null,
+	depth = 4,
+	nodeFilter = [],
+	nodes,
+	paths = null
+}) => {
+	return post<IGraphData>(API_PREFIX + '/blade-tool/graphAnalysis/getGraph', {
+		algorithmName,
+		depth,
+		nodeFilter,
+		nodes,
+		paths
+	});
 };
-
+interface IGetNextPaths {
+	nodeFilter: string[];
+	parentPaths: string[];
+	type: string;
+	value: string;
+}
 // 链路查询
-export const getNextPaths = (data: any) => {
+export const getNextPaths = (data: IGetNextPaths) => {
 	return post<INextPathResponse[]>(
 		API_PREFIX + '/blade-tool/graphAnalysis/getNextPaths',
 		data
