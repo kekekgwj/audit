@@ -11,7 +11,7 @@ export default (props: Props) => {
 
 	const iconName = `#icon-${name}`;
 
-	const c = `${className} icon-svg`;
+	const c = `${className || ''} icon-svg`;
 
 	return (
 		<svg aria-hidden="true" className={c}>
