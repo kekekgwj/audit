@@ -36,6 +36,10 @@ interface bodyTypeOption {
 	label: string;
 	value: string | number;
 }
+interface algorithmOption {
+	label: string;
+	value: string;
+}
 interface IBody {
 	// 主体类型对应的id
 	bodyType: string;
@@ -53,11 +57,15 @@ export default (props: Props) => {
 	const { updateData, toggleLayout, canAdd, setdefaultName } = props;
 	const [configVisibile, setconfigVisibile] = useState(true);
 	const [bodyTypeOptions, setBodyTypeOptions] = useState(Array<bodyTypeOption>);
+	const [algorithmOptions, setAlgorithmOptions] = useState(
+		Array<algorithmOption>
+	);
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
 
 	useEffect(() => {
 		getBodyTypeOptions();
+		getAlgorithmOptions();
 		initForm();
 	}, []);
 
@@ -72,6 +80,20 @@ export default (props: Props) => {
 		});
 
 		setBodyTypeOptions(options);
+	};
+
+	//获取算法下拉选型
+	// 待完善
+	const getAlgorithmOptions = async () => {
+		// const nodes = await getMainNodes();
+		// const options = nodes.map(({ id, name }) => {
+		// 	return {
+		// 		label: name,
+		// 		value: name
+		// 	};
+		// });
+		const options = [{ label: 'louvain', value: 'louvain' }];
+		setAlgorithmOptions(options);
 	};
 
 	// 顶部筛选条件下拉切换
@@ -120,7 +142,7 @@ export default (props: Props) => {
 	// 提交表单 获取数据
 	const searchUpdate = async (res: IFormData) => {
 		// 调用接口 获取筛选数据
-		const { bodyFilter, bodys, level, hierarchy } = res;
+		const { bodyFilter, bodys, level, hierarchy, algorithmName } = res;
 		// 用第一个主体名当默认图谱名称
 		setdefaultName(bodys[0]?.bodyName);
 		console.log(bodys, 119119);
@@ -139,7 +161,7 @@ export default (props: Props) => {
 		}
 		try {
 			const data = await getGraph({
-				algorithmName: '',
+				algorithmName: algorithmName,
 				depth: level,
 				nodeFilter: bodyFilter,
 				nodes,
@@ -354,7 +376,7 @@ export default (props: Props) => {
 									<span>挖掘算法</span>
 								</div>
 								<Form.Item
-									name="algorithm"
+									name="algorithmName"
 									label="算法"
 									className={styles['filter-form-item']}
 								>
@@ -362,7 +384,7 @@ export default (props: Props) => {
 										allowClear
 										style={{ width: '100%' }}
 										placeholder="请选择"
-										options={bodyTypeOptions}
+										options={algorithmOptions}
 									/>
 								</Form.Item>
 							</div>

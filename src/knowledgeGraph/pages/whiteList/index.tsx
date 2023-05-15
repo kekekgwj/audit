@@ -174,29 +174,31 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 				dataSource={data}
 				pagination={{ position: ['none'] }}
 			></Table>
-			<div
-				style={{
-					textAlign: 'center',
-					marginTop: '20px',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between'
-				}}
-			>
-				<div>
-					<span style={{ marginRight: '10px' }}>共{total}条记录</span>
-					<span>
-						第{current}/{Math.ceil(total / size)}页
-					</span>
+			{data.length ? (
+				<div
+					style={{
+						textAlign: 'center',
+						marginTop: '20px',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'space-between'
+					}}
+				>
+					<div>
+						<span style={{ marginRight: '10px' }}>共{total}条记录</span>
+						<span>
+							第{current}/{Math.ceil(total / size)}页
+						</span>
+					</div>
+					<Pagination
+						total={total}
+						showSizeChanger
+						onShowSizeChange={onShowSizeChange}
+						onChange={onChange}
+						showQuickJumper
+					/>
 				</div>
-				<Pagination
-					total={total}
-					showSizeChanger
-					onShowSizeChange={onShowSizeChange}
-					onChange={onChange}
-					showQuickJumper
-				/>
-			</div>
+			) : null}
 			<Add
 				open={openAdd}
 				handleCancel={handleCancelAdd}
@@ -327,7 +329,7 @@ const WhiteListCom = () => {
 					</Form.Item>
 				</Form>
 			</div>
-			{tableData?.length > 0 ? (
+			{/* {tableData?.length > 0 ? (
 				<MyTableCom
 					data={tableData}
 					onShowSizeChange={onShowSizeChange}
@@ -344,7 +346,17 @@ const WhiteListCom = () => {
 					description={false}
 					imageStyle={{ height: '193px' }}
 				/>
-			)}
+			)} */}
+			<MyTableCom
+				data={tableData}
+				onShowSizeChange={onShowSizeChange}
+				onChange={onChange}
+				total={total}
+				size={size}
+				current={current}
+				listType={listType}
+				refresh={getList}
+			/>
 		</div>
 	);
 };
