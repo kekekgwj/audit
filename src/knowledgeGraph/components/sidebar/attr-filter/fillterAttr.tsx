@@ -1,12 +1,5 @@
-import React, {
-	FC,
-	useEffect,
-	useState,
-	forwardRef,
-	useImperativeHandle,
-	useRef
-} from 'react';
-import { Checkbox, Input, Radio, DatePicker, Form } from 'antd';
+import React, { FC, forwardRef, useImperativeHandle, useRef } from 'react';
+import { Radio, DatePicker, Form } from 'antd';
 import styles from './index.module.less';
 const { RangePicker } = DatePicker;
 import SpecialCom from '../../luoji/index';
@@ -14,48 +7,96 @@ import MyTag from '../../myTag/index';
 import { INodeConfigNProps } from './index';
 
 interface Option {
-	key: string;
+	name: string;
 	label: string;
-	defaultValue: number | string | boolean | Array<any>;
-	type: any;
+	defaultValue?: number | string | boolean | Array<any>;
+	type: string;
 	dict?: any[];
+	updateFormChange: (changeData: object) => void;
 }
 interface IProps {
 	initValues: INodeConfigNProps;
 	formChange: (key: string, allValues: any) => void; //表单改变之后返回的值
 	id: string;
 }
-const getComponent = (option: Option, props) => {
-	const { value } = props;
-	const { type, key, dict } = option;
-	if (type == '1') {
-		return {
-			component: MyTag
-		};
+
+export enum ComponentsType {
+	PERSON = '1',
+	RANGE = '2',
+	DATE = '3',
+	GENDER = '4'
+}
+
+const CustomizedComponent = (option: Option) => {
+	const {
+		label,
+		type,
+		name,
+		dict,
+		defaultValue = null,
+		updateFormChange
+	} = option;
+
+	if (type == ComponentsType.PERSON) {
+		return (
+			<Form.Item label={label}>
+				<MyTag
+					label={label}
+					name={name}
+					setData={updateFormChange}
+					value={defaultValue}
+				/>
+			</Form.Item>
+		);
 	}
 
-	if (type == '4') {
-		return {
-			component: Radio.Group,
-			props: {
-				options: dict
-			}
-		};
+	if (type == ComponentsType.RANGE) {
+		return (
+			<SpecialCom
+				label={label}
+				name={name}
+				setOperator={updateFormChange}
+				value={defaultValue}
+			></SpecialCom>
+		);
 	}
-	if (type === '3') {
-		return {
-			component: RangePicker,
-			props: {
-				format: 'YYYY-MM-DD'
-			}
-		};
+	if (type == ComponentsType.DATE) {
+		return (
+			<Form.Item label={label}>
+				<RangePicker
+					format={'YYYY-MM-DD'}
+					onChange={(date, dateString) =>
+						updateFormChange({
+							[name]: {
+								value: dateString,
+								type: ComponentsType.DATE,
+								key: name
+							}
+						})
+					}
+				/>
+			</Form.Item>
+		);
 	}
-	if (type == '2') {
-		return {
-			component: SpecialCom,
-			props: {}
-		};
+	if (type == ComponentsType.GENDER) {
+		return (
+			<Form.Item label={label}>
+				<Radio.Group
+					options={dict}
+					onChange={(e) =>
+						updateFormChange({
+							[name]: {
+								value: e.target.value,
+								type: ComponentsType.GENDER,
+								key: name
+							}
+						})
+					}
+				/>
+			</Form.Item>
+		);
 	}
+	return null;
 };
 
 const FillterAttr: FC<IProps> = forwardRef(
@@ -68,8 +109,8 @@ const FillterAttr: FC<IProps> = forwardRef(
 		}));
 		//  测试数据
 		const myData = [
-			{ key: 'person', label: '人员', value: null, type: 1 },
-			{ key: 'range', label: '范围', value: null, type: 2 },
+			{ key: 'person', label: '人员', value: null, type: '1' },
+			{ key: 'range', label: '范围', value: null, type: '2' },
 			{
 				label: '性别',
 				value: null,
@@ -88,15 +129,13 @@ const FillterAttr: FC<IProps> = forwardRef(
 			}
 		];
 		const latestFormData = useRef<object>({});
-		// 自定义组件传值
-		const setData = (target, data) => {
+		const updateFormChange = (changeData: object) => {
 			const formData = {
 				...latestFormData.current,
-				[target]: data
+				...changeData
 			};
-
 			latestFormData.current = formData;
-			formChange(id, latestFormData);
+			formChange(id, formData);
 		};
 
 		return (
@@ -109,51 +148,23 @@ const FillterAttr: FC<IProps> = forwardRef(
 					style={{ maxWidth: 600 }}
 					autoComplete="off"
 					form={form}
-					onValuesChange={(changedValues, allValues) => {
-						const updateFormData = { ...latestFormData.current, ...allValues };
-
-						formChange(id, updateFormData);
-						latestFormData.current = updateFormData;
+					onValuesChange={(allValues) => {
+						updateFormChange(allValues);
 					}}
 				>
-					{properties.map((item) => {
-						const { label, value, key, type } = item;
-						const curData = configInfo.current ? configInfo.current : '';
-						const { component: Component, props: ComponentProps } =
-							getComponent(item, {
-								value: value
-							});
-						if (type == '1') {
-							return (
-								<div key={key}>
-									<MyTag
-										label={label}
-										ikey={key}
-										setData={setData}
-										value={curData ? curData[key] : {}}
-									></MyTag>
-								</div>
-							);
-						} else if (type == '2') {
-							return (
-								<div key={key}>
-									<SpecialCom
-										label={label}
-										ikey={key}
-										setOperator={setData}
-										value={curData ? curData[key] : {}}
-									></SpecialCom>
-								</div>
-							);
-						} else {
-							return (
-								<div key={key}>
-									<Form.Item label={label} name={key}>
-										<Component {...ComponentProps} />
-									</Form.Item>
-								</div>
-							);
-						}
+					{myData.map((item, index) => {
+						const { label, key, type, dict } = item;
+						return (
+							<div key={index}>
+								<CustomizedComponent
+									name={key}
+									type={type}
+									label={label}
+									dict={dict}
+									updateFormChange={updateFormChange}
+								/>
+							</div>
+						);
 					})}
 				</Form>
 			</div>

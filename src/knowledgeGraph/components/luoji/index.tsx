@@ -1,29 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Select, Button, Space, Divider } from 'antd';
+import { Form, Input, Select, Space } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import styles from './index.module.less';
 interface Props {
 	label: string;
-	ikey: string;
-	setOperator: (target: any, data: any) => void;
+	name: string;
+	setOperator: (changeData: object) => void;
 	value: any;
 }
 const SpecialCom = (props: Props) => {
-	const { label, ikey, setOperator, value } = props;
+	const { label, name, setOperator, value } = props;
 	const [form] = Form.useForm();
-	const operations = Form.useWatch(ikey, form);
+	const operations = Form.useWatch(name, form);
 
-	const defaultList = value.operations
-		? value.operations
-		: [
-				{
-					operatorType: undefined,
-					value: undefined
-				}
-		  ];
+	const defaultList =
+		value && value.operations
+			? value.operations
+			: [
+					{
+						operatorType: undefined,
+						value: undefined
+					}
+			  ];
+	// 逻辑运算符处理
+	const defaultSymbol =
+		value && value.operationLinks ? value.operationLinks : [];
+
 	const initForm = () => {
 		form.setFieldsValue({
-			[ikey]: defaultList
+			[name]: defaultList
 		});
 	};
 
@@ -31,8 +36,6 @@ const SpecialCom = (props: Props) => {
 		initForm();
 	}, []);
 
-	// 逻辑运算符处理
-	const defaultSymbol = value.operationLinks ? value.operationLinks : [];
 	const [operationLinks, setSymbol] = React.useState<string[]>(defaultSymbol);
 	const [formRenderKey, setFormRenderKey] = useState(Date.now()); // 初始渲染键
 	const handleReset = () => {
@@ -47,8 +50,9 @@ const SpecialCom = (props: Props) => {
 
 	// 传值
 	useEffect(() => {
-		console.log(operations, 38888888888);
-		setOperator(ikey, { operationLinks, operations, type: 2, key: ikey });
+		setOperator({
+			[name]: { operationLinks, operations, type: '2', key: name }
+		});
 	}, [operations, operationLinks]);
 
 	return (
@@ -93,7 +97,7 @@ const SpecialCom = (props: Props) => {
 						</div>
 					) : null}
 					<div className={styles['logical-right']}>
-						<Form.List name={ikey}>
+						<Form.List name={name}>
 							{(fields, { add, remove }) => (
 								<>
 									{fields.map(({ key, name, ...restField }, index) => (

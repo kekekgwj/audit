@@ -10,20 +10,16 @@ import {
 	message
 } from 'antd';
 import { type GraphinData } from '@antv/graphin';
-import {
-	ApartmentOutlined,
-	MinusCircleOutlined,
-	PlusCircleOutlined,
-	CaretUpOutlined,
-	CaretDownOutlined
-} from '@ant-design/icons';
+import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import SvgIcon from '@/components/svg-icon';
 import AttrFillter from './attr-filter';
 import styles from './index.module.less';
+
 import {
 	getMainNodes,
 	getGraph,
-	IFilterNode
+	IFilterNode,
+	IPath
 } from '@/api/knowledgeGraph/graphin';
 interface Props {
 	updateData: (layout: GraphinData) => void;
@@ -51,7 +47,14 @@ interface IFormData {
 	// 主体类型ID
 	bodys: IBody[];
 	level: number;
-	hierarchy: any;
+	pathFilter: any;
+}
+export enum FormItems {
+	bodys = 'bodys',
+	bodyFilter = 'bodyFilter',
+	level = 'level',
+	pathFilter = 'pathFilter',
+	algorithm = 'algorithm'
 }
 export default (props: Props) => {
 	const { updateData, toggleLayout, canAdd, setdefaultName } = props;
@@ -140,12 +143,16 @@ export default (props: Props) => {
 	};
 
 	// 提交表单 获取数据
-	const searchUpdate = async (res: IFormData) => {
+	const searchUpdate = async ({
+		pathFilter = null,
+		algorithmName = ''
+	}: {
+		pathFilter?: IPath[] | null;
+		algorithmName?: string;
+	} = {}) => {
+		const formData: IFormData = form.getFieldsValue();
 		// 调用接口 获取筛选数据
-		const { bodyFilter, bodys, level, hierarchy, algorithmName } = res;
-		// 用第一个主体名当默认图谱名称
-		setdefaultName(bodys[0]?.bodyName);
-		console.log(bodys, 119119);
+		const { bodyFilter, bodys, level } = formData;
 		const nodes: IFilterNode[] = [];
 		bodys.forEach(({ bodyType, bodyName }) => {
 			if (bodyType && bodyName) {
@@ -161,28 +168,12 @@ export default (props: Props) => {
 		}
 		try {
 			const data = await getGraph({
-				algorithmName: algorithmName,
+				algorithmName,
 				depth: level,
 				nodeFilter: bodyFilter,
 				nodes,
-				paths: hierarchy
+				paths: pathFilter
 			});
-
-			// 数据转换
-			// if (data) {
-			// 	if (data.nodes) {
-			// 		data.nodes.forEach((item) => {
-			// 			item.id = item.id + '';
-			// 		});
-			// 	}
-			// 	if (data.edges) {
-			// 		data.edges.forEach((item) => {
-			// 			item.id = item.id + '';
-			// 			item.source = item.source + '';
-			// 			item.target = item.target + '';
-			// 		});
-			// 	}
-			// }
 
 			// 获取之后，更新视图数据
 			updateData({
@@ -207,7 +198,17 @@ export default (props: Props) => {
 			level: 4
 		});
 	};
-
+	const getFormItemValue = (name: FormItems) => {
+		if (form) {
+			return form.getFieldValue(name);
+		}
+		return null;
+	};
+	const setFormItemValue = (name: FormItems, value: any) => {
+		if (form) {
+			form.setFieldValue(name, value);
+		}
+	};
 	// 渲染表单
 	const renderForm = () => {
 		return (
@@ -219,14 +220,14 @@ export default (props: Props) => {
 						wrapperCol={{ span: 18 }}
 						labelAlign="left"
 						layout="horizontal"
-						onFinish={searchUpdate}
+						onFinish={() => searchUpdate()}
 					>
 						<div className="main-filter">
 							<div className={styles['filter-item']}>
 								<SvgIcon name="filter"></SvgIcon>
 								<span>主体筛选</span>
 							</div>
-							<Form.List name="bodys">
+							<Form.List name={FormItems.bodys}>
 								{(fields, { add, remove }) => (
 									<>
 										{fields.map(({ key, name, ...restField }) => (
@@ -317,11 +318,7 @@ export default (props: Props) => {
 								<SvgIcon name="filter"></SvgIcon>
 								<span>主体过滤</span>
 							</div>
-							<Form.Item
-								name="bodyFilter"
-								label="主体类型"
-								className={styles['filter-form-item']}
-							>
+							<Form.Item name={FormItems.bodyFilter} label="主体类型">
 								<Select
 									mode="multiple"
 									allowClear
@@ -338,7 +335,7 @@ export default (props: Props) => {
 								<span>关系层级</span>
 							</div>
 							<Form.Item
-								name="level"
+								name={FormItems.level}
 								label="展示层级"
 								initialValue={4}
 								className={styles['filter-form-item']}
@@ -365,8 +362,14 @@ export default (props: Props) => {
 								<SvgIcon name="filter"></SvgIcon>
 								<span>链路筛选</span>
 							</div>
-							<Form.Item name="hierarchy" label="链路筛选">
-								<AttrFillter></AttrFillter>
+							<Form.Item name={FormItems.pathFilter} label="链路筛选">
+								<AttrFillter
+									getFormItemValue={getFormItemValue}
+									setFormItemValue={setFormItemValue}
+									updateGraph={(path: IPath[]) =>
+										searchUpdate({ pathFilter: path })
+									}
+								/>
 							</Form.Item>
 						</div>
 						{!canAdd ? (
@@ -375,11 +378,7 @@ export default (props: Props) => {
 									<SvgIcon name="filter"></SvgIcon>
 									<span>挖掘算法</span>
 								</div>
-								<Form.Item
-									name="algorithmName"
-									label="算法"
-									className={styles['filter-form-item']}
-								>
+								<Form.Item name={FormItems.algorithm} label="算法">
 									<Select
 										allowClear
 										style={{ width: '100%' }}
