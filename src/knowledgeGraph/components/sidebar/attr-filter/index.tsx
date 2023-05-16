@@ -51,7 +51,7 @@ export default (props: IProps) => {
 	const [treeData, setTreeData] = useState<ITreeData[]>([]); //树结构渲染用的数据
 
 	const nodeConfigNProperties = useRef(new Map<string, INodeConfigNProps>());
-
+	const cntInitRef = useRef<boolean>(true);
 	const [selectNodeID, setSelectedNodeID] = useState<string | null>(null);
 	const nodeFilter = getFormItemValue(FormItems.bodyFilter);
 	const curNode: {
@@ -69,16 +69,15 @@ export default (props: IProps) => {
 		curNodeVaule = curNode[0].bodyName as string;
 	}
 	// 打开/关闭设置弹框
-	const changeDialogOpen = async (isOpen = true) => {
-		setOpen(isOpen);
-		if (!isOpen) {
+	const changeDialogOpen = async () => {
+		if (!curNodeType || !curNodeVaule) {
+			message.error('未选择主体');
 			return;
 		}
+		setOpen(true);
 		try {
-			if (!curNodeType || !curNodeVaule) {
-				message.error('未选择主体');
-				return;
-			}
+			// 避免数据被销毁
+			if (!cntInitRef.current) return;
 			const res = await getNextPaths({
 				nodeFilter,
 				parentPaths: [],
@@ -87,6 +86,7 @@ export default (props: IProps) => {
 			});
 
 			setTreeData(changeDataTree(res));
+			cntInitRef.current = false;
 		} catch (e) {
 			console.error(e);
 		}
@@ -182,6 +182,7 @@ export default (props: IProps) => {
 		const configData = transData(treeData);
 
 		updateGraph(configData);
+		setOpen(false);
 	};
 	const getNodeDataConverted = (id: string): IProperty[] => {
 		const rawData = nodeConfigNProperties.current.get(id)?.configInfo || {};
@@ -259,11 +260,6 @@ export default (props: IProps) => {
 		});
 	};
 
-	// 关闭设置弹框
-	const handleCancel = () => {
-		changeDialogOpen(false);
-	};
-
 	// 自定义树形节点
 	const customTreeTitle = (nodeData: ITreeData) => {
 		return (
@@ -308,14 +304,14 @@ export default (props: IProps) => {
 
 	return (
 		<>
-			<Button onClick={() => changeDialogOpen(true)}>点我</Button>
+			<Button onClick={() => changeDialogOpen()}>点我</Button>
 			<CustomDialog
 				open={open}
 				title="链路筛选"
 				width={600}
 				height={400}
 				onOk={handleOk}
-				onCancel={handleCancel}
+				onCancel={() => setOpen(false)}
 			>
 				<div className={styles['fillter-dialog__top']}>
 					<div className={styles['fillter-tree']}>
