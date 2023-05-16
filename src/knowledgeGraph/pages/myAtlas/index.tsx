@@ -133,7 +133,8 @@ const MyTableCom = React.memo(
 						marginTop: '20px',
 						display: 'flex',
 						alignItems: 'center',
-						justifyContent: 'space-between'
+						justifyContent: 'space-between',
+						fontSize: '14px'
 					}}
 				>
 					<div>
@@ -229,11 +230,11 @@ const MyAtlasCom = () => {
 					wrapperCol={{ span: 18 }}
 					layout="inline"
 				>
-					<Form.Item name="name" label="图谱名称">
+					<Form.Item name="name" label="图谱名称" colon={false}>
 						<Input placeholder="请输入" />
 					</Form.Item>
 
-					<Form.Item name="gmtCreated" label="创建时间">
+					<Form.Item name="gmtCreated" label="创建时间" colon={false}>
 						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
 					</Form.Item>
 				</Form>
@@ -243,7 +244,13 @@ const MyAtlasCom = () => {
 					</Button>
 					<Button
 						onClick={search}
-						style={{ background: '#23955C', color: '#fff', marginLeft: '10px' }}
+						style={{
+							background: '#23955C',
+							color: '#fff',
+							marginLeft: '10px',
+							border: 'none',
+							boxShadow: 'none'
+						}}
 					>
 						查询
 					</Button>

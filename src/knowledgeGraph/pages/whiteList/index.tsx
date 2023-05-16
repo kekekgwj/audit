@@ -183,7 +183,8 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 						marginTop: '20px',
 						display: 'flex',
 						alignItems: 'center',
-						justifyContent: 'space-between'
+						justifyContent: 'space-between',
+						fontSize: '14px'
 					}}
 				>
 					<div>
@@ -306,11 +307,12 @@ const WhiteListCom = () => {
 						label="名称"
 						labelCol={{ span: 4 }}
 						wrapperCol={{ span: 20 }}
+						colon={false}
 					>
 						<Input placeholder="请输入" />
 					</Form.Item>
 
-					<Form.Item name="type" label="类型">
+					<Form.Item name="type" label="类型" colon={false}>
 						<Select
 							options={listType}
 							style={{ width: 170 }}
@@ -319,7 +321,7 @@ const WhiteListCom = () => {
 						/>
 					</Form.Item>
 
-					<Form.Item name="gmtCreated" label="创建时间">
+					<Form.Item name="gmtCreated" label="创建时间" colon={false}>
 						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
 					</Form.Item>
 				</Form>
@@ -329,7 +331,13 @@ const WhiteListCom = () => {
 					</Button>
 					<Button
 						onClick={search}
-						style={{ background: '#23955C', color: '#fff', marginLeft: '10px' }}
+						style={{
+							background: '#23955C',
+							color: '#fff',
+							marginLeft: '10px',
+							border: 'none',
+							boxShadow: 'none'
+						}}
 					>
 						查询
 					</Button>
