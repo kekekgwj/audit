@@ -45,7 +45,7 @@ interface TanbleProps {
 	current: number;
 	size: number; //每页数量
 	onShowSizeChange: (current: any, size: any) => void;
-	onChange: (pageNumber: Number) => void;
+	onChange: (pageNumber: number) => void;
 	refresh: () => void;
 }
 
@@ -320,7 +320,7 @@ const WhiteListCom = () => {
 					</Form.Item>
 
 					<Form.Item name="gmtCreated" label="创建时间">
-						<RangePicker format="YYYY-MM-DD" />
+						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
 					</Form.Item>
 				</Form>
 				<div className={styles['search-handle-box']}>
