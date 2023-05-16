@@ -269,7 +269,8 @@ const MyTableCom = React.memo((props: TableProps) => {
 					marginTop: '20px',
 					display: 'flex',
 					alignItems: 'center',
-					justifyContent: 'space-between'
+					justifyContent: 'space-between',
+					fontSize: '14px'
 				}}
 			>
 				<div>
@@ -350,7 +351,7 @@ const RuleCom = () => {
 					wrapperCol={{ span: 18 }}
 					layout="inline"
 				>
-					<Form.Item name="name" label="规则名称">
+					<Form.Item name="name" label="规则名称" colon={false}>
 						<Input placeholder="请输入" />
 					</Form.Item>
 				</Form>
@@ -360,7 +361,13 @@ const RuleCom = () => {
 					</Button>
 					<Button
 						onClick={search}
-						style={{ background: '#23955C', color: '#fff', marginLeft: '10px' }}
+						style={{
+							background: '#23955C',
+							color: '#fff',
+							marginLeft: '10px',
+							border: 'none',
+							boxShadow: 'none'
+						}}
 					>
 						查询
 					</Button>
