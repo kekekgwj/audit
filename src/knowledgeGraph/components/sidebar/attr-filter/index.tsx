@@ -197,12 +197,14 @@ export default (props: IProps) => {
 				operations: []
 			};
 			if (type === ComponentsType.PERSON) {
-				value.forEach((person: string) => {
+				value.forEach((person: string, index: number) => {
+					if (index > 0) {
+						formatValue.operationLinks.push(2);
+					}
 					formatValue.operations.push({
 						operatorType: 1,
 						value: person
 					});
-					formatValue.operationLinks.push(2);
 				});
 			}
 
@@ -225,13 +227,17 @@ export default (props: IProps) => {
 					operatorType: 1,
 					value: value
 				});
-
-				formatValue.operationLinks.push(2);
 			}
 
 			if (type === ComponentsType.RANGE) {
 				formatValue.operationLinks = value?.operationLinks || [];
 				formatValue.operations = value?.operations || [];
+			}
+			if (
+				formatValue.operationLinks.length === 0 &&
+				formatValue.operations.length === 0
+			) {
+				return null;
 			}
 			return {
 				key,
@@ -239,7 +245,7 @@ export default (props: IProps) => {
 				...formatValue
 			};
 		});
-		return convertProperties;
+		return convertProperties.filter((p) => p !== null) as IProperty[];
 	};
 
 	//转成后台需要的数据形式
