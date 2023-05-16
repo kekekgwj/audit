@@ -21,6 +21,8 @@ const MyTag = (props: Props) => {
 	const inputRef = useRef<InputRef>(null);
 	const editInputRef = useRef<InputRef>(null);
 
+	// const defaultValue = value?
+
 	useEffect(() => {
 		setData({ [name]: { value: tags, type: '1', key: name } });
 	}, [tags]);

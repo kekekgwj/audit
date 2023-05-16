@@ -34,7 +34,7 @@ interface TanbleProps {
 	current: number;
 	size: number; //每页数量
 	onShowSizeChange: (current: any, size: any) => void;
-	onChange: (pageNumber: Number) => void;
+	onChange: (pageNumber: number) => void;
 	refresh: () => void;
 }
 
@@ -84,7 +84,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	const colums = [
 		{
 			title: '序号',
-			dataIndex: 'key'
+			render: (text, record, index) => `${index + 1}`
 		},
 		{
 			title: '数据表名称',
@@ -131,6 +131,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 
 	return (
 		<div>
+			{contextHolder}
 			<Table
 				columns={colums}
 				dataSource={data}
@@ -256,11 +257,11 @@ const DataManageCom = () => {
 					</Form.Item>
 
 					<Form.Item name="gmtCreated" label="创建时间">
-						<RangePicker format="YYYY-MM-DD" />
+						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
 					</Form.Item>
 
 					<Form.Item name="updateTime" label="更新时间">
-						<RangePicker format="YYYY-MM-DD" />
+						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
 					</Form.Item>
 
 					<Form.Item>

@@ -1,21 +1,50 @@
-import React, { Ref, useEffect, useRef, useState } from 'react';
-import { Button, message, Input, Form, Row, Col } from 'antd';
-import { type GraphinData } from '@antv/graphin';
-import html2canvas from 'html2canvas';
-import GraphinCom from '@graph/components/graphin';
-import SideBar from '@graph/components/sidebar/sideBar';
-import { toImgStyle } from '@/utils/other';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import Graphin, {
+	Components,
+	IG6GraphEvent,
+	GraphinContext,
+	type TooltipValue,
+	type GraphinData,
+	type LegendChildrenProps
+} from '@antv/graphin';
+// import registerNodes from './custom-node';
+// import registerEdges from './custom-edge';
 import styles from './index.module.less';
-import { saveGraph } from '@/api/knowLedgeGraph/graphin';
+import { INode, ModelConfig, NodeConfig } from '@antv/g6';
+import { CheckboxValueType } from 'antd/es/checkbox/Group';
+import { Checkbox, Input, Col, Row, message, Form } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
 import CustomDialog from '@graph/components/custom-dialog';
+import { getGraphByRule } from '@/api/knowledgeGraph/suspiciousRule';
 
-// import { getBodyGraphin } from '@/api/knowledgeGraph/graphin';
-interface SaveProps {
-	open: boolean;
-	file: any;
-	defaultName: string;
-	setSaveOpen: (open: boolean) => void;
+// 注册自定义节点
+// registerNodes('all');
+// registerEdges('all');
+
+//功能组件
+const { Tooltip, ContextMenu, Legend } = Components;
+
+interface Props {
+	data: GraphinData;
+	refersh: boolean;
+	updateData: (data: GraphinData) => void;
+	onClose: () => void;
+	id?: string;
 }
+
+interface MenuProps {
+	onClose: () => void;
+	updateData: (data: GraphinData) => void;
+	id?: string;
+}
+
+interface NodeDetailProps {
+	nodeModel: ModelConfig;
+}
+
+interface SaveProps {}
+
+// 保存图谱
 const SaveCom = React.memo((props: SaveProps) => {
 	const [messageApi, contextHolder] = message.useMessage();
 	const [form] = Form.useForm();
@@ -23,7 +52,6 @@ const SaveCom = React.memo((props: SaveProps) => {
 
 	useEffect(() => {
 		if (open) {
-			console.log(defaultName, 187187);
 			initForm();
 		}
 	}, [open]);
@@ -76,14 +104,42 @@ const SaveCom = React.memo((props: SaveProps) => {
 	);
 });
 
-interface GraphinRef {
-	refersh: () => void;
-}
+const GraphinCom = React.memo((props: Props) => {
+	const { data, updateData, refersh } = props;
+	const [key, setKey] = useState('');
+	const [width, setWidth] = useState(600);
+	const graphinRef = useRef<HTMLDivElement>();
 
-const RelationShipCom = () => {
-	// 数据来源
+	return (
+		<div ref={graphinRef} className={styles['graphin-box']}>
+			<Graphin
+				key={key}
+				data={data}
+				width={width}
+				layout={{
+					type: 'force',
+					preventOverlap: true,
+					nodeSize: 140,
+					nodeSpacing: 50
+				}}
+			>
+				<Legend bindType="node" sortKey="typeName">
+					{(renderProps: LegendChildrenProps) => {
+						return <Legend.Node {...renderProps} />;
+					}}
+				</Legend>
+			</Graphin>
+		</div>
+	);
+});
+
+const GraphCom = () => {
+	const navigate = useNavigate();
+	let location = useLocation();
+	// 传入数据 根据此数据获取图谱数据
+	const formData = location.state;
+	// 图谱数据来源
 	const [data, setDate] = useState<GraphinData>();
-	const [barOpen, setBarOpen] = useState(true);
 	const graphinRef = useRef<GraphinRef>();
 	const [open, setSaveOpen] = React.useState(false);
 	const [file, setFile] = React.useState();
@@ -93,28 +149,25 @@ const RelationShipCom = () => {
 		getGraphinData();
 	}, []);
 
+	// 获取图谱数据
 	const getGraphinData = async () => {
-		// const data = await getBodyGraphin();
-		const data = {};
+		const data = await getGraphByRule({ auditRuleParams: '' });
 		updateData(data);
 	};
 
 	// 更新数据
 	const updateData = (value: GraphinData) => {
-		console.log(value, 107777);
 		setDate(value);
 	};
 
 	// 保存图谱
 	const saveGraph = () => {
-		console.log('1111');
 		window.pageYOffset = 0; //网页位置
 		document.documentElement.scrollTop = 0; //滚动条的位置
 		document.body.scrollTop = 0; //网页被卷去的高
 		//获取要生成图片的dom区域并转为canvas;
 		html2canvas(document.querySelector('#graphin-container')).then((canvas) => {
 			const base64Img = canvas.toDataURL('image/png'); //将canvas转为base64
-
 			const file = toImgStyle(base64Img, Date.now() + '.png');
 			setFile(file);
 			//调用后端接口，将文件传给后端
@@ -128,36 +181,12 @@ const RelationShipCom = () => {
 	};
 
 	return (
-		<div
-			style={{
-				paddingLeft: barOpen ? '330px' : '0'
-			}}
-			className={styles['main-content']}
-		>
-			<div
-				style={{
-					height: barOpen ? '100%' : '0'
-				}}
-				className={styles['filter-bar']}
-			>
-				<SideBar
-					updateData={updateData}
-					toggleLayout={toggleBarLayout}
-					canAdd={true}
-					setdefaultName={setdefaultName}
-				></SideBar>
-			</div>
+		<div className={styles['main-content']}>
 			<div className={styles['graphin-box']}>
 				{data && (
 					<>
 						<div className={styles['graphin-box__com']}>
-							<GraphinCom
-								// ref={graphinRef}
-								data={data}
-								refersh={barOpen}
-								updateData={updateData}
-								onClose={() => {}}
-							></GraphinCom>
+							<GraphinCom data={data}></GraphinCom>
 						</div>
 						<div className={styles['graphin-box__btn']}>
 							<Button
@@ -183,4 +212,4 @@ const RelationShipCom = () => {
 	);
 };
 
-export default RelationShipCom;
+export default GraphCom;

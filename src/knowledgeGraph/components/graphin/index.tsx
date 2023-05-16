@@ -13,7 +13,10 @@ import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { Checkbox, Col, Row } from 'antd';
-import { getNextGraph } from '@/api/knowledgeGraph/graphin';
+import {
+	getNextGraph,
+	getNextRelationships
+} from '@/api/knowledgeGraph/graphin';
 
 // 注册自定义节点
 registerNodes('all');
@@ -42,16 +45,17 @@ interface NodeDetailProps {
 
 const EdgeDetail = React.memo((props: NodeDetailProps) => {
 	const { nodeModel } = props;
+	const attrArr = nodeModel.attrs ? nodeModel.attrs : [];
 	return (
 		<div className={styles['node-detail-box']}>
-			<div className={styles['node-detail-item']}>
-				<span className={styles['detail-item-title']}>边id:</span>
-				{nodeModel.id as string}
-			</div>
-			<div className={styles['node-detail-item']}>
-				<span className={styles['detail-item-title']}>边id:</span>
-				{nodeModel.id as string}
-			</div>
+			{attrArr.map((item) => {
+				return (
+					<div className={styles['node-detail-item']}>
+						<span className={styles['detail-item-title']}>{item.label}:</span>
+						{item.value}
+					</div>
+				);
+			})}
 		</div>
 	);
 });
@@ -64,14 +68,14 @@ const DetailInfo = React.memo((props: DetailProps) => {
 	return (
 		<div className={styles['detail-info-box']}>
 			<div className={styles['node-detail-box']}>
-				<div className={styles['node-detail-item']}>
-					<span className={styles['detail-item-title']}>节点id:</span>
-					{detailData.id as string}
-				</div>
-				<div className={styles['node-detail-item']}>
-					<span className={styles['detail-item-title']}>节点id:</span>
-					{detailData.id as string}
-				</div>
+				{detailData.map((item) => {
+					return (
+						<div className={styles['node-detail-item']}>
+							<span className={styles['detail-item-title']}>{item.label}:</span>
+							{item.value}
+						</div>
+					);
+				})}
 			</div>
 		</div>
 	);
@@ -86,9 +90,9 @@ const LeftEvent = () => {
 		const handleNodeClick = (evt: IG6GraphEvent) => {
 			const node = evt.item as INode;
 			const model = node.getModel() as NodeConfig;
-			console.log(node, 8888888888888);
+			console.log(model, 8888888888888);
 			apis.focusNodeById(model.id);
-			setDetailData(model);
+			setDetailData(model.attrs);
 			setShowDetail(true);
 		};
 
@@ -109,16 +113,17 @@ const LeftEvent = () => {
 
 const MyMenu = React.memo((props: MenuProps) => {
 	const { data, id, onClose, updateData } = props;
+	const [relArr, setRelARR] = React.useState([]);
 	useEffect(() => {
-		getNext();
+		getRelationships();
 	}, []);
 
-	const getNext = () => {
-		getNextGraph({ nodeId: id }).then((res) => {
-			console.log(res, 119119);
+	const getRelationships = () => {
+		getNextRelationships({ nodeId: id }).then((res) => {
+			setRelARR(res);
 		});
 	};
-	const relArr = ['同事', '朋友', '合作方'];
+
 	// 选中数据
 	const [checkedRel, setCheckedRel] = React.useState([]);
 	const onChange = (checkedValues: CheckboxValueType[]) => {
@@ -127,9 +132,10 @@ const MyMenu = React.memo((props: MenuProps) => {
 
 	// 穿透到下一层
 	const showNextLeval = () => {
-		console.log(checkedRel, 2855555);
-
-		// onClose();
+		getNextGraph({ nodeId: id, relationships: checkedRel }).then((res: any) => {
+			updateData(res);
+			onClose();
+		});
 	};
 	return (
 		<div className={styles['check-group-box']}>

@@ -2,6 +2,7 @@ import React from 'react';
 import JoinConfig from './JoinConfig';
 import Grouping from './grouping';
 import Sort from './sort';
+import Filterate from './Filterate';
 import { Table } from 'antd';
 interface IProps {
 	data?: any[];
@@ -19,8 +20,9 @@ const ConfigPanel: React.FC<IProps> = ({ children }) => {
 export const JoinConfigPanel = () => (
 	<ConfigPanel>
 		{/* <JoinConfig></JoinConfig> */}
-		<Grouping></Grouping>
+		{/* <Grouping></Grouping> */}
 		{/* <Sort></Sort> */}
+		<Filterate></Filterate>
 	</ConfigPanel>
 );
 export default ConfigPanel;

@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Button, Tree, message } from 'antd';
 import CustomDialog from '@graph/components/custom-dialog';
 import { CaretDownOutlined } from '@ant-design/icons';
-import SvgIcon from '@graph/components/svg-icon';
 import FillterAttr, { ComponentsType } from './fillterAttr';
+import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 
 import { IPath, IProperty, getNextPaths } from '@/api/knowledgeGraph/graphin';
@@ -234,6 +234,7 @@ export default (props: IProps) => {
 		});
 		return convertProperties;
 	};
+
 	//转成后台需要的数据形式
 	const transData = (list: ITreeData[]): IPath[] => {
 		return list.map((item: ITreeData) => {
@@ -299,6 +300,7 @@ export default (props: IProps) => {
 				open={open}
 				title="链路筛选"
 				width={600}
+				height={400}
 				onOk={handleOk}
 				onCancel={handleCancel}
 			>

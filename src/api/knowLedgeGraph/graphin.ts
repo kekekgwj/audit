@@ -1,5 +1,5 @@
 import { INextPathResponse } from '@/knowledgeGraph/components/sidebar/attr-filter';
-import { appendQueryParams, get, post } from '@/utils/request';
+import { appendQueryParams, get, post, postFormData } from '@/utils/request';
 const env = import.meta.env;
 const { VITE_API_PREFIX: API_PREFIX } = env;
 // interface IResponse<T> {
@@ -111,14 +111,32 @@ export const getNextPaths = (data: IGetNextPaths) => {
 	);
 };
 
-interface IGetNextPath {
-	nodeId: number;
-	relationships: string[];
+// 获取下一层关系
+interface Relationships {
+	nodeId: string;
 }
-// 穿透下一层
-export const getNextGraph = (data: IGetNextPath) => {
-	return post<IGraphData>(
-		API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph',
-		data
+export const getNextRelationships = (data: Relationships) => {
+	return get(
+		appendQueryParams(
+			API_PREFIX + '/blade-tool/graphAnalysis/getNextRelationships',
+			data
+		)
 	);
 };
+
+// 穿透下一层
+interface NextGraph {
+	nodeId: string;
+	relationships: string[];
+}
+export const getNextGraph = (data: any) => {
+	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph', data);
+};
+
+//保存图谱
+export function saveGraph(formData: FormData) {
+	return postFormData(
+		API_PREFIX + '/blade-tool/graphAnalysis/saveGraph',
+		formData
+	);
+}

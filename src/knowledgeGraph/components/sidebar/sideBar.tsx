@@ -10,13 +10,8 @@ import {
 	message
 } from 'antd';
 import { type GraphinData } from '@antv/graphin';
-import {
-	ApartmentOutlined,
-	MinusCircleOutlined,
-	PlusCircleOutlined,
-	CaretUpOutlined,
-	CaretDownOutlined
-} from '@ant-design/icons';
+import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import SvgIcon from '@/components/svg-icon';
 import AttrFillter from './attr-filter';
 import styles from './index.module.less';
 
@@ -30,11 +25,16 @@ interface Props {
 	updateData: (layout: GraphinData) => void;
 	toggleLayout: (isOpen: boolean) => void;
 	canAdd: boolean;
+	setdefaultName: (name: string) => void;
 }
 
 interface bodyTypeOption {
 	label: string;
 	value: string | number;
+}
+interface algorithmOption {
+	label: string;
+	value: string;
 }
 interface IBody {
 	// 主体类型对应的id
@@ -57,14 +57,18 @@ export enum FormItems {
 	algorithm = 'algorithm'
 }
 export default (props: Props) => {
-	const { updateData, toggleLayout, canAdd } = props;
+	const { updateData, toggleLayout, canAdd, setdefaultName } = props;
 	const [configVisibile, setconfigVisibile] = useState(true);
 	const [bodyTypeOptions, setBodyTypeOptions] = useState(Array<bodyTypeOption>);
+	const [algorithmOptions, setAlgorithmOptions] = useState(
+		Array<algorithmOption>
+	);
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
 
 	useEffect(() => {
 		getBodyTypeOptions();
+		getAlgorithmOptions();
 		initForm();
 	}, []);
 
@@ -81,6 +85,20 @@ export default (props: Props) => {
 		setBodyTypeOptions(options);
 	};
 
+	//获取算法下拉选型
+	// 待完善
+	const getAlgorithmOptions = async () => {
+		// const nodes = await getMainNodes();
+		// const options = nodes.map(({ id, name }) => {
+		// 	return {
+		// 		label: name,
+		// 		value: name
+		// 	};
+		// });
+		const options = [{ label: 'louvain', value: 'louvain' }];
+		setAlgorithmOptions(options);
+	};
+
 	// 顶部筛选条件下拉切换
 	const changeVisibile = (val: boolean) => {
 		setconfigVisibile(!val);
@@ -92,17 +110,21 @@ export default (props: Props) => {
 		<div className={styles['toggle-tab']}>
 			<div className={styles['tab-title']}>筛选条件</div>
 			<div
+				className={
+					configVisibile
+						? `${styles['tab-icon']} ${styles['visibile']}`
+						: styles['tab-icon']
+				}
 				onClick={() => {
 					changeVisibile(configVisibile);
 				}}
 			>
-				<span>
-					{configVisibile ? (
+				<SvgIcon name="arrow-down"></SvgIcon>
+				{/* {configVisibile ? (
 						<CaretUpOutlined style={{ fontSize: '14px', color: '#E6697B' }} />
 					) : (
 						<CaretDownOutlined style={{ fontSize: '14px', color: '#E6697B' }} />
-					)}
-				</span>
+					)} */}
 			</div>
 		</div>
 	);
@@ -196,16 +218,13 @@ export default (props: Props) => {
 						form={form}
 						labelCol={{ span: 6 }}
 						wrapperCol={{ span: 18 }}
+						labelAlign="left"
 						layout="horizontal"
 						onFinish={() => searchUpdate()}
 					>
 						<div className="main-filter">
 							<div className={styles['filter-item']}>
-								<Space>
-									<ApartmentOutlined
-										style={{ fontSize: '14px', color: '#E6697B' }}
-									/>
-								</Space>
+								<SvgIcon name="filter"></SvgIcon>
 								<span>主体筛选</span>
 							</div>
 							<Form.List name={FormItems.bodys}>
@@ -217,6 +236,7 @@ export default (props: Props) => {
 													label="主体类型"
 													{...restField}
 													name={[name, 'bodyType']}
+													className={styles['filter-form-item']}
 												>
 													<Select
 														placeholder="请选择"
@@ -228,6 +248,7 @@ export default (props: Props) => {
 													label="主体名称"
 													{...restField}
 													name={[name, 'bodyName']}
+													className={styles['filter-form-item']}
 												>
 													<Input placeholder="主体名称" />
 												</Form.Item>
@@ -294,11 +315,7 @@ export default (props: Props) => {
 
 						<div>
 							<div className={styles['filter-item']}>
-								<Space>
-									<ApartmentOutlined
-										style={{ fontSize: '14px', color: '#E6697B' }}
-									/>
-								</Space>
+								<SvgIcon name="filter"></SvgIcon>
 								<span>主体过滤</span>
 							</div>
 							<Form.Item name={FormItems.bodyFilter} label="主体类型">
@@ -314,18 +331,14 @@ export default (props: Props) => {
 
 						<div>
 							<div className={styles['filter-item']}>
-								<Space>
-									<ApartmentOutlined
-										style={{ fontSize: '14px', color: '#E6697B' }}
-									/>
-								</Space>
+								<SvgIcon name="filter"></SvgIcon>
 								<span>关系层级</span>
 							</div>
 							<Form.Item
 								name={FormItems.level}
 								label="展示层级"
 								initialValue={4}
-								rules={[{ required: true }]}
+								className={styles['filter-form-item']}
 							>
 								<InputNumber min={0} max={6} />
 							</Form.Item>
@@ -346,11 +359,7 @@ export default (props: Props) => {
 						<Divider dashed />
 						<div>
 							<div className={styles['filter-item']}>
-								<Space>
-									<ApartmentOutlined
-										style={{ fontSize: '14px', color: '#E6697B' }}
-									/>
-								</Space>
+								<SvgIcon name="filter"></SvgIcon>
 								<span>链路筛选</span>
 							</div>
 							<Form.Item name={FormItems.pathFilter} label="链路筛选">
@@ -366,11 +375,7 @@ export default (props: Props) => {
 						{!canAdd ? (
 							<div>
 								<div className={styles['filter-item']}>
-									<Space>
-										<ApartmentOutlined
-											style={{ fontSize: '14px', color: '#E6697B' }}
-										/>
-									</Space>
+									<SvgIcon name="filter"></SvgIcon>
 									<span>挖掘算法</span>
 								</div>
 								<Form.Item name={FormItems.algorithm} label="算法">
@@ -378,7 +383,7 @@ export default (props: Props) => {
 										allowClear
 										style={{ width: '100%' }}
 										placeholder="请选择"
-										options={bodyTypeOptions}
+										options={algorithmOptions}
 									/>
 								</Form.Item>
 							</div>

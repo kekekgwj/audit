@@ -1,9 +1,15 @@
 .searchForm {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	height: 64px;
 	background: #f8f9fa;
 	margin-bottom: 20px;
+	padding: 0 20px;
+	.search-handle-box {
+		width: 138px;
+		display: flex;
+	}
 }
 :global {
 	.ant-empty-image {
@@ -12,4 +18,31 @@
 }
 .altasContent {
 	padding: 20px;
+}
+.operate-box {
+	display: flex;
+	.operate-item {
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+	}
+}
+
+.my-table-box {
+	.my-table {
+		max-height: calc(100vh - 250px);
+		overflow-y: auto;
+	}
+	:global {
+		.ant-pagination .ant-pagination-item {
+			border: 1px solid #d9d9d9;
+		}
+		.ant-pagination .ant-pagination-item-active {
+			background: #24a36f;
+			border: none;
+			a {
+				color: #fff;
+			}
+		}
+	}
 }

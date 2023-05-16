@@ -95,6 +95,7 @@ const AddCom = React.memo((props: Props) => {
 					{formArr && formArr.length > 0 && renderItem()}
 				</Form>
 			</CustomDialog>
+			{contextHolder}
 		</div>
 	);
 });

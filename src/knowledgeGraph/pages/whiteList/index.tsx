@@ -12,9 +12,11 @@ import {
 	ConfigProvider,
 	DatePicker,
 	Empty,
-	message
+	message,
+	Divider
 } from 'antd';
 import type { PaginationProps } from 'antd';
+import SvgIcon from '@/components/svg-icon';
 import emptyPage from '@/assets/img/empty.png';
 const { RangePicker } = DatePicker;
 const { confirm } = Modal;
@@ -43,7 +45,7 @@ interface TanbleProps {
 	current: number;
 	size: number; //每页数量
 	onShowSizeChange: (current: any, size: any) => void;
-	onChange: (pageNumber: Number) => void;
+	onChange: (pageNumber: number) => void;
 	refresh: () => void;
 }
 
@@ -111,7 +113,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	const colums = [
 		{
 			title: '序号',
-			dataIndex: 'key'
+			render: (text, record, index) => `${index + 1}`
 		},
 		{
 			title: '名称',
@@ -130,23 +132,22 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 			key: 'operaion',
 			render: (row, record) => {
 				return (
-					<div>
+					<div className={styles['operate-box']}>
 						<span
+							className={styles['operate-item']}
 							onClick={() => handleEdit(row)}
-							style={{ cursor: 'pointer', marginRight: '10px' }}
 						>
-							<Space>
-								<FormOutlined style={{ color: '#23955C' }} />
-							</Space>
+							<SvgIcon name="edit" color="#23955C"></SvgIcon>
 							<span style={{ marginLeft: '2px' }}>编辑</span>
 						</span>
+						<span>
+							<Divider type="vertical" />
+						</span>
 						<span
+							className={styles['operate-item']}
 							onClick={() => handleDelete(row)}
-							style={{ cursor: 'pointer' }}
 						>
-							<Space>
-								<DeleteOutlined style={{ color: '#23955C' }} />
-							</Space>
+							<SvgIcon name="delete" color="#23955C"></SvgIcon>
 							<span style={{ marginLeft: '2px' }}>删除</span>
 						</span>
 					</div>
@@ -156,7 +157,8 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	];
 
 	return (
-		<div>
+		<div className={styles['my-table-box']}>
+			{contextHolder}
 			<div className={styles['handle-table-box']}>
 				<Button
 					htmlType="button"
@@ -169,33 +171,36 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 				</Button>
 			</div>
 			<Table
+				className={styles['my-table']}
 				columns={colums}
 				dataSource={data}
 				pagination={{ position: ['none'] }}
 			></Table>
-			<div
-				style={{
-					textAlign: 'center',
-					marginTop: '20px',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between'
-				}}
-			>
-				<div>
-					<span style={{ marginRight: '10px' }}>共{total}条记录</span>
-					<span>
-						第{current}/{Math.ceil(total / size)}页
-					</span>
+			{data.length ? (
+				<div
+					style={{
+						textAlign: 'center',
+						marginTop: '20px',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'space-between'
+					}}
+				>
+					<div>
+						<span style={{ marginRight: '10px' }}>共{total}条记录</span>
+						<span>
+							第{current}/{Math.ceil(total / size)}页
+						</span>
+					</div>
+					<Pagination
+						total={total}
+						showSizeChanger
+						onShowSizeChange={onShowSizeChange}
+						onChange={onChange}
+						showQuickJumper
+					/>
 				</div>
-				<Pagination
-					total={total}
-					showSizeChanger
-					onShowSizeChange={onShowSizeChange}
-					onChange={onChange}
-					showQuickJumper
-				/>
-			</div>
+			) : null}
 			<Add
 				open={openAdd}
 				handleCancel={handleCancelAdd}
@@ -295,38 +300,42 @@ const WhiteListCom = () => {
 					labelCol={{ span: 6 }}
 					wrapperCol={{ span: 18 }}
 					layout="inline"
-					onFinish={(res: any) => {
-						search(res);
-					}}
 				>
-					<Form.Item name="name" label="名称">
-						<Input />
+					<Form.Item
+						name="name"
+						label="名称"
+						labelCol={{ span: 4 }}
+						wrapperCol={{ span: 20 }}
+					>
+						<Input placeholder="请输入" />
 					</Form.Item>
 
 					<Form.Item name="type" label="类型">
-						<Select options={listType} style={{ width: 170 }} allowClear />
+						<Select
+							options={listType}
+							style={{ width: 170 }}
+							allowClear
+							placeholder="请选择"
+						/>
 					</Form.Item>
 
 					<Form.Item name="gmtCreated" label="创建时间">
-						<RangePicker format="YYYY-MM-DD" />
-					</Form.Item>
-
-					<Form.Item>
-						<Button htmlType="button" onClick={onReset}>
-							重置
-						</Button>
-					</Form.Item>
-					<Form.Item>
-						<Button
-							htmlType="submit"
-							style={{ background: '#23955C', color: '#fff' }}
-						>
-							查询
-						</Button>
+						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
 					</Form.Item>
 				</Form>
+				<div className={styles['search-handle-box']}>
+					<Button htmlType="button" onClick={onReset}>
+						重置
+					</Button>
+					<Button
+						onClick={search}
+						style={{ background: '#23955C', color: '#fff', marginLeft: '10px' }}
+					>
+						查询
+					</Button>
+				</div>
 			</div>
-			{tableData?.length > 0 ? (
+			{/* {tableData?.length > 0 ? (
 				<MyTableCom
 					data={tableData}
 					onShowSizeChange={onShowSizeChange}
@@ -343,7 +352,17 @@ const WhiteListCom = () => {
 					description={false}
 					imageStyle={{ height: '193px' }}
 				/>
-			)}
+			)} */}
+			<MyTableCom
+				data={tableData}
+				onShowSizeChange={onShowSizeChange}
+				onChange={onChange}
+				total={total}
+				size={size}
+				current={current}
+				listType={listType}
+				refresh={getList}
+			/>
 		</div>
 	);
 };

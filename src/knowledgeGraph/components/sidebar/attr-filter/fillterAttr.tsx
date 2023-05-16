@@ -154,7 +154,6 @@ const FillterAttr: FC<IProps> = forwardRef(
 				>
 					{myData.map((item, index) => {
 						const { label, key, type, dict } = item;
-						const curData = configInfo.current ? configInfo.current : '';
 						return (
 							<div key={index}>
 								<CustomizedComponent
