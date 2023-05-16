@@ -3,13 +3,13 @@ import { Button, Tree, message } from 'antd';
 import CustomDialog from '@graph/components/custom-dialog';
 import { CaretDownOutlined } from '@ant-design/icons';
 import SvgIcon from '@graph/components/svg-icon';
-import FillterAttr from './fillterAttr';
+import FillterAttr, { ComponentsType } from './fillterAttr';
 import styles from './index.module.less';
 
-import { IPath, getGraph, getNextPaths } from '@/api/knowledgeGraph/graphin';
+import { IPath, IProperty, getNextPaths } from '@/api/knowledgeGraph/graphin';
 import { FormItems } from '../sideBar';
 
-interface IProperty {
+interface IResProperty {
 	key: string;
 	label: string;
 	type: string;
@@ -17,7 +17,7 @@ interface IProperty {
 export interface INextPathResponse {
 	name: string;
 	path?: string[];
-	properties: IProperty[];
+	properties: IResProperty[];
 }
 
 // 处理过的TreeData
@@ -27,11 +27,16 @@ interface ITreeData {
 	key: string;
 	children: ITreeData[];
 	isLeaf: boolean;
-	properties: IProperty[];
+	properties: IResProperty[];
+}
+interface IConfigInfo {
+	value: unknown;
+	type: ComponentsType;
+	key: string;
 }
 export interface INodeConfigNProps {
-	properties: IProperty[];
-	configInfo: any;
+	properties: IResProperty[];
+	configInfo: IConfigInfo | Record<string, never>;
 }
 interface IProps {
 	getFormItemValue: (name: FormItems) => any;
@@ -118,6 +123,7 @@ export default (props: IProps) => {
 			const res = await getNextPaths({
 				nodeFilter,
 				parentPaths: node.path,
+				// todo
 				type: 'Company',
 				value: '07225997'
 			});
@@ -165,23 +171,68 @@ export default (props: IProps) => {
 
 	// 点击确定
 	const handleOk = async () => {
-		//通过需要保存的节点去筛选原数组
-		if (saveNodes) {
-			// 根据树数据,生成提交数据形式
-			const configData = transData(treeData);
-			console.log('configData', configData);
+		const configData = transData(treeData);
 
-			updateGraph(configData);
-		}
+		updateGraph(configData);
 	};
-	const getNodeDataConverted = (id: string) => {
-		const rawData = nodeConfigNProperties.current.get(id)?.configInfo;
-		// const formattedData = rawData.forEach();
-		if (saveNodes.includes(id)) {
-			return rawData;
-		} else {
-			return [];
-		}
+	const getNodeDataConverted = (id: string): IProperty[] => {
+		const rawData = nodeConfigNProperties.current.get(id)?.configInfo || {};
+
+		const convertProperties = Object.entries(rawData).map(([label, v]) => {
+			if (!saveNodes.includes(id)) {
+				return {};
+			}
+			const { value, type, key } = v;
+
+			const formatValue: Pick<IProperty, 'operationLinks' | 'operations'> = {
+				operationLinks: [],
+				operations: []
+			};
+			if (type === ComponentsType.PERSON) {
+				value.forEach((person: string) => {
+					formatValue.operations.push({
+						operatorType: 1,
+						value: person
+					});
+					formatValue.operationLinks.push(2);
+				});
+			}
+
+			if (type === ComponentsType.DATE) {
+				const [start, end] = value;
+				formatValue.operations.push({
+					// >=
+					operatorType: 3,
+					value: start
+				});
+				formatValue.operations.push({
+					// <=
+					operatorType: 5,
+					value: end
+				});
+			}
+
+			if (type === ComponentsType.GENDER) {
+				value.forEach((v: string) => {
+					formatValue.operations.push({
+						operatorType: 1,
+						value: v
+					});
+					formatValue.operationLinks.push(2);
+				});
+			}
+
+			if (type === ComponentsType.RANGE) {
+				formatValue.operationLinks = value.operationLinks;
+				formatValue.operations = value.operations;
+			}
+			return {
+				key,
+				type: Number(type),
+				...formatValue
+			};
+		});
+		return convertProperties;
 	};
 	//转成后台需要的数据形式
 	const transData = (list: ITreeData[]): IPath[] => {
@@ -234,7 +285,7 @@ export default (props: IProps) => {
 		const curValues = nodeConfigNProperties.current.get(
 			key
 		) as INodeConfigNProps;
-		console.log(formAllValues);
+
 		nodeConfigNProperties.current.set(key, {
 			...curValues,
 			configInfo: formAllValues

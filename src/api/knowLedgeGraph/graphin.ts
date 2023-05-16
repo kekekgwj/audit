@@ -34,13 +34,16 @@ interface IOperation {
 	operatorType: number;
 	value: string;
 }
-interface IProperty {
-	key: string;
-	operations: IOperation[];
-	type: number;
-	// 运算条件之间的连接符 1-且 2-或
-	operationLinks: number[];
-}
+
+export type IProperty =
+	| {
+			key: string;
+			operations: IOperation[];
+			type: number;
+			// 运算条件之间的连接符 1-且 2-或
+			operationLinks: number[];
+	  }
+	| Record<string, never>;
 interface IFilters {
 	algorithmName?: string;
 	depth?: number;
