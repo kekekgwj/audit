@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { isEqual } from 'lodash';
 import emptyPage from '@/assets/img/empty.png';
 import SvgIcon from '@/components/svg-icon';
 import {
@@ -34,121 +35,137 @@ interface TableProps {
 	onChange: (pageNumber: Number) => void;
 	refresh: () => void;
 }
-const MyTableCom = React.memo((props: TableProps) => {
-	const [messageApi, contextHolder] = message.useMessage();
-	const [curId, setCurId] = React.useState();
-	const { data, total, current, size, onShowSizeChange, onChange, refresh } =
-		props;
-	const navigate = useNavigate();
-	// 查看
-	const handleDetail = (row: any) => {
-		navigate('/altasDetail', { state: { id: row.id } });
-	};
+const MyTableCom = React.memo(
+	(props: TableProps) => {
+		const [messageApi, contextHolder] = message.useMessage();
+		const [curId, setCurId] = React.useState();
+		const { data, total, current, size, onShowSizeChange, onChange, refresh } =
+			props;
+		console.log(data, 424242);
+		const [dataSource, setDataSource] = React.useState();
+		const navigate = useNavigate();
+		// 查看
+		const handleDetail = (row: any) => {
+			navigate('/altasDetail', { state: { id: row.id } });
+		};
 
-	const [openDel, setOpenDel] = React.useState(false);
+		const [openDel, setOpenDel] = React.useState(false);
 
-	// 删除
-	const handleDelete = (row) => {
-		setCurId(row.id);
-		setOpenDel(true);
-	};
+		// 删除
+		const handleDelete = (row: any) => {
+			setCurId(row.id);
+			setOpenDel(true);
+		};
 
-	const handleCancleDel = () => {
-		setOpenDel(false);
-	};
-
-	const submitDel = () => {
-		deleteGraph({ graphId: curId }).then((res) => {
+		const handleCancleDel = () => {
 			setOpenDel(false);
-			messageApi.open({
-				type: 'success',
-				content: '删除成功'
-			});
-			refresh();
-		});
-	};
+		};
 
-	const colums = [
-		{
-			title: '序号',
-			render: (text, record, index) => `${index + 1}`
-		},
-		{
-			title: '图谱名称',
-			dataIndex: 'name'
-		},
-		{
-			title: '创建时间',
-			dataIndex: 'gmtCreated'
-		},
-		{
-			title: '操作',
-			key: 'operaion',
-			render: (row, record) => {
-				return (
-					<div className={styles['operate-box']}>
-						<span
-							className={styles['operate-item']}
-							onClick={() => handleDetail(row)}
-						>
-							<SvgIcon name="see" color="#23955C"></SvgIcon>
-							<span style={{ marginLeft: '2px' }}>查看</span>
-						</span>
+		const submitDel = () => {
+			deleteGraph({ graphId: curId }).then((res) => {
+				setOpenDel(false);
+				messageApi.open({
+					type: 'success',
+					content: '删除成功'
+				});
+				refresh();
+			});
+		};
+
+		const colums = [
+			{
+				title: '序号',
+				render: (text, record, index) => `${index + 1}`
+			},
+			{
+				title: '图谱名称',
+				dataIndex: 'name'
+			},
+			{
+				title: '创建时间',
+				dataIndex: 'gmtCreated'
+			},
+			{
+				title: '操作',
+				key: 'operaion',
+				render: (row, record) => {
+					return (
+						<div className={styles['operate-box']}>
+							<span
+								className={styles['operate-item']}
+								onClick={() => handleDetail(row)}
+							>
+								<SvgIcon name="see" color="#23955C"></SvgIcon>
+								<span style={{ marginLeft: '2px' }}>查看</span>
+							</span>
+							<span>
+								<Divider type="vertical" />
+							</span>
+							<span
+								className={styles['operate-item']}
+								onClick={() => handleDelete(row)}
+							>
+								<SvgIcon name="delete" color="#23955C"></SvgIcon>
+								<span style={{ marginLeft: '2px' }}>删除</span>
+							</span>
+						</div>
+					);
+				}
+			}
+		];
+
+		return (
+			<div className={styles['my-table-box']}>
+				{contextHolder}
+				{data.length}
+				<Table
+					rowKey={(record) => {
+						return record.id + Date.now(); //在这里加上一个时间戳就可以了
+					}}
+					className={styles['my-table']}
+					columns={colums}
+					dataSource={data}
+					pagination={{ position: ['none'] }}
+				></Table>
+				<div
+					style={{
+						textAlign: 'center',
+						marginTop: '20px',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'space-between'
+					}}
+				>
+					<div>
+						<span style={{ marginRight: '10px' }}>共{total}条记录</span>
 						<span>
-							<Divider type="vertical" />
-						</span>
-						<span
-							className={styles['operate-item']}
-							onClick={() => handleDelete(row)}
-						>
-							<SvgIcon name="delete" color="#23955C"></SvgIcon>
-							<span style={{ marginLeft: '2px' }}>删除</span>
+							第{current}/{Math.ceil(total / size)}页
 						</span>
 					</div>
-				);
-			}
-		}
-	];
-
-	return (
-		<div>
-			{contextHolder}
-			<Table
-				columns={colums}
-				dataSource={data}
-				pagination={{ position: ['none'] }}
-			></Table>
-			<div
-				style={{
-					textAlign: 'center',
-					marginTop: '20px',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between'
-				}}
-			>
-				<div>
-					<span style={{ marginRight: '10px' }}>共{total}条记录</span>
-					<span>
-						第{current}/{Math.ceil(total / size)}页
-					</span>
+					<Pagination
+						total={total}
+						showSizeChanger
+						onShowSizeChange={onShowSizeChange}
+						onChange={onChange}
+						showQuickJumper
+					/>
 				</div>
-				<Pagination
-					total={total}
-					showSizeChanger
-					onShowSizeChange={onShowSizeChange}
-					onChange={onChange}
-					showQuickJumper
-				/>
+				<DeleteDialog
+					open={openDel}
+					handleCancle={handleCancleDel}
+					onOk={submitDel}
+				></DeleteDialog>
 			</div>
-			<DeleteDialog
-				open={openDel}
-				handleCancle={handleCancleDel}
-				onOk={submitDel}
-			></DeleteDialog>
-		</div>
-	);
-});
+		);
+	},
+	(prevProps, nextProps) => {
+		// console.log(prevProps.data, nextProps.data);
+		if (!isEqual(prevProps.data, nextProps.data)) {
+			return false;
+		}
+		return true;
+	}
+);
 
 const MyAtlasCom = () => {
 	const [tableData, setTableData] = React.useState([]);
@@ -158,7 +175,7 @@ const MyAtlasCom = () => {
 	const [total, setTotal] = React.useState(0);
 	useEffect(() => {
 		getList();
-	}, []);
+	}, [size, current]);
 
 	const getList = async () => {
 		const searchFormData = form.getFieldsValue();

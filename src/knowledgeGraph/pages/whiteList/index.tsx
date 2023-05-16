@@ -157,7 +157,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	];
 
 	return (
-		<div>
+		<div className={styles['my-table-box']}>
 			{contextHolder}
 			<div className={styles['handle-table-box']}>
 				<Button
@@ -171,6 +171,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 				</Button>
 			</div>
 			<Table
+				className={styles['my-table']}
 				columns={colums}
 				dataSource={data}
 				pagination={{ position: ['none'] }}

@@ -254,9 +254,10 @@ const MyTableCom = React.memo((props: TableProps) => {
 		}
 	];
 	return (
-		<div>
+		<div className={styles['my-table-box']}>
 			<div>
 				<Table
+					className={styles['my-table']}
 					columns={colums}
 					dataSource={data}
 					pagination={{ position: ['none'] }}
