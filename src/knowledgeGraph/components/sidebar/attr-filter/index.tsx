@@ -116,6 +116,15 @@ export default (props: IProps) => {
 	//	展开节点 加载数据
 	const onLoadData = async (node: ITreeData) => {
 		// 已经加载子节点
+		const { bodyType = null, bodyName = null } =
+			getFormItemValue(FormItems.bodys) &&
+			Array.isArray(getFormItemValue(FormItems.bodys))
+				? getFormItemValue(FormItems.bodys)[0]
+				: {};
+		if (!bodyName || !bodyType) {
+			message.error('未选择主体');
+			return;
+		}
 		if (node.children?.length > 0) {
 			return Promise.resolve();
 		}
@@ -123,9 +132,8 @@ export default (props: IProps) => {
 			const res = await getNextPaths({
 				nodeFilter,
 				parentPaths: node.path,
-				// todo
-				type: 'Company',
-				value: '07225997'
+				type: bodyType,
+				value: bodyName
 			});
 
 			const nodesWithPath = res.map((item) => {
@@ -213,18 +221,17 @@ export default (props: IProps) => {
 			}
 
 			if (type === ComponentsType.GENDER) {
-				value.forEach((v: string) => {
-					formatValue.operations.push({
-						operatorType: 1,
-						value: v
-					});
-					formatValue.operationLinks.push(2);
+				formatValue.operations.push({
+					operatorType: 1,
+					value: value
 				});
+
+				formatValue.operationLinks.push(2);
 			}
 
 			if (type === ComponentsType.RANGE) {
-				formatValue.operationLinks = value.operationLinks;
-				formatValue.operations = value.operations;
+				formatValue.operationLinks = value?.operationLinks || [];
+				formatValue.operations = value?.operations || [];
 			}
 			return {
 				key,

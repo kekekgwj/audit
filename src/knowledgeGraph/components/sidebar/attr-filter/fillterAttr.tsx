@@ -108,26 +108,26 @@ const FillterAttr: FC<IProps> = forwardRef(
 			form: form
 		}));
 		//  测试数据
-		const myData = [
-			{ key: 'person', label: '人员', value: null, type: '1' },
-			{ key: 'range', label: '范围', value: null, type: '2' },
-			{
-				label: '性别',
-				value: null,
-				type: '4',
-				key: 'gender',
-				dict: [
-					{ label: '男', value: '1' },
-					{ label: '女', value: '2' }
-				]
-			},
-			{
-				label: '日期',
-				value: null,
-				key: 'date',
-				type: '3'
-			}
-		];
+		// const myData = [
+		// 	{ key: 'person', label: '人员', value: null, type: '1' },
+		// 	{ key: 'range', label: '范围', value: null, type: '2' },
+		// 	{
+		// 		label: '性别',
+		// 		value: null,
+		// 		type: '4',
+		// 		key: 'gender',
+		// 		dict: [
+		// 			{ label: '男', value: '1' },
+		// 			{ label: '女', value: '2' }
+		// 		]
+		// 	},
+		// 	{
+		// 		label: '日期',
+		// 		value: null,
+		// 		key: 'date',
+		// 		type: '3'
+		// 	}
+		// ];
 		const latestFormData = useRef<object>({});
 		const updateFormChange = (changeData: object) => {
 			const formData = {
@@ -152,7 +152,7 @@ const FillterAttr: FC<IProps> = forwardRef(
 						updateFormChange(allValues);
 					}}
 				>
-					{myData.map((item, index) => {
+					{properties.map((item, index) => {
 						const { label, key, type, dict } = item;
 						return (
 							<div key={index}>
