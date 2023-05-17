@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 import { Table } from 'antd';
 import { useSelector } from 'react-redux';
 import classes from './index.module.less';
-import { JoinConfigPanel } from '../ConfigPanel';
+import ConfigPanel from '../ConfigPanel';
 import { ColumnsType } from 'antd/es/table';
 import ASSETS from '../../assets/index';
 import { IRootState } from '@/redux/store';
@@ -12,6 +12,30 @@ import { toClosePanel } from '@/redux/reducers/dataAnalysis';
 import { useGraph } from '../../lib/Graph';
 import { IImageTypes, getNodeTypeById } from '../../lib/utils';
 const { DOWNLOAD } = ASSETS;
+interface IConfigContext {
+	type: IImageTypes | null;
+	id: string | null;
+	initValue: any;
+}
+const ConfigContext = createContext<IConfigContext>({
+	type: null,
+	id: null,
+	initValue: null
+});
+
+export const useConfigContextValue = () => {
+	return useContext(ConfigContext);
+};
+const useNodeConfigValue = () => {
+	const ref = React.useRef<Record<string, object>>({});
+	const getConfigValue = (id: string) => {
+		return ref.current.id;
+	};
+	const saveConfigValue = (id: string, value: any) => {
+		ref.current.id = value;
+	};
+	return [getConfigValue, saveConfigValue];
+};
 const Panel: React.FC = () => {
 	const state = useSelector((state: IRootState) => state.dataAnalysis);
 	const graph = useGraph();
@@ -26,7 +50,7 @@ const Panel: React.FC = () => {
 		age: number;
 		address: string;
 	}
-	const { CONNECT, FILTER, TABLE } = IImageTypes;
+
 	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
 
 	const columns: ColumnsType<DataType> = [
@@ -72,14 +96,18 @@ const Panel: React.FC = () => {
 					/>
 				</div>
 			</div>
-			{/* <div className={classes.divider}></div> */}
+
 			<div className={classes.configPanel}>
 				<div className={classes.configPanel_title}>
 					<span className={classes.configPanel_title_text}>参数配置</span>
 					<CloseOutlined className={classes.closeIcon} onClick={closePanel} />
 				</div>
 				<div className={classes.configWrapper}>
-					<JoinConfigPanel />
+					<ConfigContext.Provider
+						value={{ type: clickNodeType, id: id, initValue: null }}
+					>
+						<ConfigPanel />
+					</ConfigContext.Provider>
 				</div>
 			</div>
 		</div>
