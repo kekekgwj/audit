@@ -1,21 +1,21 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import html2canvas from 'html2canvas';
+import { toImgStyle } from '@/utils/other';
 import Graphin, {
 	Components,
-	IG6GraphEvent,
-	GraphinContext,
 	type TooltipValue,
 	type GraphinData,
 	type LegendChildrenProps
 } from '@antv/graphin';
 // import registerNodes from './custom-node';
 // import registerEdges from './custom-edge';
+import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
-import { CheckboxValueType } from 'antd/es/checkbox/Group';
-import { Checkbox, Input, Col, Row, message, Form } from 'antd';
+import { Checkbox, Input, Col, Row, message, Form, Table, Button } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CustomDialog from '@graph/components/custom-dialog';
-import { getGraphByRule } from '@/api/knowledgeGraph/suspiciousRule';
+import { saveGraph } from '@/api/knowLedgeGraph/graphin';
 
 // 注册自定义节点
 // registerNodes('all');
@@ -42,13 +42,19 @@ interface NodeDetailProps {
 	nodeModel: ModelConfig;
 }
 
-interface SaveProps {}
+interface SaveProps {
+	open: boolean;
+	file: any;
+	defaultName: string;
+	tableData: [];
+	setSaveOpen: () => void;
+}
 
 // 保存图谱
 const SaveCom = React.memo((props: SaveProps) => {
 	const [messageApi, contextHolder] = message.useMessage();
 	const [form] = Form.useForm();
-	const { open, file, defaultName, setSaveOpen } = props;
+	const { open, file, defaultName, tableData, setSaveOpen } = props;
 
 	useEffect(() => {
 		if (open) {
@@ -66,6 +72,7 @@ const SaveCom = React.memo((props: SaveProps) => {
 		const formData = new FormData();
 		formData.append('picFile', file);
 		formData.append('name', data.name);
+		formData.append('data', tableData);
 		saveGraph(formData).then((res) => {
 			messageApi.open({
 				type: 'success',
@@ -107,7 +114,7 @@ const SaveCom = React.memo((props: SaveProps) => {
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData, refersh } = props;
 	const [key, setKey] = useState('');
-	const [width, setWidth] = useState(600);
+
 	const graphinRef = useRef<HTMLDivElement>();
 
 	return (
@@ -115,7 +122,6 @@ const GraphinCom = React.memo((props: Props) => {
 			<Graphin
 				key={key}
 				data={data}
-				width={width}
 				layout={{
 					type: 'force',
 					preventOverlap: true,
@@ -136,28 +142,251 @@ const GraphinCom = React.memo((props: Props) => {
 const GraphCom = () => {
 	const navigate = useNavigate();
 	let location = useLocation();
-	// 传入数据 根据此数据获取图谱数据
-	const formData = location.state;
-	// 图谱数据来源
-	const [data, setDate] = useState<GraphinData>();
 	const graphinRef = useRef<GraphinRef>();
+	// 传入数据 根据此数据获取图谱数据
+	const originData = location.state;
+	//是否命中数据
+	const [isHit, setHit] = useState<boolean>(false);
+	//是否有表
+	const [hasList, setHasList] = useState<boolean>(false);
+	// 图谱数据
+	const [data, setDate] = useState<GraphinData>();
+	//列表数据
+	const [tableData, setTableData] = useState([]);
+	//表格colums设置
+	const [colums, setColums] = useState([]);
+	//表头
+	const [tableHead, setTableHead] = useState([]);
+	//保存图谱
 	const [open, setSaveOpen] = React.useState(false);
+	//保存文件
 	const [file, setFile] = React.useState();
-	const [defaultName, setdefaultName] = React.useState();
+	//保存默认名称
+	const defaultName = originData.name;
 
 	useEffect(() => {
 		getGraphinData();
 	}, []);
 
+	// 根据表数据动态渲染表
+	useEffect(() => {
+		if (tableData && tableData.length > 0) {
+			// 根据数据获取对应项
+			const arr = Object.keys(tableData[0]);
+			const colums = tableHead.map((item, index) => {
+				return {
+					title: item,
+					dataIndex: arr[index],
+					ellipsis: true
+				};
+			});
+			setColums(colums);
+		}
+	}, [tableData]);
+
 	// 获取图谱数据
 	const getGraphinData = async () => {
-		const data = await getGraphByRule({ auditRuleParams: '' });
-		updateData(data);
-	};
+		// const res = await getGraphByRule({
+		// 	ruleId: originData.ruleId,
+		// 	value: originData.value
+		// });
 
-	// 更新数据
-	const updateData = (value: GraphinData) => {
-		setDate(value);
+		// 模拟数据
+		const res = {
+			isHit: true,
+			hasList: true,
+			data: [
+				{ name: '小明', major: '图计算' },
+				{ name: '小明', major: '图计算' },
+				{ name: '小明', major: '图计算' },
+				{ name: '小明', major: '图计算' },
+				{ name: '小明', major: '图计算' },
+				{ name: '小明', major: '图计算' },
+				{ name: '小明', major: '图计算' },
+				{ name: '小明', major: '图计算' },
+				{ name: '小明', major: '图计算' }
+			],
+			head: ['姓名', '专业'],
+			nodes: [
+				{
+					id: 'node-0',
+					x: 100,
+					y: 100,
+					data: {
+						type: 'centerPointer'
+					},
+					style: {
+						label: {
+							value: '我是\nnode0',
+							position: 'center',
+							offset: [0, 0],
+							fill: 'green'
+						},
+						keyshape: {
+							size: 80,
+							stroke: '#ff9f0f',
+							fill: '#ff9f0ea6'
+						}
+					}
+				},
+				{
+					id: 'node-1',
+					x: 200,
+					y: 200,
+					data: {
+						type: 'project'
+					},
+					style: {
+						label: {
+							value: '我是node1',
+							position: 'center',
+							offset: [0, 5],
+							fill: 'green'
+						},
+						keyshape: {
+							size: 60,
+							stroke: '#ff9f0f',
+							fill: '#ff9f0ea6'
+						}
+					}
+				},
+				{
+					id: 'node-2',
+					x: 100,
+					y: 300,
+					data: {
+						type: 'project'
+					},
+					style: {
+						label: {
+							value: '我是node2',
+							position: 'center',
+							offset: [20, 5],
+							fill: 'green'
+						},
+						keyshape: {
+							size: 40,
+							stroke: '#ff9f0f',
+							fill: '#ff9f0ea6'
+						}
+					}
+				},
+				{
+					id: 'node-3',
+					data: {
+						type: 'person'
+					},
+					style: {
+						label: {
+							value: '我是node3',
+							position: 'center',
+							offset: [20, 5],
+							fill: 'green'
+						},
+						keyshape: {
+							size: 40,
+							stroke: '#ff9f0f',
+							fill: '#ff9f0ea6'
+						}
+					}
+				},
+				{
+					id: 'node-4',
+					data: {
+						type: 'person'
+					},
+					style: {
+						label: {
+							value: '我是node4',
+							position: 'center',
+							offset: [20, 0],
+							fill: 'green'
+						},
+						keyshape: {
+							size: 40,
+							stroke: '#ff9f0f',
+							fill: '#ff9f0ea6'
+						}
+					}
+				}
+			],
+			edges: [
+				{
+					id: 'edge-0-1',
+					source: 'node-0',
+					target: 'node-1',
+					style: {
+						label: {
+							value: '我是边1'
+						}
+					}
+				},
+				{
+					id: 'edge-0-3',
+					source: 'node-0',
+					target: 'node-3',
+					style: {
+						label: {
+							value: '我是边4'
+						}
+					}
+				},
+				{
+					id: 'edge-3-4',
+					source: 'node-3',
+					target: 'node-4',
+					style: {
+						label: {
+							value: '我是边5'
+						}
+					}
+				},
+				{
+					id: 'edge-1-2',
+					source: 'node-1',
+					target: 'node-2',
+					style: {
+						label: {
+							value: '我是边2'
+						},
+						keyshape: {
+							lineWidth: 5,
+							stroke: '#00f'
+						}
+					}
+				},
+				{
+					id: 'edge-0-2',
+					source: 'node-0',
+					target: 'node-2',
+					style: {
+						label: {
+							value: '我是边3'
+						}
+					}
+				}
+			]
+		};
+
+		//是否命中数据
+		setHit(res.isHit);
+		//是否有表
+		setHasList(res.hasList);
+
+		if (res.hasList) {
+			// 表数据
+			setTableData(res?.data);
+			//表头
+			setTableHead(res.head);
+		}
+		// 图谱数据
+		const graphData = {
+			edges: res.edges,
+			nodes: res.nodes
+		};
+		setDate(graphData);
+
+		// 模拟数据
 	};
 
 	// 保存图谱
@@ -175,39 +404,63 @@ const GraphCom = () => {
 		});
 	};
 
-	const toggleBarLayout = (isOpen: boolean) => {
-		setBarOpen(isOpen);
-		// graphinRef?.current?.refersh();
+	//返回
+	const goBack = () => {
+		navigate(-1);
 	};
 
 	return (
-		<div className={styles['main-content']}>
-			<div className={styles['graphin-box']}>
-				{data && (
-					<>
-						<div className={styles['graphin-box__com']}>
-							<GraphinCom data={data}></GraphinCom>
-						</div>
-						<div className={styles['graphin-box__btn']}>
-							<Button
-								htmlType="button"
-								style={{ background: '#23955C', color: '#fff' }}
-								onClick={() => {
-									saveGraph();
-								}}
-							>
-								保存图谱
-							</Button>
-						</div>
-					</>
-				)}
+		<div className={styles['rule-result-page']}>
+			<div className={styles['top-tips']}>
+				<span className={styles['rule-name']}>规则名称:{originData.name}</span>
+				<span style={{ marginRight: '10px' }} onClick={() => goBack()}>
+					<SvgIcon name="close" color="#23955C" className={styles['icon-close']}></SvgIcon>
+				</span>
 			</div>
-			<SaveCom
-				open={open}
-				defaultName={defaultName}
-				file={file}
-				setSaveOpen={setSaveOpen}
-			></SaveCom>
+			<>
+				{isHit ? (
+					<div className={styles['main-content']}>
+						{hasList ? (
+							<div className={styles['table-box']}>
+								<Table
+									className={styles['my-table']}
+									columns={colums}
+									dataSource={tableData}
+									pagination={false}
+								></Table>
+							</div>
+						) : null}
+						<div className={styles['graphin-box']}>
+							{data && (
+								<>
+									<div className={styles['graphin-box__com']}>
+										<GraphinCom data={data}></GraphinCom>
+									</div>
+									<div className={styles['graphin-box__btn']}>
+										<Button
+											htmlType="button"
+											className={styles['save-button']}
+											style={{ background: '#23955C', color: '#fff' }}
+											onClick={() => {
+												saveGraph();
+											}}
+										>
+											保存图谱
+										</Button>
+									</div>
+								</>
+							)}
+						</div>
+						<SaveCom
+							open={open}
+							defaultName={defaultName}
+							file={file}
+							setSaveOpen={setSaveOpen}
+							tableData={tableData}
+						></SaveCom>
+					</div>
+				) : null}
+			</>
 		</div>
 	);
 };
