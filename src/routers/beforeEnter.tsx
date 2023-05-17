@@ -3,6 +3,7 @@ import { useBaseState } from '@/redux/store';
 import { useLocation } from 'react-router-dom';
 function BeforeEnter({ children }: { children: React.ReactNode }) {
 	const state = useBaseState();
+	// 	headers: { 'Blade-Auth': Cookies.get("token") },
 	if (!state.token) {
 		const location = useLocation();
 		const searchParams: Record<string, string> = {};

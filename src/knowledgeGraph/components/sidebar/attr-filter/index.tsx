@@ -74,6 +74,7 @@ export default (props: IProps) => {
 			message.error('未选择主体');
 			return;
 		}
+
 		setOpen(true);
 		try {
 			// 避免数据被销毁
@@ -180,7 +181,7 @@ export default (props: IProps) => {
 	// 点击确定
 	const handleOk = async () => {
 		const configData = transData(treeData);
-
+		console.log('treeData', treeData);
 		updateGraph(configData);
 		setOpen(false);
 	};
@@ -301,10 +302,20 @@ export default (props: IProps) => {
 			configInfo: formAllValues
 		});
 	};
-
+	const getOnePath = (treeData: ITreeData[]): string => {
+		if (treeData.length === 0) {
+			return '请选择筛选条件';
+		}
+		const firstPath = treeData[0];
+		if (firstPath.children && firstPath.children.length > 0) {
+			return getOnePath(firstPath.children);
+		} else {
+			return firstPath.path.join('  ->  ') + '...';
+		}
+	};
 	return (
 		<>
-			<Button onClick={() => changeDialogOpen()}>点我</Button>
+			<Button onClick={() => changeDialogOpen()}>{getOnePath(treeData)}</Button>
 			<CustomDialog
 				open={open}
 				title="链路筛选"
