@@ -9,7 +9,7 @@ import { getCanvasText } from '@/utils/graphin';
 
 export default () => {
 	Graphin.registerNode(
-		'custom-node',
+		'Recipient',
 		{
 			// 响应状态变化
 			setState(name, value, item) {
@@ -34,8 +34,8 @@ export default () => {
 			draw(cfg, group) {
 				// 设置自定义节点图例
 				cfg.style.keyshape = {
-					stroke: 'red',
-					fill: 'red',
+					stroke: '#24A36F',
+					fill: '#24A36F',
 					fillOpacity: 1
 				};
 
@@ -44,7 +44,7 @@ export default () => {
 				const keyshape = group.addShape('circle', {
 					attrs: {
 						r: 60,
-						fill: '#E6697B',
+						fill: '#24A36F',
 						cursor: 'pointer'
 					},
 					draggable: true,

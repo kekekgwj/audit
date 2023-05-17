@@ -1,7 +1,7 @@
 import Graphin from '@antv/graphin';
 
 export default () => {
-	Graphin.registerEdge('custom-edge', {
+	Graphin.registerEdge('OWNS', {
 		draw(cfg, group) {
 			const { startPoint, endPoint } = cfg;
 			const shape = group.addShape('path', {
@@ -22,7 +22,7 @@ export default () => {
 					fontSize: 12,
 					x: midPoint.x,
 					y: midPoint.y,
-					text: cfg.label,
+					text: cfg.type,
 					fill: '#ccc'
 				},
 				draggable: true,
