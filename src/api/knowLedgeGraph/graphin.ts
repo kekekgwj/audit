@@ -129,7 +129,7 @@ interface NextGraph {
 	nodeId: string;
 	relationships: string[];
 }
-export const getNextGraph = (data: any) => {
+export const getNextGraph = (data: NextGraph) => {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph', data);
 };
 
@@ -140,3 +140,14 @@ export function saveGraph(formData: FormData) {
 		formData
 	);
 }
+
+//获取所有算法
+interface IAlgs{
+	id:number;
+	name:string;
+	type:string
+}
+export const getAlgs = () => {
+	return post<IAlgs[]>(API_PREFIX + '/blade-tool/graphAnalysis/getAlgs');
+};
+

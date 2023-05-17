@@ -19,12 +19,13 @@ import {
 	getMainNodes,
 	getGraph,
 	IFilterNode,
-	IPath
+	IPath,
+	getAlgs
 } from '@/api/knowledgeGraph/graphin';
 interface Props {
 	updateData: (layout: GraphinData) => void;
 	toggleLayout: (isOpen: boolean) => void;
-	canAdd: boolean;
+	canAdd: boolean; //是否可添加多个主体
 	setdefaultName: (name: string) => void;
 }
 
@@ -68,8 +69,14 @@ export default (props: Props) => {
 
 	useEffect(() => {
 		getBodyTypeOptions();
-		getAlgorithmOptions();
 		initForm();
+	}, []);
+
+	// 根据条件获取算法
+	useEffect(() => {
+		if (!canAdd) {
+			getAlgorithmOptions();
+		}
 	}, []);
 
 	// 获取主体类型下拉选项
@@ -88,15 +95,19 @@ export default (props: Props) => {
 	//获取算法下拉选型
 	// 待完善
 	const getAlgorithmOptions = async () => {
-		// const nodes = await getMainNodes();
+		const res = await getAlgs();
+		console.log(res, 100);
 		// const options = nodes.map(({ id, name }) => {
 		// 	return {
 		// 		label: name,
 		// 		value: name
 		// 	};
 		// });
-		const options = [{ label: 'louvain', value: 'louvain' }];
-		setAlgorithmOptions(options);
+		const options = [
+			{ label: '选项一', value: '1', tips: '说明一' },
+			{ label: '选项二', value: '2', tips: '说明二' }
+		];
+		setAlgorithmOptions(res);
 	};
 
 	// 顶部筛选条件下拉切换
@@ -383,8 +394,26 @@ export default (props: Props) => {
 										allowClear
 										style={{ width: '100%' }}
 										placeholder="请选择"
-										options={algorithmOptions}
-									/>
+									>
+										{algorithmOptions.map((item) => {
+											return (
+												<Select.Option value={item.type} key={item.id}>
+													<div className={styles['title-options']}>
+														<div>{item.name}</div>
+														<div className={styles['option-item-tips']}>
+															<span className={styles['option-description']}>
+																<SvgIcon
+																	name="help"
+																	className={styles['option-description-icon']}
+																></SvgIcon>
+																<span>{item.description?item.description:'暂无说明'}</span>
+															</span>
+														</div>
+													</div>
+												</Select.Option>
+											);
+										})}
+									</Select>
 								</Form.Item>
 							</div>
 						) : (
