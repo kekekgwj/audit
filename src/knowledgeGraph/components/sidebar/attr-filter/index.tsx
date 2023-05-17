@@ -51,7 +51,7 @@ export default (props: IProps) => {
 	const [treeData, setTreeData] = useState<ITreeData[]>([]); //树结构渲染用的数据
 
 	const nodeConfigNProperties = useRef(new Map<string, INodeConfigNProps>());
-
+	const cntInitRef = useRef<boolean>(true);
 	const [selectNodeID, setSelectedNodeID] = useState<string | null>(null);
 	const nodeFilter = getFormItemValue(FormItems.bodyFilter);
 	const curNode: {
@@ -69,16 +69,15 @@ export default (props: IProps) => {
 		curNodeVaule = curNode[0].bodyName as string;
 	}
 	// 打开/关闭设置弹框
-	const changeDialogOpen = async (isOpen = true) => {
-		setOpen(isOpen);
-		if (!isOpen) {
+	const changeDialogOpen = async () => {
+		if (!curNodeType || !curNodeVaule) {
+			message.error('未选择主体');
 			return;
 		}
+		setOpen(true);
 		try {
-			if (!curNodeType || !curNodeVaule) {
-				message.error('未选择主体');
-				return;
-			}
+			// 避免数据被销毁
+			if (!cntInitRef.current) return;
 			const res = await getNextPaths({
 				nodeFilter,
 				parentPaths: [],
@@ -87,6 +86,7 @@ export default (props: IProps) => {
 			});
 
 			setTreeData(changeDataTree(res));
+			cntInitRef.current = false;
 		} catch (e) {
 			console.error(e);
 		}
@@ -116,6 +116,15 @@ export default (props: IProps) => {
 	//	展开节点 加载数据
 	const onLoadData = async (node: ITreeData) => {
 		// 已经加载子节点
+		const { bodyType = null, bodyName = null } =
+			getFormItemValue(FormItems.bodys) &&
+			Array.isArray(getFormItemValue(FormItems.bodys))
+				? getFormItemValue(FormItems.bodys)[0]
+				: {};
+		if (!bodyName || !bodyType) {
+			message.error('未选择主体');
+			return;
+		}
 		if (node.children?.length > 0) {
 			return Promise.resolve();
 		}
@@ -123,9 +132,8 @@ export default (props: IProps) => {
 			const res = await getNextPaths({
 				nodeFilter,
 				parentPaths: node.path,
-				// todo
-				type: 'Company',
-				value: '07225997'
+				type: bodyType,
+				value: bodyName
 			});
 
 			const nodesWithPath = res.map((item) => {
@@ -174,6 +182,7 @@ export default (props: IProps) => {
 		const configData = transData(treeData);
 
 		updateGraph(configData);
+		setOpen(false);
 	};
 	const getNodeDataConverted = (id: string): IProperty[] => {
 		const rawData = nodeConfigNProperties.current.get(id)?.configInfo || {};
@@ -189,12 +198,14 @@ export default (props: IProps) => {
 				operations: []
 			};
 			if (type === ComponentsType.PERSON) {
-				value.forEach((person: string) => {
+				value.forEach((person: string, index: number) => {
+					if (index > 0) {
+						formatValue.operationLinks.push(2);
+					}
 					formatValue.operations.push({
 						operatorType: 1,
 						value: person
 					});
-					formatValue.operationLinks.push(2);
 				});
 			}
 
@@ -213,18 +224,21 @@ export default (props: IProps) => {
 			}
 
 			if (type === ComponentsType.GENDER) {
-				value.forEach((v: string) => {
-					formatValue.operations.push({
-						operatorType: 1,
-						value: v
-					});
-					formatValue.operationLinks.push(2);
+				formatValue.operations.push({
+					operatorType: 1,
+					value: value
 				});
 			}
 
 			if (type === ComponentsType.RANGE) {
-				formatValue.operationLinks = value.operationLinks;
-				formatValue.operations = value.operations;
+				formatValue.operationLinks = value?.operationLinks || [];
+				formatValue.operations = value?.operations || [];
+			}
+			if (
+				formatValue.operationLinks.length === 0 &&
+				formatValue.operations.length === 0
+			) {
+				return null;
 			}
 			return {
 				key,
@@ -232,7 +246,7 @@ export default (props: IProps) => {
 				...formatValue
 			};
 		});
-		return convertProperties;
+		return convertProperties.filter((p) => p !== null) as IProperty[];
 	};
 
 	//转成后台需要的数据形式
@@ -244,11 +258,6 @@ export default (props: IProps) => {
 				properties: getNodeDataConverted(item.key)
 			};
 		});
-	};
-
-	// 关闭设置弹框
-	const handleCancel = () => {
-		changeDialogOpen(false);
 	};
 
 	// 自定义树形节点
@@ -295,14 +304,14 @@ export default (props: IProps) => {
 
 	return (
 		<>
-			<Button onClick={() => changeDialogOpen(true)}>点我</Button>
+			<Button onClick={() => changeDialogOpen()}>点我</Button>
 			<CustomDialog
 				open={open}
 				title="链路筛选"
 				width={600}
 				height={400}
 				onOk={handleOk}
-				onCancel={handleCancel}
+				onCancel={() => setOpen(false)}
 			>
 				<div className={styles['fillter-dialog__top']}>
 					<div className={styles['fillter-tree']}>
