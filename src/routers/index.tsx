@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { CustomRoute, routes } from './routes';
 import React from 'react';
+import BeforeEnter from './beforeEnter';
 
 const Loading = () => {
 	return <div>loading...</div>;
@@ -48,4 +49,8 @@ const rotuerViews = (routerItems: CustomRoute[]) => {
 	}
 };
 
-export default () => <Routes>{rotuerViews(routes)}</Routes>;
+export default () => (
+	<BeforeEnter>
+		<Routes>{rotuerViews(routes)}</Routes>
+	</BeforeEnter>
+);

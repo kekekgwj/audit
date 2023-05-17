@@ -75,7 +75,7 @@ const MyTableCom = React.memo(
 		const colums = [
 			{
 				title: '序号',
-				render: (text, record, index) => `${index + 1}`
+				render: (text, record, index) => `${(current - 1) * size + index + 1}`
 			},
 			{
 				title: '图谱名称',
@@ -117,7 +117,6 @@ const MyTableCom = React.memo(
 		return (
 			<div className={styles['my-table-box']}>
 				{contextHolder}
-				{data.length}
 				<Table
 					rowKey={(record) => {
 						return record.id + Date.now(); //在这里加上一个时间戳就可以了
@@ -125,7 +124,7 @@ const MyTableCom = React.memo(
 					className={styles['my-table']}
 					columns={colums}
 					dataSource={data}
-					pagination={{ position: ['none'] }}
+					pagination={false}
 				></Table>
 				<div
 					style={{

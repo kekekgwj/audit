@@ -113,7 +113,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	const colums = [
 		{
 			title: '序号',
-			render: (text, record, index) => `${index + 1}`
+			render: (text, record, index) => `${(current - 1) * size + index + 1}`
 		},
 		{
 			title: '名称',
@@ -137,7 +137,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 							className={styles['operate-item']}
 							onClick={() => handleEdit(row)}
 						>
-							<SvgIcon name="edit" color="#23955C"></SvgIcon>
+							<SvgIcon name="edit" color="#24A36F"></SvgIcon>
 							<span style={{ marginLeft: '2px' }}>编辑</span>
 						</span>
 						<span>
@@ -147,7 +147,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 							className={styles['operate-item']}
 							onClick={() => handleDelete(row)}
 						>
-							<SvgIcon name="delete" color="#23955C"></SvgIcon>
+							<SvgIcon name="delete" color="#24A36F"></SvgIcon>
 							<span style={{ marginLeft: '2px' }}>删除</span>
 						</span>
 					</div>
