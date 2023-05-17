@@ -15,7 +15,7 @@ export default (props: Props) => {
 
 	return (
 		<svg aria-hidden="true" className={c}>
-			<use xlinkHref={iconName} fill={color} />
+			<use xlinkHref={iconName} fill={color} stroke={color} />
 		</svg>
 	);
 };

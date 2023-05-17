@@ -24,7 +24,10 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 interface Props {
 	open: boolean;
 	onCancel: () => void;
-	curRow: {};
+	curRow: {
+		name: string;
+		id: string;
+	};
 }
 
 interface ProjectIdOption {
@@ -37,68 +40,16 @@ const UseModal = React.memo((prop: Props) => {
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
 
-	const [projectOptions, setProjectOptions] = React.useState(
-		Array<ProjectIdOption>
-	);
-
-	// useEffect(() => {
-	// 	getProjectIdOptions();
-	// 	initForm();
-	// }, [open]);
-
-	// const initForm = () => {
-	// 	form.setFieldValue('projects', [
-	// 		{
-	// 			projectId: undefined,
-	// 			projectMember: undefined
-	// 		}
-	// 	]);
-	// };
-
-	// const getProjectIdOptions = async () => {
-	// 	setProjectOptions([
-	// 		{ value: '001', label: 'ID1' },
-	// 		{ value: '002', label: 'ID2' },
-	// 		{ value: '003', label: 'ID3' }
-	// 	]);
-	// };
-
-	// 根据类型展示表单项 curRow.type
-	const renderItem = (type: string) => {
-		if (type == '1') {
-			return (
-				<>
-					<Form.Item label="科研项目名称" name="name">
-						<Input />
-					</Form.Item>
-				</>
-			);
-		} else if (type == '2') {
-			return (
-				<>
-					<Form.Item label="项目负责人" name="person">
-						<Input />
-					</Form.Item>
-				</>
-			);
-		} else if (type == '3') {
-			return (
-				<>
-					{/* <Form.Item key={item.key} label={item.label} name={item.key}>
-						<Input />
-					</Form.Item> */}
-				</>
-			);
-		}
-	};
-
 	// 提交表单
 	const onSubmit = () => {
 		const data = form.getFieldsValue();
 		console.log(data, 677777);
-		onCancel();
+
+		// onCancel();
 		// 跳转到查询结果界面
-		navigate('/ruleResult', { state: { data: data } });
+		navigate('/ruleResult', {
+			state: { value: data.value, name: curRow.name, ruleId: curRow.id }
+		});
 	};
 
 	return (
@@ -109,92 +60,10 @@ const UseModal = React.memo((prop: Props) => {
 			onOk={onSubmit}
 			onCancel={onCancel}
 		>
-			{/* <Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-				<Form.List name="projects">
-					{(fields, { add, remove }) => (
-						<>
-							{fields.map(({ key, name, ...restField }) => (
-								<div key={key}>
-									<Form.Item
-										label="项目ID"
-										{...restField}
-										name={[name, 'projectId']}
-									>
-										<Select
-											placeholder="请选择"
-											allowClear
-											options={projectOptions}
-										></Select>
-									</Form.Item>
-									<Form.Item
-										label="项目成员"
-										{...restField}
-										name={[name, 'projectMember']}
-									>
-										<Input placeholder="请输入" />
-									</Form.Item>
-								</div>
-							))}
-							<Space
-								style={{
-									textAlign: 'right',
-									justifyContent: 'right',
-									width: '100%'
-								}}
-							>
-								{fields.length > 1 ? (
-									<span
-										style={{ marginRight: '5px', cursor: 'pointer' }}
-										onClick={() => {
-											remove(fields[fields.length - 1].name);
-										}}
-									>
-										<MinusCircleOutlined
-											style={{ fontSize: '14px', color: '#FF8683' }}
-										/>
-										<span
-											style={{
-												fontSize: '14px',
-												color: '#FF8683',
-												marginLeft: '4px'
-											}}
-										>
-											删除
-										</span>
-									</span>
-								) : (
-									<></>
-								)}
-								<span onClick={() => add()} style={{ cursor: 'pointer' }}>
-									<PlusCircleOutlined
-										style={{ fontSize: '14px', color: '#23955C' }}
-									/>
-									<span
-										style={{
-											fontSize: '14px',
-											color: '#23955C',
-											marginLeft: '4px',
-											cursor: 'pointer'
-										}}
-									>
-										添加
-									</span>
-								</span>
-							</Space>
-						</>
-					)}
-				</Form.List>
-			</Form> */}
 			<Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-				{/* <Form.Item name="type" label="类型">
-						<Select
-							placeholder="请选择"
-							onChange={onmainTypeChange}
-							options={listType}
-							allowClear
-						></Select>
-					</Form.Item> */}
-				{curRow && renderItem(curRow)}
+				<Form.Item label={curRow.nodeLabel} name="value">
+					<Input />
+				</Form.Item>
 			</Form>
 		</CustomDialog>
 	);
@@ -212,8 +81,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 	//使用弹框
 	const [open, setOpen] = React.useState(false);
 	const [curRow, setCurRow] = React.useState({});
-	const handleUse = (row, key) => {
-		console.log(row);
+	const handleUse = (row: any) => {
 		setOpen(true);
 		setCurRow(row);
 	};
@@ -227,11 +95,12 @@ const MyTableCom = React.memo((props: TableProps) => {
 		{
 			title: '规则名称',
 			dataIndex: 'name',
-			ellipsis: true
+			ellipsis: true,
+			width: 200
 		},
 		{
-			title: '规则用途',
-			dataIndex: 'description',
+			title: '规则内容',
+			dataIndex: 'content',
 			ellipsis: true
 		},
 		{
@@ -240,10 +109,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 			key: 'operaion',
 			render: (row, record) => {
 				return (
-					<span
-						onClick={() => handleUse(row, record.key)}
-						style={{ cursor: 'pointer' }}
-					>
+					<span onClick={() => handleUse(row)} style={{ cursor: 'pointer' }}>
 						<Space>
 							<PlayCircleOutlined style={{ color: '#23955C' }} />
 						</Space>
@@ -260,7 +126,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 					className={styles['my-table']}
 					columns={colums}
 					dataSource={data}
-					pagination={{ position: ['none'] }}
+					pagination={false}
 				></Table>
 			</div>
 			<div
@@ -324,10 +190,13 @@ const RuleCom = () => {
 
 	const onReset = () => {
 		form.resetFields();
+		getList()
 	};
 
 	const search = () => {
 		// console.log(res);
+		setCurrent(1);
+		getList()
 	};
 
 	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
