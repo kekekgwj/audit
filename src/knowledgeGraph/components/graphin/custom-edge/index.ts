@@ -1,13 +1,13 @@
-import registerEdge1 from './edge1';
-import registerEdge2 from './edge2';
+import OWNS from './OWNS';
+import DONATED from './DONATED';
 
 interface RegisterNodes {
 	[key: string]: () => void;
 }
 
 const registerEdges: RegisterNodes = {
-	registerEdge1,
-	registerEdge2
+	OWNS,
+	DONATED
 };
 
 /**
