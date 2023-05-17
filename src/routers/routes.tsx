@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { LazyExoticComponent, lazy } from 'react';
 
 type Meta = {
 	title?: string;
@@ -9,7 +9,7 @@ type Meta = {
 
 export type CustomRoute = {
 	path: string;
-	component: any;
+	component: LazyExoticComponent<() => JSX.Element> | JSX.Element;
 	redirect?: string;
 	meta?: Meta;
 	children?: CustomRoute[];

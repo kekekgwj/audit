@@ -25,6 +25,12 @@ interface IGraphContext {
 		{ label, image, type }: IImageShapes
 	) => void;
 }
+
+export const useGraph = () => {
+	const { graph } = useContext(GraphContext) || {};
+	return graph;
+};
+
 export const GraphContext = createContext<IGraphContext | null>(null);
 import classes from './graph.module.less';
 import TableSourcePanel from '../components/TableSourcePanel';

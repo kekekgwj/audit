@@ -9,12 +9,12 @@ import { IRootState } from '@/redux/store';
 import { CloseOutlined } from '@ant-design/icons';
 import { dispatch } from '@/redux/store';
 import { toClosePanel } from '@/redux/reducers/dataAnalysis';
-import { GraphContext } from '../../lib/Graph';
+import { useGraph } from '../../lib/Graph';
 import { IImageTypes, getNodeTypeById } from '../../lib/utils';
 const { DOWNLOAD } = ASSETS;
 const Panel: React.FC = () => {
 	const state = useSelector((state: IRootState) => state.dataAnalysis);
-	const { graph } = useContext(GraphContext) || {};
+	const graph = useGraph();
 
 	const { curSelectedNode: id, showPanel } = state || {};
 	if (!showPanel || !graph) {
