@@ -190,7 +190,7 @@ export default (props: IProps) => {
 
 		const convertProperties = Object.entries(rawData).map(([label, v]) => {
 			if (!saveNodes.includes(id)) {
-				return {};
+				return null;
 			}
 			const { value, type, key } = v;
 
