@@ -58,8 +58,9 @@ const SpecialCom = (props: Props) => {
 	return (
 		<Form
 			name="basic"
-			labelCol={{ span: 4 }}
-			wrapperCol={{ span: 20 }}
+			// labelCol={{ span: 6 }}
+			// wrapperCol={{ span: 18 }}
+			layout="vertical"
 			style={{ maxWidth: 600 }}
 			initialValues={{ remember: true }}
 			autoComplete="off"
@@ -114,7 +115,7 @@ const SpecialCom = (props: Props) => {
 												]}
 											>
 												<Select
-													style={{ width: 100 }}
+													style={{ width: 120 }}
 													options={[
 														{ value: '1', label: '大于' },
 														{ value: '2', label: '小于' }
@@ -126,10 +127,11 @@ const SpecialCom = (props: Props) => {
 												name={[name, 'value']}
 												rules={[{ required: true, message: '' }]}
 											>
-												<Input placeholder="" style={{ width: 100 }} />
+												<Input placeholder="" style={{ width: 120 }} />
 											</Form.Item>
 											{index == operations.length - 1 ? (
 												<PlusCircleOutlined
+													style={{ fontSize: '14px', color: '#23955C' }}
 													onClick={() => {
 														add();
 														setSymbol(operationLinks.concat(['1']));
@@ -137,6 +139,7 @@ const SpecialCom = (props: Props) => {
 												/>
 											) : (
 												<MinusCircleOutlined
+													style={{ fontSize: '14px', color: '#FF8683' }}
 													onClick={() => {
 														remove(name);
 														operationLinks.splice(index, 1);
@@ -145,15 +148,6 @@ const SpecialCom = (props: Props) => {
 													}}
 												/>
 											)}
-											{/* {index == 0 ? (
-												operations.length > 1 ? (
-													''
-												) : (
-													<PlusCircleOutlined onClick={() => add()} />
-												)
-											) : (
-												<MinusCircleOutlined onClick={() => remove(name)} />
-											)} */}
 										</Space>
 									))}
 								</>

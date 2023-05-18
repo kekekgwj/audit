@@ -6,6 +6,7 @@ import styles from './index.module.less';
 interface DialogProps {
 	open: boolean; // 是否打开模态框
 	title?: string; // 模态框标题
+	minWidth?: string; // 最小宽度
 	width?: string | number; // 模态框宽度
 	height?: string | number; // 模态框内容区域高度
 	wrapClassName?: string; // 模态框外层节点class名
@@ -18,12 +19,13 @@ export default (props: DialogProps) => {
 	const {
 		open,
 		title,
-		width = 420,
+		width,
+		minWidth,
 		height,
 		wrapClassName,
 		children,
 		onOk,
-		onCancel
+		onCancel,
 	} = props;
 	// const customClassName = `${wrapClassName || ''} custom-dialog`;
 
@@ -44,6 +46,7 @@ export default (props: DialogProps) => {
 		<Modal
 			open={open}
 			width={width}
+			style={{minWidth: minWidth}}
 			footer={false}
 			wrapClassName={wrapClassName}
 			closeIcon={<CloseCircleOutlined />}

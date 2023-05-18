@@ -308,7 +308,7 @@ export default (props: IProps) => {
 			<CustomDialog
 				open={open}
 				title="链路筛选"
-				width={600}
+				minWidth="700px"
 				height={400}
 				onOk={handleOk}
 				onCancel={() => setOpen(false)}

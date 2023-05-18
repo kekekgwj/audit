@@ -107,27 +107,27 @@ const FillterAttr: FC<IProps> = forwardRef(
 		useImperativeHandle(ref, () => ({
 			form: form
 		}));
-		//  测试数据
-		// const myData = [
-		// 	{ key: 'person', label: '人员', value: null, type: '1' },
-		// 	{ key: 'range', label: '范围', value: null, type: '2' },
-		// 	{
-		// 		label: '性别',
-		// 		value: null,
-		// 		type: '4',
-		// 		key: 'gender',
-		// 		dict: [
-		// 			{ label: '男', value: '1' },
-		// 			{ label: '女', value: '2' }
-		// 		]
-		// 	},
-		// 	{
-		// 		label: '日期',
-		// 		value: null,
-		// 		key: 'date',
-		// 		type: '3'
-		// 	}
-		// ];
+		// 测试数据;
+		const myData = [
+			{ key: 'person', label: '人员', value: null, type: '1' },
+			{ key: 'range', label: '范围测试一个很长的数据', value: null, type: '2' },
+			{
+				label: '性别',
+				value: null,
+				type: '4',
+				key: 'gender',
+				dict: [
+					{ label: '男', value: '1' },
+					{ label: '女', value: '2' }
+				]
+			},
+			{
+				label: '日期',
+				value: null,
+				key: 'date',
+				type: '3'
+			}
+		];
 		const latestFormData = useRef<object>({});
 		const updateFormChange = (changeData: object) => {
 			const formData = {
@@ -140,12 +140,13 @@ const FillterAttr: FC<IProps> = forwardRef(
 
 		return (
 			<div className={styles['fillter-attr-box']}>
-				<div className="fillter-attr-box__title">供应商</div>
+				{/* <div className="fillter-attr-box__title">供应商</div> */}
 				<Form
 					name="basic"
-					labelCol={{ span: 4 }}
-					wrapperCol={{ span: 20 }}
-					style={{ maxWidth: 600 }}
+					// labelCol={{ span: 6 }}
+					// wrapperCol={{ span: 18 }}
+					layout="vertical"
+					style={{ maxWidth: 600, maxHeight: 350, overflowY: 'auto' }}
 					autoComplete="off"
 					form={form}
 					onValuesChange={(allValues) => {

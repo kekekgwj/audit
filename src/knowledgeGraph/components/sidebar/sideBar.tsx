@@ -399,14 +399,22 @@ export default (props: Props) => {
 											return (
 												<Select.Option value={item.type} key={item.id}>
 													<div className={styles['title-options']}>
-														<div>{item.name}</div>
+														<div className={styles['option-select-label']}>
+															{item.name}
+														</div>
 														<div className={styles['option-item-tips']}>
 															<span className={styles['option-description']}>
 																<SvgIcon
 																	name="help"
 																	className={styles['option-description-icon']}
 																></SvgIcon>
-																<span>{item.description?item.description:'暂无说明'}</span>
+																<span
+																	className={styles['option-description-text']}
+																>
+																	{item.description
+																		? item.description
+																		: '暂无说明'}
+																</span>
 															</span>
 														</div>
 													</div>
