@@ -216,7 +216,7 @@ const GraphinCom = React.memo((props: Props) => {
 						return <MyMenu onClose={onClose} id={id} updateData={updateData} />;
 					}}
 				</ContextMenu>
-				<Legend bindType="node" sortKey="typeName">
+				<Legend bindType="node" sortKey="type">
 					{(renderProps: LegendChildrenProps) => {
 						return <Legend.Node {...renderProps} />;
 					}}

@@ -1,11 +1,17 @@
-import registerNode1 from './node1';
+import Company from './Company';
+import Person from './Person';
+import Property from './Property';
+import Recipient from './Recipient';
 
 interface RegisterNodes {
 	[key: string]: () => void;
 }
 
 const registerNodes: RegisterNodes = {
-	registerNode1
+	Company,
+	Person,
+	Property,
+	Recipient
 };
 
 /**
