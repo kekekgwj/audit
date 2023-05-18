@@ -16,6 +16,7 @@ import { Checkbox, Input, Col, Row, message, Form, Table, Button } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CustomDialog from '@graph/components/custom-dialog';
 import { saveGraph } from '@/api/knowLedgeGraph/graphin';
+import { getGraphByRule } from '@/api/knowLedgeGraph/suspiciousRule';
 
 // 注册自定义节点
 // registerNodes('all');
@@ -48,13 +49,25 @@ interface SaveProps {
 	defaultName: string;
 	tableData: [];
 	setSaveOpen: () => void;
+	ruleId: string; //规则id
+	ruleName: string; //规则名称
+	head: []; //表头
 }
 
 // 保存图谱
 const SaveCom = React.memo((props: SaveProps) => {
 	const [messageApi, contextHolder] = message.useMessage();
 	const [form] = Form.useForm();
-	const { open, file, defaultName, tableData, setSaveOpen } = props;
+	const {
+		open,
+		file,
+		defaultName,
+		ruleId,
+		head,
+		ruleName,
+		tableData,
+		setSaveOpen
+	} = props;
 
 	useEffect(() => {
 		if (open) {
@@ -68,11 +81,16 @@ const SaveCom = React.memo((props: SaveProps) => {
 
 	// 提交表单
 	const handleOk = () => {
+		console.log(head, tableData, 838383);
 		const data = form.getFieldsValue();
 		const formData = new FormData();
 		formData.append('picFile', file);
 		formData.append('name', data.name);
+		formData.append('ruleId', ruleId);
+		formData.append('ruleName', ruleName);
+		formData.append('head', head);
 		formData.append('data', tableData);
+
 		saveGraph(formData).then((res) => {
 			messageApi.open({
 				type: 'success',
@@ -186,187 +204,188 @@ const GraphCom = () => {
 
 	// 获取图谱数据
 	const getGraphinData = async () => {
-		// const res = await getGraphByRule({
-		// 	ruleId: originData.ruleId,
-		// 	value: originData.value
-		// });
+		const res = await getGraphByRule({
+			ruleId: originData.ruleId,
+			value: originData.value
+		});
+		console.log(res, 211211211);
 
 		// 模拟数据
-		const res = {
-			isHit: true,
-			hasList: true,
-			data: [
-				{ name: '小明', major: '图计算' },
-				{ name: '小明', major: '图计算' },
-				{ name: '小明', major: '图计算' },
-				{ name: '小明', major: '图计算' },
-				{ name: '小明', major: '图计算' },
-				{ name: '小明', major: '图计算' },
-				{ name: '小明', major: '图计算' },
-				{ name: '小明', major: '图计算' },
-				{ name: '小明', major: '图计算' }
-			],
-			head: ['姓名', '专业'],
-			nodes: [
-				{
-					id: 'node-0',
-					x: 100,
-					y: 100,
-					data: {
-						type: 'centerPointer'
-					},
-					style: {
-						label: {
-							value: '我是\nnode0',
-							position: 'center',
-							offset: [0, 0],
-							fill: 'green'
-						},
-						keyshape: {
-							size: 80,
-							stroke: '#ff9f0f',
-							fill: '#ff9f0ea6'
-						}
-					}
-				},
-				{
-					id: 'node-1',
-					x: 200,
-					y: 200,
-					data: {
-						type: 'project'
-					},
-					style: {
-						label: {
-							value: '我是node1',
-							position: 'center',
-							offset: [0, 5],
-							fill: 'green'
-						},
-						keyshape: {
-							size: 60,
-							stroke: '#ff9f0f',
-							fill: '#ff9f0ea6'
-						}
-					}
-				},
-				{
-					id: 'node-2',
-					x: 100,
-					y: 300,
-					data: {
-						type: 'project'
-					},
-					style: {
-						label: {
-							value: '我是node2',
-							position: 'center',
-							offset: [20, 5],
-							fill: 'green'
-						},
-						keyshape: {
-							size: 40,
-							stroke: '#ff9f0f',
-							fill: '#ff9f0ea6'
-						}
-					}
-				},
-				{
-					id: 'node-3',
-					data: {
-						type: 'person'
-					},
-					style: {
-						label: {
-							value: '我是node3',
-							position: 'center',
-							offset: [20, 5],
-							fill: 'green'
-						},
-						keyshape: {
-							size: 40,
-							stroke: '#ff9f0f',
-							fill: '#ff9f0ea6'
-						}
-					}
-				},
-				{
-					id: 'node-4',
-					data: {
-						type: 'person'
-					},
-					style: {
-						label: {
-							value: '我是node4',
-							position: 'center',
-							offset: [20, 0],
-							fill: 'green'
-						},
-						keyshape: {
-							size: 40,
-							stroke: '#ff9f0f',
-							fill: '#ff9f0ea6'
-						}
-					}
-				}
-			],
-			edges: [
-				{
-					id: 'edge-0-1',
-					source: 'node-0',
-					target: 'node-1',
-					style: {
-						label: {
-							value: '我是边1'
-						}
-					}
-				},
-				{
-					id: 'edge-0-3',
-					source: 'node-0',
-					target: 'node-3',
-					style: {
-						label: {
-							value: '我是边4'
-						}
-					}
-				},
-				{
-					id: 'edge-3-4',
-					source: 'node-3',
-					target: 'node-4',
-					style: {
-						label: {
-							value: '我是边5'
-						}
-					}
-				},
-				{
-					id: 'edge-1-2',
-					source: 'node-1',
-					target: 'node-2',
-					style: {
-						label: {
-							value: '我是边2'
-						},
-						keyshape: {
-							lineWidth: 5,
-							stroke: '#00f'
-						}
-					}
-				},
-				{
-					id: 'edge-0-2',
-					source: 'node-0',
-					target: 'node-2',
-					style: {
-						label: {
-							value: '我是边3'
-						}
-					}
-				}
-			]
-		};
+		// const res = {
+		// 	isHit: true,
+		// 	hasList: true,
+		// 	data: [
+		// 		{ name: '小明', major: '图计算' },
+		// 		{ name: '小明', major: '图计算' },
+		// 		{ name: '小明', major: '图计算' },
+		// 		{ name: '小明', major: '图计算' },
+		// 		{ name: '小明', major: '图计算' },
+		// 		{ name: '小明', major: '图计算' },
+		// 		{ name: '小明', major: '图计算' },
+		// 		{ name: '小明', major: '图计算' },
+		// 		{ name: '小明', major: '图计算' }
+		// 	],
+		// 	head: ['姓名', '专业'],
+		// 	nodes: [
+		// 		{
+		// 			id: 'node-0',
+		// 			x: 100,
+		// 			y: 100,
+		// 			data: {
+		// 				type: 'centerPointer'
+		// 			},
+		// 			style: {
+		// 				label: {
+		// 					value: '我是\nnode0',
+		// 					position: 'center',
+		// 					offset: [0, 0],
+		// 					fill: 'green'
+		// 				},
+		// 				keyshape: {
+		// 					size: 80,
+		// 					stroke: '#ff9f0f',
+		// 					fill: '#ff9f0ea6'
+		// 				}
+		// 			}
+		// 		},
+		// 		{
+		// 			id: 'node-1',
+		// 			x: 200,
+		// 			y: 200,
+		// 			data: {
+		// 				type: 'project'
+		// 			},
+		// 			style: {
+		// 				label: {
+		// 					value: '我是node1',
+		// 					position: 'center',
+		// 					offset: [0, 5],
+		// 					fill: 'green'
+		// 				},
+		// 				keyshape: {
+		// 					size: 60,
+		// 					stroke: '#ff9f0f',
+		// 					fill: '#ff9f0ea6'
+		// 				}
+		// 			}
+		// 		},
+		// 		{
+		// 			id: 'node-2',
+		// 			x: 100,
+		// 			y: 300,
+		// 			data: {
+		// 				type: 'project'
+		// 			},
+		// 			style: {
+		// 				label: {
+		// 					value: '我是node2',
+		// 					position: 'center',
+		// 					offset: [20, 5],
+		// 					fill: 'green'
+		// 				},
+		// 				keyshape: {
+		// 					size: 40,
+		// 					stroke: '#ff9f0f',
+		// 					fill: '#ff9f0ea6'
+		// 				}
+		// 			}
+		// 		},
+		// 		{
+		// 			id: 'node-3',
+		// 			data: {
+		// 				type: 'person'
+		// 			},
+		// 			style: {
+		// 				label: {
+		// 					value: '我是node3',
+		// 					position: 'center',
+		// 					offset: [20, 5],
+		// 					fill: 'green'
+		// 				},
+		// 				keyshape: {
+		// 					size: 40,
+		// 					stroke: '#ff9f0f',
+		// 					fill: '#ff9f0ea6'
+		// 				}
+		// 			}
+		// 		},
+		// 		{
+		// 			id: 'node-4',
+		// 			data: {
+		// 				type: 'person'
+		// 			},
+		// 			style: {
+		// 				label: {
+		// 					value: '我是node4',
+		// 					position: 'center',
+		// 					offset: [20, 0],
+		// 					fill: 'green'
+		// 				},
+		// 				keyshape: {
+		// 					size: 40,
+		// 					stroke: '#ff9f0f',
+		// 					fill: '#ff9f0ea6'
+		// 				}
+		// 			}
+		// 		}
+		// 	],
+		// 	edges: [
+		// 		{
+		// 			id: 'edge-0-1',
+		// 			source: 'node-0',
+		// 			target: 'node-1',
+		// 			style: {
+		// 				label: {
+		// 					value: '我是边1'
+		// 				}
+		// 			}
+		// 		},
+		// 		{
+		// 			id: 'edge-0-3',
+		// 			source: 'node-0',
+		// 			target: 'node-3',
+		// 			style: {
+		// 				label: {
+		// 					value: '我是边4'
+		// 				}
+		// 			}
+		// 		},
+		// 		{
+		// 			id: 'edge-3-4',
+		// 			source: 'node-3',
+		// 			target: 'node-4',
+		// 			style: {
+		// 				label: {
+		// 					value: '我是边5'
+		// 				}
+		// 			}
+		// 		},
+		// 		{
+		// 			id: 'edge-1-2',
+		// 			source: 'node-1',
+		// 			target: 'node-2',
+		// 			style: {
+		// 				label: {
+		// 					value: '我是边2'
+		// 				},
+		// 				keyshape: {
+		// 					lineWidth: 5,
+		// 					stroke: '#00f'
+		// 				}
+		// 			}
+		// 		},
+		// 		{
+		// 			id: 'edge-0-2',
+		// 			source: 'node-0',
+		// 			target: 'node-2',
+		// 			style: {
+		// 				label: {
+		// 					value: '我是边3'
+		// 				}
+		// 			}
+		// 		}
+		// 	]
+		// };
 
 		//是否命中数据
 		setHit(res.isHit);
@@ -414,7 +433,11 @@ const GraphCom = () => {
 			<div className={styles['top-tips']}>
 				<span className={styles['rule-name']}>规则名称:{originData.name}</span>
 				<span style={{ marginRight: '10px' }} onClick={() => goBack()}>
-					<SvgIcon name="close" color="#23955C" className={styles['icon-close']}></SvgIcon>
+					<SvgIcon
+						name="close"
+						color="#23955C"
+						className={styles['icon-close']}
+					></SvgIcon>
 				</span>
 			</div>
 			<>
@@ -454,6 +477,9 @@ const GraphCom = () => {
 						<SaveCom
 							open={open}
 							defaultName={defaultName}
+							head={tableHead}
+							ruleId={originData.ruleId}
+							ruleName={originData.name}
 							file={file}
 							setSaveOpen={setSaveOpen}
 							tableData={tableData}

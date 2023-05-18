@@ -26,9 +26,11 @@
 	display: flex;
 
 	.fillter-tree {
-		flex: 1 1 auto;
+		max-width: 300px;
+		// flex: 1 1 auto;
 		padding-right: 10px;
 		border-right: 1px solid #ccc;
+		overflow-x: auto;
 		&-title {
 			display: flex;
 			align-items: center;
@@ -36,7 +38,7 @@
 		}
 	}
 	.fillter-attr {
-		width: 400px;
+		min-width: 400px;
 		padding-left: 20px;
 	}
 }
