@@ -30,8 +30,10 @@
 
 .filter-form {
 	box-sizing: border-box;
+	max-height: calc(100vh - 50px);
 	padding: 20px 14px;
-	overflow: hidden;
+	// overflow: hidden;
+	overflow-y: auto;
 	transition: all 0.3s;
 	&__btns {
 		margin-top: 20px;
@@ -50,6 +52,15 @@
 		font-family: Noto Sans-Bold, Noto Sans;
 		font-weight: bold;
 		color: #18181f;
+	}
+}
+.filter-item-disable {
+	span {
+		margin-left: 8px;
+		font-size: 14px;
+		font-family: Noto Sans-Bold, Noto Sans;
+		font-weight: bold;
+		color: rgba(24, 24, 31, 0.2) !important;
 	}
 }
 
@@ -81,4 +92,15 @@
 			line-height: 18px;
 		}
 	}
+}
+
+.filter-label-disable {
+	:global {
+		.ant-form-item-label > label {
+			color: rgba(24, 24, 31, 0.2) !important;
+		}
+	}
+}
+.filter-icon-disable {
+	color: rgba(24, 24, 31, 0.2) !important;
 }

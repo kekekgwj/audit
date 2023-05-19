@@ -44,6 +44,7 @@ interface IProps {
 	updateGraph: (paths: IPath[]) => void;
 	setCurPath: (paths: IPath[]) => void;
 	canUse: boolean; //是否禁用
+	curData: any; //当前图谱数据 没有禁止链路
 }
 export default (props: IProps) => {
 	const {
@@ -51,7 +52,8 @@ export default (props: IProps) => {
 		setFormItemValue,
 		updateGraph,
 		setCurPath,
-		canUse
+		canUse,
+		curData
 	} = props;
 	const fillterAttrRef = useRef(null);
 	const [open, setOpen] = useState(false);
@@ -324,7 +326,7 @@ export default (props: IProps) => {
 	};
 	return (
 		<>
-			<Button disabled={canUse} onClick={() => changeDialogOpen()}>
+			<Button disabled={canUse || !curData} onClick={() => changeDialogOpen()}>
 				{getOnePath(treeData)}
 			</Button>
 			<CustomDialog

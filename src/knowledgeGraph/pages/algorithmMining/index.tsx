@@ -296,6 +296,7 @@ const Algorithm = () => {
 				className={styles['filter-bar']}
 			>
 				<SideBar
+					curData={data}
 					updateData={updateData}
 					toggleLayout={toggleBarLayout}
 					canAdd={false}

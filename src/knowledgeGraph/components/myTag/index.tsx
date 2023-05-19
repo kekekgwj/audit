@@ -108,7 +108,7 @@ const MyTag = (props: Props) => {
 						const tagElem = (
 							<Tag
 								key={tag}
-								closable={index !== 0}
+								closable
 								style={{ userSelect: 'none' }}
 								onClose={() => handleClose(tag)}
 							>

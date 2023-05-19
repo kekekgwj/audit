@@ -142,6 +142,7 @@ const RelationShipCom = () => {
 				className={styles['filter-bar']}
 			>
 				<SideBar
+					curData={data}
 					updateData={updateData}
 					toggleLayout={toggleBarLayout}
 					canAdd={true}

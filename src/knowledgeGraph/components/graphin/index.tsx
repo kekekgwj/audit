@@ -37,6 +37,7 @@ interface MenuProps {
 	onClose: () => void;
 	updateData: (data: GraphinData) => void;
 	id?: string;
+	curData: any;
 }
 
 interface NodeDetailProps {
@@ -112,7 +113,7 @@ const LeftEvent = () => {
 };
 
 const MyMenu = React.memo((props: MenuProps) => {
-	const { data, id, onClose, updateData } = props;
+	const { id, onClose, updateData, curData } = props;
 	const [relArr, setRelARR] = React.useState([]);
 	useEffect(() => {
 		if (id) {
@@ -134,12 +135,26 @@ const MyMenu = React.memo((props: MenuProps) => {
 
 	// 穿透到下一层
 	const showNextLeval = () => {
+		const oldData = {
+			nodes: curData.nodes,
+			edges: curData.edges
+		};
 		updateData({
 			nodes: [],
 			edges: []
 		}); //先置空不然渲染有问题
 		getNextGraph({ nodeId: id, relationships: checkedRel }).then((res: any) => {
-			updateData(res);
+			let map = new Map();
+			const newData = {
+				//拼接原有数据并去重
+				nodes: [...oldData.nodes, ...res.nodes].filter(
+					(v) => !map.has(v.id) && map.set(v.id, 1)
+				),
+				edges: [...oldData.edges, ...res.edges].filter(
+					(v) => !map.has(v.id) && map.set(v.id, 1)
+				)
+			};
+			updateData(newData);
 			onClose();
 		});
 	};
@@ -178,6 +193,7 @@ const MyMenu = React.memo((props: MenuProps) => {
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData, refersh } = props;
 	const [key, setKey] = useState('');
+	const curData = { ...data }; //当前图谱数据  穿透下一层时需要拼接数据
 	const [width, setWidth] = useState(600);
 	const graphinRef = useRef<HTMLDivElement>();
 
@@ -219,7 +235,14 @@ const GraphinCom = React.memo((props: Props) => {
 				<ContextMenu style={{ background: '#fff' }} bindType="node">
 					{(value) => {
 						const { onClose, id } = value;
-						return <MyMenu onClose={onClose} id={id} updateData={updateData} />;
+						return (
+							<MyMenu
+								onClose={onClose}
+								id={id}
+								updateData={updateData}
+								curData={curData}
+							/>
+						);
 					}}
 				</ContextMenu>
 				<Legend bindType="node" sortKey="type">

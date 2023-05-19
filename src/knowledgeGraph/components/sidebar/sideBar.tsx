@@ -23,6 +23,7 @@ import {
 	getAlgs
 } from '@/api/knowledgeGraph/graphin';
 interface Props {
+	curData: any; //当前图谱数据 用来判断链路和算法是否可用 为空时禁用
 	updateData: (layout: GraphinData) => void;
 	toggleLayout: (isOpen: boolean) => void;
 	canAdd: boolean; //是否可添加多个主体
@@ -58,7 +59,7 @@ export enum FormItems {
 	algorithm = 'algorithm'
 }
 export default (props: Props) => {
-	const { updateData, toggleLayout, canAdd, setdefaultName } = props;
+	const { updateData, toggleLayout, canAdd, setdefaultName, curData } = props;
 	const [configVisibile, setconfigVisibile] = useState(true);
 	const [bodyTypeOptions, setBodyTypeOptions] = useState(Array<bodyTypeOption>);
 	const [algorithmOptions, setAlgorithmOptions] = useState(
@@ -371,12 +372,27 @@ export default (props: Props) => {
 						</div>
 						<Divider dashed />
 						<div>
-							<div className={styles['filter-item']}>
+							<div
+								className={`${styles['filter-item']} ${
+									bodys?.length > 1 || !curData
+										? styles['filter-item-disable']
+										: ''
+								}`}
+							>
 								<SvgIcon name="filter"></SvgIcon>
 								<span>链路筛选</span>
 							</div>
-							<Form.Item name={FormItems.pathFilter} label="链路筛选">
+							<Form.Item
+								name={FormItems.pathFilter}
+								label="链路筛选"
+								className={`${
+									bodys?.length > 1 || !curData
+										? styles['filter-label-disable']
+										: ''
+								}`}
+							>
 								<AttrFillter
+									curData={curData}
 									canUse={bodys?.length > 1 ? true : false}
 									setCurPath={setCurPath}
 									getFormItemValue={getFormItemValue}
@@ -389,16 +405,27 @@ export default (props: Props) => {
 						</div>
 						{!canAdd ? (
 							<div>
-								<div className={styles['filter-item']}>
+								<div
+									className={`${styles['filter-item']} ${
+										!curData ? styles['filter-item-disable'] : ''
+									}`}
+								>
 									<SvgIcon name="filter"></SvgIcon>
 									<span>挖掘算法</span>
 								</div>
-								<Form.Item name={FormItems.algorithm} label="算法">
+								<Form.Item
+									name={FormItems.algorithm}
+									label="算法"
+									className={`${
+										!curData ? styles['filter-label-disable'] : ''
+									}`}
+								>
 									<Select
 										allowClear
 										style={{ width: '100%' }}
 										placeholder="请选择"
 										onChange={handleAlgorithmChange}
+										disabled={!curData}
 									>
 										{algorithmOptions.map((item) => {
 											return (

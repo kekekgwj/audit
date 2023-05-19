@@ -19,7 +19,7 @@ export const routes: CustomRoute[] = [
 	{
 		path: '/',
 		component: lazy(() => import('@graph/layout')),
-		meta: { title: '供应商关系图谱', icon: 'atlas' },
+		meta: { title: '图谱分析工具', icon: 'atlas' },
 		children: [
 			{
 				path: 'relationShip',
@@ -31,11 +31,7 @@ export const routes: CustomRoute[] = [
 				component: lazy(() => import('@graph/pages/algorithmMining')),
 				meta: { title: '算法挖掘', icon: 'algorithm' }
 			},
-			{
-				path: 'myAtlas',
-				component: lazy(() => import('@graph/pages/myAtlas')),
-				meta: { title: '我的图谱', icon: 'my-atlas' }
-			},
+
 			{
 				path: 'suspiciousRule',
 				component: lazy(() => import('@graph/pages/suspiciousRule')),
@@ -57,6 +53,11 @@ export const routes: CustomRoute[] = [
 				path: 'whiteList',
 				component: lazy(() => import('@graph/pages/whiteList')),
 				meta: { title: '白名单', icon: 'white' }
+			},
+			{
+				path: 'myAtlas',
+				component: lazy(() => import('@graph/pages/myAtlas')),
+				meta: { title: '我的图谱', icon: 'my-atlas' }
 			}
 		]
 	},
