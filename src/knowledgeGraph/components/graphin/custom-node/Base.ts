@@ -1,15 +1,17 @@
-/**
- * 自定义节点,示例
- * todo
- * @author dongdongjie
- */
-
 import Graphin from '@antv/graphin';
 import { getCanvasText } from '@/utils/graphin';
 
+const Colors = {
+	BASE: ['red', 'red', '#fff']
+};
+
+// 获取 stroke、FILL、
+const getColorByType = (type: string): string[] => {
+	return Colors[type] ? Colors[type] : Colors['BASE'];
+};
 export default () => {
 	Graphin.registerNode(
-		'Company',
+		'Base',
 		{
 			// 响应状态变化
 			setState(name, value, item) {
@@ -32,25 +34,26 @@ export default () => {
 				}
 			},
 			draw(cfg, group) {
-				console.log('config', cfg);
 				// 设置自定义节点图例
-				cfg.style.keyshape = {
-					stroke: 'red',
-					fill: 'red',
-					fillOpacity: 1
-				};
+				console.log('config', cfg);
+				const config = cfg.config;
+				const { type, size } = config;
+				const [strokeColor, fillColor, labelColor] = getColorByType(type);
 
 				const [label] = getCanvasText(cfg.label, 12, 100);
 
 				const keyshape = group.addShape('circle', {
 					attrs: {
-						r: 60,
-						fill: '#E6697B',
+						r: size,
+						fill: fillColor,
+						strokeColor: strokeColor,
 						cursor: 'pointer'
 					},
 					draggable: true,
 					name: 'node1-body'
 				});
+
+				// label样式
 				group.addShape('text', {
 					attrs: {
 						fontSize: 12,
@@ -59,7 +62,7 @@ export default () => {
 						textAlign: 'center',
 						textBaseline: 'middle',
 						text: label,
-						fill: '#fff',
+						fill: labelColor,
 						cursor: 'pointer'
 					},
 					draggable: true,

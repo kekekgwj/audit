@@ -14,6 +14,7 @@ import { INode, ModelConfig, NodeConfig } from '@antv/g6';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { Checkbox, Col, Row } from 'antd';
 import {
+	IGraphData,
 	getNextGraph,
 	getNextRelationships
 } from '@/api/knowledgeGraph/graphin';
@@ -26,7 +27,7 @@ registerEdges('all');
 const { Tooltip, ContextMenu, Legend } = Components;
 
 interface Props {
-	data: GraphinData;
+	data: IGraphData;
 	refersh: boolean;
 	updateData: (data: GraphinData) => void;
 	onClose: () => void;
@@ -174,9 +175,43 @@ const MyMenu = React.memo((props: MenuProps) => {
 		</div>
 	);
 });
+const formatGraphData = (data: IGraphData): GraphinData => {
+	const { edges, nodes } = Object.assign({}, data);
+	const formatEdges = edges.map((edge) => {
+		const { type, similarity } = edge;
+		return {
+			...edge,
+			type: 'Base',
+			config: {
+				type,
+				size: similarity
+			}
+		};
+	});
+	const averageScore =
+		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 
+	const formatNodes = nodes.map((node) => {
+		const { type, score, communityId } = node;
+		return {
+			...node,
+			type: 'Base',
+			config: {
+				type,
+				// 最小值为10
+				size: score ? Math.max((score / averageScore) * 30, 10) : 10,
+				communityId
+			}
+		};
+	});
+	return {
+		edges: formatEdges,
+		nodes: formatNodes
+	};
+};
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData, refersh } = props;
+
 	const [key, setKey] = useState('');
 	const [width, setWidth] = useState(600);
 	const graphinRef = useRef<HTMLDivElement>();
@@ -196,7 +231,7 @@ const GraphinCom = React.memo((props: Props) => {
 		<div ref={graphinRef} className={styles['graphin-box']}>
 			<Graphin
 				key={key}
-				data={data}
+				data={formatGraphData(data)}
 				width={width}
 				layout={{
 					type: 'force',

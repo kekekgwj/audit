@@ -1,13 +1,14 @@
 import OWNS from './OWNS';
 import DONATED from './DONATED';
-
+import Base from './Base';
 interface RegisterNodes {
 	[key: string]: () => void;
 }
 
 const registerEdges: RegisterNodes = {
 	OWNS,
-	DONATED
+	DONATED,
+	Base
 };
 
 /**
