@@ -117,8 +117,11 @@ const SpecialCom = (props: Props) => {
 												<Select
 													style={{ width: 120 }}
 													options={[
-														{ value: '1', label: '大于' },
-														{ value: '2', label: '小于' }
+														{ value: '1', label: '等于' },
+														{ value: '2', label: '大于' },
+														{ value: '3', label: '大于等于' },
+														{ value: '4', label: '小于' },
+														{ value: '5', label: '小于等于' }
 													]}
 												/>
 											</Form.Item>

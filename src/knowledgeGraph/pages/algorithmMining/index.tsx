@@ -250,8 +250,7 @@ const Algorithm = () => {
 		getGraphinData();
 	}, []);
 	const getGraphinData = async () => {
-		const data = {};
-		updateData(data);
+		updateData('');
 	};
 
 	// 更新数据

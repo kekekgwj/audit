@@ -115,7 +115,9 @@ const MyMenu = React.memo((props: MenuProps) => {
 	const { data, id, onClose, updateData } = props;
 	const [relArr, setRelARR] = React.useState([]);
 	useEffect(() => {
-		getRelationships();
+		if (id) {
+			getRelationships();
+		}
 	}, []);
 
 	const getRelationships = () => {
@@ -132,6 +134,10 @@ const MyMenu = React.memo((props: MenuProps) => {
 
 	// 穿透到下一层
 	const showNextLeval = () => {
+		updateData({
+			nodes: [],
+			edges: []
+		}); //先置空不然渲染有问题
 		getNextGraph({ nodeId: id, relationships: checkedRel }).then((res: any) => {
 			updateData(res);
 			onClose();

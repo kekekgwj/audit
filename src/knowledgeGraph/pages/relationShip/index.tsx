@@ -94,20 +94,16 @@ const RelationShipCom = () => {
 	}, []);
 
 	const getGraphinData = async () => {
-		// const data = await getBodyGraphin();
-		const data = {};
-		updateData(data);
+		updateData(''); //设置初始值为空
 	};
 
 	// 更新数据
 	const updateData = (value: GraphinData) => {
-		console.log(value, 107777);
 		setDate(value);
 	};
 
 	// 保存图谱
 	const saveGraph = () => {
-		console.log('1111');
 		window.pageYOffset = 0; //网页位置
 		document.documentElement.scrollTop = 0; //滚动条的位置
 		document.body.scrollTop = 0; //网页被卷去的高

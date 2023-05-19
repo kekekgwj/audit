@@ -296,7 +296,7 @@ export default (props: Props) => {
 											) : (
 												<></>
 											)}
-											{canAdd ? (
+											{canAdd && fields.length < 3 ? (
 												<span
 													onClick={() => add()}
 													style={{ cursor: 'pointer' }}
@@ -351,7 +351,7 @@ export default (props: Props) => {
 								initialValue={4}
 								className={styles['filter-form-item']}
 							>
-								<InputNumber min={0} max={6} />
+								<InputNumber min={1} max={8} />
 							</Form.Item>
 						</div>
 
@@ -375,6 +375,7 @@ export default (props: Props) => {
 							</div>
 							<Form.Item name={FormItems.pathFilter} label="链路筛选">
 								<AttrFillter
+									canUse={bodys?.length > 1 ? true : false}
 									setCurPath={setCurPath}
 									getFormItemValue={getFormItemValue}
 									setFormItemValue={setFormItemValue}
