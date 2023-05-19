@@ -51,7 +51,7 @@ interface IFilters {
 	nodes: IFilterNode[];
 	paths?: IPath | null;
 }
-interface IGraphData {
+export interface IGraphData {
 	edges: IResEdge[];
 	nodes: IResNode[];
 }
