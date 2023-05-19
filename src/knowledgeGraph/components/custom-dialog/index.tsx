@@ -25,7 +25,7 @@ export default (props: DialogProps) => {
 		wrapClassName,
 		children,
 		onOk,
-		onCancel,
+		onCancel
 	} = props;
 	// const customClassName = `${wrapClassName || ''} custom-dialog`;
 
@@ -46,7 +46,7 @@ export default (props: DialogProps) => {
 		<Modal
 			open={open}
 			width={width}
-			style={{minWidth: minWidth}}
+			style={{ minWidth: minWidth }}
 			footer={false}
 			wrapClassName={wrapClassName}
 			closeIcon={<CloseCircleOutlined />}
