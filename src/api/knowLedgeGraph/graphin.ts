@@ -133,21 +133,33 @@ export const getNextGraph = (data: NextGraph) => {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph', data);
 };
 
-//保存图谱
-export function saveGraph(formData: FormData) {
+//上传图片
+export function uploadGraphPic(formData: FormData) {
 	return postFormData(
-		API_PREFIX + '/blade-tool/graphAnalysis/saveGraph',
+		API_PREFIX + '/blade-tool/graphAnalysis/uploadGraphPic',
 		formData
 	);
 }
 
+//保存图谱
+interface ISaveGraph {
+	name: string;
+	picUrl: string;
+	ruleId?: number | string;
+	ruleName?: string;
+	head?: [];
+	data?: [];
+}
+export function saveGraph(data: ISaveGraph) {
+	return post(API_PREFIX + '/blade-tool/graphAnalysis/saveGraph', data);
+}
+
 //获取所有算法
-interface IAlgs{
-	id:number;
-	name:string;
-	type:string
+interface IAlgs {
+	id: number;
+	name: string;
+	type: string;
 }
 export const getAlgs = () => {
 	return post<IAlgs[]>(API_PREFIX + '/blade-tool/graphAnalysis/getAlgs');
 };
-

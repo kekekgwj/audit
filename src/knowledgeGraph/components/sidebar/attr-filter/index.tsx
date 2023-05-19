@@ -42,9 +42,10 @@ interface IProps {
 	getFormItemValue: (name: FormItems) => any;
 	setFormItemValue: (name: FormItems, value: any) => any;
 	updateGraph: (paths: IPath[]) => void;
+	setCurPath: (paths: IPath[]) => void;
 }
 export default (props: IProps) => {
-	const { getFormItemValue, setFormItemValue, updateGraph } = props;
+	const { getFormItemValue, setFormItemValue, updateGraph, setCurPath } = props;
 	const fillterAttrRef = useRef(null);
 	const [open, setOpen] = useState(false);
 	const [saveNodes, setSaveNodes] = useState<string[]>([]); //需要保存的节点内容
@@ -181,8 +182,9 @@ export default (props: IProps) => {
 	// 点击确定
 	const handleOk = async () => {
 		const configData = transData(treeData);
-		console.log('treeData', treeData);
+		console.log('treeData', configData, 184184);
 		updateGraph(configData);
+		setCurPath(configData); //当前选中链路数据
 		setOpen(false);
 	};
 	const getNodeDataConverted = (id: string): IProperty[] => {

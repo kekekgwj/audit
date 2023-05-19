@@ -6,7 +6,7 @@ import { Button, message, Input, Form, Row, Col } from 'antd';
 import html2canvas from 'html2canvas';
 import styles from './index.module.less';
 import { toImgStyle } from '@/utils/other';
-import { saveGraph } from '@/api/knowLedgeGraph/graphin';
+import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
 import CustomDialog from '@graph/components/custom-dialog';
 
 const mockData: GraphinData = {
@@ -173,14 +173,14 @@ const mockData: GraphinData = {
 
 interface SaveProps {
 	open: boolean;
-	file: any;
+	fileUrl: string;
 	defaultName: string;
 	setSaveOpen: (open: boolean) => void;
 }
 const SaveCom = React.memo((props: SaveProps) => {
 	const [messageApi, contextHolder] = message.useMessage();
 	const [form] = Form.useForm();
-	const { open, file, defaultName, setSaveOpen } = props;
+	const { open, fileUrl, defaultName, setSaveOpen } = props;
 
 	useEffect(() => {
 		if (open) {
@@ -196,10 +196,11 @@ const SaveCom = React.memo((props: SaveProps) => {
 	// 提交表单
 	const handleOk = () => {
 		const data = form.getFieldsValue();
-		const formData = new FormData();
-		formData.append('picFile', file);
-		formData.append('name', data.name);
-		saveGraph(formData).then((res) => {
+		const submitData = {
+			name: data.name,
+			picUrl: fileUrl
+		};
+		saveGraph(submitData).then((res) => {
 			messageApi.open({
 				type: 'success',
 				content: '保存成功'
@@ -239,11 +240,20 @@ const SaveCom = React.memo((props: SaveProps) => {
 
 const Algorithm = () => {
 	// 数据来源
-	const [data, setDate] = React.useState(mockData);
+	const [data, setDate] = React.useState();
 	const [barOpen, setBarOpen] = React.useState(true);
 	const [open, setSaveOpen] = React.useState(false);
-	const [file, setFile] = React.useState();
+	const [fileUrl, setFile] = React.useState();
 	const [defaultName, setdefaultName] = React.useState();
+
+	useEffect(() => {
+		getGraphinData();
+	}, []);
+	const getGraphinData = async () => {
+		const data = {};
+		updateData(data);
+	};
+
 	// 更新数据
 	const updateData = (value) => {
 		setDate(value);
@@ -258,10 +268,15 @@ const Algorithm = () => {
 		html2canvas(document.querySelector('#graphin-container')).then((canvas) => {
 			const base64Img = canvas.toDataURL('image/png'); //将canvas转为base64
 			const file = toImgStyle(base64Img, Date.now() + '.png');
-			//调用后端接口，将文件传给后端
-			setFile(file);
+			//调用后端接口，将文件传给后端 返回url地址
+			const formData = new FormData();
+			formData.append('file', file);
+			uploadGraphPic(formData).then((res) => {
+				console.log(res, 123123123);
+				setFile(res);
+				setSaveOpen(true);
+			});
 		});
-		setSaveOpen(true);
 	};
 
 	const toggleBarLayout = (isOpen: boolean) => {
@@ -289,30 +304,35 @@ const Algorithm = () => {
 				></SideBar>
 			</div>
 			<div className={styles['graphin-box']}>
-				<div className={styles['graphin-box__com']}>
-					<GraphinCom
-						data={data}
-						updateData={updateData}
-						refersh={barOpen}
-						onClose={() => {}}
-					></GraphinCom>
-				</div>
-				<div className={styles['graphin-box__btn']}>
-					<Button
-						onClick={() => {
-							saveGraph();
-						}}
-						htmlType="button"
-						style={{ background: '#23955C', color: '#fff' }}
-					>
-						保存图谱
-					</Button>
-				</div>
+				{data && (
+					<>
+						<div className={styles['graphin-box__com']}>
+							<GraphinCom
+								// ref={graphinRef}
+								data={data}
+								refersh={barOpen}
+								updateData={updateData}
+								onClose={() => {}}
+							></GraphinCom>
+						</div>
+						<div className={styles['graphin-box__btn']}>
+							<Button
+								htmlType="button"
+								style={{ background: '#23955C', color: '#fff' }}
+								onClick={() => {
+									saveGraph();
+								}}
+							>
+								保存图谱
+							</Button>
+						</div>
+					</>
+				)}
 			</div>
 			<SaveCom
 				open={open}
 				defaultName={defaultName}
-				file={file}
+				fileUrl={fileUrl}
 				setSaveOpen={setSaveOpen}
 			></SaveCom>
 		</div>
