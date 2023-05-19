@@ -154,6 +154,8 @@ export default (props: Props) => {
 		const formData: IFormData = form.getFieldsValue();
 		// 调用接口 获取筛选数据
 		const { bodyFilter, bodys, level } = formData;
+		//设置主体为默认保存图谱名称
+		setdefaultName(bodys[0].bodyName);
 		const nodes: IFilterNode[] = [];
 		bodys.forEach(({ bodyType, bodyName }) => {
 			if (bodyType && bodyName) {
