@@ -64,6 +64,7 @@ export default (props: Props) => {
 	const [algorithmOptions, setAlgorithmOptions] = useState(
 		Array<algorithmOption>
 	);
+	const [curPath, setCurPath] = useState([]); //保存当前链路  算法改变需要传入
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
 
@@ -96,17 +97,6 @@ export default (props: Props) => {
 	// 待完善
 	const getAlgorithmOptions = async () => {
 		const res = await getAlgs();
-		console.log(res, 100);
-		// const options = nodes.map(({ id, name }) => {
-		// 	return {
-		// 		label: name,
-		// 		value: name
-		// 	};
-		// });
-		const options = [
-			{ label: '选项一', value: '1', tips: '说明一' },
-			{ label: '选项二', value: '2', tips: '说明二' }
-		];
 		setAlgorithmOptions(res);
 	};
 
@@ -178,6 +168,10 @@ export default (props: Props) => {
 			return;
 		}
 		try {
+			updateData({
+				nodes: [],
+				edges: []
+			}); //先置空不然渲染有问题
 			const data = await getGraph({
 				algorithmName,
 				depth: level,
@@ -194,6 +188,12 @@ export default (props: Props) => {
 		} catch (e) {
 			console.error(e);
 		}
+	};
+
+	// 算法改变
+	const handleAlgorithmChange = (value: string) => {
+		console.log(value, curPath, 111111);
+		searchUpdate({ algorithmName: value, pathFilter: curPath });
 	};
 
 	// 重置表单
@@ -296,7 +296,7 @@ export default (props: Props) => {
 											) : (
 												<></>
 											)}
-											{canAdd ? (
+											{canAdd && fields.length < 3 ? (
 												<span
 													onClick={() => add()}
 													style={{ cursor: 'pointer' }}
@@ -351,7 +351,7 @@ export default (props: Props) => {
 								initialValue={4}
 								className={styles['filter-form-item']}
 							>
-								<InputNumber min={0} max={6} />
+								<InputNumber min={1} max={8} />
 							</Form.Item>
 						</div>
 
@@ -375,6 +375,8 @@ export default (props: Props) => {
 							</div>
 							<Form.Item name={FormItems.pathFilter} label="链路筛选">
 								<AttrFillter
+									canUse={bodys?.length > 1 ? true : false}
+									setCurPath={setCurPath}
 									getFormItemValue={getFormItemValue}
 									setFormItemValue={setFormItemValue}
 									updateGraph={(path: IPath[]) =>
@@ -394,6 +396,7 @@ export default (props: Props) => {
 										allowClear
 										style={{ width: '100%' }}
 										placeholder="请选择"
+										onChange={handleAlgorithmChange}
 									>
 										{algorithmOptions.map((item) => {
 											return (

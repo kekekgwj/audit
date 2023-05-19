@@ -15,7 +15,7 @@ import { INode, ModelConfig, NodeConfig } from '@antv/g6';
 import { Checkbox, Input, Col, Row, message, Form, Table, Button } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CustomDialog from '@graph/components/custom-dialog';
-import { saveGraph } from '@/api/knowLedgeGraph/graphin';
+import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
 import { getGraphByRule } from '@/api/knowLedgeGraph/suspiciousRule';
 
 // 注册自定义节点
@@ -45,10 +45,10 @@ interface NodeDetailProps {
 
 interface SaveProps {
 	open: boolean;
-	file: any;
+	fileUrl: string;
 	defaultName: string;
-	tableData: [];
-	setSaveOpen: () => void;
+	orData: [];
+	setSaveOpen: (open: boolean) => void;
 	ruleId: string; //规则id
 	ruleName: string; //规则名称
 	head: []; //表头
@@ -60,12 +60,12 @@ const SaveCom = React.memo((props: SaveProps) => {
 	const [form] = Form.useForm();
 	const {
 		open,
-		file,
+		fileUrl,
 		defaultName,
 		ruleId,
 		head,
 		ruleName,
-		tableData,
+		orData,
 		setSaveOpen
 	} = props;
 
@@ -81,17 +81,16 @@ const SaveCom = React.memo((props: SaveProps) => {
 
 	// 提交表单
 	const handleOk = () => {
-		console.log(head, tableData, 838383);
 		const data = form.getFieldsValue();
-		const formData = new FormData();
-		formData.append('picFile', file);
-		formData.append('name', data.name);
-		formData.append('ruleId', ruleId);
-		formData.append('ruleName', ruleName);
-		formData.append('head', head);
-		formData.append('data', tableData);
-
-		saveGraph(formData).then((res) => {
+		const submitData = {
+			name: data.name,
+			picUrl: fileUrl,
+			ruleId: ruleId,
+			ruleName: ruleName,
+			head: head,
+			data: orData
+		};
+		saveGraph(submitData).then((res) => {
 			messageApi.open({
 				type: 'success',
 				content: '保存成功'
@@ -171,6 +170,8 @@ const GraphCom = () => {
 	const [data, setDate] = useState<GraphinData>();
 	//列表数据
 	const [tableData, setTableData] = useState([]);
+	//传给后端的数据
+	const [submitData, setSubmitData] = useState([]);
 	//表格colums设置
 	const [colums, setColums] = useState([]);
 	//表头
@@ -178,7 +179,7 @@ const GraphCom = () => {
 	//保存图谱
 	const [open, setSaveOpen] = React.useState(false);
 	//保存文件
-	const [file, setFile] = React.useState();
+	const [fileUrl, setFile] = React.useState();
 	//保存默认名称
 	const defaultName = originData.name;
 
@@ -189,6 +190,7 @@ const GraphCom = () => {
 	// 根据表数据动态渲染表
 	useEffect(() => {
 		if (tableData && tableData.length > 0) {
+			console.log(tableData, 191191);
 			// 根据数据获取对应项
 			const arr = Object.keys(tableData[0]);
 			const colums = tableHead.map((item, index) => {
@@ -202,190 +204,196 @@ const GraphCom = () => {
 		}
 	}, [tableData]);
 
+	//
+	const transToTableData = (head: [], data: []) => {
+		const tableDataArr = [];
+		data.forEach((item) => {
+			let newObj = {};
+			item.forEach((el, i) => {
+				newObj[head[i]] = el;
+			});
+			tableDataArr.push(newObj);
+		});
+		return tableDataArr;
+	};
+
 	// 获取图谱数据
 	const getGraphinData = async () => {
-		const res = await getGraphByRule({
-			ruleId: originData.ruleId,
-			value: originData.value
-		});
-		console.log(res, 211211211);
+		// const res = await getGraphByRule({
+		// 	ruleId: originData.ruleId,
+		// 	value: originData.value
+		// });
+		// console.log(res, 211211211);
 
-		// 模拟数据
-		// const res = {
-		// 	isHit: true,
-		// 	hasList: true,
-		// 	data: [
-		// 		{ name: '小明', major: '图计算' },
-		// 		{ name: '小明', major: '图计算' },
-		// 		{ name: '小明', major: '图计算' },
-		// 		{ name: '小明', major: '图计算' },
-		// 		{ name: '小明', major: '图计算' },
-		// 		{ name: '小明', major: '图计算' },
-		// 		{ name: '小明', major: '图计算' },
-		// 		{ name: '小明', major: '图计算' },
-		// 		{ name: '小明', major: '图计算' }
-		// 	],
-		// 	head: ['姓名', '专业'],
-		// 	nodes: [
-		// 		{
-		// 			id: 'node-0',
-		// 			x: 100,
-		// 			y: 100,
-		// 			data: {
-		// 				type: 'centerPointer'
-		// 			},
-		// 			style: {
-		// 				label: {
-		// 					value: '我是\nnode0',
-		// 					position: 'center',
-		// 					offset: [0, 0],
-		// 					fill: 'green'
-		// 				},
-		// 				keyshape: {
-		// 					size: 80,
-		// 					stroke: '#ff9f0f',
-		// 					fill: '#ff9f0ea6'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'node-1',
-		// 			x: 200,
-		// 			y: 200,
-		// 			data: {
-		// 				type: 'project'
-		// 			},
-		// 			style: {
-		// 				label: {
-		// 					value: '我是node1',
-		// 					position: 'center',
-		// 					offset: [0, 5],
-		// 					fill: 'green'
-		// 				},
-		// 				keyshape: {
-		// 					size: 60,
-		// 					stroke: '#ff9f0f',
-		// 					fill: '#ff9f0ea6'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'node-2',
-		// 			x: 100,
-		// 			y: 300,
-		// 			data: {
-		// 				type: 'project'
-		// 			},
-		// 			style: {
-		// 				label: {
-		// 					value: '我是node2',
-		// 					position: 'center',
-		// 					offset: [20, 5],
-		// 					fill: 'green'
-		// 				},
-		// 				keyshape: {
-		// 					size: 40,
-		// 					stroke: '#ff9f0f',
-		// 					fill: '#ff9f0ea6'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'node-3',
-		// 			data: {
-		// 				type: 'person'
-		// 			},
-		// 			style: {
-		// 				label: {
-		// 					value: '我是node3',
-		// 					position: 'center',
-		// 					offset: [20, 5],
-		// 					fill: 'green'
-		// 				},
-		// 				keyshape: {
-		// 					size: 40,
-		// 					stroke: '#ff9f0f',
-		// 					fill: '#ff9f0ea6'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'node-4',
-		// 			data: {
-		// 				type: 'person'
-		// 			},
-		// 			style: {
-		// 				label: {
-		// 					value: '我是node4',
-		// 					position: 'center',
-		// 					offset: [20, 0],
-		// 					fill: 'green'
-		// 				},
-		// 				keyshape: {
-		// 					size: 40,
-		// 					stroke: '#ff9f0f',
-		// 					fill: '#ff9f0ea6'
-		// 				}
-		// 			}
-		// 		}
-		// 	],
-		// 	edges: [
-		// 		{
-		// 			id: 'edge-0-1',
-		// 			source: 'node-0',
-		// 			target: 'node-1',
-		// 			style: {
-		// 				label: {
-		// 					value: '我是边1'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'edge-0-3',
-		// 			source: 'node-0',
-		// 			target: 'node-3',
-		// 			style: {
-		// 				label: {
-		// 					value: '我是边4'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'edge-3-4',
-		// 			source: 'node-3',
-		// 			target: 'node-4',
-		// 			style: {
-		// 				label: {
-		// 					value: '我是边5'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'edge-1-2',
-		// 			source: 'node-1',
-		// 			target: 'node-2',
-		// 			style: {
-		// 				label: {
-		// 					value: '我是边2'
-		// 				},
-		// 				keyshape: {
-		// 					lineWidth: 5,
-		// 					stroke: '#00f'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'edge-0-2',
-		// 			source: 'node-0',
-		// 			target: 'node-2',
-		// 			style: {
-		// 				label: {
-		// 					value: '我是边3'
-		// 				}
-		// 			}
-		// 		}
-		// 	]
-		// };
+		// 模拟数据;
+		const res = {
+			isHit: true,
+			hasList: true,
+			data: [
+				['张三', '12'],
+				['李四', '22']
+			],
+			head: ['姓名', '年龄'],
+			nodes: [
+				{
+					id: 'node-0',
+					x: 100,
+					y: 100,
+					data: {
+						type: 'centerPointer'
+					},
+					style: {
+						label: {
+							value: '我是\nnode0',
+							position: 'center',
+							offset: [0, 0],
+							fill: 'green'
+						},
+						keyshape: {
+							size: 80,
+							stroke: '#ff9f0f',
+							fill: '#ff9f0ea6'
+						}
+					}
+				},
+				{
+					id: 'node-1',
+					x: 200,
+					y: 200,
+					data: {
+						type: 'project'
+					},
+					style: {
+						label: {
+							value: '我是node1',
+							position: 'center',
+							offset: [0, 5],
+							fill: 'green'
+						},
+						keyshape: {
+							size: 60,
+							stroke: '#ff9f0f',
+							fill: '#ff9f0ea6'
+						}
+					}
+				},
+				{
+					id: 'node-2',
+					x: 100,
+					y: 300,
+					data: {
+						type: 'project'
+					},
+					style: {
+						label: {
+							value: '我是node2',
+							position: 'center',
+							offset: [20, 5],
+							fill: 'green'
+						},
+						keyshape: {
+							size: 40,
+							stroke: '#ff9f0f',
+							fill: '#ff9f0ea6'
+						}
+					}
+				},
+				{
+					id: 'node-3',
+					data: {
+						type: 'person'
+					},
+					style: {
+						label: {
+							value: '我是node3',
+							position: 'center',
+							offset: [20, 5],
+							fill: 'green'
+						},
+						keyshape: {
+							size: 40,
+							stroke: '#ff9f0f',
+							fill: '#ff9f0ea6'
+						}
+					}
+				},
+				{
+					id: 'node-4',
+					data: {
+						type: 'person'
+					},
+					style: {
+						label: {
+							value: '我是node4',
+							position: 'center',
+							offset: [20, 0],
+							fill: 'green'
+						},
+						keyshape: {
+							size: 40,
+							stroke: '#ff9f0f',
+							fill: '#ff9f0ea6'
+						}
+					}
+				}
+			],
+			edges: [
+				{
+					id: 'edge-0-1',
+					source: 'node-0',
+					target: 'node-1',
+					style: {
+						label: {
+							value: '我是边1'
+						}
+					}
+				},
+				{
+					id: 'edge-0-3',
+					source: 'node-0',
+					target: 'node-3',
+					style: {
+						label: {
+							value: '我是边4'
+						}
+					}
+				},
+				{
+					id: 'edge-3-4',
+					source: 'node-3',
+					target: 'node-4',
+					style: {
+						label: {
+							value: '我是边5'
+						}
+					}
+				},
+				{
+					id: 'edge-1-2',
+					source: 'node-1',
+					target: 'node-2',
+					style: {
+						label: {
+							value: '我是边2'
+						},
+						keyshape: {
+							lineWidth: 5,
+							stroke: '#00f'
+						}
+					}
+				},
+				{
+					id: 'edge-0-2',
+					source: 'node-0',
+					target: 'node-2',
+					style: {
+						label: {
+							value: '我是边3'
+						}
+					}
+				}
+			]
+		};
 
 		//是否命中数据
 		setHit(res.isHit);
@@ -393,10 +401,14 @@ const GraphCom = () => {
 		setHasList(res.hasList);
 
 		if (res.hasList) {
-			// 表数据
-			setTableData(res?.data);
 			//表头
 			setTableHead(res.head);
+
+			//将后端数据转换成渲染表的数据
+			setTableData(transToTableData(res.head, res.data));
+
+			// 传入后台的数据
+			setSubmitData(res?.data);
 		}
 		// 图谱数据
 		const graphData = {
@@ -417,9 +429,15 @@ const GraphCom = () => {
 		html2canvas(document.querySelector('#graphin-container')).then((canvas) => {
 			const base64Img = canvas.toDataURL('image/png'); //将canvas转为base64
 			const file = toImgStyle(base64Img, Date.now() + '.png');
-			setFile(file);
+
 			//调用后端接口，将文件传给后端
-			setSaveOpen(true);
+			const formData = new FormData();
+			formData.append('file', file);
+			uploadGraphPic(formData).then((res) => {
+				console.log(res, 123123123);
+				setFile(res);
+				setSaveOpen(true);
+			});
 		});
 	};
 
@@ -480,9 +498,9 @@ const GraphCom = () => {
 							head={tableHead}
 							ruleId={originData.ruleId}
 							ruleName={originData.name}
-							file={file}
+							fileUrl={fileUrl}
 							setSaveOpen={setSaveOpen}
-							tableData={tableData}
+							orData={submitData}
 						></SaveCom>
 					</div>
 				) : null}

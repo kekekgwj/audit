@@ -6,20 +6,19 @@ import GraphinCom from '@graph/components/graphin';
 import SideBar from '@graph/components/sidebar/sideBar';
 import { toImgStyle } from '@/utils/other';
 import styles from './index.module.less';
-import { saveGraph } from '@/api/knowLedgeGraph/graphin';
+import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
 import CustomDialog from '@graph/components/custom-dialog';
 
-// import { getBodyGraphin } from '@/api/knowledgeGraph/graphin';
 interface SaveProps {
 	open: boolean;
-	file: any;
+	fileUrl: string;
 	defaultName: string;
 	setSaveOpen: (open: boolean) => void;
 }
 const SaveCom = React.memo((props: SaveProps) => {
 	const [messageApi, contextHolder] = message.useMessage();
 	const [form] = Form.useForm();
-	const { open, file, defaultName, setSaveOpen } = props;
+	const { open, fileUrl, defaultName, setSaveOpen } = props;
 
 	useEffect(() => {
 		if (open) {
@@ -35,10 +34,11 @@ const SaveCom = React.memo((props: SaveProps) => {
 	// 提交表单
 	const handleOk = () => {
 		const data = form.getFieldsValue();
-		const formData = new FormData();
-		formData.append('picFile', file);
-		formData.append('name', data.name);
-		saveGraph(formData).then((res) => {
+		const submitData = {
+			name: data.name,
+			picUrl: fileUrl
+		};
+		saveGraph(submitData).then((res) => {
 			messageApi.open({
 				type: 'success',
 				content: '保存成功'
@@ -86,7 +86,7 @@ const RelationShipCom = () => {
 	const [barOpen, setBarOpen] = useState(true);
 	const graphinRef = useRef<GraphinRef>();
 	const [open, setSaveOpen] = React.useState(false);
-	const [file, setFile] = React.useState();
+	const [fileUrl, setFile] = React.useState();
 	const [defaultName, setdefaultName] = React.useState();
 
 	useEffect(() => {
@@ -94,20 +94,16 @@ const RelationShipCom = () => {
 	}, []);
 
 	const getGraphinData = async () => {
-		// const data = await getBodyGraphin();
-		const data = {};
-		updateData(data);
+		updateData(''); //设置初始值为空
 	};
 
 	// 更新数据
 	const updateData = (value: GraphinData) => {
-		console.log(value, 107777);
 		setDate(value);
 	};
 
 	// 保存图谱
 	const saveGraph = () => {
-		console.log('1111');
 		window.pageYOffset = 0; //网页位置
 		document.documentElement.scrollTop = 0; //滚动条的位置
 		document.body.scrollTop = 0; //网页被卷去的高
@@ -116,9 +112,14 @@ const RelationShipCom = () => {
 			const base64Img = canvas.toDataURL('image/png'); //将canvas转为base64
 
 			const file = toImgStyle(base64Img, Date.now() + '.png');
-			setFile(file);
 			//调用后端接口，将文件传给后端
-			setSaveOpen(true);
+			const formData = new FormData();
+			formData.append('file', file);
+			uploadGraphPic(formData).then((res) => {
+				console.log(res, 123123123);
+				setFile(res);
+				setSaveOpen(true);
+			});
 		});
 	};
 
@@ -176,7 +177,7 @@ const RelationShipCom = () => {
 			<SaveCom
 				open={open}
 				defaultName={defaultName}
-				file={file}
+				fileUrl={fileUrl}
 				setSaveOpen={setSaveOpen}
 			></SaveCom>
 		</div>
