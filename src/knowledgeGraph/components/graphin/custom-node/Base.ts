@@ -16,7 +16,6 @@ export default () => {
 			// 响应状态变化
 			setState(name, value, item) {
 				const group = item.getContainer();
-				console.log(group.get('children'), 1777171717);
 				const shape = group.get('children')[0]; // 顺序根据 draw 时确定
 				if (name === 'selected') {
 					if (value) {

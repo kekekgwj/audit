@@ -18,7 +18,7 @@ import {
 	getNextGraph,
 	getNextRelationships
 } from '@/api/knowledgeGraph/graphin';
-import NormalDistribution from 'normal-distribution';
+// import NormalDistribution from 'normal-distribution';
 // 注册自定义节点
 registerNodes('all');
 registerEdges('all');
@@ -203,6 +203,15 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			}
 		};
 	});
+	const getFillColorByType = (type: string): string => {
+		const colors = {
+			Company: '#f10',
+			Person: '#c00',
+			Property: '#dcc',
+			Recipient: 'green'
+		};
+		return colors[type] || '#000';
+	};
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 	// const normDist = new NormalDistribution(averageScore, 1);
@@ -212,6 +221,11 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 		return {
 			...node,
 			type: 'Base',
+			style: {
+				keyshape: {
+					fill: getFillColorByType(type)
+				}
+			},
 			config: {
 				type,
 				// 最小值为10
@@ -227,7 +241,7 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 };
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData, refersh } = props;
-
+	const formatData = formatGraphData(data);
 	const [key, setKey] = useState('');
 	const curData = { ...data }; //当前图谱数据  穿透下一层时需要拼接数据
 	const [width, setWidth] = useState(600);
@@ -248,7 +262,7 @@ const GraphinCom = React.memo((props: Props) => {
 		<div ref={graphinRef} className={styles['graphin-box']}>
 			<Graphin
 				key={key}
-				data={formatGraphData(data)}
+				data={formatData}
 				width={width}
 				layout={{
 					type: 'force',
@@ -281,9 +295,17 @@ const GraphinCom = React.memo((props: Props) => {
 						);
 					}}
 				</ContextMenu>
-				<Legend bindType="node" sortKey="type">
+				{/*color: data中的 style.keyshape.fill || style.color*/}
+				<Legend bindType="node" sortKey="config.type">
 					{(renderProps: LegendChildrenProps) => {
-						return <Legend.Node {...renderProps} />;
+						return (
+							<Legend.Node
+								{...renderProps}
+								onChange={(checkedValue, result) => {
+									console.log('click legend', checkedValue, result);
+								}}
+							/>
+						);
 					}}
 				</Legend>
 				<LeftEvent></LeftEvent>
