@@ -3551,6 +3551,11 @@
   "resolved" "https://registry.npmmirror.com/node-releases/-/node-releases-2.0.10.tgz"
   "version" "2.0.10"
 
+"normal-distribution@^1.1.1":
+  "integrity" "sha512-lyz7LXBhjiEdAw234zTz05EohshNCORpC0duBQeaKzZIeTE6oDfpcBocEXbZTFv3GkoiMPz9mhgUuv5mMc64uA=="
+  "resolved" "https://registry.npmmirror.com/normal-distribution/-/normal-distribution-1.1.1.tgz"
+  "version" "1.1.1"
+
 "normalize-path@^3.0.0", "normalize-path@~3.0.0":
   "integrity" "sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA=="
   "resolved" "https://registry.npmmirror.com/normalize-path/-/normalize-path-3.0.0.tgz"
