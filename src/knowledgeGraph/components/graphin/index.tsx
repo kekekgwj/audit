@@ -18,7 +18,8 @@ import {
 	getNextGraph,
 	getNextRelationships
 } from '@/api/knowledgeGraph/graphin';
-
+import { getFillColorByType } from './custom-node/Base';
+// import NormalDistribution from 'normal-distribution';
 // 注册自定义节点
 registerNodes('all');
 registerEdges('all');
@@ -145,7 +146,7 @@ const MyMenu = React.memo((props: MenuProps) => {
 			edges: []
 		}); //先置空不然渲染有问题
 		getNextGraph({ nodeId: id, relationships: checkedRel }).then((res: any) => {
-			let map = new Map();
+			const map = new Map();
 			const newData = {
 				//拼接原有数据并去重
 				nodes: [...oldData.nodes, ...res.nodes].filter(
@@ -203,18 +204,27 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			}
 		};
 	});
+
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
-
+	// const normDist = new NormalDistribution(averageScore, 1);
 	const formatNodes = nodes.map((node) => {
 		const { type, score, communityId } = node;
+		// console.log('score', score, normDist.pdf(score as number));
 		return {
 			...node,
 			type: 'Base',
+			style: {
+				keyshape: {
+					fill: getFillColorByType(type)
+				}
+			},
 			config: {
 				type,
-				// 最小值为10
-				size: score ? Math.max((score / averageScore) * 30, 10) : 10,
+				// 最小值为100, 最大200
+				size: score
+					? Math.min(Math.max((score / averageScore) * 200, 100), 200)
+					: 100,
 				communityId
 			}
 		};
@@ -226,7 +236,7 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 };
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData, refersh } = props;
-
+	const formatData = formatGraphData(data);
 	const [key, setKey] = useState('');
 	const curData = { ...data }; //当前图谱数据  穿透下一层时需要拼接数据
 	const [width, setWidth] = useState(600);
@@ -247,13 +257,13 @@ const GraphinCom = React.memo((props: Props) => {
 		<div ref={graphinRef} className={styles['graphin-box']}>
 			<Graphin
 				key={key}
-				data={formatGraphData(data)}
+				data={formatData}
 				width={width}
 				layout={{
 					type: 'force',
 					// linkDistance: 400,
 					preventOverlap: true,
-					nodeSize: 140,
+					nodeSize: 200,
 					nodeSpacing: 50
 					// animation: false
 				}}
@@ -280,9 +290,17 @@ const GraphinCom = React.memo((props: Props) => {
 						);
 					}}
 				</ContextMenu>
-				<Legend bindType="node" sortKey="type">
+				{/*color: data中的 style.keyshape.fill || style.color*/}
+				<Legend bindType="node" sortKey="config.type">
 					{(renderProps: LegendChildrenProps) => {
-						return <Legend.Node {...renderProps} />;
+						return (
+							<Legend.Node
+								{...renderProps}
+								onChange={(checkedValue, result) => {
+									console.log('click legend', checkedValue, result);
+								}}
+							/>
+						);
 					}}
 				</Legend>
 				<LeftEvent></LeftEvent>
