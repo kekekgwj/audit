@@ -1,13 +1,23 @@
 import Graphin from '@antv/graphin';
 import { getCanvasText } from '@/utils/graphin';
 
-const Colors = {
-	BASE: ['red', 'red', '#fff']
+const Colors: {
+	[key: string]: Array<string>;
+} = {
+	BASE: ['red', 'red', '#fff'],
+	Company: ['#E6697B', '#E6697B', '#fff'],
+	Person: ['#EBF3EF', '#EBF3EF', '#000'],
+	Property: ['#708FFF', '#708FFF', '#fff'],
+	Recipient: ['#24A36F', '#24A36F', '#fff']
 };
 
 // 获取 stroke、FILL、
 const getColorByType = (type: string): string[] => {
 	return Colors[type] ? Colors[type] : Colors['BASE'];
+};
+// legend的颜色
+export const getFillColorByType = (type: string): string => {
+	return (getColorByType(type)[0] as string) || '#000';
 };
 export default () => {
 	Graphin.registerNode(
@@ -33,16 +43,20 @@ export default () => {
 				}
 			},
 			draw(cfg, group) {
-				// 设置自定义节点图例
-				const config = cfg.config;
-				const { type, size } = config;
+				const { type, size } = cfg.config;
 				const [strokeColor, fillColor, labelColor] = getColorByType(type);
+				// 设置自定义节点图例
+				cfg.style.keyshape = {
+					stroke: strokeColor,
+					fill: fillColor,
+					fillOpacity: 1
+				};
 
-				const [label] = getCanvasText(cfg.label, 12, 100);
+				const [label] = getCanvasText(cfg.label, 12, size);
 
 				const keyshape = group.addShape('circle', {
 					attrs: {
-						r: size,
+						r: size / 2,
 						fill: fillColor,
 						strokeColor: strokeColor,
 						cursor: 'pointer'

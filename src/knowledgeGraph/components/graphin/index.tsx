@@ -18,6 +18,7 @@ import {
 	getNextGraph,
 	getNextRelationships
 } from '@/api/knowledgeGraph/graphin';
+import { getFillColorByType } from './custom-node/Base';
 // import NormalDistribution from 'normal-distribution';
 // 注册自定义节点
 registerNodes('all');
@@ -145,7 +146,7 @@ const MyMenu = React.memo((props: MenuProps) => {
 			edges: []
 		}); //先置空不然渲染有问题
 		getNextGraph({ nodeId: id, relationships: checkedRel }).then((res: any) => {
-			let map = new Map();
+			const map = new Map();
 			const newData = {
 				//拼接原有数据并去重
 				nodes: [...oldData.nodes, ...res.nodes].filter(
@@ -203,15 +204,7 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			}
 		};
 	});
-	const getFillColorByType = (type: string): string => {
-		const colors = {
-			Company: '#f10',
-			Person: '#c00',
-			Property: '#dcc',
-			Recipient: 'green'
-		};
-		return colors[type] || '#000';
-	};
+
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 	// const normDist = new NormalDistribution(averageScore, 1);
@@ -228,8 +221,10 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			},
 			config: {
 				type,
-				// 最小值为10
-				size: score ? (score / averageScore) * 5 + 20 : 20,
+				// 最小值为100, 最大200
+				size: score
+					? Math.min(Math.max((score / averageScore) * 200, 100), 200)
+					: 100,
 				communityId
 			}
 		};
@@ -268,7 +263,7 @@ const GraphinCom = React.memo((props: Props) => {
 					type: 'force',
 					// linkDistance: 400,
 					preventOverlap: true,
-					nodeSize: 140,
+					nodeSize: 200,
 					nodeSpacing: 50
 					// animation: false
 				}}
