@@ -40,11 +40,13 @@ export default () => {
 					fillOpacity: 1
 				};
 
-				const [label] = getCanvasText(cfg.label, 12, 100);
+				const { size } = cfg.config;
+
+				const [label] = getCanvasText(cfg.label, 12, size);
 
 				const keyshape = group.addShape('circle', {
 					attrs: {
-						r: 60,
+						r: size / 2,
 						fill: '#E6697B',
 						cursor: 'pointer'
 					},

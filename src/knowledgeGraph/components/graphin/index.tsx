@@ -145,7 +145,7 @@ const MyMenu = React.memo((props: MenuProps) => {
 			edges: []
 		}); //先置空不然渲染有问题
 		getNextGraph({ nodeId: id, relationships: checkedRel }).then((res: any) => {
-			let map = new Map();
+			const map = new Map();
 			const newData = {
 				//拼接原有数据并去重
 				nodes: [...oldData.nodes, ...res.nodes].filter(
@@ -213,8 +213,10 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			type: 'Base',
 			config: {
 				type,
-				// 最小值为10
-				size: score ? Math.max((score / averageScore) * 30, 10) : 10,
+				// 最小值为100, 最大200
+				size: score
+					? Math.min(Math.max((score / averageScore) * 200, 100), 200)
+					: 100,
 				communityId
 			}
 		};
@@ -253,7 +255,7 @@ const GraphinCom = React.memo((props: Props) => {
 					type: 'force',
 					// linkDistance: 400,
 					preventOverlap: true,
-					nodeSize: 140,
+					nodeSize: 200,
 					nodeSpacing: 50
 					// animation: false
 				}}
@@ -280,7 +282,7 @@ const GraphinCom = React.memo((props: Props) => {
 						);
 					}}
 				</ContextMenu>
-				<Legend bindType="node" sortKey="type">
+				<Legend bindType="node" sortKey="config.type">
 					{(renderProps: LegendChildrenProps) => {
 						return <Legend.Node {...renderProps} />;
 					}}
