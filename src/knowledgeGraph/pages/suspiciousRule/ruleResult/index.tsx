@@ -16,6 +16,7 @@ import { Checkbox, Input, Col, Row, message, Form, Table, Button } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CustomDialog from '@graph/components/custom-dialog';
 import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
+import { debounce, throttle } from 'lodash';
 import { getGraphByRule } from '@/api/knowLedgeGraph/suspiciousRule';
 
 // 注册自定义节点
@@ -182,10 +183,37 @@ const GraphCom = () => {
 	const [fileUrl, setFile] = React.useState();
 	//保存默认名称
 	const defaultName = originData.name;
+	//是否显示滚动条
+	const [showScroll, setShowScroll] = React.useState(false);
 
 	useEffect(() => {
 		getGraphinData();
 	}, []);
+
+	// 处理滚动条
+	useEffect(() => {
+		if (isHit) {
+			//有数据
+			handleScroll();
+			return () => {
+				document.removeEventListener('scroll', toShowScroll);
+			};
+		}
+	}, [isHit]);
+
+	const toShowScroll = throttle(() => {
+		setShowScroll(true);
+		toHideScroll();
+	}, 30);
+
+	const toHideScroll = debounce(() => {
+		setShowScroll(false);
+	}, 2000);
+
+	const handleScroll = () => {
+		const el = document.querySelector('#main-content');
+		el?.addEventListener('scroll', toShowScroll);
+	};
 
 	// 根据表数据动态渲染表
 	useEffect(() => {
@@ -230,6 +258,12 @@ const GraphCom = () => {
 			isHit: true,
 			hasList: true,
 			data: [
+				['张三', '12'],
+				['张三', '12'],
+				['张三', '12'],
+				['张三', '12'],
+				['张三', '12'],
+				['张三', '12'],
 				['张三', '12'],
 				['李四', '22']
 			],
@@ -416,7 +450,6 @@ const GraphCom = () => {
 			nodes: res.nodes
 		};
 		setDate(graphData);
-
 		// 模拟数据
 	};
 
@@ -434,7 +467,6 @@ const GraphCom = () => {
 			const formData = new FormData();
 			formData.append('file', file);
 			uploadGraphPic(formData).then((res) => {
-				console.log(res, 123123123);
 				setFile(res);
 				setSaveOpen(true);
 			});
@@ -447,7 +479,13 @@ const GraphCom = () => {
 	};
 
 	return (
-		<div className={styles['rule-result-page']}>
+		<div
+			className={
+				showScroll
+					? `${styles['rule-result-page']} ${styles['scroll-visibile']}`
+					: styles['rule-result-page']
+			}
+		>
 			<div className={styles['top-tips']}>
 				<span className={styles['rule-name']}>规则名称:{originData.name}</span>
 				<span style={{ marginRight: '10px' }} onClick={() => goBack()}>
@@ -460,7 +498,7 @@ const GraphCom = () => {
 			</div>
 			<>
 				{isHit ? (
-					<div className={styles['main-content']}>
+					<div id="main-content" className={styles['main-content']}>
 						{hasList ? (
 							<div className={styles['table-box']}>
 								<Table

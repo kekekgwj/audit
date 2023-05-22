@@ -1,37 +1,71 @@
 .graph-detail-page {
 	box-sizing: border-box;
-	padding: 0 20px;
+	padding-left: 20px;
 	width: 100%;
 	::-webkit-scrollbar {
-		width: 10px;
+		width: 6px;
 		height: 5px;
+		background-color: #fff;
 	}
+	::-webkit-scrollbar-track-piece {
+		background-color: #fff;
+		border-radius: 6px;
+	}
+	::-webkit-scrollbar-thumb:vertical {
+		height: 5px;
+		background-color: #fff;
+		border-radius: 6px;
+		-webkit-border-radius: 6px;
+	}
+
 	.top-back-box {
-		text-align: right;
+		position: absolute;
+		right: 20px;
+		width: calc(100% - 20px);
+		padding-left: 20px;
+		background: #fff;
+		z-index: 999;
 		height: 74px;
-		line-height: 74px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		.icon-close {
 			font-size: 30px;
 			cursor: pointer;
 		}
 	}
 	.main-content {
-		height: calc(100vh - 74px);
+		padding-top: 74px;
+		height: 100vh;
 		overflow-y: auto;
 		::-webkit-scrollbar {
-			width: 0px;
+			width: 5px;
 			height: 5px;
+		}
+		::-webkit-scrollbar-thumb:vertical {
+			height: 5px;
+			background-color: #bbbdbf;
+			border-radius: 6px;
+			-webkit-border-radius: 6px;
 		}
 		.my-table {
 			max-height: 400px;
 			overflow-y: auto;
-			margin-right: 10px;
+			margin-right: 20px;
 		}
 		.graph-picture-box {
+			padding-right: 20px;
 			.img {
 				width: 100%;
 				object-fit: cover;
 			}
 		}
+	}
+}
+.scroll-visibile {
+	::-webkit-scrollbar-thumb {
+		background-color: #bbbdbf !important;
+		border-radius: 6px !important;
+		-webkit-border-radius: 6px !important;
 	}
 }

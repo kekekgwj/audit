@@ -2,23 +2,51 @@ import React, { useEffect } from 'react';
 import { getDeatil } from '@/api/knowledgeGraph/myAltas';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Image, Table } from 'antd';
+import { debounce, throttle } from 'lodash';
 import styles from './detail.module.less';
 import SvgIcon from '@/components/svg-icon';
 const AltasDetailCom = () => {
 	const navigate = useNavigate();
 	let location = useLocation();
 	const graphId = location.state.id;
+	const [showScroll, setShowScroll] = React.useState(false);
 	const [graphUrl, setGraphUrl] = React.useState('');
 	const [tableHead, setHead] = React.useState(); //表头
 	const [data, setData] = React.useState(); //原始表数据
 	const [tableData, setTableData] = React.useState([]); //渲染表数据
 	//表格colums设置
 	const [colums, setColums] = React.useState([]);
+
+	//图谱名称
+	const [graphName, setGraphinName] = React.useState();
+
+	useEffect(() => {
+		handleScroll();
+		return () => {
+			document.removeEventListener('scroll', toShowScroll);
+		};
+	}, []);
+
+	const toShowScroll = throttle(() => {
+		setShowScroll(true);
+		toHideScroll();
+	}, 30);
+
+	const handleScroll = () => {
+		const el = document.querySelector('#main-content');
+		el.addEventListener('scroll', toShowScroll);
+	};
+
+	const toHideScroll = debounce(() => {
+		setShowScroll(false);
+	}, 2000);
+
 	useEffect(() => {
 		getDeatil({ graphId }).then((res: any) => {
 			setGraphUrl(res.picUrl);
 			setData(res.data);
 			setHead(res.head);
+			setGraphinName(res.name);
 			if (res.data) {
 				//存在表 渲染表数据
 				setTableData(transToTableData(res.head, res.data));
@@ -61,17 +89,24 @@ const AltasDetailCom = () => {
 	};
 
 	return (
-		<div className={styles['graph-detail-page']}>
+		<div
+			className={
+				showScroll
+					? `${styles['graph-detail-page']} ${styles['scroll-visibile']}`
+					: styles['graph-detail-page']
+			}
+		>
 			<div className={styles['top-back-box']}>
+				<span className={styles['rule-name']}>图谱名称:{graphName}</span>
 				<span style={{ marginRight: '10px' }} onClick={() => goBack()}>
 					<SvgIcon
 						name="close"
-						color="#24A36F"
+						color="#23955C"
 						className={styles['icon-close']}
 					></SvgIcon>
 				</span>
 			</div>
-			<div className={styles['main-content']}>
+			<div id="main-content" className={styles['main-content']}>
 				<>
 					{data ? (
 						<div className={styles['table-box']}>
