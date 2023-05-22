@@ -506,6 +506,7 @@ const GraphCom = () => {
 									columns={colums}
 									dataSource={tableData}
 									pagination={false}
+									scroll={{ y: 240 }}
 								></Table>
 							</div>
 						) : null}
