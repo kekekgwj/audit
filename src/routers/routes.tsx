@@ -47,7 +47,7 @@ export const routes: CustomRoute[] = [
 			{
 				path: 'altasDetail',
 				component: lazy(() => import('@graph/pages/myAtlas/detail')),
-				meta: { title: 'altasDetail', hidden: true }
+				meta: { title: 'altasDetail', hidden: true, active: '/myAtlas' }
 			},
 			{
 				path: 'whiteList',

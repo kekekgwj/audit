@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { routes, CustomRoute } from '@/routers/routes';
 import SvgIcon from '@/components/svg-icon';
@@ -9,6 +9,7 @@ interface MenuItem {
 	title: string | undefined;
 	icon: string | undefined;
 	active: string;
+	hidden: boolean | undefined;
 	children?: MenuItem[] | undefined;
 }
 
@@ -16,13 +17,16 @@ const initMenu = (routes: CustomRoute[], parentPath = '') => {
 	const arr: MenuItem[] = [];
 
 	routes.forEach((route: CustomRoute) => {
-		if (route?.meta?.hidden) return;
-		const active = (parentPath + '/' + route?.path).replace(/(\/)+/gi, '/');
+		// if (route?.meta?.hidden) return;
+		const active = route?.meta?.active
+			? route?.meta?.active
+			: (parentPath + '/' + route?.path).replace(/(\/)+/gi, '/');
 		arr.push({
 			path: route?.path,
 			title: route?.meta?.title,
 			icon: route?.meta?.icon,
 			active: active,
+			hidden: route?.meta?.hidden,
 			children: route?.children && initMenu(route.children, active)
 		});
 	});
@@ -30,10 +34,34 @@ const initMenu = (routes: CustomRoute[], parentPath = '') => {
 	return arr;
 };
 
+const findMenu = (menus: MenuItem[], path: string): false | MenuItem => {
+	for (let i = 0; i < menus.length; i++) {
+		const item = menus[i];
+		if (path === item.path || path === '/' + item.path) {
+			return item;
+		}
+		if (item.children && item.children.length) {
+			const flag = findMenu(item.children, path);
+			if (flag) {
+				return flag;
+			}
+		}
+	}
+	return false;
+};
+
 export default () => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const [activeMenu, setActiveMenu] = useState<MenuItem>();
 	const [menu] = useState<MenuItem[]>(initMenu(routes));
+
+	useEffect(() => {
+		const menuItem = findMenu(menu, location.pathname);
+		if (menuItem) {
+			setActiveMenu(menuItem);
+		}
+	}, [location]);
 
 	const handleNavigate = (path: string | undefined) => {
 		if (path) {
@@ -52,25 +80,28 @@ export default () => {
 				<div>{menu[0]?.title}</div>
 			</div>
 			<div className="menu-list">
-				{menu[0].children?.map((m) => (
-					<div
-						key={m.path}
-						onClick={() => {
-							handleNavigate(m.path);
-						}}
-						className={`${styles['menu-item']} ${
-							location.pathname === m.active ? styles['active'] : ''
-						}`}
-					>
-						{m.icon && (
-							<SvgIcon
-								name={m.icon}
-								className={styles['menu-item__icon']}
-							></SvgIcon>
-						)}
-						<div>{m.title || m.path}</div>
-					</div>
-				))}
+				{menu[0].children?.map((m) => {
+					if (m.hidden) return;
+					return (
+						<div
+							key={m.path}
+							onClick={() => {
+								handleNavigate(m.path);
+							}}
+							className={`${styles['menu-item']} ${
+								activeMenu?.active === m.active ? styles['active'] : ''
+							}`}
+						>
+							{m.icon && (
+								<SvgIcon
+									name={m.icon}
+									className={styles['menu-item__icon']}
+								></SvgIcon>
+							)}
+							<div>{m.title || m.path}</div>
+						</div>
+					);
+				})}
 				{/* <div className="menu-item"></div> */}
 			</div>
 		</div>
