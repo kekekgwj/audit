@@ -110,7 +110,7 @@ export default (props: Props) => {
 	// 渲染顶部
 	const renderTpggleTab = () => (
 		<div className={styles['toggle-tab']}>
-			<div className={styles['tab-title']}>筛选条件</div>
+			<div className={styles['tab-title']}>条件筛选</div>
 			<div
 				className={
 					configVisibile
@@ -211,6 +211,8 @@ export default (props: Props) => {
 			],
 			level: 4
 		});
+		// 将链路和算法置灰
+		updateData('');
 	};
 	const getFormItemValue = (name: FormItems) => {
 		if (form) {

@@ -42,7 +42,7 @@ export const routes: CustomRoute[] = [
 				component: lazy(
 					() => import('@graph/pages/suspiciousRule/ruleResult/index')
 				),
-				meta: { title: 'ruleResult', hidden: true }
+				meta: { title: 'ruleResult', hidden: true, active: '/suspiciousRule' }
 			},
 			{
 				path: 'altasDetail',
