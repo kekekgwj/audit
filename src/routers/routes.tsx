@@ -47,7 +47,7 @@ export const routes: CustomRoute[] = [
 			{
 				path: 'altasDetail',
 				component: lazy(() => import('@graph/pages/myAtlas/detail')),
-				meta: { title: 'altasDetail', hidden: true }
+				meta: { title: 'altasDetail', hidden: true, active: '/myAtlas' }
 			},
 			{
 				path: 'whiteList',
@@ -69,7 +69,14 @@ export const routes: CustomRoute[] = [
 			{
 				path: 'analysis',
 				component: lazy(() => import('@sql/pages/analysisTool')),
-				meta: { title: '数据可视化', icon: 'body' }
+				meta: { title: '数据可视化', icon: 'body' },
+				children: [
+					{
+						path: 'myTemplate',
+						component: lazy(() => import('@sql/pages/myTemplate')),
+						meta: { title: '我的模板', icon: 'body' }
+					}
+				]
 			},
 			{
 				path: 'editor',
@@ -80,6 +87,16 @@ export const routes: CustomRoute[] = [
 				path: 'data',
 				component: lazy(() => import('@sql/pages/dataManage')),
 				meta: { title: '我的数据管理', icon: 'body' }
+			},
+			{
+				path: 'myTemplate',
+				component: lazy(() => import('@sql/pages/myTemplate')),
+				meta: { title: '我的模板', icon: 'body' }
+			},
+			{
+				path: 'auditTemplate',
+				component: lazy(() => import('@sql/pages/auditTemplate')),
+				meta: { title: '审计模板', icon: 'body' }
 			}
 		]
 	}
