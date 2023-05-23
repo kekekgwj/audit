@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Button, Modal } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
+import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 
 interface DialogProps {
@@ -49,7 +50,7 @@ export default (props: DialogProps) => {
 			style={{ minWidth: minWidth }}
 			footer={false}
 			wrapClassName={wrapClassName}
-			closeIcon={<CloseCircleOutlined />}
+			closeIcon={<SvgIcon name="close" color="#fff"></SvgIcon>}
 			onCancel={onCancel}
 			className={styles['custom-dialog']}
 		>

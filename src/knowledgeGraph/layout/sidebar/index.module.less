@@ -1,12 +1,13 @@
 .parent-menu {
 	background: #f8f9fa;
-	&.menu-item {
+	.menu-item {
 		font-size: 16px;
 		padding-left: 16px;
 		color: #767676;
 		&__icon {
-			font-size: 24px;
+			font-size: 24px !important;
 			margin-right: 8px;
+			margin-left: -4px;
 		}
 	}
 }
@@ -21,6 +22,7 @@
 	cursor: pointer;
 	&.active {
 		border-color: #23955c;
+		background: #f8f9fa;
 		color: #23955c;
 		fill: #23955c;
 	}

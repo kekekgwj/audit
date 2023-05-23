@@ -75,7 +75,7 @@ interface TableProps {
 	current: number;
 	size: number; //每页数量
 	onShowSizeChange: (current: number, size: number) => void;
-	onChange: (pageNumber: Number) => void;
+	onChange: (pageNumber: number) => void;
 }
 const MyTableCom = React.memo((props: TableProps) => {
 	//使用弹框
@@ -190,13 +190,13 @@ const RuleCom = () => {
 
 	const onReset = () => {
 		form.resetFields();
-		getList()
+		getList();
 	};
 
 	const search = () => {
 		// console.log(res);
 		setCurrent(1);
-		getList()
+		getList();
 	};
 
 	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
@@ -221,7 +221,7 @@ const RuleCom = () => {
 					layout="inline"
 				>
 					<Form.Item name="name" label="规则名称" colon={false}>
-						<Input placeholder="请输入" />
+						<Input placeholder="请输入" className={styles.searchItem} />
 					</Form.Item>
 				</Form>
 				<div className={styles['search-handle-box']}>

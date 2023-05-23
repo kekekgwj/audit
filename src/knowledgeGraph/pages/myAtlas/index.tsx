@@ -230,11 +230,15 @@ const MyAtlasCom = () => {
 					layout="inline"
 				>
 					<Form.Item name="name" label="图谱名称" colon={false}>
-						<Input placeholder="请输入" />
+						<Input placeholder="请输入" className={styles.searchItem} />
 					</Form.Item>
 
 					<Form.Item name="gmtCreated" label="创建时间" colon={false}>
-						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
+						<RangePicker
+							format="YYYY-MM-DD"
+							separator={<div>至</div>}
+							className={styles.searchItem}
+						/>
 					</Form.Item>
 				</Form>
 				<div className={styles['search-handle-box']}>
