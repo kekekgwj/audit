@@ -326,7 +326,11 @@ export default (props: IProps) => {
 	};
 	return (
 		<>
-			<Button disabled={canUse || !curData} onClick={() => changeDialogOpen()}>
+			<Button
+				disabled={canUse || !curData}
+				onClick={() => changeDialogOpen()}
+				style={{ width: '100%' }}
+			>
 				{getOnePath(treeData)}
 			</Button>
 			<CustomDialog

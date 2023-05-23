@@ -4,6 +4,7 @@ import {
 	CloseCircleOutlined,
 	ExclamationCircleOutlined
 } from '@ant-design/icons';
+import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 
 interface DialogProps {
@@ -22,17 +23,18 @@ export default (props: DialogProps) => {
 			width={width}
 			footer={false}
 			wrapClassName={wrapClassName}
-			closeIcon={<CloseCircleOutlined style={{ fontSize: '20px' }} />}
+			closeIcon={<SvgIcon name="close" color="#24A36F"></SvgIcon>}
 			onCancel={handleCancle}
 			className={styles['custom-dialog']}
 		>
 			<div className={styles['ant-modal__main']}>
 				<div className={styles['delete-icon-box']}>
-					<Space>
+					{/* <Space>
 						<ExclamationCircleOutlined
 							style={{ fontSize: '45px', color: '#F6AC2D' }}
 						/>
-					</Space>
+					</Space> */}
+					<SvgIcon name="warning"></SvgIcon>
 				</div>
 				<div className={styles['ant-modal-message']}>
 					该条数据删除后将无法恢复，是否删除数据？
