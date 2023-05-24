@@ -18,13 +18,14 @@ interface Props {
 	cRef: any;
 	handleCancel: () => void;
 	refresh: () => void;
+	setOpenImport: (open: boolean) => void;
 }
 const { TextArea } = Input;
 import { importTable } from '@/api/dataAnalysis/dataManage.ts';
 const ImportCom = React.memo((props: Props) => {
 	const [form] = Form.useForm();
 	const [overLimit, setOverLimit] = React.useState(false);
-	const { open, cRef, handleCancel, refresh } = props;
+	const { open, cRef, handleCancel, refresh, setOpenImport } = props;
 	const type = Form.useWatch('type', form);
 
 	useImperativeHandle(cRef, () => ({
@@ -65,15 +66,14 @@ const ImportCom = React.memo((props: Props) => {
 		if (overLimit) {
 			return false;
 		}
-		console.log(data, 66666666);
 		form.validateFields().then(() => {
 			const formData = new FormData();
 			formData.append('tableName', data.tableName);
 			formData.append('file', data.file.originFileObj);
 			formData.append('description', data.description);
 			importTable(formData).then((res) => {
-				console.log(res, 727272);
 				message.success('导入成功');
+				setOpenImport(false);
 				refresh();
 			});
 		});

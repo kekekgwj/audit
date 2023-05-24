@@ -91,7 +91,7 @@ export const routes: CustomRoute[] = [
 			{
 				path: 'dataDetail',
 				component: lazy(() => import('@sql/pages/dataManage/detail')),
-				meta: { title: 'dataDeatil', hidden: true, active: '/data' }
+				meta: { title: 'dataDetail', hidden: true }
 			},
 			{
 				path: 'myTemplate',

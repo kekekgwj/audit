@@ -48,7 +48,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	const handleDetail = (row: any) => {
 		// 跳转到详情页
 		console.log(row.id, 595959);
-		navigate('/dataDeatil', { state: { id: row.id } });
+		navigate('/sql/dataDetail', { state: { id: row.id } });
 	};
 
 	// 删除
@@ -310,6 +310,7 @@ const DataManageCom = () => {
 				cRef={importRef}
 				handleCancel={handleCancel}
 				refresh={getList}
+				setOpenImport={setOpenImport}
 			></ImportDialog>
 		</div>
 	);

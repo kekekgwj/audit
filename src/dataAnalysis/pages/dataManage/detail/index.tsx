@@ -9,8 +9,7 @@ import { getMyTable } from '@/api/dataAnalysis/dataManage.ts';
 const DataManageDetailCom = () => {
 	const navigate = useNavigate();
 	let location = useLocation();
-	// const id = location.state.id || '';
-	const id = '';
+	const id = location.state.id;
 	const [tableHead, setHead] = React.useState(); //表头
 	const [data, setData] = React.useState(); //原始表数据
 	const [tableData, setTableData] = React.useState([]); //渲染表数据
@@ -26,28 +25,6 @@ const DataManageDetailCom = () => {
 					setTableData(transToTableData(res.head, res.data));
 				}
 			});
-		}
-
-		// 测试数据
-		else {
-			const res = {
-				head: ['姓名', '年龄'],
-				data: [
-					['张三', 8],
-					['张三', 8],
-					['张三', 8],
-					['张三', 8],
-					['张三', 8],
-					['张三', 8],
-					['张三', 8]
-				]
-			};
-			setData(res.data);
-			setHead(res.head);
-			if (res.data) {
-				//存在表 渲染表数据
-				setTableData(transToTableData(res.head, res.data));
-			}
 		}
 	}, [id]);
 
