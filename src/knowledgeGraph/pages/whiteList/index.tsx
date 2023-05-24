@@ -174,7 +174,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 				className={styles['my-table']}
 				columns={colums}
 				dataSource={data}
-				pagination={{ position: ['none'] }}
+				pagination={false}
 			></Table>
 			{data.length ? (
 				<div

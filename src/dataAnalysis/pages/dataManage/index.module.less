@@ -1,9 +1,24 @@
-.searchForm {
-	display: flex;
-	align-items: center;
-	height: 64px;
-	background: #f8f9fa;
+.data-manage-page {
+	padding: 20px;
+	.searchForm {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		background: #f8f9fa;
+		margin-bottom: 20px;
+		padding: 0 20px;
+		.search-handle-box {
+			width: 138px;
+			display: flex;
+		}
+		:global {
+			.ant-form-item {
+				margin: 12px 30px 13px 0;
+			}
+		}
+	}
 }
+
 :global {
 	.ant-empty-image {
 		margin-top: 200px;
@@ -21,5 +36,24 @@
 		border-radius: 4px 4px 4px 4px;
 		color: #fff;
 		opacity: 1;
+	}
+}
+
+.my-table-box {
+	.my-table {
+		max-height: calc(100vh - 300px);
+		overflow-y: auto;
+	}
+	:global {
+		.ant-pagination .ant-pagination-item {
+			border: 1px solid #d9d9d9;
+		}
+		.ant-pagination .ant-pagination-item-active {
+			background: #24a36f;
+			border: none;
+			a {
+				color: #fff;
+			}
+		}
 	}
 }

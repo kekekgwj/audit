@@ -89,6 +89,11 @@ export const routes: CustomRoute[] = [
 				meta: { title: '我的数据管理', icon: 'body' }
 			},
 			{
+				path: 'dataDetail',
+				component: lazy(() => import('@sql/pages/dataManage/detail')),
+				meta: { title: 'dataDeatil', hidden: true, active: '/data' }
+			},
+			{
 				path: 'myTemplate',
 				component: lazy(() => import('@sql/pages/myTemplate')),
 				meta: { title: '我的模板', icon: 'body' }
