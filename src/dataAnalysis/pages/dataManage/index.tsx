@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
 	Table,
 	Space,
@@ -21,12 +22,6 @@ import Delete from '@graph/components/delete-dialog';
 import ImportDialog from './components/importData';
 import { getDataList, deleteData } from '@/api/dataAnalysis/dataManage.ts';
 
-import {
-	getWhiteList,
-	getWhiteListType,
-	deleteWhiteList
-} from '@/api/knowledgeGraph/whiteList';
-
 interface TanbleProps {
 	data: [];
 	listType: [];
@@ -39,25 +34,21 @@ interface TanbleProps {
 }
 
 const MyTableCom = React.memo((props: TanbleProps) => {
+	const navigate = useNavigate();
 	const [messageApi, contextHolder] = message.useMessage();
 	const [curId, setCurId] = React.useState();
 
-	const [openEdit, setOpenEdit] = React.useState(false);
+	// const [openEdit, setOpenEdit] = React.useState(false);
 	const editRef = useRef();
 	const [openDel, setOpenDel] = React.useState(false);
 	const { data, total, current, size, onShowSizeChange, onChange, refresh } =
 		props;
 
-	//编辑
-	const handleEdit = (row) => {
-		setCurId(row.id);
+	//查看
+	const handleDetail = (row: any) => {
+		// 跳转到详情页
 		console.log(row.id, 595959);
-		setOpenEdit(true);
-	};
-
-	const handleCancelEdit = () => {
-		editRef.current.resetForm();
-		setOpenEdit(false);
+		navigate('/dataDeatil', { state: { id: row.id } });
 	};
 
 	// 删除
@@ -84,7 +75,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	const colums = [
 		{
 			title: '序号',
-			render: (text, record, index) => `${index + 1}`
+			render: (text, record, index) => `${(current - 1) * size + index + 1}`
 		},
 		{
 			title: '数据表名称',
@@ -96,17 +87,13 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 			dataIndex: 'gmtCreated'
 		},
 		{
-			title: '更新时间',
-			dataIndex: 'gmtCreated'
-		},
-		{
 			title: '操作',
 			key: 'operaion',
 			render: (row, record) => {
 				return (
 					<div>
 						<span
-							onClick={() => handleEdit(row)}
+							onClick={() => handleDetail(row)}
 							style={{ cursor: 'pointer', marginRight: '10px' }}
 						>
 							<Space>
@@ -130,12 +117,13 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	];
 
 	return (
-		<div>
+		<div className={styles['my-table-box']}>
 			{contextHolder}
 			<Table
+				className={styles['my-table']}
 				columns={colums}
 				dataSource={data}
-				pagination={{ position: ['none'] }}
+				pagination={false}
 			></Table>
 			<div
 				style={{
@@ -189,21 +177,30 @@ const DataManageCom = () => {
 		const searchFormData = form.getFieldsValue();
 		const searchData = {
 			tableName: searchFormData.tableName || '',
-			beginTime: '',
-			endTime: ''
+			createdBeginTime: '',
+			createdEndTime: '',
+			modifiedBeginTime: '',
+			modifiedEndTime: ''
 		};
 		if (searchFormData.gmtCreated && searchFormData.gmtCreated.length > 0) {
-			searchData.beginTime = searchFormData.gmtCreated[0].format('YYYY-MM-DD');
-			searchData.endTime = searchFormData.gmtCreated[1].format('YYYY-MM-DD');
+			searchData.createdBeginTime =
+				searchFormData.gmtCreated[0].format('YYYY-MM-DD');
+			searchData.createdEndTime =
+				searchFormData.gmtCreated[1].format('YYYY-MM-DD');
 		}
-		console.log(searchData, 246246);
+		if (searchFormData.updateTime && searchFormData.updateTime.length > 0) {
+			searchData.modifiedBeginTime =
+				searchFormData.updateTime[0].format('YYYY-MM-DD');
+			searchData.modifiedEndTime =
+				searchFormData.updateTime[1].format('YYYY-MM-DD');
+		}
+
 		const data = {
 			current: current,
 			size: size,
 			...searchData
 		};
 		const res = await getDataList(data);
-		console.log(res, 209999);
 		setTableData(res.records);
 		setTotal(res.total);
 	};
@@ -241,12 +238,10 @@ const DataManageCom = () => {
 	};
 
 	return (
-		<div style={{ padding: '20px' }}>
+		<div className={styles['data-manage-page']}>
 			<div className={styles.searchForm}>
 				<Form
 					form={form}
-					labelCol={{ span: 6 }}
-					wrapperCol={{ span: 18 }}
 					layout="inline"
 					onFinish={(res: any) => {
 						search();
@@ -263,21 +258,24 @@ const DataManageCom = () => {
 					<Form.Item name="updateTime" label="更新时间">
 						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
 					</Form.Item>
-
-					<Form.Item>
-						<Button htmlType="button" onClick={onReset}>
-							重置
-						</Button>
-					</Form.Item>
-					<Form.Item>
-						<Button
-							htmlType="submit"
-							style={{ background: '#23955C', color: '#fff' }}
-						>
-							查询
-						</Button>
-					</Form.Item>
 				</Form>
+				<div className={styles['search-handle-box']}>
+					<Button htmlType="button" onClick={onReset}>
+						重置
+					</Button>
+					<Button
+						onClick={search}
+						style={{
+							background: '#23955C',
+							color: '#fff',
+							marginLeft: '10px',
+							border: 'none',
+							boxShadow: 'none'
+						}}
+					>
+						查询
+					</Button>
+				</div>
 			</div>
 			<div className={styles['handle-table-box']}>
 				<Button

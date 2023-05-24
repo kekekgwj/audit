@@ -4,8 +4,10 @@ const { VITE_API_PREFIX: API_PREFIX } = env;
 //数据表
 interface SearchData {
 	tableName: string;
-	beginTime: string;
-	endTime: string;
+	createdBeginTime: string;
+	createdEndTime: string;
+	modifiedBeginTime: string;
+	modifiedEndTime: string;
 	current: number;
 	size: number;
 }
@@ -30,5 +32,15 @@ export function importTable(formData: FormData) {
 	return postFormData(
 		API_PREFIX + '/blade-tool/dataAnalysis/importTable',
 		formData
+	);
+}
+
+//查看数据详情
+interface DetailData {
+	id: string;
+}
+export function getMyTable(data: DetailData) {
+	return get(
+		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/getMyTable', data)
 	);
 }

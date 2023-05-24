@@ -230,7 +230,7 @@ const MyAtlasCom = () => {
 					layout="inline"
 				>
 					<Form.Item name="name" label="图谱名称" colon={false}>
-						<Input placeholder="请输入" className={styles.searchItem} />
+						<Input placeholder="请输入" />
 					</Form.Item>
 
 					<Form.Item name="gmtCreated" label="创建时间" colon={false}>
