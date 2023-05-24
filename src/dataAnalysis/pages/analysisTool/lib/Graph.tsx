@@ -440,11 +440,17 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 								ref={DndContainerRef}
 								style={{
 									position: 'relative',
-									width: '380px',
+									width: '440px',
 									height: '44px',
-									display: 'flex'
+									display: 'flex',
+									alignItems: 'center'
 								}}
 							>
+								<span
+									style={{ fontSize: 14, fontWeight: 'bold', marginRight: 30 }}
+								>
+									工具栏
+								</span>
 								{imageShapes.map(({ label, image, type }, index) => {
 									return (
 										<div
