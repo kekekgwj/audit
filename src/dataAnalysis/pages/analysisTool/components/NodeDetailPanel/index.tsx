@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { Table } from 'antd';
 import { useSelector } from 'react-redux';
 import classes from './index.module.less';
@@ -26,34 +26,14 @@ const ConfigContext = createContext<IConfigContext>({
 export const useConfigContextValue = () => {
 	return useContext(ConfigContext);
 };
-const useNodeConfigValue = () => {
-	const ref = React.useRef<Record<string, object>>({});
-	const getConfigValue = (id: string) => {
-		return ref.current.id;
-	};
-	const saveConfigValue = (id: string, value: any) => {
-		ref.current.id = value;
-	};
-	return [getConfigValue, saveConfigValue];
-};
-const Panel: React.FC = () => {
-	const state = useSelector((state: IRootState) => state.dataAnalysis);
-	const graph = useGraph();
-
-	const { curSelectedNode: id, showPanel } = state || {};
-	if (!showPanel || !graph) {
-		return null;
-	}
+const useTableSource = () => {
 	interface DataType {
 		key: React.Key;
 		name: string;
 		age: number;
 		address: string;
 	}
-
-	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
-
-	const columns: ColumnsType<DataType> = [
+	const columnsMock: ColumnsType<DataType> = [
 		{
 			title: 'Name',
 			dataIndex: 'name'
@@ -67,15 +47,43 @@ const Panel: React.FC = () => {
 			dataIndex: 'address'
 		}
 	];
-	const data: DataType[] = [];
+	const dataMock: DataType[] = [];
 	for (let i = 0; i < 46; i++) {
-		data.push({
+		dataMock.push({
 			key: i,
 			name: `Edward King ${i}`,
 			age: 32,
 			address: `London, Park Lane no. ${i}`
 		});
 	}
+	const [data, setData] = useState(dataMock);
+	const [column, setColumn] = useState(columnsMock);
+	const updateTable = (updateData, updateColumn) => {
+		setData(updateData);
+		setColumn(updateColumn);
+	};
+	return [data, column, updateTable];
+};
+const useNodeConfigValue = () => {
+	const ref = React.useRef<Record<string, object>>({});
+	const getConfigValue = (id: string) => {
+		return ref.current.id;
+	};
+	const saveConfigValue = (id: string, value: any) => {
+		ref.current.id = value;
+	};
+	return [getConfigValue, saveConfigValue];
+};
+const Panel: React.FC = () => {
+	const state = useSelector((state: IRootState) => state.dataAnalysis);
+	const graph = useGraph();
+	const [data, columns, updateTable] = useTableSource();
+	const { curSelectedNode: id, showPanel } = state || {};
+	if (!showPanel || !graph) {
+		return null;
+	}
+
+	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
 
 	const closePanel = () => {
 		dispatch(toClosePanel());

@@ -8,23 +8,31 @@ import FormItem from 'antd/es/form/FormItem';
 interface ISelectRowProps {
 	value?: any;
 	onChange?: any;
-	handleOnclickAdd: () => void;
 	handleOnDelete: (key: number) => void;
-	key: number;
+	rowName: number;
+}
+interface IRowCondition {
+	leftHeaderName: string;
+	leftTableName: string;
+	operator: string;
+	rightHeaderName: string;
+	rightTableName: string;
+}
+interface IFilterAll {
+	conditions: IRowCondition[];
+	connectionType: string;
 }
 const AddIcon = (
 	<svg
 		version="1.1"
 		id="Layer_1"
 		xmlns="http://www.w3.org/2000/svg"
-		xmlns:xlink="http://www.w3.org/1999/xlink"
 		x="0px"
 		y="0px"
 		width="19px"
 		height="19px"
 		viewBox="0 0 19 19"
 		enable-background="new 0 0 19 19"
-		xml:space="preserve"
 	>
 		{' '}
 		<image
@@ -51,7 +59,6 @@ AElFTkSuQmCC"
 const DeleteIcon = (
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
-		xmlns:xlink="http://www.w3.org/1999/xlink"
 		version="1.1"
 		id="Layer_1"
 		x="0px"
@@ -60,7 +67,6 @@ const DeleteIcon = (
 		height="19px"
 		viewBox="0 0 19 19"
 		enable-background="new 0 0 19 19"
-		xml:space="preserve"
 	>
 		{' '}
 		<image
@@ -76,46 +82,29 @@ const DeleteIcon = (
 
 const SelectRow: React.FC<ISelectRowProps> = ({
 	value = { left: '', right: '', symbol: '' },
-	onChange,
 	handleOnDelete,
-	key,
-	handleOnclickAdd
+	rowName
 }) => {
 	if (!value || value.length < 3) {
 		return null;
 	}
 
-	const onLeftChange = (v: string) => {
-		onChange({ ...value, left: v });
-	};
-	const onSymbolChange = (v: string) => {
-		onChange({ ...value, symbol: v });
-	};
-	const onRightChange = (v: string) => {
-		onChange({ ...value, right: v });
-	};
-
 	return (
 		<div className={classes.filterGroupWrapper}>
-			<Select
-				options={options.leftSelect}
-				value={value.left}
-				style={{ width: 120 }}
-				onChange={onLeftChange}
-			></Select>
-			<Select
-				options={options.symbolSelect}
-				value={value.symbol}
-				style={{ width: 120 }}
-				onChange={onSymbolChange}
-			></Select>
-			<Select
-				options={options.rightSelect}
-				value={value.right}
-				style={{ width: 120 }}
-				onChange={onRightChange}
-			></Select>
-			<div onClick={() => handleOnDelete(key)}>
+			<Form.Item name={[rowName, 'leftleftHeaderName']} noStyle>
+				<Select options={options.leftSelect} style={{ width: 120 }}></Select>
+			</Form.Item>
+			<Form.Item name={[rowName, 'operator']} noStyle>
+				<Select options={options.symbolSelect} style={{ width: 120 }}></Select>
+			</Form.Item>
+			<Form.Item name={[rowName, 'rightHeaderName']} noStyle>
+				<Select options={options.rightSelect} style={{ width: 120 }}></Select>
+			</Form.Item>
+
+			<div
+				className={classes.deleteRow}
+				onClick={() => handleOnDelete(rowName)}
+			>
 				{DeleteIcon}
 				<span>删除</span>
 			</div>
@@ -137,12 +126,20 @@ const options = {
 	],
 	symbolSelect: [
 		{
-			label: '+',
-			value: '+'
+			label: '=',
+			value: '='
 		},
 		{
-			label: '-',
-			value: '-'
+			label: '!=',
+			value: '!='
+		},
+		{
+			label: '>',
+			value: '>'
+		},
+		{
+			label: '<',
+			value: '<'
 		}
 	]
 };
@@ -175,7 +172,10 @@ const SelectGroup: React.FC = () => {
 			configs: nextList
 		});
 	};
-
+	const handleClickExec = () => {
+		// const send: IFilterAll = {};
+		console.log(form.getFieldsValue());
+	};
 	return (
 		<div>
 			<Form
@@ -187,7 +187,7 @@ const SelectGroup: React.FC = () => {
 				}}
 				form={form}
 			>
-				<div style={{ fontSize: '14px' }}>
+				<div style={{ fontSize: '14px', marginBottom: 20 }}>
 					<span style={{ fontWeight: 'bold' }}>连接语句: </span>
 					<span>多行之间是"且"的关系</span>
 				</div>
@@ -198,7 +198,7 @@ const SelectGroup: React.FC = () => {
 								<Form.Item name={name} key={key}>
 									<SelectRow
 										key={key}
-										handleOnclickAdd={handleOnclickAdd}
+										rowName={name}
 										handleOnDelete={handleOnDelete}
 									></SelectRow>
 								</Form.Item>
@@ -215,15 +215,18 @@ const SelectGroup: React.FC = () => {
 					{AddIcon}
 					<span>添加连接语句</span>
 				</div>
-				<Form.Item name={'connect_type'} style={{ marginTop: 20 }}>
+				<div className={classes.addRow}>
 					<span style={{ fontSize: 14, fontWeight: 'bold' }}>连接类型</span>
-					<Select style={{ width: 395, marginLeft: 18 }}>
-						<Select.Option>内连接</Select.Option>
-						<Select.Option>外连接</Select.Option>
-					</Select>
-				</Form.Item>
+					<Form.Item name={'connectionType'}>
+						<Select style={{ width: 395, marginLeft: 0 }}>
+							<Select.Option value="INNER JOIN">内连接</Select.Option>
+							<Select.Option value="LEFT JOIN">左连接</Select.Option>
+							<Select.Option value="LEFT JOIN">右连接</Select.Option>
+						</Select>
+					</Form.Item>
+				</div>
 			</Form>
-			<div style={{ justifyContent: 'end', display: 'flex', width: '100%' }}>
+			<div className={classes.controlRow}>
 				<Button
 					className={`${classes.btn} ${classes.reset}`}
 					htmlType="button"
@@ -235,6 +238,7 @@ const SelectGroup: React.FC = () => {
 					className={`${classes.btn} ${classes.submit}`}
 					type="primary"
 					htmlType="submit"
+					onClick={handleClickExec}
 				>
 					执行
 				</Button>

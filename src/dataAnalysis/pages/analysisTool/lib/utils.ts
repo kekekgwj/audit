@@ -233,6 +233,9 @@ export const getNodeTypeById = (graph: X6.Graph, ids: string[] | string) => {
 	const idAry = Array.isArray(ids) ? ids : [ids];
 	return idAry.map((id) => {
 		const cell = graph.getCellById(id);
+		if (!cell) {
+			return null;
+		}
 		const attrs = cell.getAttrs();
 		return attrs.custom.type;
 	});

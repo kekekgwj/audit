@@ -231,9 +231,9 @@ const Grouping: FC = () => {
 				</Form.Item>
 				<Form.Item name="type" label="函数类型">
 					<Select placeholder="请选择" onChange={onGenderChange} allowClear>
-						<Option value="male">male</Option>
-						<Option value="female">female</Option>
-						<Option value="other">other</Option>
+						<Option value="SUM">求和</Option>
+						<Option value="MAX">最大</Option>
+						<Option value="MIN">最小</Option>
 					</Select>
 				</Form.Item>
 				<Form.Item wrapperCol={{ offset: 0, span: 24 }} name="arrange" label="">
