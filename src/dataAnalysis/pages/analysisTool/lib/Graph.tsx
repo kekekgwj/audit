@@ -430,7 +430,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 							<div
 								className={classes['save-btn']}
 								onClick={() => {
-									graph?.centerContent();
+									console.log(graph?.toJSON());
 								}}
 							>
 								保存为审计模板
