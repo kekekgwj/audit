@@ -30,10 +30,24 @@ const tailLayout = {
 	wrapperCol: { offset: 24, span: 0 }
 };
 
-const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
-	const [optionList, setOptionList] = useState<List[]>(
-		JSON.parse(JSON.stringify(option))
-	);
+const SortInput: FC<SortProps> = ({ value, onChange }) => {
+	const [optionList, setOptionList] = useState<List[]>([
+		{
+			title: '数据表1',
+			list: [
+				{ title: '字段1文字', isUp: false, isDown: false },
+				{ title: '字段2文字很长很长', isUp: false, isDown: false },
+				{ title: '字段3文字很长很长', isUp: false, isDown: false }
+			]
+		},
+		{
+			title: '数据表2',
+			list: [
+				{ title: '字段01文字很长很长', isUp: false, isDown: false },
+				{ title: '字段02文字', isUp: false, isDown: false }
+			]
+		}
+	]);
 	//通过传入的状态值和下标修改dataList的排序状态
 	const setSortStatus = (
 		data: { isUp: boolean; isDown: boolean },
@@ -43,19 +57,20 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
 		const newDataList = JSON.parse(JSON.stringify(optionList));
 		newDataList[index].list[childrenIndex].isUp = data.isUp;
 		newDataList[index].list[childrenIndex].isDown = data.isDown;
+
 		setOptionList(newDataList);
 	};
 	//监听optionList改变触发onChange
 	useEffect(() => {
-		let newData: string[] = [];
-		optionList.forEach((res) => {
-			res.list.forEach((ress) => {
-				if (ress.isDown || ress.isUp) {
-					newData.push(ress.title);
-				}
-			});
-		});
-		onChange?.(newData);
+		// let newData: string[] = [];
+		// optionList.forEach((res) => {
+		// 	res.list.forEach((ress) => {
+		// 		if (ress.isDown || ress.isUp) {
+		// 			newData.push(ress.title);
+		// 		}
+		// 	});
+		// });
+		onChange?.(optionList);
 	}, [optionList]);
 	return (
 		<Collapse
@@ -175,24 +190,6 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange }) => {
 const Sort: FC = () => {
 	const [form] = Form.useForm();
 
-	const [dataList, setDataList] = useState<List[]>([
-		{
-			title: '数据表1',
-			list: [
-				{ title: '字段1文字', isUp: false, isDown: false },
-				{ title: '字段2文字很长很长', isUp: false, isDown: false },
-				{ title: '字段3文字很长很长', isUp: false, isDown: false }
-			]
-		},
-		{
-			title: '数据表2',
-			list: [
-				{ title: '字段01文字很长很长', isUp: false, isDown: false },
-				{ title: '字段02文字', isUp: false, isDown: false }
-			]
-		}
-	]); //默认值
-
 	const onFinish = (values: any) => {
 		console.log(values);
 	};
@@ -200,7 +197,9 @@ const Sort: FC = () => {
 	const onReset = () => {
 		form.resetFields();
 	};
-
+	const handleSortChange = (v) => {
+		console.log(v);
+	};
 	return (
 		<Form
 			{...layout}
@@ -214,28 +213,26 @@ const Sort: FC = () => {
 		>
 			<div className={classes.formList}>
 				<Form.Item name="according" label="">
-					<SortInput option={dataList}></SortInput>
+					<SortInput onChange={handleSortChange}></SortInput>
 				</Form.Item>
 			</div>
 
-			<Form.Item {...tailLayout}>
-				<div style={{ justifyContent: 'end', display: 'flex', width: '100%' }}>
-					<Button
-						className={`${classes.btn} ${classes.reset}`}
-						htmlType="button"
-						onClick={onReset}
-					>
-						重置
-					</Button>
-					<Button
-						className={`${classes.btn} ${classes.submit}`}
-						type="primary"
-						htmlType="submit"
-					>
-						执行
-					</Button>
-				</div>
-			</Form.Item>
+			<div style={{ justifyContent: 'end', display: 'flex', width: '100%' }}>
+				<Button
+					className={`${classes.btn} ${classes.reset}`}
+					htmlType="button"
+					onClick={onReset}
+				>
+					重置
+				</Button>
+				<Button
+					className={`${classes.btn} ${classes.submit}`}
+					type="primary"
+					htmlType="submit"
+				>
+					执行
+				</Button>
+			</div>
 		</Form>
 	);
 };

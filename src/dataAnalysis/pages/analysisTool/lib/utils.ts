@@ -276,6 +276,11 @@ export const imageShapes: IImageShapes[] = [
 		type: IImageTypes.FILTER
 	},
 	{
+		label: '排序',
+		image: ORDER,
+		type: IImageTypes.ORDER
+	},
+	{
 		label: '分组',
 		image: GROUP,
 		type: IImageTypes.GROUP
@@ -284,10 +289,5 @@ export const imageShapes: IImageShapes[] = [
 		label: '结束',
 		image: END,
 		type: IImageTypes.END
-	},
-	{
-		label: '排序',
-		image: ORDER,
-		type: IImageTypes.ORDER
 	}
 ];

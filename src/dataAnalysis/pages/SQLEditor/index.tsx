@@ -29,16 +29,16 @@ export enum BoxType {
 
 const SQLEditor: React.FC = () => {
 	useEffect(() => {
-		if (editorRef && editorRef.current) {
-			editorRef.current.editor.addEventListener('blur', () =>
-				setShowSearchBox(BoxType.NONE)
-			);
-			return () => {
-				editorRef?.current?.editor.removeEventListener('blur', () => {});
-			};
-		}
+		// if (editorRef && editorRef.current) {
+		// 	editorRef.current.editor.addEventListener('blur', () =>
+		// 		setShowSearchBox(BoxType.NONE)
+		// 	);
+		// 	return () => {
+		// 		editorRef?.current?.editor.removeEventListener('blur', () => {});
+		// 	};
+		// }
 	}, []);
-	const onChange = (...args) => {
+	const onChange = () => {
 		setShowSearchBox(BoxType.NONE);
 		// 获得焦点
 
@@ -90,7 +90,7 @@ const SQLEditor: React.FC = () => {
 					<div className={classes.hints}>
 						<span className={classes.boldText}>参数配置 : </span>
 						<span className={classes.hintText}>
-							请输入"#"选择SQL语句，输入"$"选择数据表，输入"!"选择表字段；
+							请输入"#"选择SQL语句，输入"$"选择数据表
 						</span>
 					</div>
 					<div className={classes.executeBtn}>执行</div>
@@ -130,14 +130,14 @@ const SQLEditor: React.FC = () => {
 								exec: () => {
 									triggerSearchBox(BoxType.TABLE);
 								}
-							},
-							{
-								name: '选择字段',
-								bindKey: { win: '!', mac: '!' },
-								exec: () => {
-									triggerSearchBox(BoxType.COLUMN);
-								}
 							}
+							// {
+							// 	name: '选择字段',
+							// 	bindKey: { win: '!', mac: '!' },
+							// 	exec: () => {
+							// 		triggerSearchBox(BoxType.COLUMN);
+							// 	}
+							// }
 						]}
 						// value={value}
 						onChange={onChange}

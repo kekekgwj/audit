@@ -146,40 +146,40 @@ const TableBox: FC = () => {
 		</div>
 	);
 };
-const ColumnBox: FC = () => {
-	const data = [
-		{
-			content: '测试表名1'
-		},
-		{
-			content: '测试表名22'
-		},
-		{
-			content: '测试表名3'
-		}
-	];
-	const context = useContext(EditorContext) as {
-		insertText: (text: string) => void;
-	};
-	const insertText = context.insertText;
-	const handleClickItem = (index: number) => {
-		insertText && insertText(data[index]['content']);
-	};
-	return (
-		<div className={classes.sqlBoxContainer}>
-			<div className={classes.sqlBoxContainer_title}>{'字段'}</div>
-			<div>
-				<ul style={{ listStyleType: 'none' }}>
-					{data.map(({ content }, index) => (
-						<li key={index} onClick={() => handleClickItem(index)}>
-							{content}
-						</li>
-					))}
-				</ul>
-			</div>
-		</div>
-	);
-};
+// const ColumnBox: FC = () => {
+// 	const data = [
+// 		{
+// 			content: '测试表名1'
+// 		},
+// 		{
+// 			content: '测试表名22'
+// 		},
+// 		{
+// 			content: '测试表名3'
+// 		}
+// 	];
+// 	const context = useContext(EditorContext) as {
+// 		insertText: (text: string) => void;
+// 	};
+// 	const insertText = context.insertText;
+// 	const handleClickItem = (index: number) => {
+// 		insertText && insertText(data[index]['content']);
+// 	};
+// 	return (
+// 		<div className={classes.sqlBoxContainer}>
+// 			<div className={classes.sqlBoxContainer_title}>{'字段'}</div>
+// 			<div>
+// 				<ul style={{ listStyleType: 'none' }}>
+// 					{data.map(({ content }, index) => (
+// 						<li key={index} onClick={() => handleClickItem(index)}>
+// 							{content}
+// 						</li>
+// 					))}
+// 				</ul>
+// 			</div>
+// 		</div>
+// 	);
+// };
 const SearchBox: FC<IProps> = ({ pos, type }) => {
 	const offsetLeft = (pos?.left || 0) - 150;
 	const offsetTop = (pos?.top || 0) + 30;
@@ -194,7 +194,7 @@ const SearchBox: FC<IProps> = ({ pos, type }) => {
 		>
 			{type === BoxType.SQL && <SQLBox />}
 			{type === BoxType.TABLE && <TableBox />}
-			{type === BoxType.COLUMN && <ColumnBox />}
+			{/* {type === BoxType.COLUMN && <ColumnBox />} */}
 		</div>
 	);
 };
