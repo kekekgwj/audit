@@ -1,11 +1,17 @@
 import React, { useEffect, useRef } from 'react';
-import { Card, Divider, Form, Input } from 'antd';
+import { Card, Divider, Form, Input, message } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import fileImg from '@/assets/img/file.png';
 import styles from './index.module.less';
 import SvgIcon from '@/components/svg-icon';
 import Delete from '@graph/components/delete-dialog';
 import CustomDialog from '@graph/components/custom-dialog';
+import {
+	getProjects,
+	saveProject,
+	deleteProject,
+	updateProject
+} from '@/api/dataAnalysis/myTemplate';
 
 const MyTemplate = () => {
 	const [templateList, setTemplateList] = React.useState([]);
@@ -18,13 +24,14 @@ const MyTemplate = () => {
 		getTemplateList();
 	}, []);
 	// 获取模板列表数据
-	const getTemplateList = () => {
-		const data = [
-			{ name: '模板一', createTime: '2023-05-23', id: 1 },
-			{ name: '模板二', createTime: '2023-05-23', id: 2 },
-			{ name: '模板三', createTime: '2023-05-23', id: 3 }
-		];
-		setTemplateList(data);
+	const getTemplateList = async () => {
+		const params = { current: 1, size: 10 };
+		try {
+			const res = await getProjects(params);
+			setTemplateList(res.records);
+		} catch (e) {
+			console.error(e);
+		}
 	};
 
 	//删除
@@ -36,15 +43,19 @@ const MyTemplate = () => {
 		setOpenDel(false);
 	};
 	const submitDel = () => {
-		console.log(curId, 353535);
+		deleteProject({ projectId: curId }).then(() => {
+			message.success('删除成功');
+			setOpenDel(false);
+			getTemplateList();
+		});
 	};
 
 	//编辑
-	const handleEdit = (item) => {
+	const handleEdit = (item: any) => {
 		setCurId(item.id);
 		setCurTitle('模板编辑');
 		setOpen(true);
-		form.setFieldValue('temName', item.name);
+		form.setFieldValue('name', item.name);
 	};
 	//新增
 	const handleAdd = () => {
@@ -54,10 +65,21 @@ const MyTemplate = () => {
 	};
 
 	const handleOk = () => {
+		const data = form.getFieldsValue();
 		if (curTitle == '模板编辑') {
-			console.log('编辑');
+			updateProject({ projectId: curId, name: data.name }).then(() => {
+				message.success('编辑成功');
+				form.resetFields();
+				setOpen(false);
+				getTemplateList();
+			});
 		} else {
-			console.log('新增');
+			saveProject({ name: data.name }).then(() => {
+				message.success('新建成功');
+				form.resetFields();
+				setOpen(false);
+				getTemplateList();
+			});
 		}
 	};
 	// 取消新增or编辑
@@ -94,7 +116,7 @@ const MyTemplate = () => {
 								</div>
 								<div className={styles['text-name']}>{item.name}</div>
 								<div className={styles['text-time']}>
-									最近更新：{item.createTime}
+									最近更新：{item.gmtModified}
 								</div>
 							</div>
 							<div className={styles['card-footer']}>
@@ -149,7 +171,7 @@ const MyTemplate = () => {
 				>
 					<Form.Item
 						label="模板名称"
-						name="temName"
+						name="name"
 						rules={[{ required: true, message: '请输入名称' }]}
 					>
 						<Input />
