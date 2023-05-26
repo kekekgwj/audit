@@ -1,48 +1,70 @@
 .audit-template-page {
 	padding-left: 20px;
 	padding-top: 20px;
-	display: flex;
-	flex-wrap: wrap;
-	.card-item {
-		width: 200px;
-		height: 200px;
-		margin-right: 20px;
-		margin-bottom: 20px;
+	height: 100%;
+	.template-list-page {
 		position: relative;
-		box-shadow: 1px 2px 12px 0px rgba(66, 81, 112, 0.15);
-		.card-content {
+		height: 100%;
+		.main-contain {
 			display: flex;
-			flex-direction: column;
-			align-items: center;
-			cursor: pointer;
-			.text-name {
-				font-size: 16px;
-				font-weight: 400;
-				color: #18181f;
-				line-height: 22px;
-				margin: 10px 0;
-			}
-			.text-time {
-				font-size: 12px;
-				font-weight: 400;
-				color: rgba(24, 24, 31, 0.6);
-				line-height: 22px;
+			flex-wrap: wrap;
+			.card-item {
+				width: 200px;
+				height: 200px;
+				margin-right: 20px;
+				margin-bottom: 20px;
+				position: relative;
+				box-shadow: 1px 2px 12px 0px rgba(66, 81, 112, 0.15);
+				.card-content {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					cursor: pointer;
+					.text-name {
+						font-size: 16px;
+						font-weight: 400;
+						color: #18181f;
+						line-height: 22px;
+						margin: 10px 0;
+					}
+					.text-time {
+						font-size: 12px;
+						font-weight: 400;
+						color: rgba(24, 24, 31, 0.6);
+						line-height: 22px;
+					}
+				}
+				.card-footer {
+					position: absolute;
+					bottom: 10px;
+					width: 152px;
+					display: flex;
+					align-items: center;
+					justify-content: space-around;
+					.operate-item {
+						font-size: 12px;
+						font-weight: 400;
+						color: #18181f;
+						cursor: pointer;
+						display: flex;
+						align-items: center;
+					}
+				}
 			}
 		}
-		.card-footer {
-			position: absolute;
-			bottom: 10px;
-			width: 152px;
+		.foot-pagination-box {
+			width: 100%;
+			padding-right: 20px;
+			height: 32px;
+			margin-top: 20px;
+			text-align: center;
 			display: flex;
 			align-items: center;
-			justify-content: space-around;
-			.operate-item {
-				font-size: 12px;
-				font-weight: 400;
-				color: #18181f;
-				cursor: pointer;
-				display: flex;
-				align-items: center;
+			justify-content: space-between;
+			position: absolute;
+			bottom: 50px;
+			.pagination-box {
+				margin-right: 20px;
 			}
 		}
 	}

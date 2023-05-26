@@ -43,3 +43,14 @@ export function updateProject(data: IUpdateProject) {
 		...data
 	});
 }
+
+//复制
+interface ICopyProject {
+	projectId: number | string;
+	name: string;
+}
+export function copyProject(data: ICopyProject) {
+	return post(API_PREFIX + '/blade-tool/dataAnalysis/copyProject', {
+		...data
+	});
+}
