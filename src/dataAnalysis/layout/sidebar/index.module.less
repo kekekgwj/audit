@@ -4,9 +4,9 @@
 		font-size: 16px;
 		padding-left: 16px;
 		color: #767676;
-		&__icon {
+		.menu-item__icon--parent {
 			font-size: 24px;
-			margin-right: 8px;
+			margin-right: 8px !important;
 		}
 	}
 }
@@ -25,8 +25,38 @@
 		color: #23955c;
 		fill: #23955c;
 	}
-	&__icon {
-		font-size: 16px;
+	&__icon-box {
+		width: 16px;
 		margin-right: 12px;
 	}
+	&__icon {
+		font-size: 16px;
+	}
+	&__left {
+		display: flex;
+		align-items: center;
+	}
+	&__arrow {
+		font-size: 12px;
+		transform: rotateZ(0);
+		transition: all 0.3s;
+		&.toggle {
+			transform: rotateZ(180deg);
+		}
+	}
+}
+
+.menu-item--parent {
+	justify-content: space-between;
+	&.active {
+		border-color: transparent;
+		background: transparent;
+		color: #23955c;
+		fill: #23955c;
+	}
+}
+
+.sub-menu {
+	overflow: hidden;
+	transition: all 0.3s;
 }
