@@ -19,11 +19,10 @@ const initMenu = (routes: CustomRoute[], parentPath = '') => {
 
 	routes.forEach((route: CustomRoute) => {
 		if (route?.meta?.hidden) return;
-		const active = route?.meta?.active
-			? route?.meta?.active
-			: (parentPath + '/' + route?.path).replace(/(\/)+/gi, '/');
+		const path = (parentPath + '/' + route?.path).replace(/(\/)+/gi, '/');
+		const active = route?.meta?.active ? route?.meta?.active : path;
 		arr.push({
-			path: route?.path,
+			path: path,
 			title: route?.meta?.title,
 			icon: route?.meta?.icon,
 			active: active,

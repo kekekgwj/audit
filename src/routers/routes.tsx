@@ -75,6 +75,11 @@ export const routes: CustomRoute[] = [
 						path: 'myTemplate',
 						component: lazy(() => import('@sql/pages/myTemplate')),
 						meta: { title: '我的模板' }
+					},
+					{
+						path: 'auditTemplate',
+						component: lazy(() => import('@sql/pages/auditTemplate')),
+						meta: { title: '审计模板' }
 					}
 				]
 			},
@@ -92,17 +97,17 @@ export const routes: CustomRoute[] = [
 				path: 'dataDetail',
 				component: lazy(() => import('@sql/pages/dataManage/detail')),
 				meta: { title: 'dataDetail', hidden: true }
-			},
-			{
-				path: 'myTemplate',
-				component: lazy(() => import('@sql/pages/myTemplate')),
-				meta: { title: '我的模板', icon: 'body' }
-			},
-			{
-				path: 'auditTemplate',
-				component: lazy(() => import('@sql/pages/auditTemplate')),
-				meta: { title: '审计模板', icon: 'body' }
 			}
+			// {
+			// 	path: 'myTemplate',
+			// 	component: lazy(() => import('@sql/pages/myTemplate')),
+			// 	meta: { title: '我的模板', icon: 'body' }
+			// },
+			// {
+			// 	path: 'auditTemplate',
+			// 	component: lazy(() => import('@sql/pages/auditTemplate')),
+			// 	meta: { title: '审计模板', icon: 'body' }
+			// }
 		]
 	}
 ];
