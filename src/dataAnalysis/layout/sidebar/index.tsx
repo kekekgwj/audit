@@ -1,15 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { routes, CustomRoute } from '@/routers/routes';
 import SvgIcon from '@/components/svg-icon';
+import SidebarItem from './sidebar-item';
 import styles from './index.module.less';
-import React from 'react';
 
 interface MenuItem {
 	path?: string;
 	title: string | undefined;
 	icon: string | undefined;
 	active: string;
+	hidden: boolean | undefined;
 	children?: MenuItem[] | undefined;
 }
 
@@ -18,12 +19,15 @@ const initMenu = (routes: CustomRoute[], parentPath = '') => {
 
 	routes.forEach((route: CustomRoute) => {
 		if (route?.meta?.hidden) return;
-		const active = (parentPath + '/' + route?.path).replace(/(\/)+/gi, '/');
+		const active = route?.meta?.active
+			? route?.meta?.active
+			: (parentPath + '/' + route?.path).replace(/(\/)+/gi, '/');
 		arr.push({
 			path: route?.path,
 			title: route?.meta?.title,
 			icon: route?.meta?.icon,
 			active: active,
+			hidden: route?.meta?.hidden,
 			children: route?.children && initMenu(route.children, active)
 		});
 	});
@@ -31,16 +35,53 @@ const initMenu = (routes: CustomRoute[], parentPath = '') => {
 	return arr;
 };
 
+const findMenu = (
+	menus: MenuItem[],
+	path: string,
+	parent: MenuItem | null
+): false | { parent: MenuItem | null; active: MenuItem } => {
+	for (let i = 0; i < menus.length; i++) {
+		const item = menus[i];
+		if (path === item.path || path === '/sql/' + item.path) {
+			return {
+				parent: parent,
+				active: item
+			};
+		}
+		if (item.children && item.children.length) {
+			const flag = findMenu(item.children, path, item);
+			if (flag) {
+				return {
+					parent: flag.parent,
+					active: flag.active
+				};
+			}
+		}
+	}
+	return false;
+};
+
 export default () => {
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 	const location = useLocation();
+	const [activeMenu, setActiveMenu] = useState<MenuItem>();
+	const [parentMenu, setParentMenu] = useState<MenuItem | undefined | null>();
 	const [menus] = useState<MenuItem[]>(initMenu(routes));
 
-	const handleNavigate = (path: string | undefined) => {
-		if (path) {
-			navigate(path);
+	useEffect(() => {
+		const res = findMenu(menus, location.pathname, null);
+		if (res) {
+			const { parent, active } = res;
+			setActiveMenu(active);
+			setParentMenu(parent);
 		}
-	};
+	}, [location]);
+
+	// const handleNavigate = (path: string | undefined) => {
+	// 	if (path) {
+	// 		navigate(path);
+	// 	}
+	// };
 	const menu = menus[1];
 
 	return (
@@ -49,30 +90,19 @@ export default () => {
 				{menu?.icon && (
 					<SvgIcon
 						name={menu?.icon}
-						className={styles['menu-item__icon']}
+						className={styles['menu-item__icon--parent']}
 					></SvgIcon>
 				)}
 				<div>{menu?.title}</div>
 			</div>
 			<div className="menu-list">
 				{menu.children?.map((m) => (
-					<div
+					<SidebarItem
 						key={m.path}
-						onClick={() => {
-							handleNavigate(m.path);
-						}}
-						className={`${styles['menu-item']} ${
-							location.pathname === m.active ? styles['active'] : ''
-						}`}
-					>
-						{m.icon && (
-							<SvgIcon
-								name={m.icon}
-								className={styles['menu-item__icon']}
-							></SvgIcon>
-						)}
-						<div>{m.title || m.path}</div>
-					</div>
+						menu={m}
+						parentMenu={parentMenu}
+						activeMenu={activeMenu}
+					></SidebarItem>
 				))}
 				{/* <div className="menu-item"></div> */}
 			</div>

@@ -74,7 +74,7 @@ export const routes: CustomRoute[] = [
 					{
 						path: 'myTemplate',
 						component: lazy(() => import('@sql/pages/myTemplate')),
-						meta: { title: '我的模板', icon: 'body' }
+						meta: { title: '我的模板' }
 					}
 				]
 			},
