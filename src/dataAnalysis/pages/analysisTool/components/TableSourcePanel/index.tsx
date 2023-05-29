@@ -5,6 +5,7 @@ const { Panel } = Collapse;
 import { GraphContext } from '../../lib';
 import TABLE from '@/assets/SQLEditor/table.png';
 import { IImageTypes } from '../../lib/utils';
+import SvgIcon from '@/components/svg-icon';
 const TableItem: React.FC = ({ data }) => {
 	if (!data) {
 		return null;
@@ -18,10 +19,11 @@ const TableItem: React.FC = ({ data }) => {
 		>
 			<Panel
 				header={
-					<>
-						<span className={classes.iconGroup}></span>
+					<span className={classes.itemTitleBox}>
+						{/* <span className={classes.iconGroup}></span> */}
+						<SvgIcon name="filter"></SvgIcon>
 						<span className={classes.title}>{data.title}</span>
-					</>
+					</span>
 				}
 				className={classes.itemTitle}
 				key="panel"
@@ -41,7 +43,8 @@ const TableItem: React.FC = ({ data }) => {
 									})
 								}
 							>
-								<span className={classes.iconTable}></span>
+								{/* <span className={classes.iconTable}></span> */}
+								<SvgIcon name="group"></SvgIcon>
 								<span className={classes.tableName}>{table.tableName}</span>
 							</div>
 						);
