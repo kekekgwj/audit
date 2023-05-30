@@ -144,6 +144,10 @@ export const validateConnectionRule = (
 		openMessage('table不能有输入结点');
 		return false;
 	}
+	if (sourceType === IImageTypes.TABLE && targetType === IImageTypes.CONNECT) {
+		message.error('table不能连接table');
+		return false;
+	}
 
 	// JOIN
 	if (sourceType === IImageTypes.CONNECT) {
@@ -164,8 +168,14 @@ export const validateConnectionRule = (
 	}
 	// FILTER
 	if (sourceType === IImageTypes.FILTER) {
-		if (![IImageTypes.GROUP, IImageTypes.ORDER].includes(targetType)) {
-			openMessage('filter的输出只能为group by或者order by');
+		if (
+			![IImageTypes.GROUP, IImageTypes.ORDER, IImageTypes.END].includes(
+				targetType
+			)
+		) {
+			openMessage(
+				'输出可以接节点类型为“GROUP BY”类型或者“ORDER BY”类型或者“END”类型'
+			);
 			return false;
 		}
 		if (sourceOutEdges && sourceOutEdges.length > 1) {
@@ -187,7 +197,7 @@ export const validateConnectionRule = (
 	// GROUP BY
 	if (targetType === IImageTypes.GROUP) {
 		if ([IImageTypes.END, IImageTypes.GROUP].includes(sourceType)) {
-			message.error('group by的输入不能为group by或者end');
+			message.error('输入节点类型为除“END”和“GROUP BY”以外的类');
 			return false;
 		}
 		if (targetInEdges && targetInEdges.length >= 1) {
@@ -198,7 +208,7 @@ export const validateConnectionRule = (
 	// ORDER BY
 	if (targetType === IImageTypes.ORDER) {
 		if ([IImageTypes.END, IImageTypes.ORDER].includes(sourceType)) {
-			message.error('order by的输入不能为order by或者end');
+			message.error('输入节点类型为除“END”和“ORDER BY”以外的类型');
 			return false;
 		}
 		if (targetInEdges && targetInEdges.length >= 1) {
@@ -217,10 +227,6 @@ export const validateConnectionRule = (
 		openMessage('END不能有输出');
 		return false;
 	}
-	// if (sourceType === IImageTypes.TABLE && targetType === IImageTypes.CONNECT) {
-	// 	message.error('table不能连接table');
-	// 	return false;
-	// }
 
 	// if (sourceType === IImageTypes.SQL && targetType === IImageTypes.SQL) {
 	// 	message.error('sql不能连接sql');
