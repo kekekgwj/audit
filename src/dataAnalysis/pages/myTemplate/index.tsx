@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Card, Divider, Form, Input, message, Pagination } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import fileImg from '@/assets/img/file.png';
 import styles from './index.module.less';
@@ -23,6 +24,7 @@ const MyTemplate = () => {
 	const [total, setTotal] = React.useState<number>(0);
 	const [current, setCurrent] = React.useState<number>(1);
 	const [form] = Form.useForm();
+	const navigate = useNavigate();
 	useEffect(() => {
 		getTemplateList();
 	}, []);
@@ -111,6 +113,12 @@ const MyTemplate = () => {
 		getTemplateList();
 	};
 
+	const toDetail = (item: any) => {
+		navigate('/sql/dataVisualization/templateDetail', {
+			state: { name: item.name, id: item.id, path: '我的模板' }
+		});
+	};
+
 	return (
 		<div className={styles['my-template-page']}>
 			<div className={styles['main-contain']}>
@@ -132,7 +140,10 @@ const MyTemplate = () => {
 					templateList.map((item) => {
 						return (
 							<Card key={item.id} className={styles['card-item']}>
-								<div className={styles['card-content']}>
+								<div
+									className={styles['card-content']}
+									onClick={() => toDetail(item)}
+								>
 									<div className={styles['img-icon']}>
 										<img src={fileImg} alt="" />
 									</div>

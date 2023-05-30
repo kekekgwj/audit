@@ -217,10 +217,10 @@ export const validateConnectionRule = (
 		openMessage('END不能有输出');
 		return false;
 	}
-	if (sourceType === IImageTypes.TABLE && targetType === IImageTypes.CONNECT) {
-		message.error('table不能连接table');
-		return false;
-	}
+	// if (sourceType === IImageTypes.TABLE && targetType === IImageTypes.CONNECT) {
+	// 	message.error('table不能连接table');
+	// 	return false;
+	// }
 
 	// if (sourceType === IImageTypes.SQL && targetType === IImageTypes.SQL) {
 	// 	message.error('sql不能连接sql');

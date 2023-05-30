@@ -67,8 +67,9 @@ export const routes: CustomRoute[] = [
 		meta: { title: '数据分析工具', icon: 'atlas' },
 		children: [
 			{
-				path: 'analysis',
-				component: lazy(() => import('@sql/pages/analysisTool')),
+				// path: 'analysis',
+				path: 'dataVisualization',
+				component: lazy(() => import('@sql/pages/dataVisualization')),
 				meta: { title: '数据可视化', icon: 'body' },
 				children: [
 					{
@@ -80,6 +81,15 @@ export const routes: CustomRoute[] = [
 						path: 'auditTemplate',
 						component: lazy(() => import('@sql/pages/auditTemplate')),
 						meta: { title: '审计模板' }
+					},
+					{
+						path: 'templateDetail',
+						component: lazy(() => import('@sql/pages/analysisTool')),
+						meta: {
+							title: 'templateDetail',
+							hidden: true,
+							active: '/myTemplate'
+						}
 					}
 				]
 			},
@@ -98,16 +108,6 @@ export const routes: CustomRoute[] = [
 				component: lazy(() => import('@sql/pages/dataManage/detail')),
 				meta: { title: 'dataDetail', hidden: true }
 			}
-			// {
-			// 	path: 'myTemplate',
-			// 	component: lazy(() => import('@sql/pages/myTemplate')),
-			// 	meta: { title: '我的模板', icon: 'body' }
-			// },
-			// {
-			// 	path: 'auditTemplate',
-			// 	component: lazy(() => import('@sql/pages/auditTemplate')),
-			// 	meta: { title: '审计模板', icon: 'body' }
-			// }
 		]
 	}
 ];
