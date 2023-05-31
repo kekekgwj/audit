@@ -1,9 +1,7 @@
-import { Button, Form, Input, Select } from 'antd';
-import { DefaultOptionType } from 'antd/es/select';
-import React, { useMemo, useState } from 'react';
-import Icon, { CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Select } from 'antd';
+import React from 'react';
 import classes from './index.module.less';
-import FormItem from 'antd/es/form/FormItem';
+import { useConfigContextValue } from '../../NodeDetailPanel';
 
 interface ISelectRowProps {
 	value?: any;
@@ -19,7 +17,7 @@ interface IRowCondition {
 	rightTableName: string;
 }
 interface IFilterAll {
-	conditions: IRowCondition[];
+	connectionSentences: IRowCondition[];
 	connectionType: string;
 }
 const AddIcon = (
@@ -146,22 +144,27 @@ const options = {
 
 const SelectGroup: React.FC = () => {
 	const [form] = Form.useForm();
+	const { id, getValue, setValue } = useConfigContextValue();
+	const formInitValue = (getValue && id && getValue(id)) || {};
 
 	const handleOnclickAdd = () => {
-		const list = form.getFieldValue('configs') || [];
+		const list = form.getFieldValue('connectionSentences') || [];
 		const nextList = list.concat({
 			key: list.length,
 			fieldKey: list.length
 		});
 		form.setFieldsValue({
-			configs: nextList
+			connectionSentences: nextList
 		});
 	};
-	const onFinish = (value: any) => {
-		console.log(value);
+	const onFinish = (value: IFilterAll) => {
+		if (!id || !setValue) {
+			return;
+		}
+		setValue(id, value);
 	};
 	const handleOnDelete = (key: number) => {
-		const list = form.getFieldValue('configs') || [];
+		const list = form.getFieldValue('connectionSentences') || [];
 		if (list.length === 0) {
 			return;
 		}
@@ -169,12 +172,14 @@ const SelectGroup: React.FC = () => {
 
 		nextList.splice(key, 1);
 		form.setFieldsValue({
-			configs: nextList
+			connectionSentences: nextList
 		});
 	};
-	const handleClickExec = () => {
-		// const send: IFilterAll = {};
-		console.log(form.getFieldsValue());
+	const handleOnChange = (value: IFilterAll) => {
+		if (!id || !setValue) {
+			return;
+		}
+		setValue(id, value);
 	};
 	return (
 		<div>
@@ -182,8 +187,13 @@ const SelectGroup: React.FC = () => {
 				name="customized_form_controls"
 				layout="vertical"
 				onFinish={onFinish}
+				onValuesChange={(_, value) => {
+					handleOnChange(value);
+				}}
 				initialValues={{
-					configs: [{ key: 0, fieldKey: 0 }]
+					connectionSentences: [{ key: 0, fieldKey: 0 }],
+					connectionType: 'LEFT JOIN',
+					...formInitValue
 				}}
 				form={form}
 			>
@@ -191,7 +201,7 @@ const SelectGroup: React.FC = () => {
 					<span style={{ fontWeight: 'bold' }}>连接语句: </span>
 					<span>多行之间是"且"的关系</span>
 				</div>
-				<Form.List name="configs">
+				<Form.List name="connectionSentences">
 					{(fields, { add, remove }) => (
 						<>
 							{fields.map(({ key, name }) => (
@@ -221,28 +231,27 @@ const SelectGroup: React.FC = () => {
 						<Select style={{ width: 395, marginLeft: 0 }}>
 							<Select.Option value="INNER JOIN">内连接</Select.Option>
 							<Select.Option value="LEFT JOIN">左连接</Select.Option>
-							<Select.Option value="LEFT JOIN">右连接</Select.Option>
+							<Select.Option value="RIGHT JOIN">右连接</Select.Option>
 						</Select>
 					</Form.Item>
 				</div>
+				<div className={classes.controlRow}>
+					<Button
+						className={`${classes.btn} ${classes.reset}`}
+						htmlType="button"
+						onClick={() => form.resetFields()}
+					>
+						重置
+					</Button>
+					<Button
+						className={`${classes.btn} ${classes.submit}`}
+						type="primary"
+						htmlType="submit"
+					>
+						执行
+					</Button>
+				</div>
 			</Form>
-			<div className={classes.controlRow}>
-				<Button
-					className={`${classes.btn} ${classes.reset}`}
-					htmlType="button"
-					onClick={() => form.resetFields()}
-				>
-					重置
-				</Button>
-				<Button
-					className={`${classes.btn} ${classes.submit}`}
-					type="primary"
-					htmlType="submit"
-					onClick={handleClickExec}
-				>
-					执行
-				</Button>
-			</div>
 		</div>
 	);
 };

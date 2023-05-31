@@ -16,11 +16,16 @@ interface IConfigContext {
 	type: IImageTypes | null;
 	id: string | null;
 	initValue: any;
+	getValue: ((id: string) => any) | null;
+	setValue: ((id: string, value: any) => void) | null;
+	resetValue: (id: string) => void;
 }
 const ConfigContext = createContext<IConfigContext>({
 	type: null,
 	id: null,
-	initValue: null
+	initValue: null,
+	getValue: null,
+	setValue: null
 });
 
 export const useConfigContextValue = () => {
@@ -67,10 +72,13 @@ const useTableSource = () => {
 const useNodeConfigValue = () => {
 	const ref = React.useRef<Record<string, object>>({});
 	const getConfigValue = (id: string) => {
-		return ref.current.id;
+		return ref.current[id] || {};
 	};
 	const saveConfigValue = (id: string, value: any) => {
-		ref.current.id = value;
+		ref.current[id] = value;
+	};
+	const resetConfigValue = (id: string) => {
+		saveConfigValue(id, null);
 	};
 	return [getConfigValue, saveConfigValue];
 };
@@ -78,6 +86,8 @@ const Panel: React.FC = () => {
 	const state = useSelector((state: IRootState) => state.dataAnalysis);
 	const graph = useGraph();
 	const [data, columns, updateTable] = useTableSource();
+	const [getConfigValue, saveConfigValue, resetConfigValue] =
+		useNodeConfigValue();
 	const { curSelectedNode: id, showPanel } = state || {};
 	if (!showPanel || !graph) {
 		return null;
@@ -112,9 +122,16 @@ const Panel: React.FC = () => {
 				</div>
 				<div className={classes.configWrapper}>
 					<ConfigContext.Provider
-						value={{ type: clickNodeType, id: id, initValue: null }}
+						value={{
+							type: clickNodeType,
+							id: id,
+							initValue: null,
+							getValue: getConfigValue,
+							setValue: saveConfigValue,
+							resetValue: resetConfigValue
+						}}
 					>
-						<ConfigPanel />
+						<ConfigPanel key={id} />
 					</ConfigContext.Provider>
 				</div>
 			</div>

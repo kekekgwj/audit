@@ -320,6 +320,22 @@ export default () => {
 						onChange={onChange}
 					/>
 				</div>
+				<div className={styles.controlRow}>
+					<Button
+						className={`${styles.btn} ${styles.reset}`}
+						htmlType="button"
+						// onClick={() => form.resetFields()}
+					>
+						重置
+					</Button>
+					<Button
+						className={`${styles.btn} ${styles.submit}`}
+						type="primary"
+						htmlType="submit"
+					>
+						执行
+					</Button>
+				</div>
 			</FilterateContext.Provider>
 		</>
 	);

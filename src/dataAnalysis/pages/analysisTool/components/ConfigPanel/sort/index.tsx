@@ -3,6 +3,7 @@ import classes from './index.module.less';
 import { Button, Form, Collapse } from 'antd';
 import { UpIcon, Downicon, HeartIcon, DelIcon } from './icon';
 import { DownOutlined } from '@ant-design/icons';
+import { useConfigContextValue } from '../../NodeDetailPanel';
 const { Panel } = Collapse;
 
 interface SortProps {
@@ -19,7 +20,7 @@ interface List {
 		isDown: boolean;
 	}[];
 }
-
+interface ISortAll {}
 const layout = {
 	labelCol: { span: 0 },
 	wrapperCol: { span: 24 },
@@ -31,6 +32,7 @@ const tailLayout = {
 };
 
 const SortInput: FC<SortProps> = ({ value, onChange }) => {
+	console.log(value);
 	const [optionList, setOptionList] = useState<List[]>([
 		{
 			title: '数据表1',
@@ -189,6 +191,8 @@ const SortInput: FC<SortProps> = ({ value, onChange }) => {
 
 const Sort: FC = () => {
 	const [form] = Form.useForm();
+	const { id, getValue, setValue } = useConfigContextValue();
+	const formInitValue = (getValue && id && getValue(id)) || {};
 
 	const onFinish = (values: any) => {
 		console.log(values);
@@ -198,7 +202,11 @@ const Sort: FC = () => {
 		form.resetFields();
 	};
 	const handleSortChange = (v) => {
-		console.log(v);
+		console.log('value', v);
+		if (!id || !setValue) {
+			return;
+		}
+		setValue(id, v);
 	};
 	return (
 		<Form
@@ -208,11 +216,11 @@ const Sort: FC = () => {
 			onFinish={onFinish}
 			className={classes.fromWrap}
 			initialValues={{
-				according: ['字段1文字', '字段01文字很长很长']
+				...formInitValue
 			}}
 		>
 			<div className={classes.formList}>
-				<Form.Item name="according" label="">
+				<Form.Item name="sorting">
 					<SortInput onChange={handleSortChange}></SortInput>
 				</Form.Item>
 			</div>
