@@ -7,8 +7,7 @@ import Graphin, {
 	type GraphinData,
 	type LegendChildrenProps
 } from '@antv/graphin';
-// import registerNodes from './custom-node';
-// import registerEdges from './custom-edge';
+
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
@@ -30,7 +29,7 @@ import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
 import { debounce, throttle } from 'lodash';
 import { getGraphByRule } from '@/api/knowLedgeGraph/suspiciousRule';
 // import { getFillColorByType } from './custom-node/Base';
-import registerNodes from '@/knowLedgeGraph/components/graphin/custom-node/Base';
+import registerNodes from '@/knowLedgeGraph/components/graphin/custom-node';
 
 // 注册自定义节点
 registerNodes('all');
@@ -273,10 +272,8 @@ const GraphCom = () => {
 			if (res.hasList) {
 				//表头
 				setTableHead(res.head);
-
 				//将后端数据转换成渲染表的数据
 				setTableData(transToTableData(res.head, res.data));
-
 				// 传入后台的数据
 				setSubmitData(res?.data);
 			}
@@ -286,8 +283,7 @@ const GraphCom = () => {
 			//处理节点
 			if (res.nodes && res.nodes.length) {
 				const formatNodes = res.nodes.map((node) => {
-					const { type, score, communityId } = node;
-
+					const { type } = node;
 					if (lightNodeTypes.includes(type)) {
 						//需要高亮
 						return {
@@ -299,7 +295,8 @@ const GraphCom = () => {
 								}
 							},
 							config: {
-								type: 'lightNode'
+								type: 'lightNode',
+								size: 100
 							}
 						};
 					} else {
@@ -308,7 +305,8 @@ const GraphCom = () => {
 							...node,
 							type: 'Base',
 							config: {
-								type: 'noLightNode'
+								type: 'noLightNode',
+								size: 100
 							}
 						};
 					}
@@ -319,6 +317,7 @@ const GraphCom = () => {
 					edges: res.edges,
 					nodes: formatNodes
 				};
+				console.log(graphData, 481481481);
 				setDate(graphData);
 			}
 		}

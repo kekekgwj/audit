@@ -17,7 +17,9 @@ const Colors: {
 	采购事项: ['#E4D26E', '#E4D26E', '#fff'],
 	合同: ['#759DD9', '#759DD9', '#fff'],
 	发票: ['#5ACBA9', '#5ACBA9', '#fff'],
-	资产: ['#24A36F', '#24A36F', '#fff']
+	资产: ['#24A36F', '#24A36F', '#fff'],
+	lightNode: ['#f00', '#f00', '#fff'], //高亮节点
+	noLightNode: ['#EBF3EF', '#EBF3EF', '#fff'] //不高亮节点
 };
 
 // 获取 stroke、FILL、
@@ -52,6 +54,7 @@ export default () => {
 				}
 			},
 			draw(cfg, group) {
+				console.log('config', cfg.config);
 				const { type, size } = cfg.config;
 				const [strokeColor, fillColor, labelColor] = getColorByType(type);
 				// 设置自定义节点图例
