@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Card, Divider, Form, Input, Pagination, Empty } from 'antd';
+import { Card, Divider, Form, Input, Pagination, Empty, message } from 'antd';
 import fileImg from '@/assets/img/file.png';
 import styles from './index.module.less';
 import SvgIcon from '@/components/svg-icon';
@@ -11,6 +11,7 @@ import {
 } from '@/api/dataAnalysis/auditTemplate';
 
 const AuditTemplate = () => {
+	const [messageApi, contextHolder] = message.useMessage();
 	const [templateList, setTemplateList] = React.useState([]);
 	const [curId, setCurId] = React.useState<number>();
 	const [openCopy, setOpenCopy] = React.useState<boolean>(false);
@@ -51,7 +52,10 @@ const AuditTemplate = () => {
 		const data = form.getFieldValue();
 		form.validateFields().then(() => {
 			copyAuditProject({ auditProjectId: curId, name: data.name }).then(() => {
-				message.success('复制成功');
+				messageApi.open({
+					type: 'success',
+					content: '复制成功'
+				});
 				form.resetFields();
 				setOpenCopy(false);
 				getTemplateList();
@@ -70,6 +74,7 @@ const AuditTemplate = () => {
 
 	return (
 		<div className={styles['audit-template-page']}>
+			{contextHolder}
 			{templateList?.length > 0 ? (
 				<div className={styles['template-list-page']}>
 					<div className={styles['main-contain']}>
