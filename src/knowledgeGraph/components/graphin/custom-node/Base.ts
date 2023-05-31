@@ -8,7 +8,16 @@ const Colors: {
 	Company: ['#E6697B', '#E6697B', '#fff'],
 	Person: ['#EBF3EF', '#EBF3EF', '#000'],
 	Property: ['#708FFF', '#708FFF', '#fff'],
-	Recipient: ['#24A36F', '#24A36F', '#fff']
+	Recipient: ['#24A36F', '#24A36F', '#fff'],
+	人: ['#E369E6', '#E369E6', '#fff'],
+	法人: ['#9CB2FF', '#9CB2FF', '#fff'],
+	科研项目: ['#38BDE8', '#38BDE8', '#fff'],
+	经费卡: ['#CA923E', '#CA923E', '#fff'],
+	部门: ['#E57637', '#E57637', '#fff'],
+	采购事项: ['#E4D26E', '#E4D26E', '#fff'],
+	合同: ['#759DD9', '#759DD9', '#fff'],
+	发票: ['#5ACBA9', '#5ACBA9', '#fff'],
+	资产: ['#24A36F', '#24A36F', '#fff']
 };
 
 // 获取 stroke、FILL、
