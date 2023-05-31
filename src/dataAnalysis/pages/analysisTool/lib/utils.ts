@@ -87,14 +87,14 @@ export const handleValidateNode: (
 	const currentNodesType = getAllNodeOfGraph(graph);
 	// todo: error提示
 	if ([IImageTypes.GROUP, IImageTypes.ORDER, IImageTypes.END].includes(type)) {
-		if (currentNodesType.has(IImageTypes.GROUP) && type === IImageTypes.GROUP) {
-			message.error('不能存在多个Group');
-			return false;
-		}
-		if (currentNodesType.has(IImageTypes.ORDER) && type === IImageTypes.ORDER) {
-			message.error('不能存在多个ORDEr');
-			return false;
-		}
+		// if (currentNodesType.has(IImageTypes.GROUP) && type === IImageTypes.GROUP) {
+		// 	message.error('不能存在多个分组');
+		// 	return false;
+		// }
+		// // if (currentNodesType.has(IImageTypes.ORDER) && type === IImageTypes.ORDER) {
+		// 	message.error('不能存在多个排序');
+		// 	return false;
+		// }
 		if (currentNodesType.has(IImageTypes.END) && type === IImageTypes.END) {
 			message.error('不能存在多个END');
 			return false;

@@ -144,7 +144,7 @@ const options = {
 
 const SelectGroup: React.FC = () => {
 	const [form] = Form.useForm();
-	const { id, getValue, setValue } = useConfigContextValue();
+	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const formInitValue = (getValue && id && getValue(id)) || {};
 
 	const handleOnclickAdd = () => {
@@ -180,6 +180,10 @@ const SelectGroup: React.FC = () => {
 			return;
 		}
 		setValue(id, value);
+	};
+	const handleReset = () => {
+		form.resetFields();
+		id && resetValue(id);
 	};
 	return (
 		<div>
@@ -239,7 +243,7 @@ const SelectGroup: React.FC = () => {
 					<Button
 						className={`${classes.btn} ${classes.reset}`}
 						htmlType="button"
-						onClick={() => form.resetFields()}
+						onClick={() => handleReset()}
 					>
 						重置
 					</Button>
