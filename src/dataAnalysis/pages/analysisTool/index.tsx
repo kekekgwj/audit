@@ -53,11 +53,17 @@ import FromJSONBehavior from './FromJSONBehavior';
 import NodeDetailPanel from './components/NodeDetailPanel';
 import { Graph, useGraphInstance, useGraphState } from './lib/index';
 import React, { useEffect, useCallback, useState, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const X6Graph = () => {
+	const navigate = useNavigate();
+	const location = useLocation();
 	const { nodes, setNodes, edges, setEdges, graph: gRef } = useGraphState();
 	const [messageApi, contextHolder] = message.useMessage();
 	const key = 'graph';
+	const pathName = location.state?.path; //上一级界面名称
+	const templateName = location.state?.name; //模板名称
+	const projectId = location.state?.id;
 	const openMessage = (error: string) => {
 		messageApi.open({
 			key,
@@ -66,10 +72,19 @@ const X6Graph = () => {
 			duration: 2
 		});
 	};
+	const goBack = () => {
+		navigate(-1);
+	};
 	return (
 		<>
 			{contextHolder}
-			<Graph openMessage={openMessage}>
+			<Graph
+				openMessage={openMessage}
+				goBack={goBack}
+				pathName={pathName}
+				templateName={templateName}
+				projectId={projectId}
+			>
 				{/* <AddNodeBehavior /> */}
 				{/* <FromJSONBehavior />
 				<GraphExport /> */}

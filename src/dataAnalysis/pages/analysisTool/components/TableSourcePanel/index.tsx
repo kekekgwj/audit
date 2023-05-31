@@ -1,11 +1,13 @@
 import React, { useContext, useState } from 'react';
 import classes from './index.module.less';
-import { Collapse } from 'antd';
+import { Collapse, Input } from 'antd';
+const { Search } = Input;
 const { Panel } = Collapse;
 import { GraphContext } from '../../lib';
 import TABLE from '@/assets/SQLEditor/table.png';
 import { IImageTypes } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
+import { SearchOutlined } from '@ant-design/icons';
 const TableItem: React.FC = ({ data }) => {
 	if (!data) {
 		return null;
@@ -95,10 +97,21 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 			}
 		]
 	};
+	// 搜索查询
+	const onSearch = () => {};
 	return (
 		<div className={classes.drawerWrapper}>
 			{open && (
 				<div className={classes.container}>
+					<div style={{ paddingRight: '15px' }}>
+						<Search
+							placeholder="请输入关键字"
+							enterButton="查询"
+							size="middle"
+							prefix={<SearchOutlined className="site-form-item-icon" />}
+							onSearch={onSearch}
+						/>
+					</div>
 					<TableItem data={data1}></TableItem>
 					<TableItem data={data2}></TableItem>
 				</div>

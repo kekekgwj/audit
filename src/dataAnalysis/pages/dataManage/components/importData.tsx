@@ -39,17 +39,17 @@ const ImportCom = React.memo((props: Props) => {
 	}, [open]);
 
 	const initForm = () => {
-		form.setFieldValue('type', 1);
+		form.setFieldValue('type', 'EXCEL');
 	};
 
 	const optionsType = [
 		{
 			label: '表格文件',
-			value: 1
+			value: 'EXCEL'
 		},
 		{
 			label: '数据库备份文件',
-			value: 2
+			value: 'SQL'
 		}
 	];
 	const changeType = (e: Event) => {
@@ -68,6 +68,7 @@ const ImportCom = React.memo((props: Props) => {
 		}
 		form.validateFields().then(() => {
 			const formData = new FormData();
+			formData.append('type', data.type);
 			formData.append('tableName', data.tableName);
 			formData.append('file', data.file.originFileObj);
 			formData.append('description', data.description);
@@ -93,7 +94,7 @@ const ImportCom = React.memo((props: Props) => {
 	};
 
 	const showInfo = () => {
-		if (type == 1) {
+		if (type == 'EXCEL') {
 			return (
 				<div className={styles['tip-box']}>
 					<p>说明：1、支持表格文件格式：excel；</p>
@@ -144,7 +145,7 @@ const ImportCom = React.memo((props: Props) => {
 						getValueFromEvent={normFile}
 						rules={[{ required: true, message: '请选择文件' }]}
 					>
-						{type == 1 ? (
+						{type == 'EXCEL' ? (
 							<Upload
 								maxCount={1}
 								accept=".xls,.xlsx"
@@ -153,13 +154,7 @@ const ImportCom = React.memo((props: Props) => {
 								<Button icon={<UploadOutlined />}>选择文件</Button>
 							</Upload>
 						) : (
-							<Upload
-								maxCount={1}
-								accept=".sql"
-								beforeUpload={() => {
-									return false;
-								}}
-							>
+							<Upload maxCount={1} accept=".sql" beforeUpload={beforeUpload}>
 								<Button icon={<UploadOutlined />}>选择文件</Button>
 							</Upload>
 						)}
