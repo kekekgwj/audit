@@ -80,7 +80,7 @@ const useNodeConfigValue = () => {
 	const resetConfigValue = (id: string) => {
 		saveConfigValue(id, null);
 	};
-	return [getConfigValue, saveConfigValue];
+	return [getConfigValue, saveConfigValue, resetConfigValue];
 };
 const Panel: React.FC = () => {
 	const state = useSelector((state: IRootState) => state.dataAnalysis);

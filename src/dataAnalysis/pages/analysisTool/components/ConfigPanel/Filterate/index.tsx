@@ -1,9 +1,11 @@
 import { createContext, useContext, useReducer, useState } from 'react';
 import { Button, Checkbox, Form, Input, Select } from 'antd';
+import { isEmpty, cloneDeep } from 'lodash';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import { useConfigContextValue } from '../../NodeDetailPanel';
 
 type RowGroupItme = {
 	_key: string;
@@ -160,7 +162,12 @@ const Row = (props: RowProps) => {
 				]}
 				onChange={(value) => handleChange('value2', value)}
 			/>
-			<Input className={styles['filter-box__row_item']} placeholder="请输入" />
+			<Input
+				defaultValue={props.defaultValue.value3}
+				className={styles['filter-box__row_item']}
+				placeholder="请输入"
+				onChange={(e) => handleChange('value3', e.target.value)}
+			/>
 			<div className={styles['filter-box__row_btns']}>
 				<div className={styles['add-row']} onClick={handleAdd}>
 					<SvgIcon name="add-circle" color="#24A36F"></SvgIcon>
@@ -206,6 +213,22 @@ const reducer = (state: FormData, action: any) => {
 		case 'setCol':
 			state.col = action.data;
 			break;
+		case 'reset':
+			state = {
+				row: [
+					[
+						{
+							_key: getHash(),
+							value1: '',
+							value2: '',
+							value3: ''
+						}
+					]
+				],
+
+				col: []
+			};
+			break;
 		default:
 			break;
 	}
@@ -214,15 +237,37 @@ const reducer = (state: FormData, action: any) => {
 };
 
 export default () => {
-	const [formData, dispatch] = useReducer(reducer, data);
+	const { id, getValue, setValue, resetValue } = useConfigContextValue();
+	let initData = getValue && id && getValue(id);
+	if (isEmpty(getValue && id && getValue(id))) {
+		initData = cloneDeep(data);
+	}
+	const [formData, dispatch] = useReducer(reducer, initData);
 	// const [formData, setFormData] = useState(data);
 	const [indeterminate, setIndeterminate] = useState(false);
 	const [checkAll, setCheckAll] = useState(false);
 
 	const plainOptions = ['Apple', 'Pear', 'Orange'];
 
-	const handleClick = () => {
-		console.log('form', formData);
+	// 执行
+	const submit = () => {
+		// TODO
+	};
+
+	const set = () => {
+		if (!id || !setValue) {
+			return;
+		}
+		setValue(id, formData);
+	};
+
+	// 重置
+	const reset = () => {
+		if (!id || !setValue) {
+			return;
+		}
+		resetValue(id);
+		dispatch({ type: 'reset' });
 	};
 
 	// 更新表单值
@@ -232,6 +277,7 @@ export default () => {
 		data: RowGroupItme
 	) => {
 		dispatch({ type: 'setRowData', groupIndex, rowIndex, data });
+		set();
 	};
 
 	// 删除组
@@ -242,28 +288,33 @@ export default () => {
 	// 增加组
 	const addGroup = () => {
 		dispatch({ type: 'addGroup' });
+		set();
 	};
 
 	// 删除行
 	const delRow = (groupIndex: number, rowIndex: number) => {
 		dispatch({ type: 'delRow', groupIndex, rowIndex });
+		set();
 	};
 
 	// 新增行
 	const addRow = (groupIndex: number, rowIndex: number) => {
 		dispatch({ type: 'addRow', groupIndex, rowIndex });
+		set();
 	};
 
 	const onCheckAllChange = (e: CheckboxChangeEvent) => {
 		dispatch({ type: 'setCol', data: e.target.checked ? plainOptions : [] });
 		setIndeterminate(false);
 		setCheckAll(e.target.checked);
+		set();
 	};
 
 	const onChange = (list: CheckboxValueType[]) => {
 		dispatch({ type: 'setCol', data: list });
 		setIndeterminate(!!list.length && list.length < plainOptions.length);
 		setCheckAll(list.length === plainOptions.length);
+		set();
 	};
 
 	return (
@@ -324,7 +375,7 @@ export default () => {
 					<Button
 						className={`${styles.btn} ${styles.reset}`}
 						htmlType="button"
-						// onClick={() => form.resetFields()}
+						onClick={reset}
 					>
 						重置
 					</Button>
@@ -332,6 +383,7 @@ export default () => {
 						className={`${styles.btn} ${styles.submit}`}
 						type="primary"
 						htmlType="submit"
+						onClick={submit}
 					>
 						执行
 					</Button>
