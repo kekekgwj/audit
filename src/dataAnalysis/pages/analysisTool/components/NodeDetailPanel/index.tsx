@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 import { Table } from 'antd';
 import { useSelector } from 'react-redux';
 import classes from './index.module.less';
@@ -71,15 +71,15 @@ const useTableSource = () => {
 };
 const useNodeConfigValue = () => {
 	const ref = React.useRef<Record<string, object>>({});
-	const getConfigValue = (id: string) => {
-		return ref.current[id] || {};
-	};
-	const saveConfigValue = (id: string, value: any) => {
+	const getConfigValue = useCallback((id: string) => {
+		return ref.current[id] || null;
+	}, []);
+	const saveConfigValue = useCallback((id: string, value: any) => {
 		ref.current[id] = value;
-	};
-	const resetConfigValue = (id: string) => {
+	}, []);
+	const resetConfigValue = useCallback((id: string) => {
 		saveConfigValue(id, null);
-	};
+	}, []);
 	return [getConfigValue, saveConfigValue, resetConfigValue];
 };
 const Panel: React.FC = () => {
