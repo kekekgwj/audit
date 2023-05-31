@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import classes from './index.module.less';
-import { Collapse } from 'antd';
+import { Collapse, Divider } from 'antd';
 import { getMyTables, getSystemTables } from '@/api/sqlEditor';
 const { Panel } = Collapse;
 
@@ -21,7 +21,7 @@ const TableItem: React.FC<ITable> = ({ data, title }) => {
 	return (
 		<Collapse
 			className={classes.tableItemWrapper}
-			expandIconPosition={'start'}
+			defaultActiveKey={title}
 			ghost={true}
 		>
 			<Panel
