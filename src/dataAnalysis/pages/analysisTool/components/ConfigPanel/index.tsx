@@ -29,12 +29,9 @@ const ConfigByType: () => JSX.Element = () => {
 };
 const ConfigPanel: React.FC = () => {
 	return (
-		<div>
-			<div>
-				<ConfigByType />
-			</div>
-			<div></div>
-		</div>
+		<>
+			<ConfigByType />
+		</>
 	);
 };
 export default ConfigPanel;
