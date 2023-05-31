@@ -17,6 +17,9 @@ import { toDoubleClickNode } from '../../../../redux/reducers/dataAnalysis';
 import { Options } from '@antv/x6/lib/graph/options';
 import { Divider, message } from 'antd';
 import { Dnd } from '@antv/x6-plugin-dnd';
+import SvgIcon from '@/components/svg-icon';
+import { LeftOutlined } from '@ant-design/icons';
+import { saveProjectCanvas, getProjectCanvas } from '@/api/dataAnalysis/graph';
 
 interface IGraphContext {
 	graph: X6.Graph;
@@ -47,6 +50,10 @@ interface Props {
 	container?: HTMLDivElement;
 	children?: ReactNode;
 	openMessage: (error: string) => void;
+	goBack?: () => void;
+	pathName?: string; //上一级菜单名称
+	templateName?: string; //模板名称
+	projectId?: number; //模板id
 }
 const ports = {
 	groups: {
@@ -138,6 +145,10 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			children,
 			className = 'react-x6-graph',
 			openMessage,
+			goBack,
+			pathName,
+			templateName,
+			projectId,
 			...other
 		} = props;
 		const containerRef = useRef<HTMLDivElement>(container || null);
@@ -245,6 +256,15 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 						dndContainer: panelDndContainerRef.current
 					});
 					setPanelDnd(dnd);
+				}
+				//初始化画布元素
+				if (projectId) {
+					getProjectCanvas({ projectId }).then((res) => {
+						if (res.canvasJson) {
+							const data = JSON.parse(res.canvasJson);
+							graph.fromJSON(data);
+						}
+					});
 				}
 			}
 		}, [graph, other, ref]);
@@ -416,8 +436,31 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			});
 			dnd?.start(node, e.nativeEvent as any);
 		};
+		//保存审计模板
+		const saveData = (data: any) => {
+			console.log(data, 435);
+			saveProjectCanvas({
+				canvasJson: JSON.stringify(data),
+				projectId: projectId
+			}).ten((res) => {
+				console.log(res, 443443);
+			});
+		};
 		return (
 			<GraphContext.Provider value={{ graph, startDrag }}>
+				<div className={classes['top-breadcrumb']}>
+					<div onClick={() => goBack()} className={classes['top-back']}>
+						<span>
+							<LeftOutlined />
+							<span style={{ marginLeft: '8px', cursor: 'pointer' }}>返回</span>
+						</span>
+						<span style={{ marginLeft: '8px' }}>{pathName}</span>
+					</div>
+					<div className={classes['top-template-name']}>
+						<span>/</span>
+						<span style={{ marginLeft: '8px' }}>{templateName}</span>
+					</div>
+				</div>
 				<div className={classes.container}>
 					<div className="x6-panel" ref={panelDndContainerRef}>
 						<TableSourcePanel setOpen={setOpenLeftPanel} open={openLeftPanel} />
@@ -430,7 +473,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 							<div
 								className={classes['save-btn']}
 								onClick={() => {
-									console.log(graph?.toJSON());
+									saveData(graph?.toJSON());
 								}}
 							>
 								保存为审计模板
