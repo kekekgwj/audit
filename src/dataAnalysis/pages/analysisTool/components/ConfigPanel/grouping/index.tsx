@@ -5,11 +5,12 @@ import { DelIcon } from '../sort/icon';
 import Icon, {
 	CustomIconComponentProps
 } from '@ant-design/icons/lib/components/Icon';
+import { useConfigContextValue } from '../../NodeDetailPanel';
 const { Panel } = Collapse;
 const { Option } = Select;
 interface SortProps {
 	option?: List[];
-	value?: string[];
+	value?: ICondition[];
 	onChange?: (value: string[]) => void;
 	label: string;
 }
@@ -52,21 +53,22 @@ const HeartIcon = (props: Partial<CustomIconComponentProps>) => (
 );
 
 const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
-	const [optionList, setOptionList] = useState<List[]>(
-		JSON.parse(JSON.stringify(option))
-	);
+	const [dataList, setDataList] = useState<ICondition[]>(value || []);
 
-	const [dataList, setDataList] = useState<{ key: string; title: string }[]>(
-		[]
-	);
-
-	const setData = (item: { key: string; title: string }) => {
+	const setData = (item: { key: string; title: string }, tableName: string) => {
 		if (
 			!dataList.some((res) => {
 				return res.key == item.key;
 			})
 		) {
-			setDataList([...dataList, item]);
+			setDataList([
+				...dataList,
+				{
+					title: item.title,
+					key: item.key,
+					tableName
+				}
+			]);
 		}
 	};
 
@@ -122,16 +124,16 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 						/>
 					)}
 				>
-					{optionList.map((item, index) => {
+					{option.map((item, index) => {
 						return (
 							<Panel header={item.title} key={index + 1}>
-								{item.list.map((items, childrenIndex) => {
+								{item.list.map((items, _) => {
 									return (
 										<div
 											key={items.title}
 											className={classes.sortTxt}
 											onClick={() => {
-												setData(items);
+												setData(items, item.title);
 											}}
 										>
 											<span>{items.title}</span>
@@ -146,10 +148,21 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 		</Collapse>
 	);
 };
-
+interface ICondition {
+	title: string;
+	key: string;
+	tableName: string;
+}
+interface IFormValue {
+	column: ICondition[];
+	conditions: ICondition[];
+	funcType: string;
+}
 const Grouping: FC = () => {
 	const [form] = Form.useForm();
-
+	const { id, getValue, setValue, resetValue } = useConfigContextValue();
+	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
+	console.log('formInitValue', formInitValue);
 	const [groupData, setGroupData] = useState<List[]>([
 		//分组依据列表数据
 		{
@@ -194,27 +207,18 @@ const Grouping: FC = () => {
 		}
 	]);
 
-	const onGenderChange = (value: string) => {
-		switch (value) {
-			case 'male':
-				form.setFieldsValue({ note: 'Hi, man!' });
-				break;
-			case 'female':
-				form.setFieldsValue({ note: 'Hi, lady!' });
-				break;
-			case 'other':
-				form.setFieldsValue({ note: 'Hi there!' });
-				break;
-			default:
-		}
-	};
-
 	const onFinish = (values: any) => {
 		console.log(values);
 	};
-
+	const handleOnChange = (value: any) => {
+		if (!id || !setValue) {
+			return;
+		}
+		setValue(id, value);
+	};
 	const onReset = () => {
 		form.resetFields();
+		id && resetValue(id);
 	};
 
 	return (
@@ -224,19 +228,31 @@ const Grouping: FC = () => {
 			name="control"
 			onFinish={onFinish}
 			className={classes.fromWrap}
+			onValuesChange={(_, value) => {
+				handleOnChange(value);
+			}}
+			initialValues={{
+				conditions: formInitValue.conditions || [],
+				funcType: formInitValue.funcType,
+				column: formInitValue.column || []
+			}}
 		>
 			<div className={classes.formList}>
-				<Form.Item wrapperCol={{ offset: 0, span: 24 }} name="group" label="">
+				<Form.Item
+					wrapperCol={{ offset: 0, span: 24 }}
+					name="conditions"
+					label=""
+				>
 					<SortInput label="分组依据" option={groupData}></SortInput>
 				</Form.Item>
-				<Form.Item name="type" label="函数类型">
-					<Select placeholder="请选择" onChange={onGenderChange} allowClear>
+				<Form.Item name="funcType" label="函数类型">
+					<Select placeholder="请选择" allowClear>
 						<Option value="SUM">求和</Option>
 						<Option value="MAX">最大</Option>
 						<Option value="MIN">最小</Option>
 					</Select>
 				</Form.Item>
-				<Form.Item wrapperCol={{ offset: 0, span: 24 }} name="arrange" label="">
+				<Form.Item wrapperCol={{ offset: 0, span: 24 }} name="column" label="">
 					<SortInput label="列" option={accordData}></SortInput>
 				</Form.Item>
 			</div>

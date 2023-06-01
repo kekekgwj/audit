@@ -30,26 +30,26 @@ const layout = {
 const tailLayout = {
 	wrapperCol: { offset: 24, span: 0 }
 };
-
+const mockOption = [
+	{
+		title: '数据表1',
+		list: [
+			{ title: '字段1文字', isUp: false, isDown: false },
+			{ title: '字段2文字很长很长', isUp: false, isDown: false },
+			{ title: '字段3文字很长很长', isUp: false, isDown: false }
+		]
+	},
+	{
+		title: '数据表2',
+		list: [
+			{ title: '字段01文字很长很长', isUp: false, isDown: false },
+			{ title: '字段02文字', isUp: false, isDown: false }
+		]
+	}
+];
 const SortInput: FC<SortProps> = ({ value, onChange }) => {
-	console.log(value);
-	const [optionList, setOptionList] = useState<List[]>([
-		{
-			title: '数据表1',
-			list: [
-				{ title: '字段1文字', isUp: false, isDown: false },
-				{ title: '字段2文字很长很长', isUp: false, isDown: false },
-				{ title: '字段3文字很长很长', isUp: false, isDown: false }
-			]
-		},
-		{
-			title: '数据表2',
-			list: [
-				{ title: '字段01文字很长很长', isUp: false, isDown: false },
-				{ title: '字段02文字', isUp: false, isDown: false }
-			]
-		}
-	]);
+	console.log('sort initvalue', value);
+	const [optionList, setOptionList] = useState<List[]>(value || mockOption);
 	//通过传入的状态值和下标修改dataList的排序状态
 	const setSortStatus = (
 		data: { isUp: boolean; isDown: boolean },
@@ -191,8 +191,8 @@ const SortInput: FC<SortProps> = ({ value, onChange }) => {
 
 const Sort: FC = () => {
 	const [form] = Form.useForm();
-	const { id, getValue, setValue } = useConfigContextValue();
-	const formInitValue = (getValue && id && getValue(id)) || {};
+	const { id, getValue, setValue, resetValue } = useConfigContextValue();
+	const formInitValue = getValue && id && getValue(id);
 
 	const onFinish = (values: any) => {
 		console.log(values);
@@ -200,9 +200,9 @@ const Sort: FC = () => {
 
 	const onReset = () => {
 		form.resetFields();
+		id && resetValue(id);
 	};
 	const handleSortChange = (v) => {
-		console.log('value', v);
 		if (!id || !setValue) {
 			return;
 		}
@@ -216,12 +216,15 @@ const Sort: FC = () => {
 			onFinish={onFinish}
 			className={classes.fromWrap}
 			initialValues={{
-				...formInitValue
+				sorting: formInitValue
 			}}
 		>
 			<div className={classes.formList}>
 				<Form.Item name="sorting">
-					<SortInput onChange={handleSortChange}></SortInput>
+					<SortInput
+						onChange={handleSortChange}
+						value={formInitValue}
+					></SortInput>
 				</Form.Item>
 			</div>
 

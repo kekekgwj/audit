@@ -7,21 +7,32 @@ import Graphin, {
 	type GraphinData,
 	type LegendChildrenProps
 } from '@antv/graphin';
-// import registerNodes from './custom-node';
-// import registerEdges from './custom-edge';
+
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
-import { Checkbox, Input, Col, Row, message, Form, Table, Button } from 'antd';
+import {
+	Checkbox,
+	Input,
+	Col,
+	Row,
+	message,
+	Form,
+	Table,
+	Button,
+	Empty
+} from 'antd';
+import emptyPage from '@/assets/img/nohit.png';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CustomDialog from '@/components/custom-dialog';
 import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
 import { debounce, throttle } from 'lodash';
 import { getGraphByRule } from '@/api/knowLedgeGraph/suspiciousRule';
+// import { getFillColorByType } from './custom-node/Base';
+import registerNodes from '@/knowLedgeGraph/components/graphin/custom-node';
 
 // 注册自定义节点
-// registerNodes('all');
-// registerEdges('all');
+registerNodes('all');
 
 //功能组件
 const { Tooltip, ContextMenu, Legend } = Components;
@@ -252,204 +263,64 @@ const GraphCom = () => {
 			value: originData.value
 		});
 
-		// 模拟数据;
-		// const res = {
-		// 	isHit: true,
-		// 	hasList: true,
-		// 	data: [
-		// 		['张三', '12'],
-		// 		['张三', '12'],
-		// 		['张三', '12'],
-		// 		['张三', '12'],
-		// 		['张三', '12'],
-		// 		['张三', '12'],
-		// 		['张三', '12'],
-		// 		['李四', '22']
-		// 	],
-		// 	head: ['姓名', '年龄'],
-		// 	nodes: [
-		// 		{
-		// 			id: 'node-0',
-		// 			x: 100,
-		// 			y: 100,
-		// 			data: {
-		// 				type: 'centerPointer'
-		// 			},
-		// 			style: {
-		// 				label: {
-		// 					value: '我是\nnode0',
-		// 					position: 'center',
-		// 					offset: [0, 0],
-		// 					fill: 'green'
-		// 				},
-		// 				keyshape: {
-		// 					size: 80,
-		// 					stroke: '#ff9f0f',
-		// 					fill: '#ff9f0ea6'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'node-1',
-		// 			x: 200,
-		// 			y: 200,
-		// 			data: {
-		// 				type: 'project'
-		// 			},
-		// 			style: {
-		// 				label: {
-		// 					value: '我是node1',
-		// 					position: 'center',
-		// 					offset: [0, 5],
-		// 					fill: 'green'
-		// 				},
-		// 				keyshape: {
-		// 					size: 60,
-		// 					stroke: '#ff9f0f',
-		// 					fill: '#ff9f0ea6'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'node-2',
-		// 			x: 100,
-		// 			y: 300,
-		// 			data: {
-		// 				type: 'project'
-		// 			},
-		// 			style: {
-		// 				label: {
-		// 					value: '我是node2',
-		// 					position: 'center',
-		// 					offset: [20, 5],
-		// 					fill: 'green'
-		// 				},
-		// 				keyshape: {
-		// 					size: 40,
-		// 					stroke: '#ff9f0f',
-		// 					fill: '#ff9f0ea6'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'node-3',
-		// 			data: {
-		// 				type: 'person'
-		// 			},
-		// 			style: {
-		// 				label: {
-		// 					value: '我是node3',
-		// 					position: 'center',
-		// 					offset: [20, 5],
-		// 					fill: 'green'
-		// 				},
-		// 				keyshape: {
-		// 					size: 40,
-		// 					stroke: '#ff9f0f',
-		// 					fill: '#ff9f0ea6'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'node-4',
-		// 			data: {
-		// 				type: 'person'
-		// 			},
-		// 			style: {
-		// 				label: {
-		// 					value: '我是node4',
-		// 					position: 'center',
-		// 					offset: [20, 0],
-		// 					fill: 'green'
-		// 				},
-		// 				keyshape: {
-		// 					size: 40,
-		// 					stroke: '#ff9f0f',
-		// 					fill: '#ff9f0ea6'
-		// 				}
-		// 			}
-		// 		}
-		// 	],
-		// 	edges: [
-		// 		{
-		// 			id: 'edge-0-1',
-		// 			source: 'node-0',
-		// 			target: 'node-1',
-		// 			style: {
-		// 				label: {
-		// 					value: '我是边1'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'edge-0-3',
-		// 			source: 'node-0',
-		// 			target: 'node-3',
-		// 			style: {
-		// 				label: {
-		// 					value: '我是边4'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'edge-3-4',
-		// 			source: 'node-3',
-		// 			target: 'node-4',
-		// 			style: {
-		// 				label: {
-		// 					value: '我是边5'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'edge-1-2',
-		// 			source: 'node-1',
-		// 			target: 'node-2',
-		// 			style: {
-		// 				label: {
-		// 					value: '我是边2'
-		// 				},
-		// 				keyshape: {
-		// 					lineWidth: 5,
-		// 					stroke: '#00f'
-		// 				}
-		// 			}
-		// 		},
-		// 		{
-		// 			id: 'edge-0-2',
-		// 			source: 'node-0',
-		// 			target: 'node-2',
-		// 			style: {
-		// 				label: {
-		// 					value: '我是边3'
-		// 				}
-		// 			}
-		// 		}
-		// 	]
-		// };
-
 		//是否命中数据
 		setHit(res.isHit);
 		//是否有表
 		setHasList(res.hasList);
+		//命中数据后续处理
+		if (res.isHit) {
+			if (res.hasList) {
+				//表头
+				setTableHead(res.head);
+				//将后端数据转换成渲染表的数据
+				setTableData(transToTableData(res.head, res.data));
+				// 传入后台的数据
+				setSubmitData(res?.data);
+			}
 
-		if (res.hasList) {
-			//表头
-			setTableHead(res.head);
+			// 高亮节点类型
+			const lightNodeTypes = res.lightNodeTypes;
+			//处理节点
+			if (res.nodes && res.nodes.length) {
+				const formatNodes = res.nodes.map((node) => {
+					const { type } = node;
+					if (lightNodeTypes.includes(type)) {
+						//需要高亮
+						return {
+							...node,
+							type: 'Base',
+							style: {
+								keyshape: {
+									// fill: getFillColorByType(type)
+								}
+							},
+							config: {
+								type: 'lightNode',
+								size: 100
+							}
+						};
+					} else {
+						//设为默认色
+						return {
+							...node,
+							type: 'Base',
+							config: {
+								type: 'noLightNode',
+								size: 100
+							}
+						};
+					}
+				});
 
-			//将后端数据转换成渲染表的数据
-			setTableData(transToTableData(res.head, res.data));
-
-			// 传入后台的数据
-			setSubmitData(res?.data);
+				// 图谱数据
+				const graphData = {
+					edges: res.edges,
+					nodes: formatNodes
+				};
+				console.log(graphData, 481481481);
+				setDate(graphData);
+			}
 		}
-		// 图谱数据
-		const graphData = {
-			edges: res.edges,
-			nodes: res.nodes
-		};
-		setDate(graphData);
-		// 模拟数据
 	};
 
 	// 保存图谱
@@ -541,7 +412,14 @@ const GraphCom = () => {
 							orData={submitData}
 						></SaveCom>
 					</div>
-				) : null}
+				) : (
+					<Empty
+						className={styles['empty-page']}
+						image={emptyPage}
+						description={false}
+						imageStyle={{ height: '167px', marginTop: '200px' }}
+					/>
+				)}
 			</>
 		</div>
 	);

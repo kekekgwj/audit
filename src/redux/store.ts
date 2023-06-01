@@ -7,7 +7,11 @@ function configureAppStore() {
 	});
 	return store;
 }
-import { INodeDetailPanel } from './reducers/dataAnalysis';
+import {
+	INodeDetailPanel,
+	toClosePanel,
+	toDoubleClickNode
+} from './reducers/dataAnalysis';
 import { IStoreGraph } from './reducers/knowLedgeGraphSlice';
 import { IBaseState } from './reducers/base';
 import { useSelector } from 'react-redux';
@@ -22,4 +26,12 @@ export const dispatch: Dispatch = store.dispatch;
 export const useBaseState = () => {
 	const baseState = useSelector((state: IRootState) => state.base);
 	return baseState;
+};
+
+export const onClickGraphNode = (id: string) => {
+	dispatch(toDoubleClickNode({ id, showPanel: true }));
+};
+
+export const onClickCloseConfigPanel = () => {
+	dispatch(toClosePanel());
 };

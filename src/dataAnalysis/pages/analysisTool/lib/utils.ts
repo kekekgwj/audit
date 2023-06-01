@@ -87,14 +87,14 @@ export const handleValidateNode: (
 	const currentNodesType = getAllNodeOfGraph(graph);
 	// todo: error提示
 	if ([IImageTypes.GROUP, IImageTypes.ORDER, IImageTypes.END].includes(type)) {
-		if (currentNodesType.has(IImageTypes.GROUP) && type === IImageTypes.GROUP) {
-			message.error('不能存在多个Group');
-			return false;
-		}
-		if (currentNodesType.has(IImageTypes.ORDER) && type === IImageTypes.ORDER) {
-			message.error('不能存在多个ORDEr');
-			return false;
-		}
+		// if (currentNodesType.has(IImageTypes.GROUP) && type === IImageTypes.GROUP) {
+		// 	message.error('不能存在多个分组');
+		// 	return false;
+		// }
+		// // if (currentNodesType.has(IImageTypes.ORDER) && type === IImageTypes.ORDER) {
+		// 	message.error('不能存在多个排序');
+		// 	return false;
+		// }
 		if (currentNodesType.has(IImageTypes.END) && type === IImageTypes.END) {
 			message.error('不能存在多个END');
 			return false;
@@ -269,6 +269,7 @@ export interface IImageShapes {
 import ASSETS from '../assets/index';
 import { message } from 'antd';
 import { Options } from '@antv/x6/lib/graph/options';
+import { saveProjectCanvas } from '@/api/dataAnalysis/graph';
 const { FILTER, CONNECT, GROUP, ORDER, END } = ASSETS;
 export const imageShapes: IImageShapes[] = [
 	{
@@ -297,3 +298,44 @@ export const imageShapes: IImageShapes[] = [
 		type: IImageTypes.END
 	}
 ];
+interface ISaveData
+	extends Pick<
+		Parameters<typeof saveProjectCanvas>[0],
+		'configs' | 'projectId'
+	> {
+	canvas: {
+		cells: X6.Cell.Properties[];
+	};
+}
+export const saveData: (params: ISaveData) => void = ({
+	canvas,
+	projectId,
+	configs = null
+}) => {
+	if (!canvas || !projectId) {
+		return;
+	}
+
+	saveProjectCanvas({
+		canvasJson: JSON.stringify({
+			content: canvas,
+			configs
+		}),
+		projectId
+	});
+};
+
+export const syncData = (
+	projectID: number | null,
+	graph: X6.Graph | null,
+	getAllConfigs: () => void
+) => {
+	if (!projectID || !graph) {
+		return;
+	}
+	saveData({
+		canvas: graph?.toJSON(),
+		projectId: projectID,
+		configs: getAllConfigs()
+	});
+};
