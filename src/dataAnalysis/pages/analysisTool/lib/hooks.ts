@@ -1,17 +1,42 @@
 import { Graph, Node, Edge } from '@antv/x6';
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { diffCells, patch, checkId } from './utils';
+import { useLocation, useNavigate } from 'react-router';
 
 type GraphState = {
 	nodes?: Node.Metadata[];
 	edges?: Edge.Metadata[];
 	graph?: Graph;
 };
+interface IGraphInfo {
+	goBack: () => void;
+	pathName: string; //上一级菜单名称
+	templateName: string; //模板名称
+	projectId: number; //模板id
+}
+export const useGraphPageInfo = (): IGraphInfo => {
+	const location = useLocation();
+	const pathName = location.state.path; //上一级界面名称
+	const templateName = location.state.name; //模板名称
+	const projectId = location.state.id;
+	const navigate = useNavigate();
+	const goBack = () => {
+		navigate(-1);
+	};
+	return {
+		pathName,
+		templateName,
+		projectId,
+		goBack
+	};
+};
+
 export const useGraphState = (initState: GraphState = {}) => {
 	const { nodes: n = [], edges: e = [], graph: g = null } = initState;
 	const [nodes, _setNodes] = useState<Node.Metadata[]>(n);
 	const [edges, _setEdges] = useState<Edge.Metadata[]>(e);
 	const graph = useRef<Graph | null>(g);
+
 	const diffNodes = useMemo(
 		() => diffCells(graph.current, nodes, 'node'),
 		[nodes]
