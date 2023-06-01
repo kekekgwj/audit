@@ -30,7 +30,7 @@ import {
 import styles from './index.module.less';
 import Add from './components/add';
 import Edit from './components/edit';
-import Delete from '@graph/components/delete-dialog';
+import Delete from '@/components/delete-dialog';
 
 import {
 	getWhiteList,

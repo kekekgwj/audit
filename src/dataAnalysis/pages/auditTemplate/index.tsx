@@ -3,7 +3,7 @@ import { Card, Divider, Form, Input, Pagination, Empty } from 'antd';
 import fileImg from '@/assets/img/file.png';
 import styles from './index.module.less';
 import SvgIcon from '@/components/svg-icon';
-import CustomDialog from '@graph/components/custom-dialog';
+import CustomDialog from '@/components/custom-dialog';
 import emptyPage from '@/assets/img/empty.png';
 import {
 	getAuditProjects,

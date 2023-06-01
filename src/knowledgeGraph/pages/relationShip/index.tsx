@@ -7,7 +7,7 @@ import SideBar from '@graph/components/sidebar/sideBar';
 import { toImgStyle } from '@/utils/other';
 import styles from './index.module.less';
 import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
-import CustomDialog from '@graph/components/custom-dialog';
+import CustomDialog from '@/components/custom-dialog';
 
 interface SaveProps {
 	open: boolean;

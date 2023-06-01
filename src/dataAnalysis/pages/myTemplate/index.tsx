@@ -5,8 +5,8 @@ import { PlusCircleOutlined } from '@ant-design/icons';
 import fileImg from '@/assets/img/file.png';
 import styles from './index.module.less';
 import SvgIcon from '@/components/svg-icon';
-import Delete from '@graph/components/delete-dialog';
-import CustomDialog from '@graph/components/custom-dialog';
+import Delete from '@/components/delete-dialog';
+import CustomDialog from '@/components/custom-dialog';
 import {
 	getProjects,
 	saveProject,

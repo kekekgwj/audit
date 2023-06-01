@@ -1,5 +1,5 @@
 import React, { useState, useImperativeHandle, useEffect } from 'react';
-import CustomDialog from '@graph/components/custom-dialog';
+import CustomDialog from '@/components/custom-dialog';
 import styles from './dialog.module.less';
 import {
 	Space,

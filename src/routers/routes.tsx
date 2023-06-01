@@ -94,9 +94,33 @@ export const routes: CustomRoute[] = [
 				]
 			},
 			{
-				path: 'editor',
-				component: lazy(() => import('@sql/pages/SQLEditor')),
-				meta: { title: 'SQL查询', icon: 'body' }
+				path: 'sqlQuery',
+				component: lazy(() => import('@sql/pages/dataVisualization')),
+				// component: lazy(() => import('@sql/pages/SQLEditor')),
+				meta: { title: 'SQL查询', icon: 'body' },
+				children: [
+					{
+						path: 'editer',
+						component: lazy(() => import('@sql/pages/SQLEditor')),
+						meta: {
+							title: 'SQL执行'
+						}
+					},
+					{
+						path: 'auditRules',
+						component: lazy(() => import('@sql/pages/SQLAuditRules')),
+						meta: {
+							title: '审计规则SQL'
+						}
+					},
+					{
+						path: 'common',
+						component: lazy(() => import('@sql/pages/SQLCommon')),
+						meta: {
+							title: '我的常用SQL'
+						}
+					}
+				]
 			},
 			{
 				path: 'data',

@@ -14,7 +14,7 @@ import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
 import { Checkbox, Input, Col, Row, message, Form, Table, Button } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import CustomDialog from '@graph/components/custom-dialog';
+import CustomDialog from '@/components/custom-dialog';
 import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
 import { debounce, throttle } from 'lodash';
 import { getGraphByRule } from '@/api/knowLedgeGraph/suspiciousRule';
@@ -159,7 +159,7 @@ const GraphinCom = React.memo((props: Props) => {
 
 const GraphCom = () => {
 	const navigate = useNavigate();
-	let location = useLocation();
+	const location = useLocation();
 	const graphinRef = useRef<GraphinRef>();
 	// 传入数据 根据此数据获取图谱数据
 	const originData = location.state;
@@ -236,7 +236,7 @@ const GraphCom = () => {
 	const transToTableData = (head: [], data: []) => {
 		const tableDataArr = [];
 		data.forEach((item) => {
-			let newObj = {};
+			const newObj = {};
 			item.forEach((el, i) => {
 				newObj[head[i]] = el;
 			});
