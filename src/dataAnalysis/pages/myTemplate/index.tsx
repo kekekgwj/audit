@@ -21,20 +21,95 @@ const MyTemplate = () => {
 	const [openDel, setOpenDel] = React.useState(false); // 删除
 	const [open, setOpen] = React.useState(false); // 新增or编辑or复制
 	const [curTitle, setCurTitle] = React.useState();
-	const [total, setTotal] = React.useState<number>(0);
+	const [totalPage, setTotalPage] = React.useState<number>(1); //总页数
 	const [current, setCurrent] = React.useState<number>(1);
+	const [pageSize, setPageSize] = React.useState<number>(10);
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
+	const sizeRef = useRef();
+	const totalPageRef = useRef();
+	const currentRef = useRef();
+	const templateListRef = useRef();
 	useEffect(() => {
-		getTemplateList();
+		sizeRef.current = pageSize;
+	}, [pageSize]);
+	useEffect(() => {
+		currentRef.current = current;
+	}, [current]);
+	useEffect(() => {
+		totalPageRef.current = totalPage;
+	}, [totalPage]);
+	useEffect(() => {
+		templateListRef.current = templateList;
+	}, [templateList]);
+	//获取内容区域
+	useEffect(() => {
+		let dom = document.querySelector('#mainContain');
+		// 当前界面每行可容纳个数
+		const rowNum = Math.floor(dom?.scrollWidth / 220);
+		// 每列可容纳个数
+		const colNum = Math.floor(dom?.scrollHeight / 220);
+		//每页数量
+		let size = rowNum * colNum;
+		setPageSize(size);
+		//第一次获取数据
+		getTemplateListFirst(size);
+		//监听滚动
+		dom?.addEventListener('scroll', handleScroll);
+		return () => {
+			dom?.removeEventListener('scroll', handleScroll);
+		};
 	}, []);
-	// 获取模板列表数据
-	const getTemplateList = async () => {
-		const params = { current: current, size: 10 };
+
+	// 滚动事件
+	const handleScroll = () => {
+		let dom = document.querySelector('#mainContain');
+		const scrollDistance =
+			dom?.scrollHeight - dom?.scrollTop - dom?.clientHeight;
+		if (scrollDistance <= 0) {
+			//等于0证明已经到底，可以请求接口
+			if (currentRef?.current < totalPageRef?.current) {
+				//当前页数小于总页数就请求
+				setCurrent(currentRef?.current + 1); //当前页数自增
+				const nowPage = currentRef?.current + 1;
+				//请求接口的代码
+				getTemplateListMore(nowPage);
+			}
+		}
+	};
+	// 初始获取数据
+	const getTemplateListFirst = async (size: number) => {
+		const params = { current: currentRef.current, size: size };
 		try {
 			const res = await getProjects(params);
 			setTemplateList(res.records);
-			setTotal(res.total);
+			setTotalPage(Math.ceil(res.total / size));
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	// 获取更多数据
+	const getTemplateListMore = async (page: number) => {
+		const params = { current: page, size: sizeRef.current };
+		try {
+			const res = await getProjects(params);
+			console.log(templateListRef.current, 939393);
+			setTemplateList([...templateListRef.current, ...res.records]);
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	//更新界面数据
+	const getTemplateList = async () => {
+		// 需要重置到显示第一页数据 需要重置总页数
+		setCurrent(1);
+		const params = { current: 1, size: sizeRef.current };
+		try {
+			const res = await getProjects(params);
+			setTemplateList(res.records);
+			setTotalPage(Math.ceil(res.total / sizeRef?.current));
 		} catch (e) {
 			console.error(e);
 		}
@@ -121,7 +196,7 @@ const MyTemplate = () => {
 
 	return (
 		<div className={styles['my-template-page']}>
-			<div className={styles['main-contain']}>
+			<div className={styles['main-contain']} id="mainContain">
 				<div className={styles['add-item']}>
 					<div
 						className={styles['add-content-box']}
@@ -186,7 +261,7 @@ const MyTemplate = () => {
 					})}
 			</div>
 
-			<div className={styles['foot-pagination-box']}>
+			{/* <div className={styles['foot-pagination-box']}>
 				<div>
 					<span style={{ marginRight: '10px' }}>共{total}条记录</span>
 					<span>
@@ -202,7 +277,7 @@ const MyTemplate = () => {
 						showQuickJumper
 					/>
 				</div>
-			</div>
+			</div> */}
 			<Delete
 				open={openDel}
 				handleCancle={handleCancleDel}
