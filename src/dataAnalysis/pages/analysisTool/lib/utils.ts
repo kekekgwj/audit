@@ -269,6 +269,7 @@ export interface IImageShapes {
 import ASSETS from '../assets/index';
 import { message } from 'antd';
 import { Options } from '@antv/x6/lib/graph/options';
+import { saveProjectCanvas } from '@/api/dataAnalysis/graph';
 const { FILTER, CONNECT, GROUP, ORDER, END } = ASSETS;
 export const imageShapes: IImageShapes[] = [
 	{
@@ -297,3 +298,44 @@ export const imageShapes: IImageShapes[] = [
 		type: IImageTypes.END
 	}
 ];
+interface ISaveData
+	extends Pick<
+		Parameters<typeof saveProjectCanvas>[0],
+		'configs' | 'projectId'
+	> {
+	canvas: {
+		cells: X6.Cell.Properties[];
+	};
+}
+export const saveData: (params: ISaveData) => void = ({
+	canvas,
+	projectId,
+	configs = null
+}) => {
+	if (!canvas || !projectId) {
+		return;
+	}
+
+	saveProjectCanvas({
+		canvasJson: JSON.stringify({
+			content: canvas,
+			configs
+		}),
+		projectId
+	});
+};
+
+export const syncData = (
+	projectID: number | null,
+	graph: X6.Graph | null,
+	getAllConfigs: () => void
+) => {
+	if (!projectID || !graph) {
+		return;
+	}
+	saveData({
+		canvas: graph?.toJSON(),
+		projectId: projectID,
+		configs: getAllConfigs()
+	});
+};

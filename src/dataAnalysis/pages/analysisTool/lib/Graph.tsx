@@ -12,29 +12,90 @@ import type { ReactNode } from 'react';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Keyboard } from '@antv/x6-plugin-keyboard';
-import { dispatch } from '../../../../redux/store';
-import { toDoubleClickNode } from '../../../../redux/reducers/dataAnalysis';
-import { Options } from '@antv/x6/lib/graph/options';
 import { Divider, message } from 'antd';
 import { Dnd } from '@antv/x6-plugin-dnd';
-import SvgIcon from '@/components/svg-icon';
 import { LeftOutlined } from '@ant-design/icons';
 import { saveProjectCanvas, getProjectCanvas } from '@/api/dataAnalysis/graph';
 
-interface IGraphContext {
-	graph: X6.Graph;
+interface IGraphContext extends IGraphConfig {
+	graph: X6.Graph | null;
 	startDrag: (
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 		{ label, image, type }: IImageShapes
 	) => void;
+	projectID: number | null;
 }
-
+interface IGraphConfig {
+	getConfigValue: (id: string) => any;
+	saveConfigValue: (id: string, value: any) => void;
+	resetConfigValue: (id: string) => void;
+	getAllConfigs: () => void;
+	setAllConfigs: (value: any) => void;
+}
 export const useGraph = () => {
 	const { graph } = useContext(GraphContext) || {};
 	return graph;
 };
+export const useGraphID = () => {
+	const { projectID } = useContext(GraphContext) || {};
+	return projectID;
+};
 
-export const GraphContext = createContext<IGraphContext | null>(null);
+export const useGraphContext = () => {
+	return useContext(GraphContext) || {};
+};
+
+export const useNodeConfigValue: () => IGraphConfig = () => {
+	const ref = React.useRef<Record<string, object>>({});
+
+	const getConfigValue = useCallback((id: string) => {
+		return ref.current[id] || null;
+	}, []);
+	const saveConfigValue = useCallback((id: string, value: any) => {
+		ref.current[id] = value;
+	}, []);
+	const resetConfigValue = useCallback((id: string) => {
+		saveConfigValue(id, null);
+	}, []);
+	const getAllConfigs = () => {
+		return ref.current;
+	};
+	const setAllConfigs = (value: any) => {
+		ref.current = value;
+	};
+	return {
+		getConfigValue,
+		saveConfigValue,
+		resetConfigValue,
+		getAllConfigs,
+		setAllConfigs
+	};
+};
+export const GraphContext = createContext<IGraphContext>({
+	graph: null,
+	startDrag: function (
+		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+		{ label, image, type }: IImageShapes
+	): void {
+		throw new Error('Function not implemented.');
+	},
+	projectID: null,
+	getConfigValue: function (id: string) {
+		throw new Error('Function not implemented.');
+	},
+	saveConfigValue: function (id: string, value: any): void {
+		throw new Error('Function not implemented.');
+	},
+	resetConfigValue: function (id: string): void {
+		throw new Error('Function not implemented.');
+	},
+	getAllConfigs: function (): void {
+		throw new Error('Function not implemented.');
+	},
+	setAllConfigs: function (value: any): void {
+		throw new Error('Function not implemented.');
+	}
+});
 import classes from './graph.module.less';
 import TableSourcePanel from '../components/TableSourcePanel';
 import {
@@ -43,17 +104,16 @@ import {
 	getNodeTypeById,
 	handleValidateNode,
 	imageShapes,
+	syncData,
 	validateConnectionRule
 } from './utils';
+import { useGraphPageInfo } from './hooks';
+import { config } from 'process';
 interface Props {
 	className?: string;
 	container?: HTMLDivElement;
 	children?: ReactNode;
 	openMessage: (error: string) => void;
-	goBack?: () => void;
-	pathName?: string; //上一级菜单名称
-	templateName?: string; //模板名称
-	projectId?: number; //模板id
 }
 const ports = {
 	groups: {
@@ -145,26 +205,24 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			children,
 			className = 'react-x6-graph',
 			openMessage,
-			goBack,
-			pathName,
-			templateName,
-			projectId,
 			...other
 		} = props;
 		const containerRef = useRef<HTMLDivElement>(container || null);
 		const graphWrapperRef = useRef<HTMLDivElement>(null);
 		const DndContainerRef = useRef<HTMLDivElement>(null);
 		const panelDndContainerRef = useRef<HTMLDivElement>(null);
-
-		const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
-			for (let i = 0, len = ports.length; i < len; i += 1) {
-				ports[i].style.visibility = show ? 'visible' : 'hidden';
-			}
-		};
+		const { goBack, pathName, templateName, projectId } = useGraphPageInfo();
+		const {
+			getConfigValue,
+			saveConfigValue,
+			resetConfigValue,
+			getAllConfigs,
+			setAllConfigs
+		} = useNodeConfigValue();
 		// 初始化画布和dnd
 		useEffect(() => {
 			if (graphWrapperRef.current && containerRef.current && !graph) {
-				const graph = new X6.Graph({
+				const graph: X6.Graph = new X6.Graph({
 					container: containerRef.current,
 					autoResize: false,
 					grid: true,
@@ -257,97 +315,35 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 					});
 					setPanelDnd(dnd);
 				}
-				//初始化画布元素
-				if (projectId) {
-					getProjectCanvas({ projectId }).then((res) => {
-						if (res.canvasJson) {
-							const data = JSON.parse(res.canvasJson);
-							graph.fromJSON(data);
-						}
-					});
-				}
 			}
+			//初始化画布元素
+			// if (projectId) {
+			// 	getProjectCanvas({ projectId }).then((res) => {
+			// 		if (res.canvasJson) {
+			// 			const data = JSON.parse(res.canvasJson);
+			// 			graph.fromJSON(data.content);
+			// 		}
+			// 	});
+			// }
 		}, [graph, other, ref]);
-		// 监听事件
 		useEffect(() => {
-			if (!graph) {
+			if (!graph || !projectId) {
 				return;
 			}
-			graph.on('node:mouseenter', () => {
-				const container = document.getElementById('x6-graph')!;
-				const ports = container.querySelectorAll(
-					'.x6-port-body'
-				) as NodeListOf<SVGElement>;
-				showPorts(ports, true);
-			});
-			graph.on('node:mouseleave', () => {
-				const container = document.getElementById('x6-graph')!;
-				const ports = container.querySelectorAll(
-					'.x6-port-body'
-				) as NodeListOf<SVGElement>;
-				showPorts(ports, false);
-			});
-			graph.on('node:dblclick', ({ node }) => {
-				const { id } = node;
-				dispatch(toDoubleClickNode({ id, showPanel: true }));
-				const cell = graph.getCellById(id);
-				const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
-				const { CONNECT, FILTER, TABLE } = IImageTypes;
-				if ([CONNECT].includes(clickNodeType)) {
-					console.log('union or join');
-				}
-				// if ([FILTER].includes(clickNodeType)) {
-				// }
-				// if (TABLE === clickNodeType) {
-				// }
-
-				// if (SQL === clickNodeType) {
-				// }
-				const edges = graph.getEdges();
-				const sourceNodes: string[] = [];
-				// 找到节点的所有连接节点
-				edges.forEach((e) => {
-					const sourceID = e.getSourceCellId();
-					const targetID = e.getTargetCellId();
-					if (targetID === id) {
-						sourceNodes.push(sourceID);
-					}
-				});
-				// 获取到所有连接节点的type
-				const types = getNodeTypeById(graph, sourceNodes);
-				// todo: >= 2
-				if (types.filter((v) => v !== IImageTypes.SQL).length < 2) {
-				}
-				// if (cell.isNode()) {
-				// 	const ports = cell.getPorts();
-				// 	ports.forEach(({ id }) => {
-				// 		console.log('port props', cell.getPortProp(id || ''));
-				// 	});
-				// }
-			});
-			graph.bindKey(['meta+a', 'ctrl+a'], () => {
-				const nodes = graph.getNodes();
-				if (nodes) {
-					graph.select(nodes);
-				}
-			});
-			graph.on('node:added', ({ cell }) => {
-				// getNodeTypeByCell(cell);
-			});
-			// delete
-			graph.bindKey('backspace', () => {
-				const cells = graph.getSelectedCells();
-				if (cells.length) {
-					graph.removeCells(cells);
-				}
-			});
-			return () => {
-				graph.off('node:mouseenter');
-				graph.off('node:mouseleave');
-				graph.unbindKey('backspace');
-				graph.unbindKey(['meta+a', 'ctrl+a']);
-			};
+			(async () => {
+				const res = await getProjectCanvas({ projectId });
+				const { canvasJson } = res;
+				const { content, configs } = JSON.parse(canvasJson);
+				graph.fromJSON(content);
+				setAllConfigs(configs);
+			})();
+		}, [projectId, graph]);
+		// 监听画布尺寸
+		useEffect(() => {
+			window.addEventListener('resize', handleResize);
+			return () => window.removeEventListener('resize', handleResize);
 		}, [graph]);
+
 		const handleResize = () => {
 			if (graphWrapperRef && graphWrapperRef.current && graph) {
 				const wrapperWidth = graphWrapperRef.current.offsetWidth;
@@ -360,6 +356,9 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 				let maxOffsetWidth = wrapperWidth,
 					maxoffsetHeight = wrapperHeight;
 				cells.forEach((cell) => {
+					if (!cell || !cell.position) {
+						return;
+					}
 					const { x, y } = cell.position;
 					maxOffsetWidth = Math.max(x + graphOffsetWidth, maxOffsetWidth);
 					maxoffsetHeight = Math.max(y + graphOffsetHeight, maxoffsetHeight);
@@ -369,10 +368,6 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			}
 		};
 
-		useEffect(() => {
-			window.addEventListener('resize', handleResize);
-			return () => window.removeEventListener('resize', handleResize);
-		}, [graph]);
 		const startDrag = (
 			e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 			{ label, image, type }: IImageShapes
@@ -436,20 +431,24 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			});
 			dnd?.start(node, e.nativeEvent as any);
 		};
-		//保存审计模板
-		const saveData = (data: any) => {
-			console.log(data, 435);
-			saveProjectCanvas({
-				canvasJson: JSON.stringify(data),
-				projectId: projectId
-			}).ten((res) => {
-				console.log(res, 443443);
-			});
-		};
+
 		return (
-			<GraphContext.Provider value={{ graph, startDrag }}>
+			<GraphContext.Provider
+				value={{
+					graph,
+					startDrag,
+					projectID: projectId,
+					getConfigValue,
+					saveConfigValue,
+					resetConfigValue,
+					getAllConfigs
+				}}
+			>
 				<div className={classes['top-breadcrumb']}>
-					<div onClick={() => goBack()} className={classes['top-back']}>
+					<div
+						onClick={() => goBack && goBack()}
+						className={classes['top-back']}
+					>
 						<span>
 							<LeftOutlined />
 							<span style={{ marginLeft: '8px', cursor: 'pointer' }}>返回</span>
@@ -473,7 +472,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 							<div
 								className={classes['save-btn']}
 								onClick={() => {
-									saveData(graph?.toJSON());
+									syncData(projectId, graph, getAllConfigs);
 								}}
 							>
 								保存为审计模板
