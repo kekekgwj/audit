@@ -20,10 +20,11 @@ interface IProps {
 }
 interface ISQlBOX {}
 interface ISQLBoxBlock {
-	handleClickItem: (index: number) => void;
+	handleClickItem: (index: string) => void;
 	index: number;
 	title: string;
 	content: string | ReactElement;
+	value: string;
 }
 function useHover<T extends HTMLElement = HTMLElement>(
 	elementRef: RefObject<T>
@@ -54,6 +55,7 @@ const SQLBoxBlock: FC<ISQLBoxBlock> = ({
 	handleClickItem,
 	index,
 	title,
+	value,
 	content
 }) => {
 	const ref = useRef(null);
@@ -62,42 +64,80 @@ const SQLBoxBlock: FC<ISQLBoxBlock> = ({
 		<div
 			className={`${classes.sqlBox} ${isHovered ? classes.selectedBlock : ''}`}
 			key={index}
-			onClick={() => handleClickItem(index)}
+			onClick={() => handleClickItem(value)}
 			ref={ref}
 		>
 			<div className={classes.sqlBox_title}>{title}</div>
-			<Markup content={content} />
+			{/* <Markup content={content} /> */}
 			{/* <div className={classes.content}>{content}</div> */}
 		</div>
 	);
 };
+
 const SQLBox: FC<ISQlBOX> = ({}) => {
 	const context = useContext(EditorContext) as {
 		insertText: (text: string) => void;
 	};
 	const insertText = context.insertText;
-	const handleClickItem = (index: number) => {
-		insertText && insertText(data[index]['value']);
+	const handleClickItem = (value: string) => {
+		insertText && insertText(value);
 	};
 	// todo sql关键词高亮
-	const data = [
+	// const data = [
+	// 	{
+	// 		title: '审计规则SQL',
+	// 		content: highlight('SELECT * FROM TEST表', { html: true }),
+	// 		value: 'SELECT * FROM TEST表'
+	// 	},
+	// 	{
+	// 		title: '我的常用SQL',
+	// 		content: highlight('SELECT * FROM 之江实验室app用户访问数据', {
+	// 			html: true
+	// 		}),
+	// 		value: 'SELECT * FROM 之江实验室app用户访问数据'
+	// 	}
+	// ];
+
+	// 审计规则SQL
+	const auditRules = [
 		{
-			title: '审计规则SQL',
-			content: highlight('SELECT * FROM TEST表', { html: true }),
-			value: 'SELECT * FROM TEST表'
-		},
-		{
-			title: '我的常用SQL',
+			title: '审计规则SQL名称-1',
 			content: highlight('SELECT * FROM 之江实验室app用户访问数据', {
 				html: true
 			}),
 			value: 'SELECT * FROM 之江实验室app用户访问数据'
+		},
+		{
+			title: '审计规则SQL名称-2',
+			content: highlight('SELECT * FROM 之江实验室app用户访问数据2', {
+				html: true
+			}),
+			value: 'SELECT * FROM 之江实验室app用户访问数据2'
 		}
 	];
+
+	// 我的常用SQL
+	const myCommon = [
+		{
+			title: '我的常用SQL名称-1',
+			content: highlight('SELECT * FROM 之江实验室app用户访问数据', {
+				html: true
+			}),
+			value: 'SELECT * FROM 之江实验室app用户访问数据'
+		},
+		{
+			title: '我的常用SQL名称-2',
+			content: highlight('SELECT * FROM 之江实验室app用户访问数据2', {
+				html: true
+			}),
+			value: 'SELECT * FROM 之江实验室app用户访问数据2'
+		}
+	];
+
 	return (
 		<div className={classes.sqlBoxContainer}>
-			<div className={classes.sqlBoxContainer_title}>{'SQL语句'}</div>
-			<div>
+			{/* <div className={classes.sqlBoxContainer_title}>{'SQL语句'}</div> */}
+			{/* <div>
 				{data.map(({ title, content, value }, index) => (
 					<SQLBoxBlock
 						key={index}
@@ -107,6 +147,36 @@ const SQLBox: FC<ISQlBOX> = ({}) => {
 						handleClickItem={handleClickItem}
 					/>
 				))}
+			</div> */}
+			<div className={classes.sqlBoxGroup}>
+				<div className={classes.sqlBoxGroupTitle}>审计规则SQL</div>
+				<div className={classes.sqlBoxItems}>
+					{auditRules.map(({ title, content, value }, index) => (
+						<SQLBoxBlock
+							key={index}
+							title={title}
+							content={content}
+							index={index}
+							value={value}
+							handleClickItem={handleClickItem}
+						/>
+					))}
+				</div>
+			</div>
+			<div className={classes.sqlBoxGroup}>
+				<div className={classes.sqlBoxGroupTitle}>我的常用SQL</div>
+				<div className={classes.sqlBoxItems}>
+					{myCommon.map(({ title, content, value }, index) => (
+						<SQLBoxBlock
+							key={index}
+							title={title}
+							content={content}
+							index={index}
+							value={value}
+							handleClickItem={handleClickItem}
+						/>
+					))}
+				</div>
 			</div>
 		</div>
 	);
@@ -115,26 +185,29 @@ const SQLBox: FC<ISQlBOX> = ({}) => {
 const TableBox: FC = () => {
 	const data = [
 		{
-			content: '测试表名1'
+			name: 'aZZlabCGXM2022',
+			zhName: '测试表名1'
 		},
 		{
-			content: '测试表名22'
+			name: 'aZZlabCGXM2023',
+			zhName: '测试表名22'
 		},
 		{
-			content: '测试表名3'
+			name: 'aZZlabCGXM2024',
+			zhName: '测试表名3'
 		}
 	];
 	const context = useContext(EditorContext) as {
 		insertText: (text: string) => void;
 	};
 	const insertText = context.insertText;
-	const handleClickItem = (index: number) => {
-		insertText && insertText(data[index]['content']);
+	const handleClickItem = (value: string) => {
+		insertText && insertText(value);
 	};
 	return (
 		<div className={classes.sqlBoxContainer}>
-			<div className={classes.sqlBoxContainer_title}>{'数据表'}</div>
-			<div>
+			{/* <div className={classes.sqlBoxContainer_title}>{'数据表'}</div> */}
+			{/* <div>
 				<ul style={{ listStyleType: 'none' }}>
 					{data.map(({ content }, index) => (
 						<li key={index} onClick={() => handleClickItem(index)}>
@@ -142,6 +215,20 @@ const TableBox: FC = () => {
 						</li>
 					))}
 				</ul>
+			</div> */}
+
+			<div className={classes.sqlBoxGroup}>
+				{/* <div className={classes.sqlBoxGroupTitle}>表分组1</div> */}
+				{data.map(({ zhName, name }, index) => (
+					<li
+						key={index}
+						onClick={() => handleClickItem(name)}
+						className={classes.tableBox}
+					>
+						<span className={classes.tableBoxName}>{name}</span>
+						<span>({zhName})</span>
+					</li>
+				))}
 			</div>
 		</div>
 	);

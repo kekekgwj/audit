@@ -2,6 +2,7 @@
 	width: 390px;
 	.sqlBoxContainer {
 		width: 100%;
+		padding: 20px 20px 0 20px;
 		border-radius: 4px;
 		box-shadow: 1px 2px 12px 0px rgba(66, 81, 112, 0.15);
 		background: #ffffff;
@@ -16,34 +17,68 @@
 			font-size: 14px;
 			margin-left: 6px;
 		}
-		&_title {
-			width: 100%;
-			height: 50px;
-			background: #23955c;
-			box-shadow: 1px 2px 12px 0px rgba(66, 81, 112, 0.15);
-			text-align: center;
-			line-height: 50px;
-			font-size: 18px;
-			color: #fff;
+
+		.sqlBoxGroup {
+			margin-bottom: 20px;
+			border-bottom: 1px dashed rgba(0, 0, 0, 0.2);
+
+			&:last-child {
+				margin-bottom: 0;
+				border: none;
+			}
+			.sqlBoxGroupTitle {
+				margin-bottom: 7px;
+				font-size: 14px;
+				font-weight: bolder;
+			}
+			.sqlBoxItems {
+				padding-bottom: 10px;
+			}
 		}
-		.sqlBox:not(:last-child)::after {
-			content: '';
-			width: 342px;
-			height: 1px;
-			position: absolute;
-			bottom: 0px;
-			left: 24px;
-			background-color: rgba(0, 0, 0, 0.2);
-		}
+
+		// &_title {
+		// 	width: 100%;
+		// 	height: 50px;
+		// 	background: #23955c;
+		// 	box-shadow: 1px 2px 12px 0px rgba(66, 81, 112, 0.15);
+		// 	text-align: center;
+		// 	line-height: 50px;
+		// 	font-size: 18px;
+		// 	color: #fff;
+		// }
+		// .sqlBox:not(:last-child)::after {
+		// 	content: '';
+		// 	width: 342px;
+		// 	height: 1px;
+		// 	position: absolute;
+		// 	bottom: 0px;
+		// 	left: 24px;
+		// 	background-color: rgba(0, 0, 0, 0.2);
+		// }
 		.selectedBlock {
 			background-color: rgba(211, 211, 211, 0.5);
 		}
+
+		.tableBox {
+			display: flex;
+			align-items: center;
+			padding: 7px 0;
+			font-size: 14px;
+			cursor: pointer;
+			.tableBoxName {
+				margin-right: 8px;
+				color: #ff9d00;
+			}
+		}
 		.sqlBox {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
 			box-sizing: border-box;
 			position: relative;
 			width: 100%;
-			height: 100px;
-			padding: 24px;
+			// height: 100px;
+			padding: 7px 16px;
 			cursor: pointer;
 			&_title {
 				font-size: 14px;
