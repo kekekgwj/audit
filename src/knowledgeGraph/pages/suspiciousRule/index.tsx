@@ -16,7 +16,7 @@ import {
 } from '@ant-design/icons';
 import emptyPage from '@/assets/img/empty.png';
 import styles from './index.module.less';
-import CustomDialog from '@graph/components/custom-dialog';
+import CustomDialog from '@/components/custom-dialog';
 import { getSuspiciousRule } from '@/api/knowledgeGraph/suspiciousRule';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 

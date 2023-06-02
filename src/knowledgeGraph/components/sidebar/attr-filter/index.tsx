@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Button, Tree, message } from 'antd';
-import CustomDialog from '@graph/components/custom-dialog';
+import CustomDialog from '@/components/custom-dialog';
 import { CaretDownOutlined } from '@ant-design/icons';
 import FillterAttr, { ComponentsType } from './fillterAttr';
 import SvgIcon from '@/components/svg-icon';

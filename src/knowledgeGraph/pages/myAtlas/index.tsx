@@ -21,7 +21,7 @@ import {
 import type { PaginationProps } from 'antd';
 const { RangePicker } = DatePicker;
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
-import DeleteDialog from '@graph/components/delete-dialog';
+import DeleteDialog from '@/components/delete-dialog';
 import styles from './index.module.less';
 
 import { getMyAltasList, deleteGraph } from '@/api/knowledgeGraph/myAltas';

@@ -18,7 +18,7 @@ import emptyPage from '@/assets/img/empty.png';
 const { RangePicker } = DatePicker;
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import styles from './index.module.less';
-import Delete from '@graph/components/delete-dialog';
+import Delete from '@/components/delete-dialog';
 import ImportDialog from './components/importData';
 import { getDataList, deleteData } from '@/api/dataAnalysis/dataManage.ts';
 

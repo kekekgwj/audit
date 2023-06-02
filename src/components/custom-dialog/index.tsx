@@ -12,6 +12,8 @@ interface DialogProps {
 	height?: string | number; // 模态框内容区域高度
 	wrapClassName?: string; // 模态框外层节点class名
 	children?: React.ReactNode; // 自节点
+	showOkButton?: boolean; // 是否显示确认按钮
+	showCancelButton?: boolean; // 是否显示取消按钮
 	onOk?: (...args: any[]) => any; // 确定按钮事件
 	onCancel?: (...args: any[]) => any; // 取消按钮事件
 }
@@ -25,6 +27,8 @@ export default (props: DialogProps) => {
 		height,
 		wrapClassName,
 		children,
+		showOkButton = true,
+		showCancelButton = true,
 		onOk,
 		onCancel
 	} = props;
@@ -61,12 +65,16 @@ export default (props: DialogProps) => {
 				{children}
 			</div>
 			<div className={styles['ant-modal__footer']}>
-				<Button className={styles.cancel} onClick={onCancel}>
-					取消
-				</Button>
-				<Button type="primary" className={styles.submit} onClick={onOk}>
-					确定
-				</Button>
+				{showCancelButton && (
+					<Button className={styles.cancel} onClick={onCancel}>
+						取消
+					</Button>
+				)}
+				{showOkButton && (
+					<Button type="primary" className={styles.submit} onClick={onOk}>
+						确定
+					</Button>
+				)}
 			</div>
 		</Modal>
 	);
