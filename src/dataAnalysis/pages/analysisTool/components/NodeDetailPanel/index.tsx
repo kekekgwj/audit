@@ -15,6 +15,7 @@ import { IRootState, onClickCloseConfigPanel } from '@/redux/store';
 import { CloseOutlined } from '@ant-design/icons';
 import { useGraph, useGraphContext, useGraphID } from '../../lib/Graph';
 import { IImageTypes, getNodeTypeById, syncData } from '../../lib/utils';
+import SvgIcon from '@/components/svg-icon';
 const { DOWNLOAD } = ASSETS;
 interface IConfigContext {
 	type: IImageTypes | null;
@@ -81,7 +82,7 @@ const Panel: React.FC = () => {
 	const state = useSelector((state: IRootState) => state.dataAnalysis);
 	const graph = useGraph();
 	const [data, columns, updateTable] = useTableSource();
-
+	const [showConfig, setShowConfig] = useState(true);
 	const { curSelectedNode: id, showPanel = false } = state || {};
 	const projectID = useGraphID();
 	const { getConfigValue, saveConfigValue, resetConfigValue, getAllConfigs } =
@@ -92,6 +93,10 @@ const Panel: React.FC = () => {
 	if (!showPanel || !graph) {
 		return null;
 	}
+
+	const toggleConfig = () => {
+		setShowConfig(!showConfig);
+	};
 
 	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
 
@@ -115,28 +120,48 @@ const Panel: React.FC = () => {
 				</div>
 			</div>
 
-			<div className={classes.configPanel}>
+			{/* <div className={classes.configPanel}> */}
+			<div
+				className={`${
+					showConfig ? classes.configPanel : classes.hideConfigPanel
+				}`}
+			>
 				<div className={classes.configPanel_title}>
+					{!showConfig ? (
+						<span
+							onClick={() => toggleConfig()}
+							className={classes.svgIcon}
+							style={{ marginRight: '5px' }}
+						>
+							<SvgIcon
+								name="closeArrow"
+								className={classes.closeIcon}
+							></SvgIcon>
+						</span>
+					) : null}
 					<span className={classes.configPanel_title_text}>参数配置</span>
-					<CloseOutlined
-						className={classes.closeIcon}
-						onClick={onClickCloseConfigPanel}
-					/>
+					{showConfig ? (
+						<span onClick={() => toggleConfig()} className={classes.svgIcon}>
+							<SvgIcon name="openArrow" className={classes.closeIcon}></SvgIcon>
+						</span>
+					) : null}
 				</div>
-				<div className={classes.configWrapper}>
-					<ConfigContext.Provider
-						value={{
-							type: clickNodeType,
-							id: id,
-							initValue: null,
-							getValue: getConfigValue,
-							setValue: saveConfigValue,
-							resetValue: resetConfigValue
-						}}
-					>
-						<ConfigPanel key={id} />
-					</ConfigContext.Provider>
-				</div>
+				{showConfig ? (
+					<div className={classes.configWrapper}>
+						<ConfigContext.Provider
+							value={{
+								type: clickNodeType,
+								id: id,
+								initValue: null,
+								getValue: getConfigValue,
+								setValue: saveConfigValue,
+								resetValue: resetConfigValue
+							}}
+						>
+							<ConfigPanel key={id} />
+						</ConfigContext.Provider>
+					</div>
+				) : null}
 			</div>
 		</div>
 	);

@@ -69,9 +69,33 @@
 			overflow: auto;
 			height: calc(100% - 21px - 50px + 15px);
 		}
+		.closeIcon {
+			position: absolute;
+			right: 40px;
+		}
 	}
-	.closeIcon {
+	.hideConfigPanel {
 		position: absolute;
-		right: 40px;
+		top: 0;
+		right: 5px;
+		.configPanel_title {
+			width: 120px;
+			position: relative;
+			height: 50px;
+			background: #f8f9fa;
+			line-height: 50px;
+			padding-left: 20px;
+			display: flex;
+			align-items: center;
+			.configPanel_title_text {
+				font-size: 14px;
+				font-weight: bold;
+			}
+		}
+	}
+	.svgIcon {
+		display: flex;
+		align-items: center;
+		cursor: pointer;
 	}
 }
