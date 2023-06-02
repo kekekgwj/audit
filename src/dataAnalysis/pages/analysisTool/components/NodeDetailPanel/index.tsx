@@ -120,7 +120,6 @@ const Panel: React.FC = () => {
 				</div>
 			</div>
 
-			{/* <div className={classes.configPanel}> */}
 			<div
 				className={`${
 					showConfig ? classes.configPanel : classes.hideConfigPanel

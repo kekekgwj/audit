@@ -9,17 +9,18 @@ import {
 	getAuditProjects,
 	copyAuditProject
 } from '@/api/dataAnalysis/auditTemplate';
+import { useNavigate } from 'react-router-dom';
 
 const AuditTemplate = () => {
 	const [messageApi, contextHolder] = message.useMessage();
 	const [templateList, setTemplateList] = React.useState([]);
 	const [curId, setCurId] = React.useState<number>();
 	const [openCopy, setOpenCopy] = React.useState<boolean>(false);
-	const [total, setTotal] = React.useState<number>(2);
 	const [current, setCurrent] = React.useState<number>(1); //当前页
 	const [totalPage, setTotalPage] = React.useState<number>(1); //总页数
 	const [pageSize, setPageSize] = React.useState<number>(10); //每页数量
 	const [hasData, setHasData] = React.useState<boolean>(false);
+	const navigate = useNavigate();
 	const [form] = Form.useForm();
 	const sizeRef = useRef();
 	const totalPageRef = useRef();
@@ -63,19 +64,18 @@ const AuditTemplate = () => {
 			// 添加监听事件
 			const el = document.querySelector('#mainContain');
 			el?.addEventListener('scroll', handleScroll);
-			// return () => {
-			// 	el?.removeEventListener('scroll', handleScroll);
-			// };
+			return () => {
+				el?.removeEventListener('scroll', handleScroll);
+			};
 		}
 	}, [hasData]);
 
 	const handleScroll = () => {
 		let dom = document.querySelector('#mainContain');
-		console.log(dom, 747474);
 		const scrollDistance =
 			dom?.scrollHeight - dom?.scrollTop - dom?.clientHeight;
 		console.log(scrollDistance, 767676);
-		if (scrollDistance <= 0) {
+		if (scrollDistance <= 5) {
 			//等于0证明已经到底，可以请求接口
 			if (currentRef?.current < totalPageRef?.current) {
 				//当前页数小于总页数就请求
@@ -143,6 +143,12 @@ const AuditTemplate = () => {
 		getTemplateList();
 	};
 
+	const toDetail = (item: any) => {
+		navigate('/sql/dataVisualization/templateDetail', {
+			state: { name: item.name, id: item.id, path: '审计模板' }
+		});
+	};
+
 	return (
 		<div className={styles['audit-template-page']}>
 			{contextHolder}
@@ -153,7 +159,10 @@ const AuditTemplate = () => {
 							{templateList.map((item) => {
 								return (
 									<Card key={item.id} className={styles['card-item']}>
-										<div className={styles['card-content']}>
+										<div
+											className={styles['card-content']}
+											onClick={() => toDetail(item)}
+										>
 											<div className={styles['img-icon']}>
 												<img src={fileImg} alt="" />
 											</div>

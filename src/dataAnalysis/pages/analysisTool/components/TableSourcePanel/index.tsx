@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import classes from './index.module.less';
 import { Collapse, Input } from 'antd';
 const { Search } = Input;
@@ -8,6 +8,7 @@ import TABLE from '@/assets/SQLEditor/table.png';
 import { IImageTypes } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
 import { SearchOutlined } from '@ant-design/icons';
+import { getTablesData } from '@/api/dataAnalysis/graph';
 const TableItem: React.FC = ({ data }) => {
 	if (!data) {
 		return null;
@@ -18,11 +19,11 @@ const TableItem: React.FC = ({ data }) => {
 			className={classes.tableItemWrapper}
 			expandIconPosition={'start'}
 			ghost={true}
+			defaultActiveKey={['panel']}
 		>
 			<Panel
 				header={
 					<span className={classes.itemTitleBox}>
-						{/* <span className={classes.iconGroup}></span> */}
 						<SvgIcon name="filter"></SvgIcon>
 						<span className={classes.title}>{data.title}</span>
 					</span>
@@ -39,15 +40,16 @@ const TableItem: React.FC = ({ data }) => {
 								onMouseDown={(e) =>
 									startDrag &&
 									startDrag(e, {
-										label: table.tableName || '',
+										label: table.tableCnName || table.tableName || '',
 										image: TABLE,
 										type: IImageTypes.TABLE
 									})
 								}
 							>
-								{/* <span className={classes.iconTable}></span> */}
-								<SvgIcon name="group"></SvgIcon>
-								<span className={classes.tableName}>{table.tableName}</span>
+								<span className={classes.iconTable}></span>
+								<span className={classes.tableName}>
+									{table.tableCnName ? table.tableCnName : table.tableName}
+								</span>
 							</div>
 						);
 					})}
@@ -63,42 +65,102 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 	const onClickSwitch = () => {
 		setOpen(!open);
 	};
-	const data1 = {
-		title: '系统数据',
-		tables: [
-			{
-				tableName: '数据表名称1'
-			},
-			{
-				tableName: '数据表名称2'
-			},
-			{
-				tableName: '数据表名称3'
-			},
-			{
-				tableName: '数据表名称4'
-			}
-		]
+
+	const [systemData, setSystemData] = useState({}); //系统数据
+	const [myData, setMyData] = useState({}); //我的数据
+	const [searchData, setSearchData] = useState({}); //搜索数据
+	const [showSearch, setShowSearch] = useState(false); //展示搜索数据
+
+	useEffect(() => {
+		getSystemData();
+		getMyData();
+	}, []);
+	//系统数据
+	const getSystemData = async () => {
+		try {
+			const res = await getTablesData({ queryType: 1 });
+			const data = {
+				title: '系统数据',
+				tables: res
+			};
+			setSystemData(data);
+		} catch (e) {
+			console.error(e);
+		}
 	};
-	const data2 = {
-		title: '我的数据',
-		tables: [
-			{
-				tableName: '数据表名称1'
-			},
-			{
-				tableName: '数据表名称2'
-			},
-			{
-				tableName: '数据表名称3'
-			},
-			{
-				tableName: '数据表名称4'
-			}
-		]
+
+	const getMyData = async () => {
+		try {
+			const res = await getTablesData({ queryType: 2 });
+			const data = {
+				title: '我的数据',
+				tables: res
+			};
+			console.log(data, 969696);
+			setMyData(data);
+		} catch (e) {
+			console.error(e);
+		}
 	};
+	// const data1 = {
+	// 	title: '系统数据',
+	// 	tables: [
+	// 		{
+	// 			tableName: '数据表名称1'
+	// 		},
+	// 		{
+	// 			tableName: '数据表名称2'
+	// 		},
+	// 		{
+	// 			tableName: '数据表名称3'
+	// 		},
+	// 		{
+	// 			tableName: '数据表名称4'
+	// 		}
+	// 	]
+	// };
+	// const data2 = {
+	// 	title: '我的数据',
+	// 	tables: [
+	// 		{
+	// 			tableName: '数据表名称1'
+	// 		},
+	// 		{
+	// 			tableName: '数据表名称2'
+	// 		},
+	// 		{
+	// 			tableName: '数据表名称3'
+	// 		},
+	// 		{
+	// 			tableName: '数据表名称4'
+	// 		}
+	// 	]
+	// };
 	// 搜索查询
-	const onSearch = () => {};
+	const onSearch = async (val: string) => {
+		if (!val) {
+			setShowSearch(false);
+			return;
+		}
+		try {
+			const res = await getTablesData({ queryType: 3, tableCnName: val });
+			const data = {
+				title: '搜索结果',
+				tables: res
+			};
+			console.log(data, 969696);
+			setSearchData(data);
+			setShowSearch(true);
+		} catch (e) {
+			console.error(e);
+		}
+	};
+	const changeSearch = (e: any) => {
+		// 没有数据，关闭搜索
+		if (!e.target.value) {
+			setShowSearch(false);
+		}
+	};
 	return (
 		<div className={classes.drawerWrapper}>
 			{open && (
@@ -110,10 +172,17 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 							size="middle"
 							prefix={<SearchOutlined className="site-form-item-icon" />}
 							onSearch={onSearch}
+							onChange={changeSearch}
 						/>
 					</div>
-					<TableItem data={data1}></TableItem>
-					<TableItem data={data2}></TableItem>
+					{showSearch ? (
+						<TableItem data={searchData}></TableItem>
+					) : (
+						<>
+							<TableItem data={systemData}></TableItem>
+							<TableItem data={myData}></TableItem>
+						</>
+					)}
 				</div>
 			)}
 

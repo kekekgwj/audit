@@ -32,3 +32,23 @@ export function getProjectCanvas(
 		)
 	);
 }
+
+// 获取数据列表
+interface IGetTablesData {
+	orderBy?: number;
+	queryType?: number; //1系统数据 2我的数据 3系统数据和我的数据
+	tableCnName?: string;
+	tableName?: string;
+}
+interface IGetTablesDataResponse {
+	id: number;
+	tableCnName: string;
+	tableName: string;
+}
+export function getTablesData(
+	data: IGetTablesData
+): Promise<IGetTablesDataResponse> {
+	return get(
+		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/getTables', data)
+	);
+}
