@@ -4,6 +4,7 @@ import { GraphinContext, GraphinContextType } from '@antv/graphin';
 import type { LegendProps } from './typing';
 
 export const getEnumValue = (obj: any, keyString: string) => {
+	console.info('keyString', obj, keyString);
 	const keyArray = keyString.split('.');
 	const enumValue = keyArray.reduce((acc, curr, currIndex, array) => {
 		const currValue = acc[curr];
@@ -24,7 +25,6 @@ export const getEnumValue = (obj: any, keyString: string) => {
  */
 export const getEnumDataMap = (data: any[], sortKey: string) => {
 	const enumDataMap: Map<string | number, any[]> = new Map();
-
 	data.forEach((item) => {
 		/** 得到枚举值 */
 		const enumValue = getEnumValue(item, sortKey);
@@ -61,9 +61,6 @@ const useLegend = ({
 	}
 	// @ts-ignore
 	const dataMap = getEnumDataMap(data[`${bindType}s`], sortKey);
-	console.log('dataMap', dataMap);
-	console.log('data', data);
-
 	/** 计算legend.content 的 options */
 	const keys = [...dataMap.keys()];
 	const options = keys.map((key) => {
@@ -84,7 +81,6 @@ const useLegend = ({
 			checked: true
 		};
 	});
-	console.log('options', options);
 	return {
 		dataMap,
 		options

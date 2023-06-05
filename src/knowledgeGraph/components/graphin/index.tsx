@@ -194,18 +194,14 @@ const MyMenu = React.memo((props: MenuProps) => {
 });
 const formatGraphData = (data: IGraphData): GraphinData => {
 	const { edges, nodes } = Object.assign({}, data);
-	// const mockEdge = {
-	// 	attrs: null,
-	// 	id: '13068',
-	// 	similarity: null,
-	// 	source: '10244',
-	// 	target: '10245',
-	// 	type: '属于（部门）'
-	// };
+
 	const formatEdges = edges.map((edge) => {
-		const { type, similarity } = edge;
+		const { type, similarity, id, source, target } = edge;
 		return {
 			...edge,
+			id: id + '-edge',
+			source: source + '-node',
+			target: target + '-node',
 			type: 'Base',
 			config: {
 				type,
@@ -219,9 +215,10 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 	// const normDist = new NormalDistribution(averageScore, 1);
 
 	const formatNodes = nodes.map((node) => {
-		const { type, score, communityId } = node;
+		const { type, score, communityId, id } = node;
 		return {
 			...node,
+			id: id + '-node',
 			type: 'Base',
 			style: {
 				keyshape: {
@@ -238,7 +235,6 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			}
 		};
 	});
-	console.log('formatNodes', formatNodes);
 
 	return {
 		edges: formatEdges,
