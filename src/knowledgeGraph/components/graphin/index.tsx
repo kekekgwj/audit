@@ -194,15 +194,15 @@ const MyMenu = React.memo((props: MenuProps) => {
 });
 const formatGraphData = (data: IGraphData): GraphinData => {
 	const { edges, nodes } = Object.assign({}, data);
-	const mockEdge = {
-		attrs: null,
-		id: '13068',
-		similarity: null,
-		source: '10244',
-		target: '10245',
-		type: '属于（部门）'
-	};
-	const formatEdges = [...edges, mockEdge].map((edge) => {
+	// const mockEdge = {
+	// 	attrs: null,
+	// 	id: '13068',
+	// 	similarity: null,
+	// 	source: '10244',
+	// 	target: '10245',
+	// 	type: '属于（部门）'
+	// };
+	const formatEdges = edges.map((edge) => {
 		const { type, similarity } = edge;
 		return {
 			...edge,
