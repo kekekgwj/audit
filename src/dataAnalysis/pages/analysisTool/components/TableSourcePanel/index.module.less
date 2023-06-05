@@ -33,18 +33,24 @@
 				margin-left: 8px;
 				display: flex;
 				align-items: center;
-				// .iconTable {
-				// 	display: inline-block;
-				// 	width: 16px;
-				// 	height: 16px;
-				// 	background-image: url('../../../../../assets//SQLEditor/table.png');
-				// 	background-size: cover;
-				// }
+				.iconTable {
+					display: inline-block;
+					width: 16px;
+					height: 16px;
+					background-image: url('../../../../../assets//SQLEditor/table.png');
+					background-size: cover;
+				}
 				.tableName {
 					margin-left: 8px;
 					font-size: 14px;
 					font-weight: 400;
 					color: #767676;
+					display: inline-block;
+					overflow-wrap: break-word;
+					max-width: 120px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
 				}
 			}
 			.textWrapper:not(:first-child) {

@@ -32,3 +32,46 @@ export function getProjectCanvas(
 		)
 	);
 }
+
+// 获取数据列表
+interface IGetTablesData {
+	orderBy?: number;
+	queryType?: number; //1系统数据 2我的数据 3系统数据和我的数据
+	tableCnName?: string;
+	tableName?: string;
+}
+interface IGetTablesDataResponse {
+	id: number;
+	tableCnName: string;
+	tableName: string;
+}
+export function getTablesData(
+	data: IGetTablesData
+): Promise<IGetTablesDataResponse> {
+	return get(
+		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/getTables', data)
+	);
+}
+
+//保存为审计模板
+interface ISaveAsAuditProject {
+	projectId: number;
+	name: string;
+}
+export function saveAsAuditProject(data: ISaveAsAuditProject) {
+	return post(API_PREFIX + '/blade-tool/dataAnalysis/saveAsAuditProject', {
+		...data
+	});
+}
+
+//下载导出
+interface IExportData {
+	projectId: number;
+	canvasJson?: string;
+}
+interface IExportDataResponse {}
+export function exportData(data: IExportData): Promise<IExportDataResponse> {
+	return get(
+		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/export', data)
+	);
+}

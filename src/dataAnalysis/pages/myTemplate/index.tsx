@@ -66,7 +66,9 @@ const MyTemplate = () => {
 		let dom = document.querySelector('#mainContain');
 		const scrollDistance =
 			dom?.scrollHeight - dom?.scrollTop - dom?.clientHeight;
-		if (scrollDistance <= 0) {
+		console.log(scrollDistance, 696969);
+		if (scrollDistance <= 5) {
+			//细小误差导致不能到0，取一个较小值
 			//等于0证明已经到底，可以请求接口
 			if (currentRef?.current < totalPageRef?.current) {
 				//当前页数小于总页数就请求
