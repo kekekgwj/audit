@@ -52,3 +52,26 @@ export function getTablesData(
 		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/getTables', data)
 	);
 }
+
+//保存为审计模板
+interface ISaveAsAuditProject {
+	projectId: number;
+	name: string;
+}
+export function saveAsAuditProject(data: ISaveAsAuditProject) {
+	return post(API_PREFIX + '/blade-tool/dataAnalysis/saveAsAuditProject', {
+		...data
+	});
+}
+
+//下载导出
+interface IExportData {
+	projectId: number;
+	canvasJson?: string;
+}
+interface IExportDataResponse {}
+export function exportData(data: IExportData): Promise<IExportDataResponse> {
+	return get(
+		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/export', data)
+	);
+}

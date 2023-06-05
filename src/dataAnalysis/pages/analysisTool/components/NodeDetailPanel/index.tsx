@@ -16,6 +16,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { useGraph, useGraphContext, useGraphID } from '../../lib/Graph';
 import { IImageTypes, getNodeTypeById, syncData } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
+import { exportData } from '@/api/dataAnalysis/graph';
 const { DOWNLOAD } = ASSETS;
 interface IConfigContext {
 	type: IImageTypes | null;
@@ -98,6 +99,18 @@ const Panel: React.FC = () => {
 		setShowConfig(!showConfig);
 	};
 
+	const downLoadData = async () => {
+		try {
+			const data = {
+				projectId: projectID
+			};
+			const res = await exportData(data);
+			console.log('导出结果：', res);
+		} catch {
+			console.log('err');
+		}
+	};
+
 	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
 
 	return (
@@ -105,7 +118,9 @@ const Panel: React.FC = () => {
 			<div className={classes.data}>
 				<div className={classes.download}>
 					<img src={DOWNLOAD} className={classes.download_icon}></img>
-					<span className={classes.download_text}>下载</span>
+					<span className={classes.download_text} onClick={downLoadData}>
+						下载
+					</span>
 					<CloseOutlined
 						className={classes.closeIcon}
 						onClick={onClickCloseConfigPanel}

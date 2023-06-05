@@ -12,10 +12,11 @@ import type { ReactNode } from 'react';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Keyboard } from '@antv/x6-plugin-keyboard';
-import { Divider, message } from 'antd';
+import { Divider, message, Form, Input } from 'antd';
 import { Dnd } from '@antv/x6-plugin-dnd';
 import { LeftOutlined } from '@ant-design/icons';
-import { saveProjectCanvas, getProjectCanvas } from '@/api/dataAnalysis/graph';
+import { saveAsAuditProject, getProjectCanvas } from '@/api/dataAnalysis/graph';
+import CustomDialog from '@/components/custom-dialog';
 
 interface IGraphContext extends IGraphConfig {
 	graph: X6.Graph | null;
@@ -200,6 +201,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 		const [dnd, setDnd] = useState<Dnd | null>(null);
 		const [panelDnd, setPanelDnd] = useState<Dnd | null>(null);
 		const [openLeftPanel, setOpenLeftPanel] = useState<boolean>(true);
+		const [openSave, setOpenSave] = useState<boolean>(false);
 		const {
 			container,
 			children,
@@ -212,6 +214,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 		const DndContainerRef = useRef<HTMLDivElement>(null);
 		const panelDndContainerRef = useRef<HTMLDivElement>(null);
 		const { goBack, pathName, templateName, projectId } = useGraphPageInfo();
+		const [form] = Form.useForm();
 		const {
 			getConfigValue,
 			saveConfigValue,
@@ -433,6 +436,27 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			dnd?.start(node, e.nativeEvent as any);
 		};
 
+		//保存为审计模板
+		const saveAsAuditTem = () => {
+			setOpenSave(true);
+			form.resetFields();
+		};
+
+		const handleSave = async () => {
+			const data = form.getFieldsValue();
+			try {
+				const res = await saveAsAuditProject({ projectId, name: data.name });
+				message.success('保存成功');
+				setOpenSave(false);
+			} catch (e) {
+				console.error(e);
+			}
+		};
+
+		const handleCancel = () => {
+			setOpenSave(false);
+		};
+
 		return (
 			<GraphContext.Provider
 				value={{
@@ -473,7 +497,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 							<div
 								className={classes['save-btn']}
 								onClick={() => {
-									syncData(projectId, graph, getAllConfigs);
+									saveAsAuditTem();
 								}}
 							>
 								保存为审计模板
@@ -533,6 +557,27 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 						{!!graph && children}
 					</div>
 				</div>
+				<CustomDialog
+					open={openSave}
+					width={600}
+					onOk={handleSave}
+					onCancel={handleCancel}
+				>
+					<Form
+						form={form}
+						labelCol={{ span: 4 }}
+						wrapperCol={{ span: 20 }}
+						labelAlign="left"
+					>
+						<Form.Item
+							label="模板名称"
+							name="name"
+							rules={[{ required: true, message: '请输入名称' }]}
+						>
+							<Input />
+						</Form.Item>
+					</Form>
+				</CustomDialog>
 			</GraphContext.Provider>
 		);
 	}
