@@ -19,13 +19,14 @@ import {
 	getNextRelationships
 } from '@/api/knowledgeGraph/graphin';
 import { getFillColorByType } from './custom-node/Base';
+import Legend from './legend';
 // import NormalDistribution from 'normal-distribution';
 // 注册自定义节点
 registerNodes('all');
 registerEdges('all');
 
 //功能组件
-const { Tooltip, ContextMenu, Legend } = Components;
+const { Tooltip, ContextMenu } = Components;
 
 interface Props {
 	data: IGraphData;
@@ -208,9 +209,9 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 	// const normDist = new NormalDistribution(averageScore, 1);
+
 	const formatNodes = nodes.map((node) => {
 		const { type, score, communityId } = node;
-		// console.log('score', score, normDist.pdf(score as number));
 		return {
 			...node,
 			type: 'Base',
@@ -229,6 +230,7 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			}
 		};
 	});
+	console.log('formatNodes', formatNodes);
 	return {
 		edges: formatEdges,
 		nodes: formatNodes
@@ -297,7 +299,12 @@ const GraphinCom = React.memo((props: Props) => {
 							<Legend.Node
 								{...renderProps}
 								onChange={(checkedValue, result) => {
-									console.log('click legend', checkedValue, result);
+									console.log(
+										'click legend',
+										checkedValue,
+										result,
+										renderProps
+									);
 								}}
 							/>
 						);

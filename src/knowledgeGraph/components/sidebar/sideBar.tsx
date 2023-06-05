@@ -182,15 +182,16 @@ export default (props: Props) => {
 				nodes,
 				paths: pathFilter
 			});
-			const nodes = data.nodes || [];
-			const edges = data.edges || [];
-			if (nodes.length === 0) {
+			console.log('data', data);
+			const nodesData = data.nodes || [];
+			const edgesData = data.edges || [];
+			if (nodesData.length === 0) {
 				message.error('查询结果为空');
 			}
 			// 获取之后，更新视图数据
 			updateData({
-				nodes,
-				edges
+				nodes: nodesData,
+				edges: edgesData
 			});
 		} catch (e) {
 			message.error('查询结果为空');

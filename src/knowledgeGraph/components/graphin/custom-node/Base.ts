@@ -54,7 +54,6 @@ export default () => {
 				}
 			},
 			draw(cfg, group) {
-				console.log('config', cfg.config);
 				const { type, size } = cfg.config;
 				const [strokeColor, fillColor, labelColor] = getColorByType(type);
 				// 设置自定义节点图例
