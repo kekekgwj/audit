@@ -62,6 +62,8 @@ const useLegend = ({
 	// @ts-ignore
 	const dataMap = getEnumDataMap(data[`${bindType}s`], sortKey);
 	console.log('dataMap', dataMap);
+	console.log('data', data);
+
 	/** 计算legend.content 的 options */
 	const keys = [...dataMap.keys()];
 	const options = keys.map((key) => {
@@ -82,6 +84,7 @@ const useLegend = ({
 			checked: true
 		};
 	});
+	console.log('options', options);
 	return {
 		dataMap,
 		options

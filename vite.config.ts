@@ -6,7 +6,8 @@ import removeConsole from 'vite-plugin-remove-console';
 export default defineConfig(({ mode, command }) => {
 	const env = loadEnv(mode, process.cwd());
 	return {
-		plugins: [createVitePlugins(env.VITE_APP_ENV, command), removeConsole()],
+		plugins: [createVitePlugins(env.VITE_APP_ENV, command)],
+		// plugins: [createVitePlugins(env.VITE_APP_ENV, command), removeConsole()],
 		resolve: {
 			// https://cn.vitejs.dev/config/#resolve-alias
 			alias: {
