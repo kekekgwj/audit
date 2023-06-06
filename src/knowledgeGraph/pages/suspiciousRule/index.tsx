@@ -17,7 +17,21 @@ import {
 import emptyPage from '@/assets/img/empty.png';
 import styles from './index.module.less';
 import CustomDialog from '@/components/custom-dialog';
-import { getSuspiciousRule } from '@/api/knowledgeGraph/rule';
+// import { getSuspiciousRule } from '@/api/knowledgeGraph/rule';
+import { appendQueryParams, get, post } from '@/utils/request';
+const env = import.meta.env;
+const { VITE_API_PREFIX: API_PREFIX } = env;
+// 可以规则列表
+interface RuleProps {
+	name: string;
+	current: number;
+	size: number;
+}
+export function getSuspiciousRule(data: RuleProps) {
+	return get(
+		appendQueryParams(API_PREFIX + '/blade-tool/graphAnalysis/getRules', data)
+	);
+}
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // 使用弹框
