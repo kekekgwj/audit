@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import emptyPage from '@/assets/img/empty.png';
 import SvgIcon from '@/components/svg-icon';
 import {

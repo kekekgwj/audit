@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { getDeatil } from '@/api/knowledgeGraph/myAltas';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Image, Table } from 'antd';
-import { debounce, throttle } from 'lodash';
+import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 import styles from './detail.module.less';
 import SvgIcon from '@/components/svg-icon';
 const AltasDetailCom = () => {

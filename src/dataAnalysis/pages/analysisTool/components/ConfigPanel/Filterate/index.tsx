@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, useState } from 'react';
 import { Button, Checkbox, Form, Input, Select } from 'antd';
-import { isEmpty, cloneDeep } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import cloneDeep from 'lodash/cloneDeep';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
