@@ -7,8 +7,8 @@ import Graphin, {
 	type GraphinData,
 	type LegendChildrenProps
 } from '@antv/graphin';
-import registerNodes from './custom-node';
-import registerEdges from './custom-edge';
+import registerNodes from './custom-node/index';
+import registerEdges from './custom-edge/index';
 import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
