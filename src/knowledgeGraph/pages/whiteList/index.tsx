@@ -17,7 +17,7 @@ import {
 } from 'antd';
 import type { PaginationProps } from 'antd';
 import SvgIcon from '@/components/svg-icon';
-import emptyPage from '@/assets/img/empty.png';
+import emptyPage from '@/assets/img/noWhiteData.png';
 const { RangePicker } = DatePicker;
 const { confirm } = Modal;
 
@@ -110,22 +110,43 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 		});
 	};
 
+	const showName = (name: string) => {
+		const arr = name.split(';');
+		const r = arr.filter((s) => {
+			return s && s.trim();
+		});
+		const result = r[0] ? r[0] : '';
+		return result;
+	};
+
 	const colums = [
 		{
 			title: '序号',
 			render: (text, record, index) => `${(current - 1) * size + index + 1}`
 		},
 		{
-			title: '名称',
-			dataIndex: 'name'
+			title: '类型',
+			dataIndex: 'type',
+			sorter: (a: any, b: any) => a.type.localeCompare(b.type)
 		},
 		{
-			title: '类型',
-			dataIndex: 'type'
+			title: '名称',
+			dataIndex: 'name',
+			render: (name: string) => showName(name),
+			sorter: (a: any, b: any) => a.name.localeCompare(b.name)
 		},
 		{
 			title: '创建时间',
-			dataIndex: 'gmtCreated'
+			dataIndex: 'gmtModified',
+			sorter: (a: any, b: any) => {
+				let aTimeString = a.gmtModified;
+				let bTimeString = b.gmtModified;
+				aTimeString = aTimeString.replace(/-/g, '/');
+				bTimeString = bTimeString.replace(/-/g, '/');
+				let aTime = new Date(aTimeString).getTime();
+				let bTime = new Date(bTimeString).getTime();
+				return bTime - aTime;
+			}
 		},
 		{
 			title: '操作',
@@ -156,6 +177,13 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 		}
 	];
 
+	const customizeRenderEmpty = () => (
+		//这里面就是我们自己定义的空状态
+		<div style={{ textAlign: 'center', marginTop: '100px' }}>
+			<img src={emptyPage} alt="" />
+		</div>
+	);
+
 	return (
 		<div className={styles['my-table-box']}>
 			{contextHolder}
@@ -170,12 +198,20 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 					新增
 				</Button>
 			</div>
-			<Table
+			<ConfigProvider renderEmpty={customizeRenderEmpty}>
+				<Table
+					className={styles['my-table']}
+					columns={colums}
+					dataSource={data}
+					pagination={false}
+				></Table>
+			</ConfigProvider>
+			{/* <Table
 				className={styles['my-table']}
 				columns={colums}
 				dataSource={data}
 				pagination={false}
-			></Table>
+			></Table> */}
 			{data.length ? (
 				<div
 					style={{

@@ -96,12 +96,14 @@ const MyTableCom = React.memo((props: TableProps) => {
 			title: '规则名称',
 			dataIndex: 'name',
 			ellipsis: true,
-			width: 200
+			width: 200,
+			sorter: (a: any, b: any) => a.name.localeCompare(b.name)
 		},
 		{
 			title: '规则内容',
 			dataIndex: 'content',
-			ellipsis: true
+			ellipsis: true,
+			sorter: (a: any, b: any) => a.content.localeCompare(b.content)
 		},
 		{
 			title: '操作',

@@ -158,9 +158,9 @@ const GraphinCom = React.memo((props: Props) => {
 					nodeSpacing: 50
 				}}
 			>
-				<Legend bindType="node" sortKey="typeName">
+				<Legend bindType="node" sortKey="config.type">
 					{(renderProps: LegendChildrenProps) => {
-						return <Legend.Node {...renderProps} />;
+						return <Legend.Node {...renderProps} onChange={() => {}} />;
 					}}
 				</Legend>
 			</Graphin>
@@ -196,6 +196,8 @@ const GraphCom = () => {
 	const defaultName = originData.name;
 	//是否显示滚动条
 	const [showScroll, setShowScroll] = React.useState(false);
+	//显示加载界面
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		getGraphinData();
@@ -258,68 +260,74 @@ const GraphCom = () => {
 
 	// 获取图谱数据
 	const getGraphinData = async () => {
-		const res = await getGraphByRule({
-			ruleId: originData.ruleId,
-			value: originData.value
-		});
+		try {
+			const res = await getGraphByRule({
+				ruleId: originData.ruleId,
+				value: originData.value
+			});
+			setLoading(false);
+			//是否命中数据
+			setHit(res.isHit);
+			//是否有表
+			setHasList(res.hasList);
+			//命中数据后续处理
+			if (res.isHit) {
+				if (res.hasList) {
+					//表头
+					setTableHead(res.head);
+					//将后端数据转换成渲染表的数据
+					setTableData(transToTableData(res.head, res.data));
+					// 传入后台的数据
+					setSubmitData(res?.data);
+				}
 
-		//是否命中数据
-		setHit(res.isHit);
-		//是否有表
-		setHasList(res.hasList);
-		//命中数据后续处理
-		if (res.isHit) {
-			if (res.hasList) {
-				//表头
-				setTableHead(res.head);
-				//将后端数据转换成渲染表的数据
-				setTableData(transToTableData(res.head, res.data));
-				// 传入后台的数据
-				setSubmitData(res?.data);
-			}
-
-			// 高亮节点类型
-			const lightNodeTypes = res.lightNodeTypes;
-			//处理节点
-			if (res.nodes && res.nodes.length) {
-				const formatNodes = res.nodes.map((node) => {
-					const { type } = node;
-					if (lightNodeTypes.includes(type)) {
-						//需要高亮
-						return {
-							...node,
-							type: 'Base',
-							style: {
-								keyshape: {
-									// fill: getFillColorByType(type)
+				// 高亮节点类型
+				const lightNodeTypes = res.lightNodeTypes;
+				//处理节点
+				if (res.nodes && res.nodes.length) {
+					const formatNodes = res.nodes.map((node) => {
+						const { type } = node;
+						if (lightNodeTypes.includes(type)) {
+							//需要高亮
+							return {
+								...node,
+								type: 'Base',
+								style: {
+									keyshape: {
+										// fill: getFillColorByType(type)
+									}
+								},
+								config: {
+									type: 'lightNode',
+									size: 100
 								}
-							},
-							config: {
-								type: 'lightNode',
-								size: 100
-							}
-						};
-					} else {
-						//设为默认色
-						return {
-							...node,
-							type: 'Base',
-							config: {
-								type: 'noLightNode',
-								size: 100
-							}
-						};
-					}
-				});
+							};
+						} else {
+							//设为默认色
+							return {
+								...node,
+								type: 'Base',
+								config: {
+									type: 'noLightNode',
+									size: 100
+								}
+							};
+						}
+					});
 
-				// 图谱数据
-				const graphData = {
-					edges: res.edges,
-					nodes: formatNodes
-				};
-				console.log(graphData, 481481481);
-				setDate(graphData);
+					// 图谱数据
+					const graphData = {
+						edges: res.edges,
+						nodes: formatNodes
+					};
+					setDate(graphData);
+				}
+			} else {
+				message.error('未命中数据');
 			}
+		} catch {
+			setLoading(false);
+			message.error('未命中数据');
 		}
 	};
 
@@ -356,71 +364,79 @@ const GraphCom = () => {
 					: styles['rule-result-page']
 			}
 		>
-			<div className={styles['top-tips']}>
-				<span className={styles['rule-name']}>规则名称:{originData.name}</span>
-				<span style={{ marginRight: '10px' }} onClick={() => goBack()}>
-					<SvgIcon
-						name="close"
-						color="#23955C"
-						className={styles['icon-close']}
-					></SvgIcon>
-				</span>
-			</div>
-			<>
-				{isHit ? (
-					<div id="main-content" className={styles['main-content']}>
-						{hasList ? (
-							<div className={styles['table-box']}>
-								<Table
-									className={styles['my-table']}
-									columns={colums}
-									dataSource={tableData}
-									pagination={false}
-									scroll={{ y: 240 }}
-								></Table>
-							</div>
-						) : null}
-						<div className={styles['graphin-box']}>
-							{data && (
-								<>
-									<div className={styles['graphin-box__com']}>
-										<GraphinCom data={data}></GraphinCom>
-									</div>
-									<div className={styles['graphin-box__btn']}>
-										<Button
-											htmlType="button"
-											className={styles['save-button']}
-											style={{ background: '#23955C', color: '#fff' }}
-											onClick={() => {
-												saveGraph();
-											}}
-										>
-											保存图谱
-										</Button>
-									</div>
-								</>
-							)}
-						</div>
-						<SaveCom
-							open={open}
-							defaultName={defaultName}
-							head={tableHead}
-							ruleId={originData.ruleId}
-							ruleName={originData.name}
-							fileUrl={fileUrl}
-							setSaveOpen={setSaveOpen}
-							orData={submitData}
-						></SaveCom>
+			{loading ? (
+				<div>loading...</div>
+			) : (
+				<div>
+					<div className={styles['top-tips']}>
+						<span className={styles['rule-name']}>
+							规则名称:{originData.name}
+						</span>
+						<span style={{ marginRight: '10px' }} onClick={() => goBack()}>
+							<SvgIcon
+								name="close"
+								color="#23955C"
+								className={styles['icon-close']}
+							></SvgIcon>
+						</span>
 					</div>
-				) : (
-					<Empty
-						className={styles['empty-page']}
-						image={emptyPage}
-						description={false}
-						imageStyle={{ height: '167px', marginTop: '200px' }}
-					/>
-				)}
-			</>
+					<>
+						{isHit ? (
+							<div id="main-content" className={styles['main-content']}>
+								{hasList ? (
+									<div className={styles['table-box']}>
+										<Table
+											className={styles['my-table']}
+											columns={colums}
+											dataSource={tableData}
+											pagination={false}
+											scroll={{ y: 240 }}
+										></Table>
+									</div>
+								) : null}
+								<div className={styles['graphin-box']}>
+									{data && (
+										<>
+											<div className={styles['graphin-box__com']}>
+												<GraphinCom data={data}></GraphinCom>
+											</div>
+											<div className={styles['graphin-box__btn']}>
+												<Button
+													htmlType="button"
+													className={styles['save-button']}
+													style={{ background: '#23955C', color: '#fff' }}
+													onClick={() => {
+														saveGraph();
+													}}
+												>
+													保存图谱
+												</Button>
+											</div>
+										</>
+									)}
+								</div>
+								<SaveCom
+									open={open}
+									defaultName={defaultName}
+									head={tableHead}
+									ruleId={originData.ruleId}
+									ruleName={originData.name}
+									fileUrl={fileUrl}
+									setSaveOpen={setSaveOpen}
+									orData={submitData}
+								></SaveCom>
+							</div>
+						) : (
+							<Empty
+								className={styles['empty-page']}
+								image={emptyPage}
+								description={false}
+								imageStyle={{ height: '167px', marginTop: '200px' }}
+							/>
+						)}
+					</>
+				</div>
+			)}
 		</div>
 	);
 };

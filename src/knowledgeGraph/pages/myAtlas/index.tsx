@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { isEqual } from 'lodash';
-import emptyPage from '@/assets/img/empty.png';
+import emptyPage from '@/assets/img/noGraph.png';
 import SvgIcon from '@/components/svg-icon';
 import {
 	Table,
@@ -188,7 +188,6 @@ const MyAtlasCom = () => {
 			searchData.beginTime = searchFormData.gmtCreated[0].format('YYYY-MM-DD');
 			searchData.endTime = searchFormData.gmtCreated[1].format('YYYY-MM-DD');
 		}
-
 		const data = {
 			current: current,
 			size: size,
