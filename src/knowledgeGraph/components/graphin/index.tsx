@@ -19,13 +19,14 @@ import {
 	getNextRelationships
 } from '@/api/knowledgeGraph/graphin';
 import { getFillColorByType } from './custom-node/Base';
+import Legend from './legend';
 // import NormalDistribution from 'normal-distribution';
 // 注册自定义节点
 registerNodes('all');
 registerEdges('all');
 
 //功能组件
-const { Tooltip, ContextMenu, Legend } = Components;
+const { Tooltip, ContextMenu } = Components;
 
 interface Props {
 	data: IGraphData;
@@ -193,10 +194,14 @@ const MyMenu = React.memo((props: MenuProps) => {
 });
 const formatGraphData = (data: IGraphData): GraphinData => {
 	const { edges, nodes } = Object.assign({}, data);
+
 	const formatEdges = edges.map((edge) => {
-		const { type, similarity } = edge;
+		const { type, similarity, id, source, target } = edge;
 		return {
 			...edge,
+			id: id + '-edge',
+			source: source + '-node',
+			target: target + '-node',
 			type: 'Base',
 			config: {
 				type,
@@ -208,11 +213,12 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 	// const normDist = new NormalDistribution(averageScore, 1);
+
 	const formatNodes = nodes.map((node) => {
-		const { type, score, communityId } = node;
-		// console.log('score', score, normDist.pdf(score as number));
+		const { type, score, communityId, id } = node;
 		return {
 			...node,
+			id: id + '-node',
 			type: 'Base',
 			style: {
 				keyshape: {
@@ -229,6 +235,7 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			}
 		};
 	});
+
 	return {
 		edges: formatEdges,
 		nodes: formatNodes
@@ -297,7 +304,12 @@ const GraphinCom = React.memo((props: Props) => {
 							<Legend.Node
 								{...renderProps}
 								onChange={(checkedValue, result) => {
-									console.log('click legend', checkedValue, result);
+									console.log(
+										'click legend',
+										checkedValue,
+										result,
+										renderProps
+									);
 								}}
 							/>
 						);
