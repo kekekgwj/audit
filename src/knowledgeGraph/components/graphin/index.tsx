@@ -117,15 +117,17 @@ const LeftEvent = () => {
 
 const MyMenu = React.memo((props: MenuProps) => {
 	const { id, onClose, updateData, curData } = props;
+	const orginId = id?.split('-')[0] || ''; //还原数据库id
+	console.log(orginId, 121212);
 	const [relArr, setRelARR] = React.useState([]);
 	useEffect(() => {
-		if (id) {
+		if (orginId) {
 			getRelationships();
 		}
 	}, []);
 
 	const getRelationships = () => {
-		getNextRelationships({ nodeId: id }).then((res) => {
+		getNextRelationships({ nodeId: orginId }).then((res) => {
 			setRelARR(res);
 		});
 	};
@@ -146,20 +148,23 @@ const MyMenu = React.memo((props: MenuProps) => {
 			nodes: [],
 			edges: []
 		}); //先置空不然渲染有问题
-		getNextGraph({ nodeId: id, relationships: checkedRel }).then((res: any) => {
-			const map = new Map();
-			const newData = {
-				//拼接原有数据并去重
-				nodes: [...oldData.nodes, ...res.nodes].filter(
-					(v) => !map.has(v.id) && map.set(v.id, 1)
-				),
-				edges: [...oldData.edges, ...res.edges].filter(
-					(v) => !map.has(v.id) && map.set(v.id, 1)
-				)
-			};
-			updateData(newData);
-			onClose();
-		});
+		getNextGraph({ nodeId: orginId, relationships: checkedRel }).then(
+			(res: any) => {
+				const map = new Map();
+				const newData = {
+					//拼接原有数据并去重
+					nodes: [...oldData.nodes, ...res.nodes].filter(
+						(v) => !map.has(v.id) && map.set(v.id, 1)
+					),
+					edges: [...oldData.edges, ...res.edges].filter(
+						(v) => !map.has(v.id) && map.set(v.id, 1)
+					)
+				};
+
+				updateData(newData);
+				onClose();
+			}
+		);
 	};
 	return (
 		<div className={styles['check-group-box']}>
