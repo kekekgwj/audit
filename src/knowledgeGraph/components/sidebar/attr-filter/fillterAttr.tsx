@@ -108,26 +108,26 @@ const FillterAttr: FC<IProps> = forwardRef(
 			form: form
 		}));
 		// 测试数据;
-		const myData = [
-			{ key: 'person', label: '人员', value: null, type: '1' },
-			{ key: 'range', label: '范围测试一个很长的数据', value: null, type: '2' },
-			{
-				label: '性别',
-				value: null,
-				type: '4',
-				key: 'gender',
-				dict: [
-					{ label: '男', value: '1' },
-					{ label: '女', value: '2' }
-				]
-			},
-			{
-				label: '日期',
-				value: null,
-				key: 'date',
-				type: '3'
-			}
-		];
+		// const myData = [
+		// 	{ key: 'person', label: '人员', value: null, type: '1' },
+		// 	{ key: 'range', label: '范围测试一个很长的数据', value: null, type: '2' },
+		// 	{
+		// 		label: '性别',
+		// 		value: null,
+		// 		type: '4',
+		// 		key: 'gender',
+		// 		dict: [
+		// 			{ label: '男', value: '1' },
+		// 			{ label: '女', value: '2' }
+		// 		]
+		// 	},
+		// 	{
+		// 		label: '日期',
+		// 		value: null,
+		// 		key: 'date',
+		// 		type: '3'
+		// 	}
+		// ];
 		const latestFormData = useRef<object>({});
 		const updateFormChange = (changeData: object) => {
 			const formData = {

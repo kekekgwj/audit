@@ -191,7 +191,7 @@ export default (props: IProps) => {
 	// 点击确定
 	const handleOk = async () => {
 		const configData = transData(treeData);
-		console.log('treeData', configData, 184184);
+
 		updateGraph(configData);
 		setCurPath(configData); //当前选中链路数据
 		setOpen(false);
@@ -262,15 +262,52 @@ export default (props: IProps) => {
 	};
 
 	//转成后台需要的数据形式
-	const transData = (list: ITreeData[]): IPath[] => {
-		return list.map((item: ITreeData) => {
+	const transData = (list: ITreeData[]): IPath[] | null => {
+		const listTrans = list.map((item: ITreeData) => {
+			const { children, title, key } = item;
+			const nextPaths = transData(children);
+			const properties = getNodeDataConverted(key);
+
+			if (!saveNodes.includes(key)) {
+				if (nextPaths && nextPaths.filter((v) => v !== null).length === 0) {
+					return null;
+				}
+				if (!nextPaths) {
+					return null;
+				}
+			}
 			return {
-				name: item.title,
-				nextPaths: transData(item.children),
-				properties: getNodeDataConverted(item.key)
+				name: title,
+				nextPaths: nextPaths || [],
+				properties
 			};
 		});
+		const listTransNoNull = listTrans.filter((v) => v !== null) as IPath[];
+		return listTransNoNull.length === 0 ? null : listTransNoNull;
 	};
+	// const tagDeleteData = (data: IPath[]) => {
+	// 	if (data.length === 0) {
+	// 		return true;
+	// 	}
+	// 	let isDelete = true;
+	// 	data.forEach((item) => {
+	// 		const { id, nextPaths } = item;
+	// 		if (!tagDeleteData(nextPaths) || saveNodes.includes(id)) {
+	// 			isDelete = false;
+	// 		}
+	// 	});
+	// 	return isDelete;
+	// };
+	// const filterSelectData = (data: IPath[]) => {
+	// 	const filterData = [];
+	// 	// if (item.nextPaths.length === 0 && )
+	// 	data.forEach((item) => {
+	// 		if (!saveNodes.includes(id) && item.nextPaths.length === 0) {
+	// 			return;
+	// 		}
+	// 	});
+	// 	return filterData;
+	// };
 
 	// 自定义树形节点
 	const customTreeTitle = (nodeData: ITreeData) => {

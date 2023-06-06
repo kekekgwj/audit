@@ -4,7 +4,6 @@ import { GraphinContext, GraphinContextType } from '@antv/graphin';
 import type { LegendProps } from './typing';
 
 export const getEnumValue = (obj: any, keyString: string) => {
-	console.info('keyString', obj, keyString);
 	const keyArray = keyString.split('.');
 	const enumValue = keyArray.reduce((acc, curr, currIndex, array) => {
 		const currValue = acc[curr];
