@@ -215,8 +215,23 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			}
 		};
 	});
+	const mockEdge = {
+		id: '67892-edge',
+		type: 'Base',
+		source: '10244-node',
+		target: '10245-node',
+		attrs: null,
+		similarity: null,
+		config: {
+			type: 'TESTTTTTTTTTT',
+			size: null
+		}
+	};
+	console.log('formatEdges', formatEdges);
 
-	const polyEdges = Utils.processEdges([...formatEdges]);
+	const polyEdges = Utils.processEdges([...formatEdges, mockEdge], {
+		poly: 50
+	});
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 	// const normDist = new NormalDistribution(averageScore, 1);
