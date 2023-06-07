@@ -140,7 +140,7 @@ export default (props: Props) => {
 					bodyName: undefined
 				}
 			],
-			level: 4
+			level: 2
 		});
 	};
 
@@ -358,10 +358,10 @@ export default (props: Props) => {
 							<Form.Item
 								name={FormItems.level}
 								label="展示层级"
-								initialValue={4}
+								initialValue={2}
 								className={styles['filter-form-item']}
 							>
-								<InputNumber min={1} max={8} />
+								<InputNumber min={1} max={8} disabled />
 							</Form.Item>
 						</div>
 

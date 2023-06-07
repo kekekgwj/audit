@@ -326,17 +326,18 @@ export default (props: IProps) => {
 		}
 	};
 
-	const ref = useRef(null);
-	const [test, setTest] = useState<Array<number>>([]);
-	const [width, setWidth] = useState(700);
+	// const ref = useRef(null);
+	// const dom = document.getElementById('fillter-top');
+	// const [test, setTest] = useState<Array<number>>([]);
+	// const [width, setWidth] = useState(700);
 
-	const handleTest = () => {
-		console.log('test');
-		const arr = [...test];
-		arr.push(1);
-		setTest(arr);
-		setWidth(1000);
-	};
+	// const handleTest = () => {
+	// 	console.log('test');
+	// 	const arr = [...test];
+	// 	arr.push(1);
+	// 	setTest(arr);
+	// 	setWidth(1000);
+	// };
 
 	// useEffect(() => {
 	// 	const ro = new ResizeObserver((entries, observer) => {
@@ -348,7 +349,8 @@ export default (props: IProps) => {
 	// 			console.log(`Element's paddings: ${top}px ; ${left}px`);
 	// 		}
 	// 	});
-	// 	ro.observe(document.getElementById('app'));
+	// 	console.log(ref.current);
+	// 	// ro.observe(document.getElementById('test'));
 	// }, []);
 
 	return (
@@ -369,9 +371,13 @@ export default (props: IProps) => {
 				onOk={handleOk}
 				onCancel={() => setOpen(false)}
 			>
-				<div ref={ref} id="" className={styles['fillter-dialog__top']}>
+				<div
+					// ref={ref}
+					id="fillter-top"
+					className={styles['fillter-dialog__top']}
+				>
 					<div className={styles['fillter-tree']}>
-						{/* <Tree
+						<Tree
 							checkable
 							checkStrictly
 							switcherIcon={<CaretDownOutlined />}
@@ -380,8 +386,8 @@ export default (props: IProps) => {
 							onCheck={checkedNodes}
 							onSelect={selectNodes}
 							loadData={onLoadData}
-						/> */}
-						<div style={{ whiteSpace: 'nowrap' }}>
+						/>
+						{/* <div style={{ whiteSpace: 'nowrap' }}>
 							{test.map((item) => (
 								<div style={{ display: 'inline-block' }}>
 									ceshiceshiceshiceshiceshiceshiceshiceshiceshiceshiceshiceshiceshi
@@ -389,7 +395,7 @@ export default (props: IProps) => {
 							))}
 						</div>
 
-						<div onClick={handleTest}>点我</div>
+						<div onClick={handleTest}>点我</div> */}
 					</div>
 					<div className={styles['fillter-attr']}>
 						{selectNodeID &&

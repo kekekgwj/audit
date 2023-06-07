@@ -56,7 +56,7 @@ const EdgeDetail = React.memo((props: NodeDetailProps) => {
 				return (
 					<div className={styles['node-detail-item']}>
 						<span className={styles['detail-item-title']}>{item.label}:</span>
-						{item.value}djfkladjsfklajdsklfjakl;jf;aldsjfa
+						{item.value}
 					</div>
 				);
 			})}
