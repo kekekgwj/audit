@@ -350,25 +350,50 @@ export default (props: IProps) => {
 			configInfo: formAllValues
 		});
 	};
-	const getOnePath = (treeData: ITreeData[]): string => {
-		if (treeData.length === 0) {
-			return '请选择筛选条件';
+
+	const getOnePath = (treeData: ITreeData[]): ITreeData | null => {
+		if (!treeData || treeData.length === 0) {
+			return null;
 		}
-		const firstPath = treeData[0];
-		if (firstPath.children && firstPath.children.length > 0) {
-			return getOnePath(firstPath.children);
-		} else {
-			return firstPath.path.join('  ->  ') + '...';
+		for (const item of treeData) {
+			if (saveNodes.includes(item.key)) {
+				const child = getOnePath(item.children);
+				return child ? child : item;
+			} else {
+				const path = getOnePath(item.children);
+				if (path) {
+					return path;
+				}
+			}
 		}
+
+		return null;
 	};
+	const convertPathToHint = (): string => {
+		const item = getOnePath(treeData);
+		return item ? item.path.join('  ->  ') : '请选择筛选条件';
+	};
+
 	return (
 		<>
 			<Button
 				disabled={canUse || !curData}
 				onClick={() => changeDialogOpen()}
-				style={{ width: '100%', textOverflow: 'ellipsis', overflow: 'hidden' }}
+				style={{
+					width: '100%',
+					textOverflow: 'ellipsis',
+					overflow: 'hidden'
+				}}
 			>
-				{getOnePath(treeData)}
+				<div
+					style={{
+						width: '100%',
+						textOverflow: 'ellipsis',
+						overflow: 'hidden'
+					}}
+				>
+					{convertPathToHint()}
+				</div>
 			</Button>
 			<CustomDialog
 				open={open}

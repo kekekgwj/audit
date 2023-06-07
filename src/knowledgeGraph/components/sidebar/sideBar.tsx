@@ -68,7 +68,7 @@ export default (props: Props) => {
 	const [curPath, setCurPath] = useState([]); //保存当前链路  算法改变需要传入
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
-
+	console.log('curPath', curPath);
 	useEffect(() => {
 		getBodyTypeOptions();
 		initForm();
@@ -182,7 +182,7 @@ export default (props: Props) => {
 				nodes,
 				paths: pathFilter
 			});
-			console.log('data', data);
+
 			const nodesData = data.nodes || [];
 			const edgesData = data.edges || [];
 			if (nodesData.length === 0) {
