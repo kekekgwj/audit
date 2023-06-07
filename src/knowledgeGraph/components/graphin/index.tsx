@@ -272,24 +272,33 @@ const GraphinCom = React.memo((props: Props) => {
 				data={formatData}
 				width={width}
 				layout={{
-					type: 'force',
-					// linkDistance: 400,
-					preventOverlap: true,
-					nodeSize: 200,
-					nodeSpacing: 50
-					// animation: false
+					type: 'graphin-force',
+					preset: {
+						type: 'concentric' // 力导的前置布局
+					},
+					gravity: 1, // 可选
+					speed: 2, // 可选
+					clustering: true, // 可选
+					clusterGravity: 3, // 可选
+					maxIteration: 2000, // 可选，迭代次数
+					workerEnabled: true,
+					animation: true,
+					gpuEnabled: true
 				}}
 			>
 				<Tooltip bindType="edge" placement={'top'}>
 					{(value: TooltipValue) => {
-						if (value.model) {
+						if (value.model && value.model.config.type !== '领用') {
 							const { model } = value;
 							return <EdgeDetail nodeModel={model} />;
 						}
 						return null;
 					}}
 				</Tooltip>
-				<ContextMenu style={{ background: '#fff' }} bindType="node">
+				<ContextMenu
+					style={{ width: 'auto', background: '#fff' }}
+					bindType="node"
+				>
 					{(value) => {
 						const { onClose, id } = value;
 						return (

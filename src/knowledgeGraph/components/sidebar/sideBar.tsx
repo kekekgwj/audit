@@ -194,7 +194,7 @@ export default (props: Props) => {
 				edges: edgesData
 			});
 		} catch (e) {
-			message.error('查询结果为空');
+			// message.error('查询结果为空');
 		}
 	};
 
