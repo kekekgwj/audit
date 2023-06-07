@@ -329,7 +329,7 @@ const GraphCom = () => {
 			}
 		} catch {
 			setLoading(false);
-			message.error('未命中数据');
+			// message.error('未命中数据');
 		}
 	};
 

@@ -99,13 +99,13 @@ const AuditTemplate = () => {
 	};
 	// 获取模板列表数据
 	const getTemplateList = async () => {
-		const params = {
-			current: 1,
-			size: 10
-		};
+		// 重置到第一页
+		setCurrent(1);
+		const params = { current: 1, size: sizeRef.current };
 		try {
 			const res = await getAuditProjects(params);
 			setTemplateList(res.records);
+			setTotalPage(Math.ceil(res.total / sizeRef?.current));
 		} catch (e) {
 			console.error(e);
 		}

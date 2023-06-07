@@ -14,6 +14,7 @@ interface DialogProps {
 	children?: React.ReactNode; // 自节点
 	showOkButton?: boolean; // 是否显示确认按钮
 	showCancelButton?: boolean; // 是否显示取消按钮
+	isAutoWidth?: boolean; // 是否自动宽度
 	onOk?: (...args: any[]) => any; // 确定按钮事件
 	onCancel?: (...args: any[]) => any; // 取消按钮事件
 }

@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import ResizeObserver from 'resize-observer-polyfill';
 import { Button, Tree, message } from 'antd';
 import CustomDialog from '@/components/custom-dialog';
 import { CaretDownOutlined } from '@ant-design/icons';
@@ -399,11 +400,12 @@ export default (props: IProps) => {
 				open={open}
 				title="链路筛选"
 				minWidth="700px"
+				// width={width}
 				height={400}
 				onOk={handleOk}
 				onCancel={() => setOpen(false)}
 			>
-				<div className={styles['fillter-dialog__top']}>
+				<div id="" className={styles['fillter-dialog__top']}>
 					<div className={styles['fillter-tree']}>
 						<Tree
 							checkable
@@ -415,6 +417,15 @@ export default (props: IProps) => {
 							onSelect={selectNodes}
 							loadData={onLoadData}
 						/>
+						{/* <div style={{ whiteSpace: 'nowrap' }}>
+							{test.map((item) => (
+								<div style={{ display: 'inline-block' }}>
+									ceshiceshiceshiceshiceshiceshiceshiceshiceshiceshiceshiceshiceshi
+								</div>
+							))}
+						</div>
+
+						<div onClick={handleTest}>点我</div> */}
 					</div>
 					<div className={styles['fillter-attr']}>
 						{selectNodeID &&
