@@ -56,7 +56,7 @@ const EdgeDetail = React.memo((props: NodeDetailProps) => {
 				return (
 					<div className={styles['node-detail-item']}>
 						<span className={styles['detail-item-title']}>{item.label}:</span>
-						{item.value}
+						{item.value}djfkladjsfklajdsklfjakl;jf;aldsjfa
 					</div>
 				);
 			})}
@@ -272,23 +272,17 @@ const GraphinCom = React.memo((props: Props) => {
 				data={formatData}
 				width={width}
 				layout={{
-					type: 'graphin-force',
-					preset: {
-						type: 'concentric' // 力导的前置布局
-					},
-					gravity: 1, // 可选
-					speed: 2, // 可选
-					clustering: true, // 可选
-					clusterGravity: 3, // 可选
-					maxIteration: 2000, // 可选，迭代次数
-					workerEnabled: true,
-					animation: true,
-					gpuEnabled: true
+					type: 'force',
+					// linkDistance: 400,
+					preventOverlap: true,
+					nodeSize: 200,
+					nodeSpacing: 50
+					// animation: false
 				}}
 			>
-				<Tooltip bindType="edge" placement={'top'}>
+				<Tooltip bindType="edge" placement={'top'} style={{ width: 'auto' }}>
 					{(value: TooltipValue) => {
-						if (value.model && value.model.config.type !== '领用') {
+						if (value.model && value.model.attrs && value.model.attrs.length) {
 							const { model } = value;
 							return <EdgeDetail nodeModel={model} />;
 						}
