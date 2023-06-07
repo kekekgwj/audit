@@ -23,6 +23,7 @@ const LegendNode: React.FunctionComponent<LegendChildrenProps> = (props) => {
 	const [state, setState] = React.useState({
 		options: sortOptions
 	});
+	console.log(sortOptions);
 
 	/** 更新state依赖 */
 	useEffect(() => {

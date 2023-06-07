@@ -223,14 +223,15 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			id: id + '-node',
 			type: 'Base',
 			style: {
-				keyshape: {
-					fill: isCenter
-						? getFillColorByType('中心节点')
-						: getFillColorByType(type)
-				}
+				// keyshape: {
+				// 	fill: isCenter
+				// 		? getFillColorByType('中心节点')
+				// 		: getFillColorByType(type)
+				// }
 			},
 			config: {
-				type,
+				// type决定color
+				type: isCenter ? '中心节点' : type,
 				// 最小值为100, 最大200
 				size: score
 					? Math.min(Math.max((score / averageScore) * 200, 100), 200)
@@ -239,7 +240,7 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			}
 		};
 	});
-
+	console.log('formatNodes', formatNodes);
 	return {
 		edges: polyEdges,
 		nodes: formatNodes

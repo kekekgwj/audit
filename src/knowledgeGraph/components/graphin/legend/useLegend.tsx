@@ -30,7 +30,7 @@ export const getEnumDataMap = (data: any[], sortKey: string) => {
 		const enumValue = getEnumValue(item, sortKey);
 		/** 按照枚举值重新将节点存放 */
 		const current = enumDataMap.get(enumValue);
-		const mapKey = isCenter ? '中心结点' : enumValue;
+		const mapKey = isCenter ? '中心节点' : enumValue;
 		if (current) {
 			enumDataMap.set(mapKey, [...current, item]);
 		} else {
@@ -62,7 +62,7 @@ const useLegend = ({
 	}
 	// @ts-ignore
 	const dataMap = getEnumDataMap(data[`${bindType}s`], sortKey);
-	console.log('dataMap', dataMap);
+
 	/** 计算legend.content 的 options */
 	const keys = [...dataMap.keys()];
 	const options = keys.map((key) => {
@@ -83,6 +83,7 @@ const useLegend = ({
 			checked: true
 		};
 	});
+
 	return {
 		dataMap,
 		options
