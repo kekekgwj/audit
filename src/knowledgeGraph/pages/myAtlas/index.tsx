@@ -188,7 +188,6 @@ const MyAtlasCom = () => {
 			searchData.beginTime = searchFormData.gmtCreated[0].format('YYYY-MM-DD');
 			searchData.endTime = searchFormData.gmtCreated[1].format('YYYY-MM-DD');
 		}
-
 		const data = {
 			current: current,
 			size: size,

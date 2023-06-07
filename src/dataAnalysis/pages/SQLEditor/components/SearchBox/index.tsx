@@ -11,6 +11,7 @@ import classes from './index.module.less';
 import { EditorContext, BoxType } from '../..';
 import { highlight } from 'sql-highlight';
 import { Markup } from 'interweave';
+import { getSqls, getTables } from '@/api/dataAnalysis/sql';
 interface IProps {
 	pos: {
 		left: number;
@@ -74,7 +75,10 @@ const SQLBoxBlock: FC<ISQLBoxBlock> = ({
 	);
 };
 
-const SQLBox: FC<ISQlBOX> = ({}) => {
+const SQLBox: FC<ISQlBOX> = () => {
+	const [auditRules, setAuditRules] = useState([]);
+	const [myCommon, setMyCommon] = useState([]);
+
 	const context = useContext(EditorContext) as {
 		insertText: (text: string) => void;
 	};
@@ -82,6 +86,24 @@ const SQLBox: FC<ISQlBOX> = ({}) => {
 	const handleClickItem = (value: string) => {
 		insertText && insertText(value);
 	};
+
+	useEffect(() => {
+		getMyCommon();
+	}, []);
+
+	const getMyCommon = async () => {
+		const res = await getSqls();
+		console.log(res);
+		const list = res.map((item) => ({
+			title: item.name,
+			content: highlight('SELECT * FROM 之江实验室app用户访问数据', {
+				html: true
+			}),
+			value: 'SELECT * FROM 之江实验室app用户访问数据'
+		}));
+		setMyCommon(list);
+	};
+
 	// todo sql关键词高亮
 	// const data = [
 	// 	{
@@ -99,40 +121,40 @@ const SQLBox: FC<ISQlBOX> = ({}) => {
 	// ];
 
 	// 审计规则SQL
-	const auditRules = [
-		{
-			title: '审计规则SQL名称-1',
-			content: highlight('SELECT * FROM 之江实验室app用户访问数据', {
-				html: true
-			}),
-			value: 'SELECT * FROM 之江实验室app用户访问数据'
-		},
-		{
-			title: '审计规则SQL名称-2',
-			content: highlight('SELECT * FROM 之江实验室app用户访问数据2', {
-				html: true
-			}),
-			value: 'SELECT * FROM 之江实验室app用户访问数据2'
-		}
-	];
+	// const auditRules = [
+	// 	{
+	// 		title: '审计规则SQL名称-1',
+	// 		content: highlight('SELECT * FROM 之江实验室app用户访问数据', {
+	// 			html: true
+	// 		}),
+	// 		value: 'SELECT * FROM 之江实验室app用户访问数据'
+	// 	},
+	// 	{
+	// 		title: '审计规则SQL名称-2',
+	// 		content: highlight('SELECT * FROM 之江实验室app用户访问数据2', {
+	// 			html: true
+	// 		}),
+	// 		value: 'SELECT * FROM 之江实验室app用户访问数据2'
+	// 	}
+	// ];
 
 	// 我的常用SQL
-	const myCommon = [
-		{
-			title: '我的常用SQL名称-1',
-			content: highlight('SELECT * FROM 之江实验室app用户访问数据', {
-				html: true
-			}),
-			value: 'SELECT * FROM 之江实验室app用户访问数据'
-		},
-		{
-			title: '我的常用SQL名称-2',
-			content: highlight('SELECT * FROM 之江实验室app用户访问数据2', {
-				html: true
-			}),
-			value: 'SELECT * FROM 之江实验室app用户访问数据2'
-		}
-	];
+	// const myCommon = [
+	// 	{
+	// 		title: '我的常用SQL名称-1',
+	// 		content: highlight('SELECT * FROM 之江实验室app用户访问数据', {
+	// 			html: true
+	// 		}),
+	// 		value: 'SELECT * FROM 之江实验室app用户访问数据'
+	// 	},
+	// 	{
+	// 		title: '我的常用SQL名称-2',
+	// 		content: highlight('SELECT * FROM 之江实验室app用户访问数据2', {
+	// 			html: true
+	// 		}),
+	// 		value: 'SELECT * FROM 之江实验室app用户访问数据2'
+	// 	}
+	// ];
 
 	return (
 		<div className={classes.sqlBoxContainer}>
@@ -183,20 +205,37 @@ const SQLBox: FC<ISQlBOX> = ({}) => {
 };
 
 const TableBox: FC = () => {
-	const data = [
-		{
-			name: 'aZZlabCGXM2022',
-			zhName: '测试表名1'
-		},
-		{
-			name: 'aZZlabCGXM2023',
-			zhName: '测试表名22'
-		},
-		{
-			name: 'aZZlabCGXM2024',
-			zhName: '测试表名3'
-		}
-	];
+	const [data, setData] = useState([]);
+
+	useEffect(() => {
+		getList();
+	}, []);
+
+	const getList = async () => {
+		const res = await getTables(3);
+		const list = res.map((item) => ({
+			id: item.id,
+			name: item.tableName,
+			zhName: item.tableCnName
+		}));
+
+		setData(list);
+	};
+
+	// const data = [
+	// 	{
+	// 		name: 'aZZlabCGXM2022',
+	// 		zhName: '测试表名1'
+	// 	},
+	// 	{
+	// 		name: 'aZZlabCGXM2023',
+	// 		zhName: '测试表名22'
+	// 	},
+	// 	{
+	// 		name: 'aZZlabCGXM2024',
+	// 		zhName: '测试表名3'
+	// 	}
+	// ];
 	const context = useContext(EditorContext) as {
 		insertText: (text: string) => void;
 	};

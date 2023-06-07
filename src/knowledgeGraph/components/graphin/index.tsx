@@ -118,15 +118,17 @@ const LeftEvent = () => {
 
 const MyMenu = React.memo((props: MenuProps) => {
 	const { id, onClose, updateData, curData } = props;
+	const orginId = id?.split('-')[0] || ''; //还原数据库id
+	console.log(orginId, 121212);
 	const [relArr, setRelARR] = React.useState([]);
 	useEffect(() => {
-		if (id) {
+		if (orginId) {
 			getRelationships();
 		}
 	}, []);
 
 	const getRelationships = () => {
-		getNextRelationships({ nodeId: id }).then((res) => {
+		getNextRelationships({ nodeId: orginId }).then((res) => {
 			setRelARR(res);
 		});
 	};
@@ -147,20 +149,23 @@ const MyMenu = React.memo((props: MenuProps) => {
 			nodes: [],
 			edges: []
 		}); //先置空不然渲染有问题
-		getNextGraph({ nodeId: id, relationships: checkedRel }).then((res: any) => {
-			const map = new Map();
-			const newData = {
-				//拼接原有数据并去重
-				nodes: [...oldData.nodes, ...res.nodes].filter(
-					(v) => !map.has(v.id) && map.set(v.id, 1)
-				),
-				edges: [...oldData.edges, ...res.edges].filter(
-					(v) => !map.has(v.id) && map.set(v.id, 1)
-				)
-			};
-			updateData(newData);
-			onClose();
-		});
+		getNextGraph({ nodeId: orginId, relationships: checkedRel }).then(
+			(res: any) => {
+				const map = new Map();
+				const newData = {
+					//拼接原有数据并去重
+					nodes: [...oldData.nodes, ...res.nodes].filter(
+						(v) => !map.has(v.id) && map.set(v.id, 1)
+					),
+					edges: [...oldData.edges, ...res.edges].filter(
+						(v) => !map.has(v.id) && map.set(v.id, 1)
+					)
+				};
+
+				updateData(newData);
+				onClose();
+			}
+		);
 	};
 	return (
 		<div className={styles['check-group-box']}>
@@ -272,24 +277,33 @@ const GraphinCom = React.memo((props: Props) => {
 				data={formatData}
 				width={width}
 				layout={{
-					type: 'force',
-					// linkDistance: 400,
-					preventOverlap: true,
-					nodeSize: 200,
-					nodeSpacing: 50
-					// animation: false
+					type: 'graphin-force',
+					preset: {
+						type: 'concentric' // 力导的前置布局
+					},
+					gravity: 1, // 可选
+					speed: 2, // 可选
+					clustering: true, // 可选
+					clusterGravity: 3, // 可选
+					maxIteration: 2000, // 可选，迭代次数
+					workerEnabled: true,
+					animation: true,
+					gpuEnabled: true
 				}}
 			>
 				<Tooltip bindType="edge" placement={'top'}>
 					{(value: TooltipValue) => {
-						if (value.model) {
+						if (value.model && value.model.config.type !== '领用') {
 							const { model } = value;
 							return <EdgeDetail nodeModel={model} />;
 						}
 						return null;
 					}}
 				</Tooltip>
-				<ContextMenu style={{ background: '#fff' }} bindType="node">
+				<ContextMenu
+					style={{ width: 'auto', background: '#fff' }}
+					bindType="node"
+				>
 					{(value) => {
 						const { onClose, id } = value;
 						return (

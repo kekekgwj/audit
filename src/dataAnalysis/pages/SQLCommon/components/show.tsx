@@ -2,6 +2,8 @@ import CustomDialog from '@/components/custom-dialog';
 import { Form, Input } from 'antd';
 import { useEffect } from 'react';
 
+import { getSql } from '@/api/dataAnalysis/sql';
+
 const { TextArea } = Input;
 
 interface Props {
@@ -16,9 +18,18 @@ export default (props: Props) => {
 
 	useEffect(() => {
 		if (open) {
-			form.setFieldsValue(defaultValue);
+			// form.setFieldsValue(defaultValue);
+			getInfo();
 		}
 	}, [open]);
+
+	const getInfo = async () => {
+		const res = await getSql(defaultValue.key);
+		form.setFieldsValue({
+			sqlName: res.name,
+			sqlContent: res.sql
+		});
+	};
 
 	return (
 		<div>
