@@ -1,3 +1,5 @@
+import { message } from 'antd';
+
 // http request
 export async function http<T>(request: RequestInfo): Promise<T> {
 	const response = await fetch(request);
@@ -6,10 +8,13 @@ export async function http<T>(request: RequestInfo): Promise<T> {
 		if (response.ok) {
 			return body.data;
 		} else {
-			throw 'request failed';
+			throw body;
 		}
 	} catch (e) {
 		console.error(e);
+
+		message.warning(e?.msg || '系统错误');
+
 		return Promise.reject(e);
 	}
 }
