@@ -11,12 +11,14 @@ import {
 	Select,
 	DatePicker,
 	Empty,
-	message
+	message,
+	Divider
 } from 'antd';
 import type { PaginationProps } from 'antd';
 import emptyPage from '@/assets/img/empty.png';
 const { RangePicker } = DatePicker;
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import Delete from '@/components/delete-dialog';
 import ImportDialog from './components/importData';
@@ -37,8 +39,6 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 	const navigate = useNavigate();
 	const [messageApi, contextHolder] = message.useMessage();
 	const [curId, setCurId] = React.useState();
-
-	// const [openEdit, setOpenEdit] = React.useState(false);
 	const editRef = useRef();
 	const [openDel, setOpenDel] = React.useState(false);
 	const { data, total, current, size, onShowSizeChange, onChange, refresh } =
@@ -91,23 +91,22 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 			key: 'operaion',
 			render: (row, record) => {
 				return (
-					<div>
+					<div className={styles['operate-box']}>
 						<span
+							className={styles['operate-item']}
 							onClick={() => handleDetail(row)}
-							style={{ cursor: 'pointer', marginRight: '10px' }}
 						>
-							<Space>
-								<EyeOutlined style={{ color: '#23955C' }} />
-							</Space>
+							<SvgIcon name="see" color="#23955C"></SvgIcon>
 							<span style={{ marginLeft: '2px' }}>查看</span>
 						</span>
+						<span>
+							<Divider type="vertical" />
+						</span>
 						<span
+							className={styles['operate-item']}
 							onClick={() => handleDelete(row)}
-							style={{ cursor: 'pointer' }}
 						>
-							<Space>
-								<DeleteOutlined style={{ color: '#23955C' }} />
-							</Space>
+							<SvgIcon name="delete" color="#24A36F"></SvgIcon>
 							<span style={{ marginLeft: '2px' }}>删除</span>
 						</span>
 					</div>
