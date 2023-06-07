@@ -5,32 +5,17 @@ import { INode } from '@antv/g6';
 import { GraphinContext } from '@antv/graphin';
 import './index.less';
 import type { LegendChildrenProps, OptionType } from './typing';
-
+import { nodeSequence } from '../custom-node/Base';
 const LegendNode: React.FunctionComponent<LegendChildrenProps> = (props) => {
 	const { graph, theme } = React.useContext(GraphinContext);
 
 	const { options: defaultOptions, dataMap, onChange } = props;
-	const sequence = [
-		'BASE',
-		'Property',
-		'Person',
-		'Company',
-		'Recipient',
-		'人',
-		'法人',
-		'科研项目',
-		'经费卡',
-		'部门',
-		'采购事项',
-		'合同',
-		'发票',
-		'资产'
-	];
+
 	const sortOptions = defaultOptions.sort(
 		(optionA: OptionType, optionB: OptionType) => {
 			const { label: labelA } = optionA;
 			const { label: labelB } = optionB;
-			return sequence.indexOf(labelA) - sequence.indexOf(labelB);
+			return nodeSequence.indexOf(labelA) - nodeSequence.indexOf(labelB);
 		}
 	);
 	const { mode } = theme;

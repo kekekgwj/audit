@@ -3,6 +3,7 @@ import Graphin, {
 	Components,
 	IG6GraphEvent,
 	GraphinContext,
+	Utils,
 	type TooltipValue,
 	type GraphinData,
 	type LegendChildrenProps
@@ -210,19 +211,22 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 		};
 	});
 
+	const polyEdges = Utils.processEdges([...formatEdges]);
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 	// const normDist = new NormalDistribution(averageScore, 1);
 
 	const formatNodes = nodes.map((node) => {
-		const { type, score, communityId, id } = node;
+		const { type, score, communityId, id, isCenter = false } = node;
 		return {
 			...node,
 			id: id + '-node',
 			type: 'Base',
 			style: {
 				keyshape: {
-					fill: getFillColorByType(type)
+					fill: isCenter
+						? getFillColorByType('中心节点')
+						: getFillColorByType(type)
 				}
 			},
 			config: {
@@ -237,7 +241,7 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 	});
 
 	return {
-		edges: formatEdges,
+		edges: polyEdges,
 		nodes: formatNodes
 	};
 };

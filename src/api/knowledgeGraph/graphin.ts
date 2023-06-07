@@ -67,6 +67,7 @@ interface IResNode {
 	label: string;
 	score: number | null;
 	type: string;
+	isCenter?: boolean;
 }
 
 interface IResEdge {
