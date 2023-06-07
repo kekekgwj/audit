@@ -33,7 +33,6 @@ export function getProjectCanvas(
 	);
 }
 //获取审计模板画布内容
-
 interface IGetAuditProjectCanvas {
 	auditProjectId: number;
 }
