@@ -13,7 +13,7 @@ export function saveProjectCanvas(data: ISaveProjectCanvas) {
 	});
 }
 
-//获取画布模板
+//获取我的模板画布内容
 interface IGetProjectCanvas {
 	projectId: number;
 }
@@ -28,6 +28,26 @@ export function getProjectCanvas(
 	return get(
 		appendQueryParams(
 			API_PREFIX + '/blade-tool/dataAnalysis/getProjectCanvas',
+			data
+		)
+	);
+}
+//获取审计模板画布内容
+
+interface IGetAuditProjectCanvas {
+	auditProjectId: number;
+}
+interface IGetAuditProjectCanvasResponse {
+	canvasJson: string;
+	id: number;
+	name: string;
+}
+export function getAuditProjectCanvas(
+	data: IGetAuditProjectCanvas
+): Promise<IGetAuditProjectCanvasResponse> {
+	return get(
+		appendQueryParams(
+			API_PREFIX + '/blade-tool/dataAnalysis/getAuditProjectCanvas',
 			data
 		)
 	);

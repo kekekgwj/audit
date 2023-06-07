@@ -15,7 +15,11 @@ import { Keyboard } from '@antv/x6-plugin-keyboard';
 import { Divider, message, Form, Input } from 'antd';
 import { Dnd } from '@antv/x6-plugin-dnd';
 import { LeftOutlined } from '@ant-design/icons';
-import { saveAsAuditProject, getProjectCanvas } from '@/api/dataAnalysis/graph';
+import {
+	saveAsAuditProject,
+	getProjectCanvas,
+	getAuditProjectCanvas
+} from '@/api/dataAnalysis/graph';
 import CustomDialog from '@/components/custom-dialog';
 
 interface IGraphContext extends IGraphConfig {
@@ -333,13 +337,26 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			if (!graph || !projectId) {
 				return;
 			}
-			(async () => {
-				const res = await getProjectCanvas({ projectId });
-				const { canvasJson } = res;
-				const { content, configs } = JSON.parse(canvasJson);
-				graph.fromJSON(content);
-				setAllConfigs(configs);
-			})();
+			// 这里要分我的模板和审计模板
+			if (pathName == '我的模板') {
+				(async () => {
+					const res = await getProjectCanvas({ projectId });
+					const { canvasJson } = res;
+					const { content, configs } = JSON.parse(canvasJson);
+					graph.fromJSON(content);
+					setAllConfigs(configs);
+				})();
+			} else if (pathName == '审计模板') {
+				(async () => {
+					const res = await getAuditProjectCanvas({
+						auditProjectId: projectId
+					});
+					const { canvasJson } = res;
+					const { content, configs } = JSON.parse(canvasJson);
+					graph.fromJSON(content);
+					setAllConfigs(configs);
+				})();
+			}
 		}, [projectId, graph]);
 		// 监听画布尺寸
 		useEffect(() => {

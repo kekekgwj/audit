@@ -261,6 +261,7 @@ const GraphCom = () => {
 
 	// 获取图谱数据
 	const getGraphinData = async () => {
+		setLoading(true);
 		try {
 			const res = await getGraphByRule({
 				ruleId: originData.ruleId,
