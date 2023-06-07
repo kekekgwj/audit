@@ -2,6 +2,8 @@ import CustomDialog from '@/components/custom-dialog';
 import { Form, Input } from 'antd';
 import { useEffect } from 'react';
 
+import { getSql } from '@/api/dataAnalysis/sql';
+
 const { TextArea } = Input;
 
 interface Props {
@@ -17,12 +19,22 @@ export default (props: Props) => {
 
 	useEffect(() => {
 		if (open) {
-			form.setFieldsValue(defaultValue);
+			// form.setFieldsValue(defaultValue);
+			getInfo();
 		}
 	}, [open]);
 
 	const handleOk = () => {
 		submit(form.getFieldsValue());
+	};
+
+	const getInfo = async () => {
+		const res = await getSql(defaultValue.key);
+		form.setFieldsValue({
+			key: res.id,
+			sqlName: res.name,
+			sqlContent: res.sql
+		});
 	};
 
 	return (
@@ -35,6 +47,7 @@ export default (props: Props) => {
 				onCancel={cancel}
 			>
 				<Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+					<Form.Item name="key" hidden></Form.Item>
 					<Form.Item name="sqlName" label="SQL名称">
 						<Input placeholder="请输入" />
 					</Form.Item>

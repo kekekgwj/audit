@@ -5,7 +5,7 @@ import React, {
 	useRef,
 	useState
 } from 'react';
-import { Button, Divider, Table } from 'antd';
+import { Button, Divider, Table, message } from 'antd';
 import AceEditor from 'react-ace';
 import classes from './index.module.less';
 // import 'ace-builds/src-noconflict/mode-javascript';
@@ -19,6 +19,8 @@ import ReactAce from 'react-ace/lib/ace';
 import TableSourcePanel from './components/TableSourcePanel';
 import SvgIcon from '@/components/svg-icon';
 import SaveDialog from './components/SaveDialog';
+
+import { saveSql, getResultBySql, exportBySql } from '@/api/dataAnalysis/sql';
 
 export const EditorContext = createContext({});
 
@@ -40,7 +42,8 @@ const SQLEditor: React.FC = () => {
 		// 	};
 		// }
 	}, []);
-	const onChange = () => {
+	const onChange = (val: string) => {
+		setSql(val);
 		setShowSearchBox(BoxType.NONE);
 		// 获得焦点
 
@@ -84,14 +87,27 @@ const SQLEditor: React.FC = () => {
 	const [openAdd, setOpenAdd] = useState(false);
 	const [pos, setPos] = useState<IPos>({ top: 0, left: 0 });
 	const [showSearchBox, setShowSearchBox] = useState<BoxType>(BoxType.NONE);
+	const [sql, setSql] = useState('');
+
+	const [messageApi, contextHolder] = message.useMessage();
+
 	const triggerSearchBox = (type: BoxType) => {
 		getCursorPosition();
 		setShowSearchBox(type);
 	};
 
 	// 保存为我的常用sql
-	const handleSubmitAdd = (form: { sqlName: string }) => {
-		console.log(form);
+	const handleSubmitAdd = async (form: { sqlName: string }) => {
+		await saveSql({
+			sql: sql,
+			sqlName: form.sqlName
+		});
+
+		messageApi.open({
+			type: 'success',
+			content: '保存成功'
+		});
+
 		setOpenAdd(false);
 	};
 
@@ -105,48 +121,34 @@ const SQLEditor: React.FC = () => {
 		setOpenAdd(true);
 	};
 
-	const handleExecute = () => {
+	const handleExecute = async () => {
 		// TODO 请求后端接口
+
+		const res = await getResultBySql(sql);
+
+		console.log({ res });
 
 		// 设置结果的列配置
 		setColumns([
 			{
-				title: 'Age',
-				dataIndex: 'age',
-				key: 'age'
+				title: 'Age'
+				// dataIndex: 'age',
 			},
 			{
-				title: 'Address',
-				dataIndex: 'address',
-				key: 'address'
+				title: 'Age'
+				// dataIndex: 'age',
 			}
 		]);
 		// 设置结果数据
-		setResult([
-			{
-				key: '1',
-				name: 'John Brown',
-				age: 32,
-				address: 'New York No. 1 Lake Park',
-				tags: ['nice', 'developer']
-			},
-			{
-				key: '2',
-				name: 'Jim Green',
-				age: 42,
-				address: 'London No. 1 Lake Park',
-				tags: ['loser']
-			},
-			{
-				key: '3',
-				name: 'Joe Black',
-				age: 32,
-				address: 'Sydney No. 1 Lake Park',
-				tags: ['cool', 'teacher']
-			}
-		]);
+		setResult(res.data);
 		// 展示结果
 		setHasResult(true);
+	};
+
+	// 下载
+	const handleDownLoad = async () => {
+		const res = await exportBySql(sql);
+		console.log(res);
 	};
 	return (
 		<div className={classes.container}>
@@ -236,7 +238,7 @@ const SQLEditor: React.FC = () => {
 					{hasResult && (
 						<>
 							<div className={classes.aceResultMid}>
-								<div className={classes.downloadBtn}>
+								<div className={classes.downloadBtn} onClick={handleDownLoad}>
 									<SvgIcon
 										name="see"
 										className={classes.downloadIcon}
@@ -247,6 +249,7 @@ const SQLEditor: React.FC = () => {
 							<div className={classes.aceResultTable}>
 								<Table
 									columns={columns}
+									showHeader={false}
 									dataSource={result}
 									scroll={{ y: 300 }}
 									pagination={false}
@@ -271,6 +274,8 @@ const SQLEditor: React.FC = () => {
 				submit={handleSubmitAdd}
 				cancel={handleCancelAdd}
 			></SaveDialog>
+
+			{contextHolder}
 		</div>
 	);
 };

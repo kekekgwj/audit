@@ -48,11 +48,13 @@ export async function postFormData<T>(
 
 export const appendQueryParams: (
 	url: string,
-	params: { [key: string]: string | number }
+	params?: { [key: string]: string | number }
 ) => string = (url, params) => {
 	let queryParams = '';
-	Object.keys(params).forEach((key) => {
-		queryParams = queryParams.concat(key, '=', String(params[key]), '&');
-	});
+
+	params &&
+		Object.keys(params).forEach((key) => {
+			queryParams = queryParams.concat(key, '=', String(params[key]), '&');
+		});
 	return `${url}?${queryParams}`.slice(0, -1);
 };

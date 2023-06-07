@@ -9,13 +9,20 @@ import styles from './index.module.less';
 import { Button, DatePicker, Divider, Form, Input, message } from 'antd';
 import SvgIcon from '@/components/svg-icon';
 
+import {
+	getSqlPage,
+	saveSql,
+	deleteSql,
+	updateSql
+} from '@/api/dataAnalysis/sql';
+
 const { RangePicker } = DatePicker;
 
 interface DataType {
 	key: string;
 	sqlName: string;
-	sqlContent: string;
-	useTo: string;
+	gmtCreated: string;
+	sqlContent?: string;
 }
 
 export default () => {
@@ -42,7 +49,7 @@ export default () => {
 		{
 			title: '创建时间',
 			width: 200,
-			dataIndex: 'useTo'
+			dataIndex: 'gmtCreated'
 		},
 		{
 			title: '操作',
@@ -94,10 +101,18 @@ export default () => {
 	const handleAdd = () => {
 		setOpenAdd(true);
 	};
-	// 提交编辑
-	const handleSubmitAdd = (form: DataType) => {
-		// TODO 请求新增接口
-		console.log(form);
+	// 提交新增
+	const handleSubmitAdd = async (form: DataType) => {
+		await saveSql({
+			sql: form.sqlContent || '',
+			sqlName: form.sqlName
+		});
+
+		messageApi.open({
+			type: 'success',
+			content: '新增成功'
+		});
+
 		setOpenAdd(false);
 		tableRefresh();
 	};
@@ -125,9 +140,18 @@ export default () => {
 	};
 
 	// 提交编辑
-	const handleSubmitEdit = (form: DataType) => {
-		// TODO 请求编辑接口
-		console.log(form);
+	const handleSubmitEdit = async (form: DataType) => {
+		await updateSql({
+			sql: form.sqlContent || '',
+			sqlId: form.key,
+			sqlName: form.sqlName
+		});
+
+		messageApi.open({
+			type: 'success',
+			content: '编辑成功'
+		});
+
 		setOpenEdit(false);
 		tableRefresh();
 	};
@@ -149,8 +173,8 @@ export default () => {
 	};
 
 	// 确认删除
-	const submitDel = () => {
-		// TODO 请求删除接口
+	const submitDel = async () => {
+		await deleteSql(currentRow.key);
 
 		messageApi.open({
 			type: 'success',
@@ -160,27 +184,30 @@ export default () => {
 		tableRefresh();
 	};
 
-	const getData = (pageIndex: number, pageSize: number) => {
-		// console.log(pageIndex, pageSize);
-		console.log(searchForm.getFieldsValue());
+	const getData = async (pageIndex: number, pageSize: number) => {
+		const query = searchForm.getFieldsValue();
 
-		const list: DataType[] = [
-			{
-				key: '1',
-				sqlName: 'John Brown',
-				sqlContent: 'select * from table1',
-				useTo: 'New York No. 1 Lake Park'
-			},
-			{
-				key: '2',
-				sqlName: 'Jim Green',
-				sqlContent: 'select * from table2',
-				useTo: 'London No. 1 Lake Park'
-			}
-		];
+		const res = await getSqlPage({
+			current: pageIndex,
+			size: pageSize,
+			name: query.sqlName || '',
+			startTime: query.createdDate
+				? query.createdDate[0].format('YYYY-MM-DD')
+				: '',
+			endTime: query.createdDate
+				? query.createdDate[1].format('YYYY-MM-DD')
+				: ''
+		});
+
+		const list: DataType[] = res.records.map((item) => ({
+			key: item.id,
+			sqlName: item.name,
+			gmtCreated: item.gmtCreated
+		}));
+
 		return {
 			list,
-			total: 101
+			total: res.total
 		};
 	};
 

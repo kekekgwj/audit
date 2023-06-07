@@ -4,12 +4,14 @@ import SvgIcon from '@/components/svg-icon';
 import DataTable from '@/components/data-table';
 import Show from './components/show';
 
+import { getAuditSqlPage } from '@/api/dataAnalysis/sql';
+
 import styles from './index.module.less';
 
 interface DataType {
 	key: string;
 	sqlName: string;
-	sqlContent: string;
+	sqlContent?: string;
 	useTo: string;
 }
 
@@ -67,27 +69,22 @@ export default () => {
 		setOpenShow(false);
 	};
 
-	const getData = (pageIndex: number, pageSize: number) => {
-		// console.log(pageIndex, pageSize);
-		console.log(searchForm.getFieldsValue());
+	const getData = async (pageIndex: number, pageSize: number) => {
+		const res = await getAuditSqlPage({
+			current: pageIndex,
+			size: pageSize,
+			name: searchForm.getFieldsValue().sqlName || ''
+		});
 
-		const list: DataType[] = [
-			{
-				key: '1',
-				sqlName: 'John Brown',
-				sqlContent: 'select * from table11',
-				useTo: 'New York No. 1 Lake Park'
-			},
-			{
-				key: '2',
-				sqlName: 'Jim Green',
-				sqlContent: 'select * from table12',
-				useTo: 'London No. 1 Lake Park'
-			}
-		];
+		const list: DataType[] = res.records.map((item) => ({
+			key: item.id,
+			sqlName: item.name,
+			useTo: item.effect
+		}));
+
 		return {
 			list,
-			total: 101
+			total: res.total
 		};
 	};
 
