@@ -158,13 +158,7 @@ const GraphinCom = React.memo((props: Props) => {
 					nodeSize: 140,
 					nodeSpacing: 50
 				}}
-			>
-				<Legend bindType="node" sortKey="config.type">
-					{(renderProps: LegendChildrenProps) => {
-						return <Legend.Node {...renderProps} onChange={() => {}} />;
-					}}
-				</Legend>
-			</Graphin>
+			></Graphin>
 		</div>
 	);
 });
