@@ -375,6 +375,30 @@ export default (props: IProps) => {
 		return item ? item.path.join('  ->  ') : '请选择筛选条件';
 	};
 
+	const ref = useRef(null);
+	const [test, setTest] = useState<Array<number>>([]);
+	const [width, setWidth] = useState(700);
+
+	const handleTest = () => {
+		console.log('test');
+		const arr = [...test];
+		arr.push(1);
+		setTest(arr);
+		// setWidth(1000);
+	};
+
+	useEffect(() => {
+		if (open) {
+			const ro = new ResizeObserver((entries, observer) => {
+				for (const entry of entries) {
+					const { width } = entry.contentRect;
+					setWidth(+width + 400);
+				}
+			});
+			ro.observe(ref.current);
+		}
+	}, [open]);
+
 	return (
 		<>
 			<Button
@@ -400,13 +424,13 @@ export default (props: IProps) => {
 				open={open}
 				title="链路筛选"
 				minWidth="700px"
-				// width={width}
+				width={width}
 				height={400}
 				onOk={handleOk}
 				onCancel={() => setOpen(false)}
 			>
-				<div id="" className={styles['fillter-dialog__top']}>
-					<div className={styles['fillter-tree']}>
+				<div className={styles['fillter-dialog__top']}>
+					<div ref={ref} id="fillter-tree" className={styles['fillter-tree']}>
 						<Tree
 							checkable
 							checkStrictly
@@ -417,15 +441,6 @@ export default (props: IProps) => {
 							onSelect={selectNodes}
 							loadData={onLoadData}
 						/>
-						{/* <div style={{ whiteSpace: 'nowrap' }}>
-							{test.map((item) => (
-								<div style={{ display: 'inline-block' }}>
-									ceshiceshiceshiceshiceshiceshiceshiceshiceshiceshiceshiceshiceshi
-								</div>
-							))}
-						</div>
-
-						<div onClick={handleTest}>点我</div> */}
 					</div>
 					<div className={styles['fillter-attr']}>
 						{selectNodeID &&

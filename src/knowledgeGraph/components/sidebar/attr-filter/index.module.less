@@ -24,9 +24,10 @@
 
 .fillter-dialog__top {
 	display: flex;
+	overflow: hidden;
 
 	.fillter-tree {
-		flex: 1 1 300px;
+		flex: 1 1 auto;
 		padding-right: 10px;
 		border-right: 1px solid #ccc;
 		&-title {
@@ -37,7 +38,7 @@
 	}
 	.fillter-attr {
 		flex: 0 0 auto;
-		min-width: 400px;
+		width: 400px;
 		padding-left: 20px;
 	}
 }
