@@ -21,7 +21,7 @@ import {
 	IFilterNode,
 	IPath,
 	getAlgs
-} from '@/api/knowledgeGraph/graphin';
+} from '@/api/knowLedgeGraph/graphin';
 interface Props {
 	curData: any; //当前图谱数据 用来判断链路和算法是否可用 为空时禁用
 	updateData: (layout: GraphinData) => void;

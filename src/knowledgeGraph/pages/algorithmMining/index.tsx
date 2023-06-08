@@ -6,7 +6,7 @@ import { Button, message, Input, Form, Row, Col } from 'antd';
 import html2canvas from 'html2canvas';
 import styles from './index.module.less';
 import { toImgStyle } from '@/utils/other';
-import { saveGraph, uploadGraphPic } from '@/api/knowledgeGraph/graphin';
+import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
 import CustomDialog from '@/components/custom-dialog';
 
 const mockData: GraphinData = {

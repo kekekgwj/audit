@@ -17,7 +17,7 @@ import {
 import emptyPage from '@/assets/img/empty.png';
 import styles from './index.module.less';
 import CustomDialog from '@/components/custom-dialog';
-import { getSuspiciousRule } from '@/api/knowledgeGraph/rule';
+import { getSuspiciousRule, checkNodeByRule } from '@/api/knowLedgeGraph/rule';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // 使用弹框
@@ -41,15 +41,22 @@ const UseModal = React.memo((prop: Props) => {
 	const navigate = useNavigate();
 
 	// 提交表单
-	const onSubmit = () => {
+	const onSubmit = async () => {
 		const data = form.getFieldsValue();
-		console.log(data, 677777);
 
-		// onCancel();
-		// 跳转到查询结果界面
-		navigate('/ruleResult', {
-			state: { value: data.value, name: curRow.name, ruleId: curRow.id }
-		});
+		try {
+			await checkNodeByRule({
+				ruleId: curRow.id,
+				value: data.value
+			});
+			// onCancel();
+			// 跳转到查询结果界面
+			navigate('/ruleResult', {
+				state: { value: data.value, name: curRow.name, ruleId: curRow.id }
+			});
+		} catch (e) {
+			console.log(e);
+		}
 	};
 
 	return (

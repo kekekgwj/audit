@@ -18,7 +18,7 @@ import {
 	IGraphData,
 	getNextGraph,
 	getNextRelationships
-} from '@/api/knowledgeGraph/graphin';
+} from '@/api/knowLedgeGraph/graphin';
 import Legend from './legend';
 // import NormalDistribution from 'normal-distribution';
 // 注册自定义节点

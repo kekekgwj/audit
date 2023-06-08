@@ -25,3 +25,18 @@ export function getGraphByRule(data: GraphByRuleProps) {
 		)
 	);
 }
+
+// 可疑规则主体校验
+export function checkNodeByRule(data: {
+	ruleId: number | string;
+	value: string;
+}) {
+	return get(
+		appendQueryParams(
+			API_PREFIX + '/blade-tool/graphAnalysis/checkNodeByRule',
+			{
+				...data
+			}
+		)
+	);
+}

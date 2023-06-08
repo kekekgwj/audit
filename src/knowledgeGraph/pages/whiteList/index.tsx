@@ -36,7 +36,7 @@ import {
 	getWhiteList,
 	getWhiteListType,
 	deleteWhiteList
-} from '@/api/knowledgeGraph/whiteList';
+} from '@/api/knowLedgeGraph/whiteList';
 
 interface TanbleProps {
 	data: [];
@@ -143,8 +143,8 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 				let bTimeString = b.gmtModified;
 				aTimeString = aTimeString.replace(/-/g, '/');
 				bTimeString = bTimeString.replace(/-/g, '/');
-				let aTime = new Date(aTimeString).getTime();
-				let bTime = new Date(bTimeString).getTime();
+				const aTime = new Date(aTimeString).getTime();
+				const bTime = new Date(bTimeString).getTime();
 				return bTime - aTime;
 			}
 		},

@@ -5,7 +5,7 @@ import {
 	getWhiteDetail,
 	getPrimaryProperties,
 	updateWhiteList
-} from '@/api/knowledgeGraph/whiteList';
+} from '@/api/knowLedgeGraph/whiteList';
 
 interface EditProps {
 	open: boolean;

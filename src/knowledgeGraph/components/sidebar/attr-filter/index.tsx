@@ -7,7 +7,7 @@ import FillterAttr, { ComponentsType } from './fillterAttr';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 
-import { IPath, IProperty, getNextPaths } from '@/api/knowledgeGraph/graphin';
+import { IPath, IProperty, getNextPaths } from '@/api/knowLedgeGraph/graphin';
 import { FormItems } from '../sideBar';
 
 interface IResProperty {

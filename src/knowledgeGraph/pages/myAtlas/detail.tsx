@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { getDeatil } from '@/api/knowledgeGraph/myAltas';
+import { getDeatil } from '@/api/knowLedgeGraph/myAltas';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Image, Table } from 'antd';
 import debounce from 'lodash/debounce';
@@ -8,7 +8,7 @@ import styles from './detail.module.less';
 import SvgIcon from '@/components/svg-icon';
 const AltasDetailCom = () => {
 	const navigate = useNavigate();
-	let location = useLocation();
+	const location = useLocation();
 	const graphId = location.state.id;
 	const [showScroll, setShowScroll] = React.useState(false);
 	const [graphUrl, setGraphUrl] = React.useState('');
@@ -76,7 +76,7 @@ const AltasDetailCom = () => {
 	const transToTableData = (head: [], data: []) => {
 		const tableDataArr = [];
 		data.forEach((item) => {
-			let newObj = {};
+			const newObj = {};
 			item.forEach((el, i) => {
 				newObj[head[i]] = el;
 			});
