@@ -19,7 +19,6 @@ import {
 	getNextGraph,
 	getNextRelationships
 } from '@/api/knowledgeGraph/graphin';
-import { getFillColorByType } from './custom-node/Base';
 import Legend from './legend';
 // import NormalDistribution from 'normal-distribution';
 // 注册自定义节点
@@ -205,40 +204,25 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 		const { type, similarity, id, source, target } = edge;
 		return {
 			...edge,
+			type: 'graphin-line',
 			id: id + '-edge',
 			source: source + '-node',
 			target: target + '-node',
-			type: 'Base',
-			config: {
-				type,
-				size: similarity
+			style: {
+				label: {
+					value: type
+				},
+				keyshape: {
+					lineWidth: 1 + (similarity || 0) * 4
+				}
 			}
 		};
 	});
-	const mockEdge = {
-		id: '67892-edge',
-		type: 'Base',
-		source: '10244-node',
-		target: '10245-node',
-		attrs: null,
-		similarity: null,
-		config: {
-			type: 'TESTTTTTTTTTT',
-			size: null
-		}
-	};
-	// const polyEdges = Utils.processEdges([...formatEdges, mockEdge]);
-	// const polyEdges = Utils.processEdges(
-	// 	[...formatEdges, mockEdge, mockEdge, mockEdge],
-	// 	{
-	// 		poly: 10,
-	// 		loop: 10
-	// 	}
-	// );
-	// console.log('polyEdges', polyEdges);
+
+	const polyEdges = Utils.processEdges([...formatEdges]);
+
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
-	// const normDist = new NormalDistribution(averageScore, 1);
 
 	const formatNodes = nodes.map((node) => {
 		const { type, score, communityId, id, isCenter = false } = node;
@@ -246,13 +230,6 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 			...node,
 			id: id + '-node',
 			type: 'Base',
-			style: {
-				// keyshape: {
-				// 	fill: isCenter
-				// 		? getFillColorByType('中心节点')
-				// 		: getFillColorByType(type)
-				// }
-			},
 			config: {
 				// type决定color
 				type: isCenter ? '中心节点' : type,
@@ -266,7 +243,7 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 	});
 
 	return {
-		edges: formatEdges,
+		edges: polyEdges,
 		nodes: formatNodes
 	};
 };
