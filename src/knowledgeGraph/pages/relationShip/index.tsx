@@ -6,7 +6,7 @@ import GraphinCom from '@graph/components/graphin';
 import SideBar from '@graph/components/sidebar/sideBar';
 import { toImgStyle } from '@/utils/other';
 import styles from './index.module.less';
-import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
+import { saveGraph, uploadGraphPic } from '@/api/knowledgeGraph/graphin';
 import CustomDialog from '@/components/custom-dialog';
 
 interface SaveProps {

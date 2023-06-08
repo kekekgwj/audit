@@ -3,12 +3,13 @@ import Graphin, {
 	Components,
 	IG6GraphEvent,
 	GraphinContext,
+	Utils,
 	type TooltipValue,
 	type GraphinData,
 	type LegendChildrenProps
 } from '@antv/graphin';
-import registerNodes from './custom-node';
-import registerEdges from './custom-edge';
+import registerNodes from './custom-node/index';
+import registerEdges from './custom-edge/index';
 import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
@@ -18,7 +19,6 @@ import {
 	getNextGraph,
 	getNextRelationships
 } from '@/api/knowledgeGraph/graphin';
-import { getFillColorByType } from './custom-node/Base';
 import Legend from './legend';
 // import NormalDistribution from 'normal-distribution';
 // 注册自定义节点
@@ -204,34 +204,35 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 		const { type, similarity, id, source, target } = edge;
 		return {
 			...edge,
+			type: 'graphin-line',
 			id: id + '-edge',
 			source: source + '-node',
 			target: target + '-node',
-			type: 'Base',
-			config: {
-				type,
-				size: similarity
+			style: {
+				label: {
+					value: type
+				},
+				keyshape: {
+					lineWidth: 1 + (similarity || 0) * 4
+				}
 			}
 		};
 	});
 
+	const polyEdges = Utils.processEdges([...formatEdges]);
+
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
-	// const normDist = new NormalDistribution(averageScore, 1);
 
 	const formatNodes = nodes.map((node) => {
-		const { type, score, communityId, id } = node;
+		const { type, score, communityId, id, isCenter = false } = node;
 		return {
 			...node,
 			id: id + '-node',
 			type: 'Base',
-			style: {
-				keyshape: {
-					fill: getFillColorByType(type)
-				}
-			},
 			config: {
-				type,
+				// type决定color
+				type: isCenter ? '中心节点' : type,
 				// 最小值为100, 最大200
 				size: score
 					? Math.min(Math.max((score / averageScore) * 200, 100), 200)
@@ -242,7 +243,7 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 	});
 
 	return {
-		edges: formatEdges,
+		edges: polyEdges,
 		nodes: formatNodes
 	};
 };

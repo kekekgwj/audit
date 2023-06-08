@@ -25,11 +25,12 @@ import {
 import emptyPage from '@/assets/img/nohit.png';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CustomDialog from '@/components/custom-dialog';
-import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
-import { debounce, throttle } from 'lodash';
-import { getGraphByRule } from '@/api/knowLedgeGraph/suspiciousRule';
+import { saveGraph, uploadGraphPic } from '@/api/knowledgeGraph/graphin';
+import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
+import { getGraphByRule } from '@/api/knowledgeGraph/rule';
 // import { getFillColorByType } from './custom-node/Base';
-import registerNodes from '@/knowLedgeGraph/components/graphin/custom-node';
+import registerNodes from '@/knowledgeGraph/components/graphin/custom-node';
 
 // 注册自定义节点
 registerNodes('all');

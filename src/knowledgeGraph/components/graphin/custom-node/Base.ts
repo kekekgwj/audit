@@ -4,11 +4,7 @@ import { getCanvasText } from '@/utils/graphin';
 const Colors: {
 	[key: string]: Array<string>;
 } = {
-	BASE: ['red', 'red', '#fff'],
-	Company: ['#E6697B', '#E6697B', '#fff'],
-	Person: ['#EBF3EF', '#EBF3EF', '#000'],
-	Property: ['#708FFF', '#708FFF', '#fff'],
-	Recipient: ['#24A36F', '#24A36F', '#fff'],
+	中心节点: ['#E6697B ', '#E6697B ', '#fff'],
 	人: ['#E369E6', '#E369E6', '#fff'],
 	法人: ['#9CB2FF', '#9CB2FF', '#fff'],
 	科研项目: ['#38BDE8', '#38BDE8', '#fff'],
@@ -19,9 +15,14 @@ const Colors: {
 	发票: ['#5ACBA9', '#5ACBA9', '#fff'],
 	资产: ['#24A36F', '#24A36F', '#fff'],
 	lightNode: ['#f00', '#f00', '#fff'], //高亮节点
-	noLightNode: ['#EBF3EF', '#EBF3EF', '#fff'] //不高亮节点
+	noLightNode: ['#EBF3EF', '#EBF3EF', '#fff'], //不高亮节点
+	BASE: ['red', 'red', '#fff'],
+	Company: ['#E6697B', '#E6697B', '#fff'],
+	Person: ['#EBF3EF', '#EBF3EF', '#000'],
+	Property: ['#708FFF', '#708FFF', '#fff'],
+	Recipient: ['#24A36F', '#24A36F', '#fff']
 };
-
+export const nodeSequence = Object.keys(Colors);
 // 获取 stroke、FILL、
 const getColorByType = (type: string): string[] => {
 	return Colors[type] ? Colors[type] : Colors['BASE'];

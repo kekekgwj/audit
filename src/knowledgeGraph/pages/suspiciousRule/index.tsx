@@ -17,7 +17,7 @@ import {
 import emptyPage from '@/assets/img/empty.png';
 import styles from './index.module.less';
 import CustomDialog from '@/components/custom-dialog';
-import { getSuspiciousRule } from '@/api/knowledgeGraph/suspiciousRule';
+import { getSuspiciousRule } from '@/api/knowledgeGraph/rule';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // 使用弹框

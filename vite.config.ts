@@ -7,16 +7,18 @@ export default defineConfig(({ mode, command }) => {
 	const env = loadEnv(mode, process.cwd());
 	return {
 		// plugins: [createVitePlugins(env.VITE_APP_ENV, command)],
+		base: './',
 		plugins: [createVitePlugins(env.VITE_APP_ENV, command), removeConsole()],
 		resolve: {
 			// https://cn.vitejs.dev/config/#resolve-alias
 			alias: {
+				src: '/src',
 				// 设置路径
-				'~': path.resolve(__dirname, './'),
-				'@': path.resolve(__dirname, './src/'),
+				'~': path.resolve(__dirname, '/'),
+				'@': path.resolve(__dirname, '/src/'),
 				// 设置别名
-				'@graph': path.resolve(__dirname, './src/knowledgeGraph'),
-				'@sql': path.resolve(__dirname, './src/dataAnalysis')
+				'@graph': path.resolve(__dirname, '/src/knowledgeGraph'),
+				'@sql': path.resolve(__dirname, '/src/dataAnalysis')
 			},
 			// https://cn.vitejs.dev/config/#resolve-extensions
 			extensions: ['.js', '.ts', '.jsx', '.tsx', '.json']
