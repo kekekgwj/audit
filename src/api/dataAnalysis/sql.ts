@@ -148,8 +148,12 @@ export function getTables(queryType: number) {
 // 执行传入的sql语句，导出查询结果
 export function exportBySql(sql: string, fileName: string) {
 	return download(
-		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/exportBySql', {
-			sql
+		new Request(API_PREFIX + '/blade-tool/dataAnalysis/exportBySql', {
+			method: 'post',
+			body: JSON.stringify({ sql }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
 		}),
 		fileName
 	);
