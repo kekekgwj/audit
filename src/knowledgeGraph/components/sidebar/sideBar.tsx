@@ -68,7 +68,7 @@ export default (props: Props) => {
 	const [curPath, setCurPath] = useState([]); //保存当前链路  算法改变需要传入
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
-	console.log('curPath', curPath);
+
 	useEffect(() => {
 		getBodyTypeOptions();
 		initForm();
@@ -171,10 +171,10 @@ export default (props: Props) => {
 			return;
 		}
 		try {
-			updateData({
-				nodes: [],
-				edges: []
-			}); //先置空不然渲染有问题
+			// updateData({
+			// 	nodes: [],
+			// 	edges: []
+			// }); //先置空不然渲染有问题
 			const data = await getGraph({
 				algorithmName,
 				depth: level,
@@ -271,7 +271,7 @@ export default (props: Props) => {
 													name={[name, 'bodyName']}
 													className={styles['filter-form-item']}
 												>
-													<Input placeholder="主体名称" />
+													<Input placeholder="主体名称" allowClear={true} />
 												</Form.Item>
 												{/* <MinusCircleOutlined onClick={() => remove(name)} /> */}
 											</div>
