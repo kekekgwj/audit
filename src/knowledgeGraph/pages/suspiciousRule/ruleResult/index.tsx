@@ -25,10 +25,10 @@ import {
 import emptyPage from '@/assets/img/nohit.png';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CustomDialog from '@/components/custom-dialog';
-import { saveGraph, uploadGraphPic } from '@/api/knowledgeGraph/graphin';
+import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
-import { getGraphByRule } from '@/api/knowledgeGraph/rule';
+import { getGraphByRule } from '@/api/knowLedgeGraph/rule';
 // import { getFillColorByType } from './custom-node/Base';
 import registerNodes from '@/knowledgeGraph/components/graphin/custom-node';
 
@@ -158,13 +158,7 @@ const GraphinCom = React.memo((props: Props) => {
 					nodeSize: 140,
 					nodeSpacing: 50
 				}}
-			>
-				<Legend bindType="node" sortKey="config.type">
-					{(renderProps: LegendChildrenProps) => {
-						return <Legend.Node {...renderProps} onChange={() => {}} />;
-					}}
-				</Legend>
-			</Graphin>
+			></Graphin>
 		</div>
 	);
 });

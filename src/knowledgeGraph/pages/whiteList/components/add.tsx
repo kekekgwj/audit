@@ -4,7 +4,7 @@ import { Space, Pagination, Form, Input, Button, Select, message } from 'antd';
 import {
 	getPrimaryProperties,
 	saveWhiteList
-} from '@/api/knowledgeGraph/whiteList';
+} from '@/api/knowLedgeGraph/whiteList';
 
 interface Props {
 	open: boolean;

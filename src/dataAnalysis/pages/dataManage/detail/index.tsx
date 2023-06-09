@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { getDeatil } from '@/api/knowledgeGraph/myAltas';
+import { getDeatil } from '@/api/knowLedgeGraph/myAltas';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Table } from 'antd';
 
@@ -8,7 +8,7 @@ import SvgIcon from '@/components/svg-icon';
 import { getMyTable } from '@/api/dataAnalysis/dataManage.ts';
 const DataManageDetailCom = () => {
 	const navigate = useNavigate();
-	let location = useLocation();
+	const location = useLocation();
 	const id = location.state.id;
 	const [tableHead, setHead] = React.useState(); //表头
 	const [data, setData] = React.useState(); //原始表数据
@@ -49,7 +49,7 @@ const DataManageDetailCom = () => {
 	const transToTableData = (head: [], data: []) => {
 		const tableDataArr = [];
 		data.forEach((item) => {
-			let newObj = {};
+			const newObj = {};
 			item.forEach((el, i) => {
 				newObj[head[i]] = el;
 			});

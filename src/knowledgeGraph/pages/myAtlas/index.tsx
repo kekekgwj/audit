@@ -24,7 +24,7 @@ import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import DeleteDialog from '@/components/delete-dialog';
 import styles from './index.module.less';
 
-import { getMyAltasList, deleteGraph } from '@/api/knowledgeGraph/myAltas';
+import { getMyAltasList, deleteGraph } from '@/api/knowLedgeGraph/myAltas';
 
 interface TableProps {
 	data: [];
