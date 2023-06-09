@@ -5,10 +5,12 @@ import {
 
 import { Checkbox, Col, Row } from 'antd';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Components } from '@antv/graphin';
 import styles from './index.module.less';
 import { useGraphContext } from '..';
+import { GraphinContext } from '@antv/graphin/lib';
+import { onSetSelectID } from '@/redux/store';
 interface MenuProps {
 	onClose: () => void;
 
@@ -28,7 +30,7 @@ const RightMenu = () => {
 
 const MyMenu = React.memo((props: MenuProps) => {
 	const { curData, updateData } = useGraphContext();
-	console.log('curData', curData, updateData);
+
 	if (!curData || !updateData) {
 		return <></>;
 	}
@@ -52,13 +54,15 @@ const MyMenu = React.memo((props: MenuProps) => {
 	const onChange = (checkedValues: CheckboxValueType[]) => {
 		setCheckedRel(checkedValues);
 	};
-
 	// 穿透到下一层
 	const showNextLeval = () => {
 		const oldData = {
 			nodes: curData.nodes,
 			edges: curData.edges
 		};
+		// for 移动到中心节点
+
+		onSetSelectID({ selectID: orginId + '-node' });
 		getNextGraph({ nodeId: orginId, relationships: checkedRel }).then(
 			(res: any) => {
 				const map = new Map();

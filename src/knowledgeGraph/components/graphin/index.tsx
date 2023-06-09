@@ -6,7 +6,7 @@ import React, {
 	useState
 } from 'react';
 import Graphin, {
-	GraphinContext,
+	Behaviors,
 	type GraphinData,
 	type LegendChildrenProps
 } from '@antv/graphin';
@@ -19,6 +19,9 @@ import RightMenu from './RightMenu';
 import styles from './index.module.less';
 import formatCustomEdges from './customEdge';
 import formatCustomNodes from './customNode';
+import FocusCenter from './FocusCenter';
+import { onSetCenterID, useFocuseState } from '@/redux/store';
+const { Hoverable } = Behaviors;
 interface Props {
 	data: IGraphData;
 	refersh: boolean;
@@ -26,20 +29,6 @@ interface Props {
 	onClose: () => void;
 	id?: string;
 }
-
-const FocusCenter = ({ centerNode }: { centerNode: string | null }) => {
-	const { graph, apis } = useContext(GraphinContext);
-	useEffect(() => {
-		graph.on('afterrender', () => {
-			if (centerNode) {
-				const node = graph.findById(centerNode);
-				node && apis.focusNodeById(centerNode);
-			}
-		});
-		return () => graph.off('afterrender');
-	}, []);
-	return <></>;
-};
 
 const getCenterNode = ({ nodes }: Pick<IGraphData, 'nodes'>): string | null => {
 	let centerNode = null;
@@ -77,9 +66,9 @@ export const useGraphContext = () => {
 };
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData, refersh } = props;
-
 	const formatData = formatGraphData(data);
 	const centerNode = getCenterNode({ nodes: data.nodes });
+	onSetCenterID({ centerID: centerNode });
 	const [key, setKey] = useState('');
 
 	const curData = { ...data }; //当前图谱数据  穿透下一层时需要拼接数据
@@ -131,7 +120,8 @@ const GraphinCom = React.memo((props: Props) => {
 				<GraphContext.Provider value={{ updateData, curData }}>
 					<RightMenu />
 				</GraphContext.Provider>
-				<FocusCenter centerNode={centerNode}></FocusCenter>
+				<FocusCenter />
+				<Hoverable bindType="node" />
 			</Graphin>
 		</div>
 	);

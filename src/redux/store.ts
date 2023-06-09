@@ -15,10 +15,16 @@ import {
 import { IStoreGraph } from './reducers/knowLedgeGraphSlice';
 import { IBaseState } from './reducers/base';
 import { useSelector } from 'react-redux';
+import {
+	IFocusCenter,
+	toSetCenterID,
+	toSetSelectID
+} from './reducers/focusCenterSlice';
 export interface IRootState {
 	dataAnalysis: INodeDetailPanel;
 	knowledgeGraph: IStoreGraph;
 	base: IBaseState;
+	focusCenter: IFocusCenter;
 }
 export const store: Store = configureAppStore();
 export const dispatch: Dispatch = store.dispatch;
@@ -28,10 +34,33 @@ export const useBaseState = () => {
 	return baseState;
 };
 
+export const useFocuseState = () => {
+	const focusCenterState = useSelector(
+		(state: IRootState) => state.focusCenter
+	);
+	return focusCenterState;
+};
+
 export const onClickGraphNode = (id: string) => {
 	dispatch(toDoubleClickNode({ id, showPanel: true }));
 };
 
 export const onClickCloseConfigPanel = () => {
 	dispatch(toClosePanel());
+};
+
+export const onSetCenterID = ({
+	centerID = null
+}: {
+	centerID: string | null;
+}) => {
+	dispatch(toSetCenterID({ centerID }));
+};
+
+export const onSetSelectID = ({
+	selectID = null
+}: {
+	selectID: string | null;
+}) => {
+	dispatch(toSetSelectID({ selectID }));
 };
