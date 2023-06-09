@@ -84,7 +84,6 @@ const RelationShipCom = () => {
 	// 数据来源
 	const [data, setDate] = useState<GraphinData>();
 	const [barOpen, setBarOpen] = useState(true);
-	const graphinRef = useRef<GraphinRef>();
 	const [open, setSaveOpen] = React.useState(false);
 	const [fileUrl, setFile] = React.useState();
 	const [defaultName, setdefaultName] = React.useState();

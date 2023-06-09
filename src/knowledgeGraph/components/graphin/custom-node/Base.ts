@@ -24,7 +24,7 @@ const Colors: {
 };
 export const nodeSequence = Object.keys(Colors);
 // 获取 stroke、FILL、
-const getColorByType = (type: string): string[] => {
+export const getColorByType = (type: string): string[] => {
 	return Colors[type] ? Colors[type] : Colors['BASE'];
 };
 // legend的颜色

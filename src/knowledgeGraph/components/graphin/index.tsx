@@ -13,13 +13,14 @@ import registerEdges from './custom-edge/index';
 import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
-import { Checkbox, Col, Row } from 'antd';
+import { Button, Checkbox, Col, Row } from 'antd';
 import {
 	IGraphData,
 	getNextGraph,
 	getNextRelationships
 } from '@/api/knowledgeGraph/graphin';
 import Legend from './legend';
+import { getColorByType } from './custom-node/Base';
 // import NormalDistribution from 'normal-distribution';
 // 注册自定义节点
 registerNodes('all');
@@ -114,7 +115,52 @@ const LeftEvent = () => {
 	}, []);
 	return <>{showDetail ? <DetailInfo detailData={detailData} /> : null}</>;
 };
+const focusNodeById = (graph: any, nodeId: string) => {
+	if (!graph || typeof nodeId !== 'string') {
+		return;
+	}
 
+	const node = graph.findById(nodeId);
+	console.log('node,', node);
+
+	if (!node) {
+		console.warn(`The node ${nodeId} does not exist!`);
+		return;
+	}
+
+	graph.focusItem(nodeId, true, {
+		duration: 200,
+		easing: 'easeCubic'
+	});
+
+	graph.setItemState(node, 'selected', true);
+	node.toFront();
+};
+const FocusCenter = ({ centerNode }: { centerNode: string | null }) => {
+	const { graph, apis } = useContext(GraphinContext);
+	console.log(graph);
+	// useEffect(() => {
+	// 	console.log(graph);
+	// }, [graph]);
+	// console.log('centerNode', centerNode);
+	// focusNodeById(graph, centerNode);
+	// console.log('ccc', centerNode);
+	useEffect(() => {
+		if (centerNode) {
+			console.log('centernode', centerNode);
+			focusNodeById(graph, centerNode);
+		}
+	}, [centerNode]);
+	return (
+		<Button
+			onClick={() => {
+				focusNodeById(graph, centerNode);
+			}}
+		>
+			click
+		</Button>
+	);
+};
 const MyMenu = React.memo((props: MenuProps) => {
 	const { id, onClose, updateData, curData } = props;
 	const orginId = id?.split('-')[0] || ''; //还原数据库id
@@ -197,6 +243,17 @@ const MyMenu = React.memo((props: MenuProps) => {
 		</div>
 	);
 });
+const getCenterNode = (nodes: Pick<IGraphData, 'nodes'>): string | null => {
+	let centerNode = null;
+	for (const node of nodes) {
+		const { isCenter, id } = node;
+		if (isCenter) {
+			centerNode = id + '-node';
+			break;
+		}
+	}
+	return centerNode;
+};
 const formatGraphData = (data: IGraphData): GraphinData => {
 	const { edges, nodes } = Object.assign({}, data);
 
@@ -225,11 +282,41 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 
 	const formatNodes = nodes.map((node) => {
-		const { type, score, communityId, id, isCenter = false } = node;
+		const { type, score, communityId, id, isCenter = false, label } = node;
+		const [strokeColor, fillColor, labelColor] = getColorByType(
+			isCenter ? '中心节点' : type
+		);
+
+		const size = score
+			? Math.min(Math.max((score / averageScore) * 200, 100), 200)
+			: 100;
 		return {
 			...node,
 			id: id + '-node',
-			type: 'Base',
+			type: 'graphin-circle',
+			style: {
+				label: {
+					value: label,
+					fontSize: 12,
+					x: 0,
+					y: 0,
+					textAlign: 'center',
+					textBaseline: 'middle',
+					fill: labelColor,
+					cursor: 'pointer'
+				},
+				keyshape: {
+					stroke: strokeColor,
+					fill: fillColor,
+					fillOpacity: 1,
+					opacity: 1,
+					size: size,
+					cursor: 'pointer'
+				},
+				halo: {
+					visible: false
+				}
+			},
 			config: {
 				// type决定color
 				type: isCenter ? '中心节点' : type,
@@ -249,25 +336,28 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 };
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData, refersh } = props;
+
 	const formatData = formatGraphData(data);
+	const centerNode = getCenterNode(data.nodes);
 	const [key, setKey] = useState('');
+	console.info('data', data, key);
 	const curData = { ...data }; //当前图谱数据  穿透下一层时需要拼接数据
 	const [width, setWidth] = useState(600);
-	const graphinRef = useRef<HTMLDivElement>();
+	const graphinContainerRef = useRef<HTMLDivElement>();
 
 	useEffect(() => {
-		const rect = graphinRef?.current?.getBoundingClientRect();
+		const rect = graphinContainerRef?.current?.getBoundingClientRect();
 		setWidth(rect?.width as number);
 	}, []);
 
 	useEffect(() => {
-		const rect = graphinRef?.current?.getBoundingClientRect();
+		const rect = graphinContainerRef?.current?.getBoundingClientRect();
 		setKey(`${rect?.width}`);
 		setWidth(rect?.width as number);
 	}, [refersh]);
 
 	return (
-		<div ref={graphinRef} className={styles['graphin-box']}>
+		<div ref={graphinContainerRef} className={styles['graphin-box']}>
 			<Graphin
 				key={key}
 				data={formatData}
@@ -325,6 +415,7 @@ const GraphinCom = React.memo((props: Props) => {
 					}}
 				</Legend>
 				<LeftEvent></LeftEvent>
+				<FocusCenter centerNode={centerNode}></FocusCenter>
 			</Graphin>
 		</div>
 	);
