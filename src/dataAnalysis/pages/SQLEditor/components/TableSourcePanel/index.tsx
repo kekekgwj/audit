@@ -28,7 +28,7 @@ const TableItem: React.FC<ITable> = ({ data, title }) => {
 				key={title}
 				header={
 					<>
-						<image className={classes.iconGroup}></image>
+						<div className={classes.iconGroup}></div>
 						<span className={classes.title}>{title}</span>
 					</>
 				}
@@ -37,7 +37,7 @@ const TableItem: React.FC<ITable> = ({ data, title }) => {
 				{data &&
 					data.map((table) => {
 						return (
-							<div className={classes.textWrapper}>
+							<div key={table.tableName} className={classes.textWrapper}>
 								<span className={classes.iconTable}></span>
 								<span className={classes.tableName}>{table.tableName}</span>
 							</div>
