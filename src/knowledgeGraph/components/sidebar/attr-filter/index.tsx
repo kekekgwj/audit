@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Button, Tree, message } from 'antd';
 import CustomDialog from '@/components/custom-dialog';
-import { CaretDownOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, CloseOutlined } from '@ant-design/icons';
 import FillterAttr, { ComponentsType } from './fillterAttr';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
@@ -42,10 +42,9 @@ export interface INodeConfigNProps {
 interface IProps {
 	getFormItemValue: (name: FormItems) => any;
 	setFormItemValue: (name: FormItems, value: any) => any;
-	updateGraph: (paths: IPath[]) => void;
-	setCurPath: (paths: IPath[]) => void;
+	updateGraph: (paths: IPath[] | null) => void;
+	setCurPath: (paths: IPath[] | null) => void;
 	canUse: boolean; //是否禁用
-	curData: any; //当前图谱数据 没有禁止链路
 }
 export default (props: IProps) => {
 	const {
@@ -53,8 +52,7 @@ export default (props: IProps) => {
 		setFormItemValue,
 		updateGraph,
 		setCurPath,
-		canUse,
-		curData
+		canUse
 	} = props;
 	const fillterAttrRef = useRef(null);
 	const [open, setOpen] = useState(false);
@@ -79,6 +77,12 @@ export default (props: IProps) => {
 		curNodeType = curNode[0].bodyType as string;
 		curNodeVaule = curNode[0].bodyName as string;
 	}
+
+	// useEffect(() => {
+	// 	if (!cntInitRef.current) return;
+	// 	setTreeData([]);
+	// 	setCurPath(null);
+	// }, [curNodeType, curNodeVaule]);
 	// 打开/关闭设置弹框
 	const changeDialogOpen = async () => {
 		if (!curNodeType || !curNodeVaule) {
@@ -104,6 +108,25 @@ export default (props: IProps) => {
 		}
 		// 设表单初始值
 	};
+	// todo
+	// const resetDialog = async () => {
+	// 	if (!curNodeType || !curNodeVaule) {
+	// 		message.error('未选择主体');
+	// 		return;
+	// 	}
+	// 	const res = await getNextPaths({
+	// 		nodeFilter,
+	// 		parentPaths: [],
+	// 		type: curNodeType,
+	// 		value: curNodeVaule
+	// 	});
+	// 	const formatDataTree = changeDataTree(res);
+	// 	setTreeData(formatDataTree);
+	// 	const configData = transData(formatDataTree);
+
+	// 	updateGraph(configData);
+	// 	setCurPath(configData); //当前选中链路数据
+	// };
 	//把原始数据改成dataTree能用的数据
 	const changeDataTree = (list: INextPathResponse[]): ITreeData[] => {
 		return list.map((item) => {
@@ -286,29 +309,6 @@ export default (props: IProps) => {
 		const listTransNoNull = listTrans.filter((v) => v !== null) as IPath[];
 		return listTransNoNull.length === 0 ? null : listTransNoNull;
 	};
-	// const tagDeleteData = (data: IPath[]) => {
-	// 	if (data.length === 0) {
-	// 		return true;
-	// 	}
-	// 	let isDelete = true;
-	// 	data.forEach((item) => {
-	// 		const { id, nextPaths } = item;
-	// 		if (!tagDeleteData(nextPaths) || saveNodes.includes(id)) {
-	// 			isDelete = false;
-	// 		}
-	// 	});
-	// 	return isDelete;
-	// };
-	// const filterSelectData = (data: IPath[]) => {
-	// 	const filterData = [];
-	// 	// if (item.nextPaths.length === 0 && )
-	// 	data.forEach((item) => {
-	// 		if (!saveNodes.includes(id) && item.nextPaths.length === 0) {
-	// 			return;
-	// 		}
-	// 	});
-	// 	return filterData;
-	// };
 
 	// 自定义树形节点
 	const customTreeTitle = (nodeData: ITreeData) => {
@@ -376,16 +376,7 @@ export default (props: IProps) => {
 	};
 
 	const ref = useRef(null);
-	const [test, setTest] = useState<Array<number>>([]);
 	const [width, setWidth] = useState(700);
-
-	const handleTest = () => {
-		console.log('test');
-		const arr = [...test];
-		arr.push(1);
-		setTest(arr);
-		// setWidth(1000);
-	};
 
 	useEffect(() => {
 		if (open) {
@@ -402,7 +393,7 @@ export default (props: IProps) => {
 	return (
 		<>
 			<Button
-				disabled={canUse || !curData}
+				disabled={!canUse}
 				onClick={() => changeDialogOpen()}
 				style={{
 					width: '100%',
@@ -420,6 +411,11 @@ export default (props: IProps) => {
 					{convertPathToHint()}
 				</div>
 			</Button>
+			{/* <CloseOutlined
+				onClick={() => {
+					resetDialog();
+				}}
+			/> */}
 			<CustomDialog
 				open={open}
 				title="链路筛选"

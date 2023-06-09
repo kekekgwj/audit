@@ -60,6 +60,8 @@ export enum FormItems {
 }
 export default (props: Props) => {
 	const { updateData, toggleLayout, canAdd, setdefaultName, curData } = props;
+	const [filterNAlgorithDisable, setFilterNAlgorithDisable] =
+		useState<boolean>(false);
 	const [configVisibile, setconfigVisibile] = useState(true);
 	const [bodyTypeOptions, setBodyTypeOptions] = useState(Array<bodyTypeOption>);
 	const [algorithmOptions, setAlgorithmOptions] = useState(
@@ -68,7 +70,9 @@ export default (props: Props) => {
 	const [curPath, setCurPath] = useState([]); //保存当前链路  算法改变需要传入
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
-
+	useEffect(() => {
+		setFilterNAlgorithDisable(true);
+	}, [bodys]);
 	useEffect(() => {
 		getBodyTypeOptions();
 		initForm();
@@ -171,10 +175,6 @@ export default (props: Props) => {
 			return;
 		}
 		try {
-			// updateData({
-			// 	nodes: [],
-			// 	edges: []
-			// }); //先置空不然渲染有问题
 			const data = await getGraph({
 				algorithmName,
 				depth: level,
@@ -193,6 +193,7 @@ export default (props: Props) => {
 				nodes: nodesData,
 				edges: edgesData
 			});
+			setFilterNAlgorithDisable(false);
 		} catch (e) {
 			// message.error('查询结果为空');
 		}
@@ -200,7 +201,6 @@ export default (props: Props) => {
 
 	// 算法改变
 	const handleAlgorithmChange = (value: string) => {
-		console.log(value, curPath, 111111);
 		searchUpdate({ algorithmName: value, pathFilter: curPath });
 	};
 
@@ -229,6 +229,19 @@ export default (props: Props) => {
 		if (form) {
 			form.setFieldValue(name, value);
 		}
+	};
+	const getFilterKey = () => {
+		if (
+			bodys &&
+			Array.isArray(bodys) &&
+			bodys[0].bodyName &&
+			bodys[0].bodyType
+		) {
+			const curNodeType = bodys[0].bodyType as string;
+			const curNodeVaule = bodys[0].bodyName as string;
+			return curNodeType + '-' + curNodeVaule;
+		}
+		return Date.now();
 	};
 	// 渲染表单
 	const renderForm = () => {
@@ -399,8 +412,11 @@ export default (props: Props) => {
 								}`}
 							>
 								<AttrFillter
-									curData={curData}
-									canUse={bodys?.length > 1 ? true : false}
+									key={getFilterKey()}
+									canUse={
+										!filterNAlgorithDisable && bodys?.length === 1 && curData
+									}
+									// 用于保存选择的筛选项
 									setCurPath={setCurPath}
 									getFormItemValue={getFormItemValue}
 									setFormItemValue={setFormItemValue}
@@ -414,7 +430,9 @@ export default (props: Props) => {
 							<div>
 								<div
 									className={`${styles['filter-item']} ${
-										!curData ? styles['filter-item-disable'] : ''
+										!curData || filterNAlgorithDisable
+											? styles['filter-item-disable']
+											: ''
 									}`}
 								>
 									<SvgIcon name="filter"></SvgIcon>
@@ -424,7 +442,9 @@ export default (props: Props) => {
 									name={FormItems.algorithm}
 									label="算法"
 									className={`${
-										!curData ? styles['filter-label-disable'] : ''
+										!curData || filterNAlgorithDisable
+											? styles['filter-label-disable']
+											: ''
 									}`}
 								>
 									<Select
@@ -432,7 +452,7 @@ export default (props: Props) => {
 										style={{ width: '100%' }}
 										placeholder="请选择"
 										onChange={handleAlgorithmChange}
-										disabled={!curData}
+										disabled={!curData || filterNAlgorithDisable}
 									>
 										{algorithmOptions.map((item) => {
 											return (
