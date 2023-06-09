@@ -5,7 +5,7 @@ import { INode } from '@antv/g6';
 import { GraphinContext } from '@antv/graphin';
 import './index.less';
 import type { LegendChildrenProps, OptionType } from './typing';
-import { nodeSequence } from '../custom-node/Base';
+import { nodeSequence } from '../customNode';
 const LegendNode: React.FunctionComponent<LegendChildrenProps> = (props) => {
 	const { graph, theme } = React.useContext(GraphinContext);
 
