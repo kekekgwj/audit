@@ -11,7 +11,7 @@ import classes from './index.module.less';
 import { EditorContext, BoxType } from '../..';
 import { highlight } from 'sql-highlight';
 import { Markup } from 'interweave';
-import { getSqls, getTables } from '@/api/dataAnalysis/sql';
+import { getSqls, getTables, getAuditSqls } from '@/api/dataAnalysis/sql';
 interface IProps {
 	pos: {
 		left: number;
@@ -89,17 +89,30 @@ const SQLBox: FC<ISQlBOX> = () => {
 
 	useEffect(() => {
 		getMyCommon();
+		getAudit();
 	}, []);
+
+	const getAudit = async () => {
+		const res = await getAuditSqls();
+		const list = res.map((item) => ({
+			title: item.name,
+			content: highlight(item.sql || '', {
+				html: true
+			}),
+			value: item.sql || ''
+		}));
+
+		setAuditRules(list);
+	};
 
 	const getMyCommon = async () => {
 		const res = await getSqls();
-		console.log(res);
 		const list = res.map((item) => ({
 			title: item.name,
-			content: highlight('SELECT * FROM 之江实验室app用户访问数据', {
+			content: highlight(item.sql || '', {
 				html: true
 			}),
-			value: 'SELECT * FROM 之江实验室app用户访问数据'
+			value: item.sql || ''
 		}));
 		setMyCommon(list);
 	};

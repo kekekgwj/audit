@@ -1,4 +1,4 @@
-import { appendQueryParams, get, post, postFormData } from '@/utils/request';
+import { appendQueryParams, get, post, download } from '@/utils/request';
 const env = import.meta.env;
 const { VITE_API_PREFIX: API_PREFIX } = env;
 
@@ -123,6 +123,13 @@ export function getSqls() {
 	);
 }
 
+// 查询我的常用sql列表
+export function getAuditSqls() {
+	return get<MySql[]>(
+		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/getAuditSqls')
+	);
+}
+
 interface Tables {
 	id: string | number;
 	tableCnName: string;
@@ -139,10 +146,11 @@ export function getTables(queryType: number) {
 }
 
 // 执行传入的sql语句，导出查询结果
-export function exportBySql(sql: string) {
-	return get(
+export function exportBySql(sql: string, fileName: string) {
+	return download(
 		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/exportBySql', {
 			sql
-		})
+		}),
+		fileName
 	);
 }
