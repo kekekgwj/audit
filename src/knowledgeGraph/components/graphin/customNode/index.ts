@@ -70,6 +70,9 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 				halo: {
 					visible: false
 				}
+			},
+			config: {
+				type
 			}
 		};
 	});
