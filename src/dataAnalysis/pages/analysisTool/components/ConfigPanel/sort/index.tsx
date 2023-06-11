@@ -5,11 +5,14 @@ import { UpIcon, Downicon, HeartIcon, DelIcon } from './icon';
 import { DownOutlined } from '@ant-design/icons';
 import { useConfigContextValue } from '../../NodeDetailPanel';
 const { Panel } = Collapse;
+import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
+import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 
 interface SortProps {
 	option?: List[];
 	value?: string[];
 	onChange?: (value: string[]) => void;
+	dataList: [];
 }
 
 interface List {
@@ -47,9 +50,11 @@ const mockOption = [
 		]
 	}
 ];
-const SortInput: FC<SortProps> = ({ value, onChange }) => {
+const SortInput: FC<SortProps> = ({ value, onChange, dataList }) => {
 	console.log('sort initvalue', value);
+	console.log(dataList, 55555);
 	const [optionList, setOptionList] = useState<List[]>(value || mockOption);
+	// const [optionList, setOptionList] = useState<List[]>(value || dataList);
 	//通过传入的状态值和下标修改dataList的排序状态
 	const setSortStatus = (
 		data: { isUp: boolean; isDown: boolean },
@@ -190,12 +195,142 @@ const SortInput: FC<SortProps> = ({ value, onChange }) => {
 };
 
 const Sort: FC = () => {
+	const graph = useGraph();
+	const projectID = useGraphID();
+	const canvasData = graph.toJSON();
 	const [form] = Form.useForm();
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const formInitValue = getValue && id && getValue(id);
+	const [dataList, setDataList] = useState([]);
 
 	const onFinish = (values: any) => {
 		console.log(values);
+	};
+
+	// 获取配置项
+	useEffect(() => {
+		const params = {
+			id,
+			canvasJson: JSON.stringify({
+				content: canvasData
+			})
+		};
+		// getCanvasConfig(params).then((res) => {
+		// 	console.log(res, 215215);
+		// });
+		// 测试数据
+		const res = [
+			{
+				tableName: 'tableName1',
+				tableCnName: '表名一',
+				fields: [
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段二',
+						id: '2',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					}
+				]
+			},
+			{
+				tableName: 'tableName2',
+				tableCnName: '表名二',
+				fields: [
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段二',
+						id: '2',
+						tableName: '',
+						dataType: '',
+						description: ''
+					}
+				]
+			}
+		];
+		setDataList(transData(res));
+	});
+
+	//转数据形式
+	const transData = (data: any) => {
+		const formatData = data.map((item) => {
+			const listArr = item.fields;
+			const list = [];
+			listArr?.forEach((el) => {
+				list.push({
+					title: el.fieldName,
+					isUp: false,
+					isDown: false
+				});
+			});
+			return {
+				title: item.tableCnName,
+				list: list
+			};
+		});
+		return formatData;
 	};
 
 	const onReset = () => {
@@ -224,6 +359,7 @@ const Sort: FC = () => {
 					<SortInput
 						onChange={handleSortChange}
 						value={formInitValue}
+						// dataList={dataList}
 					></SortInput>
 				</Form.Item>
 			</div>

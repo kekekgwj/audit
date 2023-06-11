@@ -25,9 +25,9 @@ const EdgeDetail = React.memo((props: NodeDetailProps) => {
 	const attrArr = nodeModel.attrs ? nodeModel.attrs : [];
 	return (
 		<div className={styles['node-detail-box']}>
-			{attrArr.map((item) => {
+			{attrArr.map((item, index) => {
 				return (
-					<div className={styles['node-detail-item']}>
+					<div className={styles['node-detail-item']} key={index}>
 						<span className={styles['detail-item-title']}>{item.label}:</span>
 						{item.value}
 					</div>

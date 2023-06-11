@@ -1,4 +1,6 @@
 import { appendQueryParams, get, post, postFormData } from '@/utils/request';
+import { Interface } from 'readline';
+import { string } from 'prop-types';
 const env = import.meta.env;
 const { VITE_API_PREFIX: API_PREFIX } = env;
 //保存画布模板
@@ -106,4 +108,15 @@ export function exportData(data: IExportData): Promise<IExportDataResponse> {
 	return get(
 		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/export', data)
 	);
+}
+
+//获取工具组件配置项
+interface IGetCanvasConfig {
+	id: string;
+	canvasJson: string;
+}
+export function getCanvasConfig(data: IGetCanvasConfig) {
+	return post(API_PREFIX + '/blade-tool/dataAnalysis/getCanvasConfig', {
+		...data
+	});
 }

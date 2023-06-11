@@ -85,7 +85,7 @@ const Panel: React.FC = () => {
 	const graph = useGraph();
 	const [data, columns, updateTable] = useTableSource();
 	const [showConfig, setShowConfig] = useState(true);
-	const [hasConfig, setHasConfig] = useState(true); //是否有配置项 table时没有配置项
+	// const [hasConfig, setHasConfig] = useState(true); //是否有配置项 table时没有配置项
 	const { curSelectedNode: id, showPanel = false } = state || {};
 	const projectID = useGraphID();
 	const { getConfigValue, saveConfigValue, resetConfigValue, getAllConfigs } =
@@ -156,15 +156,6 @@ const Panel: React.FC = () => {
 	};
 
 	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
-	// useEffect(() => {
-	// 	//当为table节点时隐藏配置项
-	// 	if (clickNodeType == 'TABLE') {
-	// 		setHasConfig(false);
-	// 	} else {
-	// 		setHasConfig(true);
-	// 	}
-	// }, [clickNodeType]);
-	console.log(clickNodeType, 115115);
 
 	return (
 		<div className={classes.container}>
@@ -187,8 +178,8 @@ const Panel: React.FC = () => {
 					/>
 				</div>
 			</div>
-			<div>
-				{hasConfig ? (
+			<div style={{ overflowY: 'auto' }}>
+				{clickNodeType != 'TABLE' ? (
 					<div
 						className={`${
 							showConfig ? classes.configPanel : classes.hideConfigPanel

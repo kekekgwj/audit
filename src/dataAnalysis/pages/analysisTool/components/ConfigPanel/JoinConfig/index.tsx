@@ -1,13 +1,17 @@
 import { Button, Form, Select } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import classes from './index.module.less';
 import { useConfigContextValue } from '../../NodeDetailPanel';
+import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
+import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 
 interface ISelectRowProps {
 	value?: any;
 	onChange?: any;
 	handleOnDelete: (key: number) => void;
 	rowName: number;
+	leftOptions: [];
+	rightOptions: [];
 }
 interface IRowCondition {
 	leftHeaderName: string;
@@ -81,22 +85,43 @@ const DeleteIcon = (
 const SelectRow: React.FC<ISelectRowProps> = ({
 	value = { left: '', right: '', symbol: '' },
 	handleOnDelete,
-	rowName
+	rowName,
+	leftOptions,
+	rightOptions
 }) => {
 	if (!value || value.length < 3) {
 		return null;
 	}
 
+	const symbolSelect = [
+		{
+			label: '=',
+			value: '='
+		},
+		{
+			label: '!=',
+			value: '!='
+		},
+		{
+			label: '>',
+			value: '>'
+		},
+		{
+			label: '<',
+			value: '<'
+		}
+	];
+
 	return (
 		<div className={classes.filterGroupWrapper}>
-			<Form.Item name={[rowName, 'leftleftHeaderName']} noStyle>
-				<Select options={options.leftSelect} style={{ width: 120 }}></Select>
+			<Form.Item name={[rowName, 'leftHeaderName']} noStyle>
+				<Select options={leftOptions} style={{ width: 120 }}></Select>
 			</Form.Item>
 			<Form.Item name={[rowName, 'operator']} noStyle>
-				<Select options={options.symbolSelect} style={{ width: 120 }}></Select>
+				<Select options={symbolSelect} style={{ width: 120 }}></Select>
 			</Form.Item>
 			<Form.Item name={[rowName, 'rightHeaderName']} noStyle>
-				<Select options={options.rightSelect} style={{ width: 120 }}></Select>
+				<Select options={rightOptions} style={{ width: 120 }}></Select>
 			</Form.Item>
 
 			<div
@@ -143,10 +168,167 @@ const options = {
 };
 
 const SelectGroup: React.FC = () => {
+	const graph = useGraph();
+	const projectID = useGraphID();
+	const canvasData = graph.toJSON();
 	const [form] = Form.useForm();
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const formInitValue = (getValue && id && getValue(id)) || {};
 
+	const [leftOptions, setLeftSelect] = useState([]);
+	const [rightOptions, setRightSelect] = useState([]);
+	const [leftTableName, setLeftTableName] = useState();
+	const [rightTableName, setRightTableName] = useState();
+
+	//获取配置项
+	useEffect(() => {
+		const params = {
+			id,
+			canvasJson: JSON.stringify({
+				content: canvasData
+			})
+		};
+
+		// 测试数据
+		// const res = [
+		// 	{
+		// 		tableName: 'tableName1',
+		// 		tableCnName: '表名一',
+		// 		fields: [
+		// 			{
+		// 				fieldName: '字段一',
+		// 				id: '1',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			},
+		// 			{
+		// 				fieldName: '字段二',
+		// 				id: '2',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			},
+		// 			{
+		// 				fieldName: '字段一',
+		// 				id: '1',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			},
+		// 			{
+		// 				fieldName: '字段一',
+		// 				id: '1',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			},
+		// 			{
+		// 				fieldName: '字段一',
+		// 				id: '1',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			},
+		// 			{
+		// 				fieldName: '字段一',
+		// 				id: '1',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			},
+		// 			{
+		// 				fieldName: '字段一',
+		// 				id: '1',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			},
+		// 			{
+		// 				fieldName: '字段一',
+		// 				id: '1',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			},
+		// 			{
+		// 				fieldName: '字段一',
+		// 				id: '1',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			}
+		// 		]
+		// 	},
+		// 	{
+		// 		tableName: 'tableName2',
+		// 		tableCnName: '表名二',
+		// 		fields: [
+		// 			{
+		// 				fieldName: '字段一',
+		// 				id: '1',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			},
+		// 			{
+		// 				fieldName: '字段二',
+		// 				id: '2',
+		// 				tableName: '',
+		// 				dataType: '',
+		// 				description: ''
+		// 			}
+		// 		]
+		// 	}
+		// ];
+		// const configData1 = res[0] || [];
+		// const configData2 = res[1] || [];
+		// setLeftTableName(res[0].tableName);
+		// setRightTableName(res[0].tableName);
+		// // 获取下拉选项
+		// const leftData = configData1.fields.map((item, index) => {
+		// 	return {
+		// 		label: item.description || item.fieldName, //展示描述没有展示名称
+		// 		value: item.fieldName
+		// 	};
+		// });
+
+		// const rightData = configData2?.fields?.map((item, index) => {
+		// 	return {
+		// 		label: item.description || item.fieldName, //展示描述没有展示名称
+		// 		value: item.fieldName
+		// 	};
+		// });
+
+		// setLeftSelect(leftData);
+		// setRightSelect(rightData);
+
+		// console.log(leftOptions, rightOptions, 275275275);
+		getCanvasConfig(params).then((res) => {
+			console.log(res, 164164164);
+
+			// 获取数据第一条作为左表，第二条为右表
+			const configData1 = res[0] || [];
+			const configData2 = res[1] || [];
+			// 获取下拉选项
+			const leftOptions = configData1.fields.map((item, index) => {
+				return {
+					label: item.description || item.fieldName, //展示描述没有展示名称
+					value: item.fieldName
+				};
+			});
+
+			const rihthOptions = configData2?.fields?.map((item, index) => {
+				return {
+					label: item.description || item.fieldName, //展示描述没有展示名称
+					value: item.fieldName
+				};
+			});
+
+			setLeftSelect(leftOptions);
+			setRightSelect(rihthOptions);
+		});
+	}, []);
 	const handleOnclickAdd = () => {
 		const list = form.getFieldValue('connectionSentences') || [];
 		const nextList = list.concat({
@@ -158,10 +340,48 @@ const SelectGroup: React.FC = () => {
 		});
 	};
 	const onFinish = (value: IFilterAll) => {
-		if (!id || !setValue) {
-			return;
+		// 可能需要处理
+		if (value.connectionSentences && value.connectionSentences.length) {
+			value.connectionSentences = value.connectionSentences.map(
+				(item, index) => {
+					return {
+						leftHeaderName: item.leftHeaderName,
+						operator: item.operator,
+						rightHeaderName: item.rightHeaderName
+					};
+				}
+			);
 		}
-		setValue(id, value);
+		value.leftTableName = leftTableName;
+		value.rightTableName = rightTableName;
+		console.log(value, 16116161);
+		const params = {
+			canvasJson: JSON.stringify({
+				content: canvasData,
+				configs: { [id]: value }
+			}),
+			executeId: id, //当前选中元素id
+			projectId: projectID
+		};
+
+		getResult(params).then((res: any) => {
+			if (res.head && res.head.length) {
+				//生成columns
+				const colums = res.head.map((item, index) => {
+					return {
+						title: item,
+						dataIndex: item
+					};
+				});
+				// 根据表头和数据拼接成可渲染的表数据
+				// const tableData = transToTableData(res.head, res.data);
+				// updateTable(tableData, colums);
+			}
+		});
+		// if (!id || !setValue) {
+		// 	return;
+		// }
+		// setValue(id, value);
 	};
 	const handleOnDelete = (key: number) => {
 		const list = form.getFieldValue('connectionSentences') || [];
@@ -214,6 +434,8 @@ const SelectGroup: React.FC = () => {
 										key={key}
 										rowName={name}
 										handleOnDelete={handleOnDelete}
+										leftOptions={leftOptions}
+										rightOptions={rightOptions}
 									></SelectRow>
 								</Form.Item>
 							))}

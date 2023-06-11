@@ -1,5 +1,12 @@
-import { createContext, useContext, useReducer, useState } from 'react';
-import { Button, Checkbox, Form, Input, Select } from 'antd';
+import {
+	createContext,
+	useContext,
+	useReducer,
+	useState,
+	useEffect
+} from 'react';
+import { Button, Checkbox, Form, Input, Select, Cascader } from 'antd';
+
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
 import SvgIcon from '@/components/svg-icon';
@@ -7,10 +14,11 @@ import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { useConfigContextValue } from '../../NodeDetailPanel';
-
+import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
+import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 type RowGroupItme = {
 	_key: string;
-	value1: string;
+	value1: [];
 	value2: string;
 	value3: string;
 };
@@ -33,6 +41,7 @@ type addRow = (rowGroupIndex: number, rowIndex: number) => void;
 interface GroupProps {
 	index: number;
 	rowGroup: Array<RowGroupItme>;
+	configData: []; //配置选项
 }
 
 interface RowProps {
@@ -72,7 +81,7 @@ const data: FormData = {
 		[
 			{
 				_key: getHash(),
-				value1: '',
+				value1: [],
 				value2: '',
 				value3: ''
 			}
@@ -108,6 +117,7 @@ const Group = (props: GroupProps) => {
 							index={itemIndex}
 							defaultValue={item}
 							delRow={delRow}
+							configData={props.configData}
 						></Row>
 					);
 				})}
@@ -123,6 +133,7 @@ const Row = (props: RowProps) => {
 	const filterateContext = useContext(FilterateContext);
 
 	const handleChange = (key: string, val: string) => {
+		console.log(val, 127127);
 		filterateContext?.setRowData(props.groupIndex, props.index, {
 			...props.defaultValue,
 			[key]: val
@@ -137,9 +148,45 @@ const Row = (props: RowProps) => {
 		filterateContext?.addRow(props.groupIndex, props.index);
 	};
 
+	const displayRender = (
+		labels: string[],
+		selectedOptions: DefaultOptionType[]
+	) =>
+		labels.map((label, i) => {
+			const option = selectedOptions[i];
+			if (i === labels.length - 1) {
+				return <span key={option.value}>{label}</span>;
+			}
+			return <span key={option.value}>{label} / </span>;
+		});
+
+	const symbolSelect = [
+		{
+			label: '=',
+			value: '='
+		},
+
+		{
+			label: '>',
+			value: '>'
+		},
+		{
+			label: '<',
+			value: '<'
+		},
+		{
+			label: '>=',
+			value: '>='
+		},
+		{
+			label: '<=',
+			value: '<='
+		}
+	];
+
 	return (
 		<div className={styles['filter-box__row']}>
-			<Select
+			{/* <Select
 				className={styles['filter-box__row_item']}
 				defaultValue={props.defaultValue.value1}
 				placeholder="请选择"
@@ -150,17 +197,21 @@ const Row = (props: RowProps) => {
 					{ value: 'disabled', label: 'Disabled', disabled: true }
 				]}
 				onChange={(value) => handleChange('value1', value)}
+			/> */}
+			{/* 这里是级联选择，先选表，再选字段 */}
+			<Cascader
+				className={styles['filter-box__row_item']}
+				placeholder="请选择"
+				options={props.configData}
+				defaultValue={[]}
+				displayRender={displayRender}
+				onChange={(value) => handleChange('value1', value)}
 			/>
 			<Select
 				className={styles['filter-box__row_item']}
 				defaultValue={props.defaultValue.value2}
 				placeholder="请选择"
-				options={[
-					{ value: 'jack', label: 'Jack' },
-					{ value: 'lucy', label: 'Lucy' },
-					{ value: 'Yiminghe', label: 'yiminghe' },
-					{ value: 'disabled', label: 'Disabled', disabled: true }
-				]}
+				options={symbolSelect}
 				onChange={(value) => handleChange('value2', value)}
 			/>
 			<Input
@@ -193,7 +244,7 @@ const reducer = (state: FormData, action: any) => {
 			state.row.push([
 				{
 					_key: getHash(),
-					value1: '',
+					value1: [],
 					value2: '',
 					value3: ''
 				}
@@ -202,7 +253,7 @@ const reducer = (state: FormData, action: any) => {
 		case 'addRow':
 			state.row[action.groupIndex].splice(action.rowIndex + 1, 0, {
 				_key: getHash(),
-				value1: '',
+				value1: [],
 				value2: '',
 				value3: ''
 			});
@@ -220,7 +271,7 @@ const reducer = (state: FormData, action: any) => {
 					[
 						{
 							_key: getHash(),
-							value1: '',
+							value1: [],
 							value2: '',
 							value3: ''
 						}
@@ -239,6 +290,9 @@ const reducer = (state: FormData, action: any) => {
 
 export default () => {
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
+	const graph = useGraph();
+	const projectID = useGraphID();
+	const canvasData = graph.toJSON();
 	let initData = getValue && id && getValue(id);
 	if (isEmpty(getValue && id && getValue(id))) {
 		initData = cloneDeep(data);
@@ -247,12 +301,178 @@ export default () => {
 	// const [formData, setFormData] = useState(data);
 	const [indeterminate, setIndeterminate] = useState(false);
 	const [checkAll, setCheckAll] = useState(false);
+	const [configData, setConfigData] = useState([]);
+
+	//获取对应配置数据
+	useEffect(() => {
+		const params = {
+			id,
+			canvasJson: JSON.stringify({
+				content: canvasData
+			})
+		};
+
+		const r = [
+			{
+				tableName: 'tableName1',
+				tableCnName: '表名一',
+				fields: [
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段二',
+						id: '2',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					}
+				]
+			},
+			{
+				tableName: 'tableName2',
+				tableCnName: '表名二',
+				fields: [
+					{
+						fieldName: '字段一',
+						id: '1',
+						tableName: '',
+						dataType: '',
+						description: ''
+					},
+					{
+						fieldName: '字段二',
+						id: '2',
+						tableName: '',
+						dataType: '',
+						description: ''
+					}
+				]
+			}
+		];
+		setConfigData(formatCascaderData(r));
+		getCanvasConfig(params).then((res) => {
+			console.log(res, 315315);
+		});
+	}, []);
+
+	// 拼接为级联选择器形式数据
+	const formatCascaderData = (data: any) => {
+		const formatData = data.map((item) => {
+			const childrenArr = item.fields;
+			const children = [];
+			childrenArr?.forEach((el) => {
+				children.push({
+					label: el.description || el.fieldName, //展示描述没有展示名称
+					value: el.fieldName
+				});
+			});
+			return {
+				label: item.tableCnName,
+				value: item.tableName,
+				children: children
+			};
+		});
+		console.log(formatData, 361361);
+		return formatData;
+	};
 
 	const plainOptions = ['Apple', 'Pear', 'Orange'];
 
 	// 执行
 	const submit = () => {
-		// TODO
+		console.log(formData, 300300);
+		formData.row.map((item, index) => {
+			if (item && item.length) {
+				formData.row[index] = item.map((el, i) => {
+					return {
+						tableName: el.value1[0],
+						tableHeader: el.value1[1],
+						operator: el.value2,
+						value: el.value3,
+						dataType: 1 //需要从获取的数据对应读取
+					};
+				});
+			}
+		});
+
+		console.log(formData, 480480480);
+		const params = {
+			canvasJson: JSON.stringify({
+				content: canvasData,
+				configs: { [id]: formData }
+			}),
+			executeId: id, //当前选中元素id
+			projectId: projectID
+		};
+		console.log(params, 490490490);
+		getResult(params).then((res: any) => {
+			if (res.head && res.head.length) {
+				//生成columns
+				const colums = res.head.map((item, index) => {
+					return {
+						title: item,
+						dataIndex: item
+					};
+				});
+				// 根据表头和数据拼接成可渲染的表数据
+				// const tableData = transToTableData(res.head, res.data);
+				// updateTable(tableData, colums);
+			}
+		});
 	};
 
 	const set = () => {
@@ -340,6 +560,7 @@ export default () => {
 								key={rowGroupIndex}
 								index={rowGroupIndex}
 								rowGroup={rowGroup}
+								configData={configData}
 							></Group>
 						);
 					})}
@@ -366,11 +587,26 @@ export default () => {
 						</div>
 					</div>
 
-					<CheckboxGroup
+					{/* <CheckboxGroup
 						options={plainOptions}
 						value={formData.col}
 						onChange={onChange}
-					/>
+					/> */}
+					{configData.map((item, index) => {
+						return (
+							<div className={styles['checkbox-group-item']}>
+								<div>{item.label + ':'}</div>
+								<div>
+									<CheckboxGroup
+										className={styles['checkbox-group']}
+										options={item.children}
+										value={formData.col}
+										onChange={onChange}
+									/>
+								</div>
+							</div>
+						);
+					})}
 				</div>
 				<div className={styles.controlRow}>
 					<Button

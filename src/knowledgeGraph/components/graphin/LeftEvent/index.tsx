@@ -39,9 +39,9 @@ const DetailInfo = React.memo((props: DetailProps) => {
 	return (
 		<div className={styles['detail-info-box']}>
 			<div className={styles['node-detail-box']}>
-				{detailData.map((item) => {
+				{detailData.map((item, index) => {
 					return (
-						<div className={styles['node-detail-item']}>
+						<div className={styles['node-detail-item']} key={index}>
 							<span className={styles['detail-item-title']}>{item.label}:</span>
 							{item.value}
 						</div>

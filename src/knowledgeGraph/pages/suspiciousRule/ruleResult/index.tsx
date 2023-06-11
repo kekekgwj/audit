@@ -30,6 +30,7 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { getGraphByRule } from '@/api/knowLedgeGraph/rule';
 // import { getFillColorByType } from './custom-node/Base';
+import formatCustomNodes from '@/knoweledgeGraph/components/graphin/customNode';
 
 // 注册自定义节点
 
@@ -285,7 +286,7 @@ const GraphCom = () => {
 							//需要高亮
 							return {
 								...node,
-								type: 'Base',
+								type: 'lightNode',
 								style: {
 									keyshape: {
 										// fill: getFillColorByType(type)
@@ -300,7 +301,7 @@ const GraphCom = () => {
 							//设为默认色
 							return {
 								...node,
-								type: 'Base',
+								type: 'noLightNode',
 								config: {
 									type: 'noLightNode',
 									size: 100
@@ -312,7 +313,7 @@ const GraphCom = () => {
 					// 图谱数据
 					const graphData = {
 						edges: res.edges,
-						nodes: formatNodes
+						nodes: formatCustomNodes({ nodes: formatNodes })
 					};
 					setDate(graphData);
 				}
