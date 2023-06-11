@@ -122,23 +122,16 @@ const SQLEditor: React.FC = () => {
 	};
 
 	const handleExecute = async () => {
-		// TODO 请求后端接口
-
 		const res = await getResultBySql(sql);
 
-		console.log({ res });
+		const columns = res.head.map((item: string, index: number) => ({
+			title: item,
+			dataIndex: index
+		}));
 
 		// 设置结果的列配置
-		setColumns([
-			{
-				title: 'Age'
-				// dataIndex: 'age',
-			},
-			{
-				title: 'Age'
-				// dataIndex: 'age',
-			}
-		]);
+
+		setColumns(columns);
 		// 设置结果数据
 		setResult(res.data);
 		// 展示结果
@@ -147,8 +140,7 @@ const SQLEditor: React.FC = () => {
 
 	// 下载
 	const handleDownLoad = async () => {
-		const res = await exportBySql(sql);
-		console.log(res);
+		await exportBySql(sql, 'sql执行.xlsx');
 	};
 	return (
 		<div className={classes.container}>

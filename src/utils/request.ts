@@ -19,6 +19,25 @@ export async function http<T>(request: RequestInfo): Promise<T> {
 	}
 }
 
+export async function download(request: RequestInfo, fileName: string) {
+	try {
+		const response = await fetch(request);
+		const blob = await response.blob();
+		const url = window.URL.createObjectURL(new Blob([blob]));
+		const link = document.createElement('a');
+		link.style.display = 'none';
+		link.href = url;
+		link.setAttribute('download', fileName);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		window.URL.revokeObjectURL(url);
+	} catch (e) {
+		console.log(e);
+		return Promise.reject(e);
+	}
+}
+
 export async function get<T>(
 	path: string,
 	args: RequestInit = { method: 'get' }

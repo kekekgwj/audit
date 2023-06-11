@@ -262,6 +262,10 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 										}
 									}
 								},
+								tools: {
+									name: 'button-remove',
+									args: { distance: -40 }
+								},
 								zIndex: 0
 							});
 						},

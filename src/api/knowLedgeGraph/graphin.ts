@@ -56,7 +56,7 @@ export interface IGraphData {
 	nodes: IResNode[];
 }
 
-interface IResNode {
+export interface IResNode {
 	attrs: {
 		key: string;
 		label: string;
@@ -70,7 +70,7 @@ interface IResNode {
 	isCenter?: boolean;
 }
 
-interface IResEdge {
+export interface IResEdge {
 	attrs: {
 		key: string;
 		label: string;

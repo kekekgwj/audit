@@ -30,10 +30,8 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { getGraphByRule } from '@/api/knowLedgeGraph/rule';
 // import { getFillColorByType } from './custom-node/Base';
-import registerNodes from '@/knowledgeGraph/components/graphin/custom-node';
 
 // 注册自定义节点
-registerNodes('all');
 
 //功能组件
 const { Tooltip, ContextMenu, Legend } = Components;
