@@ -40,7 +40,7 @@ const TableItem: React.FC = ({ data }) => {
 								onMouseDown={(e) =>
 									startDrag &&
 									startDrag(e, {
-										label: table.tableCnName || table.tableName || '',
+										label: table.tableName || '',
 										image: TABLE,
 										type: IImageTypes.TABLE
 									})

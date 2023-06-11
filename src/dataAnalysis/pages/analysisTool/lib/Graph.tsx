@@ -390,7 +390,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 
 		const startDrag = (
 			e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-			{ label, image, type }: IImageShapes
+			{ label, image, type, labelCn }: IImageShapes
 		) => {
 			if (!graph) {
 				return;

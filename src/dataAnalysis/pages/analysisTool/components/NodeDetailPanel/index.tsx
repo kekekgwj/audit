@@ -16,7 +16,8 @@ import { CloseOutlined } from '@ant-design/icons';
 import { useGraph, useGraphContext, useGraphID } from '../../lib/Graph';
 import { IImageTypes, getNodeTypeById, syncData } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
-import { exportData } from '@/api/dataAnalysis/graph';
+import { exportData, getResult } from '@/api/dataAnalysis/graph';
+import { Divider } from 'rc-menu';
 const { DOWNLOAD } = ASSETS;
 interface IConfigContext {
 	type: IImageTypes | null;
@@ -84,13 +85,56 @@ const Panel: React.FC = () => {
 	const graph = useGraph();
 	const [data, columns, updateTable] = useTableSource();
 	const [showConfig, setShowConfig] = useState(true);
+	const [hasConfig, setHasConfig] = useState(true); //是否有配置项 table时没有配置项
 	const { curSelectedNode: id, showPanel = false } = state || {};
 	const projectID = useGraphID();
 	const { getConfigValue, saveConfigValue, resetConfigValue, getAllConfigs } =
 		useGraphContext();
-	// useEffect(() => {
-	// 	syncData(projectID, graph, getAllConfigs);
-	// }, [showPanel]);
+	useEffect(() => {
+		syncData(projectID, graph, getAllConfigs);
+	}, [showPanel]);
+	// 点击画布元素触发事件，获取对应表的数据
+	useEffect(() => {
+		//执行获取表数据
+		if (id) {
+			const canvasData = graph.toJSON();
+			console.log(canvasData, 1010101010);
+			const params = {
+				canvasJson: JSON.stringify({
+					content: canvasData
+				}),
+				executeId: id, //当前选中元素id
+				projectId: projectID
+			};
+			getResult(params).then((res: any) => {
+				if (res.head && res.head.length) {
+					//生成columns
+					const colums = res.head.map((item, index) => {
+						return {
+							title: item,
+							dataIndex: item
+						};
+					});
+					// 根据表头和数据拼接成可渲染的表数据
+					const tableData = transToTableData(res.head, res.data);
+					updateTable(tableData, colums);
+				}
+			});
+		}
+	}, [id]);
+	// 获取数据转换成表格数据
+	const transToTableData = (head: [], data: []) => {
+		const tableDataArr = [];
+		data.forEach((item) => {
+			const newObj = {};
+			item.forEach((el, i) => {
+				newObj[head[i]] = el;
+			});
+			tableDataArr.push(newObj);
+		});
+		return tableDataArr;
+	};
+
 	if (!showPanel || !graph) {
 		return null;
 	}
@@ -101,10 +145,10 @@ const Panel: React.FC = () => {
 
 	const downLoadData = async () => {
 		try {
-			const data = {
+			const params = {
 				projectId: projectID
 			};
-			const res = await exportData(data);
+			const res = await exportData(params);
 			console.log('导出结果：', res);
 		} catch {
 			console.log('err');
@@ -112,6 +156,15 @@ const Panel: React.FC = () => {
 	};
 
 	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
+	// useEffect(() => {
+	// 	//当为table节点时隐藏配置项
+	// 	if (clickNodeType == 'TABLE') {
+	// 		setHasConfig(false);
+	// 	} else {
+	// 		setHasConfig(true);
+	// 	}
+	// }, [clickNodeType]);
+	console.log(clickNodeType, 115115);
 
 	return (
 		<div className={classes.container}>
@@ -134,8 +187,60 @@ const Panel: React.FC = () => {
 					/>
 				</div>
 			</div>
+			<div>
+				{hasConfig ? (
+					<div
+						className={`${
+							showConfig ? classes.configPanel : classes.hideConfigPanel
+						}`}
+					>
+						<div className={classes.configPanel_title}>
+							{!showConfig ? (
+								<span
+									onClick={() => toggleConfig()}
+									className={classes.svgIcon}
+									style={{ marginRight: '5px' }}
+								>
+									<SvgIcon
+										name="closeArrow"
+										className={classes.closeIcon}
+									></SvgIcon>
+								</span>
+							) : null}
+							<span className={classes.configPanel_title_text}>参数配置</span>
+							{showConfig ? (
+								<span
+									onClick={() => toggleConfig()}
+									className={classes.svgIcon}
+								>
+									<SvgIcon
+										name="openArrow"
+										className={classes.closeIcon}
+									></SvgIcon>
+								</span>
+							) : null}
+						</div>
+						{showConfig ? (
+							<div className={classes.configWrapper}>
+								<ConfigContext.Provider
+									value={{
+										type: clickNodeType,
+										id: id,
+										initValue: null,
+										getValue: getConfigValue,
+										setValue: saveConfigValue,
+										resetValue: resetConfigValue
+									}}
+								>
+									<ConfigPanel key={id} />
+								</ConfigContext.Provider>
+							</div>
+						) : null}
+					</div>
+				) : null}
+			</div>
 
-			<div
+			{/* <div
 				className={`${
 					showConfig ? classes.configPanel : classes.hideConfigPanel
 				}`}
@@ -176,7 +281,7 @@ const Panel: React.FC = () => {
 						</ConfigContext.Provider>
 					</div>
 				) : null}
-			</div>
+			</div> */}
 		</div>
 	);
 };
