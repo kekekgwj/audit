@@ -15,7 +15,7 @@ export enum IImageTypes {
 export const diffCells = (
 	graph: Graph | null,
 	cells: Metadata[] = [],
-	type: string = 'node'
+	type = 'node'
 ) => {
 	const create: C[] = [];
 	const update: U[] = [];
@@ -264,6 +264,7 @@ export interface IImageShapes {
 	label: string;
 	image: string;
 	type: IImageTypes;
+	labelCn?: string;
 }
 
 import ASSETS from '../assets/index';
