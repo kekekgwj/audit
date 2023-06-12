@@ -109,9 +109,7 @@ interface IExportData {
 }
 interface IExportDataResponse {}
 export function exportData(data: IExportData): Promise<IExportDataResponse> {
-	return get(
-		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/export', data)
-	);
+	return post(API_PREFIX + '/blade-tool/dataAnalysis/export', data);
 }
 
 //获取工具组件配置项

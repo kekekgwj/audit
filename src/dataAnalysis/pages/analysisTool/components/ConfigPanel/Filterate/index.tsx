@@ -372,7 +372,6 @@ export default () => {
 		formData.row.map((item, index) => {
 			if (item && item.length) {
 				formData.row[index] = item.map((el, i) => {
-					console.log(el.value1[1], 435435435);
 					return {
 						tableName: el.value1[0],
 						tableHeader: el.value1[1]?.split('#')[0],
@@ -424,9 +423,7 @@ export default () => {
 		};
 		console.log(params, 490490490);
 		getResult(params).then((res: any) => {
-			if (res.head && res.head.length) {
-				updateTable(res.data, res.head);
-			}
+			updateTable(res.data, res.head);
 		});
 	};
 
