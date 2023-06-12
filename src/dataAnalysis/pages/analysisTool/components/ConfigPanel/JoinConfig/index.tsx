@@ -4,6 +4,7 @@ import classes from './index.module.less';
 import { useConfigContextValue } from '../../NodeDetailPanel';
 import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
+import { syncData } from '../../../lib/utils';
 
 interface ISelectRowProps {
 	value?: any;
@@ -176,6 +177,7 @@ const SelectGroup: React.FC = () => {
 	const [form] = Form.useForm();
 	const { id, getValue, setValue, resetValue, updateTable } =
 		useConfigContextValue();
+	const { getAllConfigs, syncGraph } = useGraphContext();
 	const formInitValue = (getValue && id && getValue(id)) || {};
 
 	const [leftOptions, setLeftSelect] = useState([]);
@@ -247,11 +249,11 @@ const SelectGroup: React.FC = () => {
 		const { leftTableName, rightTableName } = tableNames as unknown as any;
 		value.leftTableName = leftTableName;
 		value.rightTableName = rightTableName;
-		console.log(ref.current, value, 16116161);
+
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
-				configs: { [id]: value }
+				configs: getAllConfigs()
 			}),
 			executeId: id, //当前选中元素id
 			projectId: projectID
@@ -260,10 +262,7 @@ const SelectGroup: React.FC = () => {
 		getResult(params).then((res: any) => {
 			updateTable(res.data, res.head);
 		});
-		// if (!id || !setValue) {
-		// 	return;
-		// }
-		// setValue(id, value);
+		syncGraph();
 	};
 	const handleOnDelete = (key: number) => {
 		const list = form.getFieldValue('connectionSentences') || [];

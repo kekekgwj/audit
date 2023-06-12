@@ -18,7 +18,6 @@ import {
 	IImageTypes,
 	formatDataSource,
 	getNodeTypeById,
-	syncData,
 	useInitRender
 } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
@@ -54,6 +53,29 @@ export const useConfigContextValue = () => {
 export const useUpdateTable = () => {
 	return useContext(ConfigContext).updateTable;
 };
+
+export const useExecuteComponentNUpdateTable = (
+	id: string,
+	configValue: any
+) => {
+	// const { graph, syncGraph, getAllConfigs } = useGraphContext();
+	// const projectID = useGraphID();
+	// const canvasData = graph.toJSON();
+	// const updateTable = useUpdateTable();
+	// const params = {
+	// 	canvasJson: JSON.stringify({
+	// 		content: canvasData,
+	// 		// configs: { [id]: configValue }
+	// 		configs: getAllConfigs()
+	// 	}),
+	// 	executeId: id, //当前选中元素id
+	// 	projectId: projectID
+	// };
+	// getResult(params).then((res: any) => {
+	// 	updateTable(res.data, res.head);
+	// });
+	// syncGraph();
+};
 const useTableSource = () => {
 	const [data, setData] = useState([]);
 	const [columns, setColumns] = useState([]);
@@ -76,13 +98,18 @@ const Panel: React.FC = () => {
 	const { curSelectedNode: id, showPanel = false } = state || {};
 	const executeType = [IImageTypes.TABLE, IImageTypes.END];
 	const projectID = useGraphID();
-	const { getConfigValue, saveConfigValue, resetConfigValue, getAllConfigs } =
-		useGraphContext();
+	const {
+		getConfigValue,
+		saveConfigValue,
+		resetConfigValue,
+		syncGraph,
+		getAllConfigs
+	} = useGraphContext();
 
 	const isInit = useInitRender();
 
 	useEffect(() => {
-		!isInit && syncData(projectID, graph, getAllConfigs);
+		!isInit && syncGraph();
 	}, [showPanel]);
 	// 点击画布元素触发事件，获取对应表的数据
 	useEffect(() => {
@@ -91,13 +118,12 @@ const Panel: React.FC = () => {
 			return;
 		}
 		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
-
 		if (executeType.includes(curType)) {
 			const canvasData = graph.toJSON();
-
 			const params = {
 				canvasJson: JSON.stringify({
-					content: canvasData
+					content: canvasData,
+					configs: getAllConfigs()
 				}),
 				executeId: id, //当前选中元素id
 				projectId: projectID

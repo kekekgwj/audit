@@ -36,6 +36,7 @@ interface IGraphConfig {
 	resetConfigValue: (id: string) => void;
 	getAllConfigs: () => void;
 	setAllConfigs: (value: any) => void;
+	syncGraph: () => void;
 }
 export const useGraph = () => {
 	const { graph } = useContext(GraphContext) || {};
@@ -103,6 +104,9 @@ export const GraphContext = createContext<IGraphContext>({
 	},
 	setAllConfigs: function (value: any): void {
 		throw new Error('Function not implemented.');
+	},
+	syncGraph: function (): void {
+		throw new Error('Function not implemented.');
 	}
 });
 import classes from './graph.module.less';
@@ -113,10 +117,11 @@ import {
 	getNodeTypeById,
 	handleValidateNode,
 	imageShapes,
+	syncData,
 	validateConnectionRule
 } from './utils';
 import { useGraphPageInfo } from './hooks';
-import { config } from 'process';
+
 interface Props {
 	className?: string;
 	container?: HTMLDivElement;
@@ -459,7 +464,9 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			});
 			dnd?.start(node, e.nativeEvent as any);
 		};
-
+		const syncGraph = () => {
+			syncData(projectId, graph, getAllConfigs());
+		};
 		//保存为审计模板
 		const saveAsAuditTem = () => {
 			setOpenSave(true);
@@ -490,7 +497,8 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 					getConfigValue,
 					saveConfigValue,
 					resetConfigValue,
-					getAllConfigs
+					getAllConfigs,
+					syncGraph
 				}}
 			>
 				<div className={classes['top-breadcrumb']}>

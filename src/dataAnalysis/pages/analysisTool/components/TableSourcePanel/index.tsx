@@ -102,7 +102,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 			console.error(e);
 		}
 	};
-	// const data1 = {
+
 	// 	title: '系统数据',
 	// 	tables: [
 	// 		{

@@ -329,7 +329,7 @@ export const saveData: (params: ISaveData) => void = ({
 export const syncData = (
 	projectID: number | null,
 	graph: X6.Graph | null,
-	getAllConfigs: () => void
+	configs: any
 ) => {
 	if (!projectID || !graph) {
 		return;
@@ -337,7 +337,7 @@ export const syncData = (
 	saveData({
 		canvas: graph?.toJSON(),
 		projectId: projectID,
-		configs: getAllConfigs()
+		configs: configs
 	});
 };
 export const useInitRender = () => {
