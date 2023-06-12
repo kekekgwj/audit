@@ -95,8 +95,9 @@ const Panel: React.FC = () => {
 	}, [showPanel]);
 	// 点击画布元素触发事件，获取对应表的数据
 	useEffect(() => {
+		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
 		//执行获取表数据
-		if (id) {
+		if (id && curType == 'TABLE') {
 			const canvasData = graph.toJSON();
 			console.log(canvasData, 1010101010);
 			const params = {
@@ -178,7 +179,7 @@ const Panel: React.FC = () => {
 					/>
 				</div>
 			</div>
-			<div style={{ overflowY: 'auto' }}>
+			<div>
 				{clickNodeType != 'TABLE' ? (
 					<div
 						className={`${

@@ -193,19 +193,20 @@ const SelectGroup: React.FC = () => {
 
 		getCanvasConfig(params).then((res) => {
 			console.log(res, 164164164);
-
 			// 获取数据第一条作为左表，第二条为右表
 			const configData1 = res[0] || [];
 			const configData2 = res[1] || [];
+			setLeftTableName(res[0].tableName);
+			setRightTableName(res[1].tableName);
 			// 获取下拉选项
-			const leftOptions = configData1.fields.map((item, index) => {
+			const leftData = configData1.fields.map((item, index) => {
 				return {
 					label: item.description || item.fieldName, //展示描述没有展示名称
 					value: item.fieldName
 				};
 			});
 
-			const rihthOptions = configData2?.fields?.map((item, index) => {
+			const rightData = configData2?.fields?.map((item, index) => {
 				return {
 					label: item.description || item.fieldName, //展示描述没有展示名称
 					value: item.fieldName
@@ -215,7 +216,6 @@ const SelectGroup: React.FC = () => {
 				leftTableName: configData1?.tableName,
 				rightTableName: configData2?.tableName
 			};
-			console.log(`ref.current['tableNames']`, ref.current['tableNames']);
 			setLeftSelect(leftOptions);
 			setRightSelect(rihthOptions);
 		});
