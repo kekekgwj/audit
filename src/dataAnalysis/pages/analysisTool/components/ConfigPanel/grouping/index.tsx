@@ -5,7 +5,7 @@ import { DelIcon } from '../sort/icon';
 import Icon, {
 	CustomIconComponentProps
 } from '@ant-design/icons/lib/components/Icon';
-import { useConfigContextValue } from '../../NodeDetailPanel';
+import { useConfigContextValue, useUpdateTable } from '../../NodeDetailPanel';
 import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 const { Panel } = Collapse;
@@ -17,12 +17,13 @@ interface SortProps {
 	label: string;
 }
 interface List {
-	title: string;
+	tableName: string;
 	key: string;
 	list: {
 		title: string;
 		key: string;
 	}[];
+	tableRealName: string;
 }
 
 const layout = {
@@ -57,7 +58,15 @@ const HeartIcon = (props: Partial<CustomIconComponentProps>) => (
 const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 	const [dataList, setDataList] = useState<ICondition[]>(value || []);
 
-	const setData = (item: { key: string; title: string }, tableName: string) => {
+	const setData = (
+		item: {
+			key: string;
+			title: string;
+		},
+		tableRealName: string,
+		tableCnName: string
+	) => {
+		console.log('item', item);
 		if (
 			!dataList.some((res) => {
 				return res.key == item.key;
@@ -68,7 +77,7 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 				{
 					title: item.title,
 					key: item.key,
-					tableName
+					tableName: tableRealName
 				}
 			]);
 		}
@@ -127,15 +136,17 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 					)}
 				>
 					{option.map((item, index) => {
+						const { tableRealName, tableName } = item;
+
 						return (
-							<Panel header={item.title} key={index + 1}>
+							<Panel header={tableName} key={index + 1}>
 								{item.list.map((items, _) => {
 									return (
 										<div
 											key={items.title}
 											className={classes.sortTxt}
 											onClick={() => {
-												setData(items, item.title);
+												setData(items, tableRealName, tableName);
 											}}
 										>
 											<span>{items.title}</span>
@@ -195,7 +206,8 @@ const Grouping: FC = () => {
 				});
 			});
 			return {
-				title: item.tableCnName,
+				tableRealName: item.tableName,
+				tableName: item.tableCnName,
 				key: index,
 				list: list
 			};
@@ -204,8 +216,9 @@ const Grouping: FC = () => {
 	};
 	const [groupData, setGroupData] = useState<List[]>();
 	const [accordData, setAccordData] = useState<List[]>();
+	const updateTable = useUpdateTable();
 
-	const onFinish = (values: any) => {
+	const onFinish = async (values: any) => {
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
@@ -214,20 +227,8 @@ const Grouping: FC = () => {
 			executeId: id, //当前选中元素id
 			projectId: projectID
 		};
-		getResult(params).then((res: any) => {
-			if (res.head && res.head.length) {
-				//生成columns
-				const colums = res.head.map((item, index) => {
-					return {
-						title: item,
-						dataIndex: item
-					};
-				});
-				// 根据表头和数据拼接成可渲染的表数据
-				// const tableData = transToTableData(res.head, res.data);
-				// updateTable(tableData, colums);
-			}
-		});
+		const { data, head } = await getResult(params);
+		updateTable(data, head);
 	};
 	const handleOnChange = (value: any) => {
 		if (!id || !setValue) {

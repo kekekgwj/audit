@@ -16,6 +16,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { useGraph, useGraphContext, useGraphID } from '../../lib/Graph';
 import {
 	IImageTypes,
+	formatDataSource,
 	getNodeTypeById,
 	syncData,
 	useInitRender
@@ -50,12 +51,17 @@ const ConfigContext = createContext<IConfigContext>({
 export const useConfigContextValue = () => {
 	return useContext(ConfigContext);
 };
+export const useUpdateTable = () => {
+	return useContext(ConfigContext).updateTable;
+};
 const useTableSource = () => {
 	const [data, setData] = useState([]);
 	const [columns, setColumns] = useState([]);
+
 	const updateTable = (updateData: any, updateColumn: any) => {
-		setData(updateData);
-		setColumns(updateColumn);
+		const { data, columns } = formatDataSource(updateData, updateColumn);
+		setData(data);
+		setColumns(columns);
 	};
 	return { data, columns, updateTable };
 };
@@ -64,6 +70,7 @@ const Panel: React.FC = () => {
 	const state = useSelector((state: IRootState) => state.dataAnalysis);
 	const graph = useGraph();
 	const { data, columns, updateTable } = useTableSource();
+
 	const [showConfig, setShowConfig] = useState(true);
 
 	const { curSelectedNode: id, showPanel = false } = state || {};
@@ -85,44 +92,32 @@ const Panel: React.FC = () => {
 		}
 		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
 
-		if (executeType.includes(curType)) {
-			const canvasData = graph.toJSON();
+		// if (executeType.includes(curType)) {
+		// 	const canvasData = graph.toJSON();
 
-			const params = {
-				canvasJson: JSON.stringify({
-					content: canvasData
-				}),
-				executeId: id, //当前选中元素id
-				projectId: projectID
-			};
-			getResult(params).then((res: any) => {
-				if (res.head && res.head.length) {
-					//生成columns
-					const colums = res.head.map((item, index) => {
-						return {
-							title: item,
-							dataIndex: item
-						};
-					});
-					// 根据表头和数据拼接成可渲染的表数据
-					const tableData = transToTableData(res.head, res.data);
-					updateTable(tableData, colums);
-				}
-			});
-		}
+		// 	const params = {
+		// 		canvasJson: JSON.stringify({
+		// 			content: canvasData
+		// 		}),
+		// 		executeId: id, //当前选中元素id
+		// 		projectId: projectID
+		// 	};
+		// 	getResult(params).then((res: any) => {
+		// 		if (res.head && res.head.length) {
+		// 			//生成columns
+		// 			const colums = res.head.map((item, index) => {
+		// 				return {
+		// 					title: item,
+		// 					dataIndex: item
+		// 				};
+		// 			});
+		// 			// 根据表头和数据拼接成可渲染的表数据
+		// 			const tableData = transToTableData(res.head, res.data);
+		// 			updateTable(tableData, colums);
+		// 		}
+		// 	});
+		// }
 	}, [id]);
-	// 获取数据转换成表格数据
-	const transToTableData = (head: [], data: []) => {
-		const tableDataArr = [];
-		data.forEach((item) => {
-			const newObj = {};
-			item.forEach((el, i) => {
-				newObj[head[i]] = el;
-			});
-			tableDataArr.push(newObj);
-		});
-		return tableDataArr;
-	};
 
 	if (!showPanel || !graph) {
 		return null;

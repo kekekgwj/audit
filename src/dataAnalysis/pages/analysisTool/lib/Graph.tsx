@@ -54,7 +54,6 @@ export const useNodeConfigValue: () => IGraphConfig = () => {
 	const ref = React.useRef<Record<string, object>>({});
 
 	const getConfigValue = useCallback((id: string) => {
-		console.log('ref.current', ref.current);
 		if (ref.current) {
 			return ref.current[id];
 		} else {

@@ -347,3 +347,30 @@ export const useInitRender = () => {
 	}, []);
 	return ref.current.init;
 };
+
+export const formatDataSource = (data: any[], head: string[]) => {
+	// 获取数据转换成表格数据
+
+	interface IColumn {
+		title: string;
+		dataIndex: string;
+		key: string;
+	}
+	const columns: IColumn[] = head.map((item, index) => {
+		return {
+			title: item,
+			dataIndex: item,
+			key: item
+		};
+	});
+	const columnsName = columns.map((c) => c.dataIndex);
+	const formatData = data.map((row) => {
+		const dataObj: Record<string, any> = {};
+		row.forEach((v, index) => {
+			dataObj[columnsName[index]] = v;
+		});
+		return dataObj;
+	});
+
+	return { data: formatData, columns };
+};
