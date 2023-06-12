@@ -386,10 +386,7 @@ export default (props: Props) => {
 								initialValue={1}
 								className={styles['filter-form-item']}
 							>
-								<Select>
-									<Select.Option value={1}>1</Select.Option>
-									<Select.Option value={2}>2</Select.Option>
-								</Select>
+								<InputNumber min={1} max={2} />
 							</Form.Item>
 						</div>
 
