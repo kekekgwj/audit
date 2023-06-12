@@ -52,9 +52,9 @@ const mockOption = [
 ];
 const SortInput: FC<SortProps> = ({ value, onChange, dataList }) => {
 	console.log('sort initvalue', value);
-	console.log(dataList, 55555);
+	console.log(dataList, mockOption, 55555);
 	const [optionList, setOptionList] = useState<List[]>(value || mockOption);
-	// const [optionList, setOptionList] = useState<List[]>(value || dataList);
+	// const [optionList, setOptionList] = useState<List[]>(dataList);
 	//通过传入的状态值和下标修改dataList的排序状态
 	const setSortStatus = (
 		data: { isUp: boolean; isDown: boolean },
@@ -205,6 +205,29 @@ const Sort: FC = () => {
 
 	const onFinish = (values: any) => {
 		console.log(values);
+		const params = {
+			canvasJson: JSON.stringify({
+				content: canvasData,
+				configs: { [id]: values.sorting }
+			}),
+			executeId: id, //当前选中元素id
+			projectId: projectID
+		};
+		console.log(params, 216216);
+		getResult(params).then((res: any) => {
+			if (res.head && res.head.length) {
+				//生成columns
+				const colums = res.head.map((item, index) => {
+					return {
+						title: item,
+						dataIndex: item
+					};
+				});
+				// 根据表头和数据拼接成可渲染的表数据
+				// const tableData = transToTableData(res.head, res.data);
+				// updateTable(tableData, colums);
+			}
+		});
 	};
 
 	// 获取配置项
@@ -311,7 +334,7 @@ const Sort: FC = () => {
 			}
 		];
 		setDataList(transData(res));
-	});
+	}, []);
 
 	//转数据形式
 	const transData = (data: any) => {
@@ -359,7 +382,7 @@ const Sort: FC = () => {
 					<SortInput
 						onChange={handleSortChange}
 						value={formInitValue}
-						// dataList={dataList}
+						dataList={dataList}
 					></SortInput>
 				</Form.Item>
 			</div>
