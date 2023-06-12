@@ -54,7 +54,12 @@ export const useNodeConfigValue: () => IGraphConfig = () => {
 	const ref = React.useRef<Record<string, object>>({});
 
 	const getConfigValue = useCallback((id: string) => {
-		return ref.current[id] || null;
+		console.log('ref.current', ref.current);
+		if (ref.current) {
+			return ref.current[id];
+		} else {
+			null;
+		}
 	}, []);
 	const saveConfigValue = useCallback((id: string, value: any) => {
 		ref.current[id] = value;
@@ -348,7 +353,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 					const { canvasJson } = res;
 					const { content, configs } = JSON.parse(canvasJson);
 					graph.fromJSON(content);
-					setAllConfigs(configs);
+					setAllConfigs(configs || {});
 				})();
 			} else if (pathName == '审计模板') {
 				(async () => {
@@ -358,7 +363,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 					const { canvasJson } = res;
 					const { content, configs } = JSON.parse(canvasJson);
 					graph.fromJSON(content);
-					setAllConfigs(configs);
+					setAllConfigs(configs || {});
 				})();
 			}
 		}, [projectId, graph]);
