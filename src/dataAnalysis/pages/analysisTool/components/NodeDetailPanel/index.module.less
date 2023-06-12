@@ -7,6 +7,7 @@
 	display: flex;
 	background-color: #fff;
 	.data {
+		width: 100%;
 		position: relative;
 		flex: 1;
 		.download {
@@ -26,6 +27,7 @@
 			}
 		}
 		.tableWrapper {
+			width: 100%;
 			padding: 21px;
 			overflow: auto;
 			height: calc(100% - 21px - 50px + 15px);
@@ -68,6 +70,7 @@
 			width: 600px;
 			padding: 20px;
 			overflow: auto;
+
 			height: calc(100% - 21px - 50px + 15px);
 		}
 		.closeIcon {
@@ -98,5 +101,10 @@
 		display: flex;
 		align-items: center;
 		cursor: pointer;
+	}
+	:global {
+		.ant-table-wrapper .ant-table-thead > tr > th {
+			min-width: 100px !important;
+		}
 	}
 }

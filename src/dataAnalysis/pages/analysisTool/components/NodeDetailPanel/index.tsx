@@ -105,6 +105,9 @@ const Panel: React.FC = () => {
 			getResult(params).then((res: any) => {
 				updateTable(res.data, res.head);
 			});
+		} else {
+			//需要将表数据清空
+			updateTable([], []);
 		}
 	}, [id]);
 

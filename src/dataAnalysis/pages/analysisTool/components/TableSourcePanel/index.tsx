@@ -42,7 +42,8 @@ const TableItem: React.FC = ({ data }) => {
 									startDrag(e, {
 										label: table.tableName || '',
 										image: TABLE,
-										type: IImageTypes.TABLE
+										type: IImageTypes.TABLE,
+										cnLabel: table.tableCnName || ''
 									})
 								}
 							>

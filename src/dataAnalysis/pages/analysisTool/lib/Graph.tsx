@@ -397,7 +397,7 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 
 		const startDrag = (
 			e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-			{ label, image, type, labelCn }: IImageShapes
+			{ label, image, type }: IImageShapes
 		) => {
 			if (!graph) {
 				return;
@@ -405,7 +405,6 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			const node = graph?.createNode({
 				inherit: 'rect',
 				width: type === IImageTypes.TABLE ? label.length * 14 + 40 : 36,
-				// height: 38,
 				height: type === IImageTypes.TABLE ? 38 : 58,
 				label: label,
 				markup: [
