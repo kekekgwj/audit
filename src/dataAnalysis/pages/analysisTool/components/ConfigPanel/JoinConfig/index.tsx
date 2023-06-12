@@ -1,5 +1,5 @@
 import { Button, Form, Select } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import classes from './index.module.less';
 import { useConfigContextValue } from '../../NodeDetailPanel';
 import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
@@ -23,6 +23,8 @@ interface IRowCondition {
 interface IFilterAll {
 	connectionSentences: IRowCondition[];
 	connectionType: string;
+	leftTableName: string;
+	rightTableName: string;
 }
 const AddIcon = (
 	<svg
@@ -172,13 +174,14 @@ const SelectGroup: React.FC = () => {
 	const projectID = useGraphID();
 	const canvasData = graph.toJSON();
 	const [form] = Form.useForm();
-	const { id, getValue, setValue, resetValue } = useConfigContextValue();
+	const { id, getValue, setValue, resetValue, updateTable } =
+		useConfigContextValue();
 	const formInitValue = (getValue && id && getValue(id)) || {};
 
 	const [leftOptions, setLeftSelect] = useState([]);
 	const [rightOptions, setRightSelect] = useState([]);
-	const [leftTableName, setLeftTableName] = useState();
-	const [rightTableName, setRightTableName] = useState();
+
+	const ref = useRef<Record<string, object>>({});
 
 	//获取配置项
 	useEffect(() => {
@@ -189,142 +192,31 @@ const SelectGroup: React.FC = () => {
 			})
 		};
 
-		// 测试数据
-		// const res = [
-		// 	{
-		// 		tableName: 'tableName1',
-		// 		tableCnName: '表名一',
-		// 		fields: [
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段二',
-		// 				id: '2',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			}
-		// 		]
-		// 	},
-		// 	{
-		// 		tableName: 'tableName2',
-		// 		tableCnName: '表名二',
-		// 		fields: [
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段二',
-		// 				id: '2',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			}
-		// 		]
-		// 	}
-		// ];
-		// const configData1 = res[0] || [];
-		// const configData2 = res[1] || [];
-		// setLeftTableName(res[0].tableName);
-		// setRightTableName(res[0].tableName);
-		// // 获取下拉选项
-		// const leftData = configData1.fields.map((item, index) => {
-		// 	return {
-		// 		label: item.description || item.fieldName, //展示描述没有展示名称
-		// 		value: item.fieldName
-		// 	};
-		// });
-
-		// const rightData = configData2?.fields?.map((item, index) => {
-		// 	return {
-		// 		label: item.description || item.fieldName, //展示描述没有展示名称
-		// 		value: item.fieldName
-		// 	};
-		// });
-
-		// setLeftSelect(leftData);
-		// setRightSelect(rightData);
-
-		// console.log(leftOptions, rightOptions, 275275275);
 		getCanvasConfig(params).then((res) => {
 			console.log(res, 164164164);
-
 			// 获取数据第一条作为左表，第二条为右表
 			const configData1 = res[0] || [];
 			const configData2 = res[1] || [];
+			setLeftTableName(res[0].tableName);
+			setRightTableName(res[1].tableName);
 			// 获取下拉选项
-			const leftOptions = configData1.fields.map((item, index) => {
+			const leftData = configData1.fields.map((item, index) => {
 				return {
 					label: item.description || item.fieldName, //展示描述没有展示名称
 					value: item.fieldName
 				};
 			});
 
-			const rihthOptions = configData2?.fields?.map((item, index) => {
+			const rightData = configData2?.fields?.map((item, index) => {
 				return {
 					label: item.description || item.fieldName, //展示描述没有展示名称
 					value: item.fieldName
 				};
 			});
-
+			ref.current['tableNames'] = {
+				leftTableName: configData1?.tableName,
+				rightTableName: configData2?.tableName
+			};
 			setLeftSelect(leftOptions);
 			setRightSelect(rihthOptions);
 		});
@@ -352,9 +244,12 @@ const SelectGroup: React.FC = () => {
 				}
 			);
 		}
+
+		const tableNames = ref.current['tableNames'];
+		const { leftTableName, rightTableName } = tableNames as unknown as any;
 		value.leftTableName = leftTableName;
 		value.rightTableName = rightTableName;
-		console.log(value, 16116161);
+		console.log(ref.current, value, 16116161);
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,

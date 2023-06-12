@@ -30,7 +30,7 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { getGraphByRule } from '@/api/knowLedgeGraph/rule';
 // import { getFillColorByType } from './custom-node/Base';
-import formatCustomNodes from '@/knowledgeGraph/components/graphin/customNode';
+import formatCustomNodes from '@graph/components/graphin/customNode';
 
 // 注册自定义节点
 

@@ -6,6 +6,8 @@ import Icon, {
 	CustomIconComponentProps
 } from '@ant-design/icons/lib/components/Icon';
 import { useConfigContextValue } from '../../NodeDetailPanel';
+import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
+import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 const { Panel } = Collapse;
 const { Option } = Select;
 interface SortProps {
@@ -159,56 +161,73 @@ interface IFormValue {
 	funcType: string;
 }
 const Grouping: FC = () => {
+	const graph = useGraph();
+	const projectID = useGraphID();
+	const canvasData = graph?.toJSON();
 	const [form] = Form.useForm();
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
-	console.log('formInitValue', formInitValue);
-	const [groupData, setGroupData] = useState<List[]>([
-		//分组依据列表数据
-		{
-			title: '数据表1',
-			key: '0',
-			list: [
-				{ title: '字段1', key: '0-1' },
-				{ title: '字段2', key: '0-2' }
-			]
-		},
-		{
-			title: '数据表2',
-			key: '1',
-			list: [{ title: '字段2', key: '1-1' }]
-		},
-		{
-			title: '数据表3',
-			key: '2',
-			list: [{ title: '字段3', key: '2-1' }]
-		}
-	]);
 
-	const [accordData, setAccordData] = useState<List[]>([
-		//列数据
-		{
-			title: '数据表1',
-			key: '0',
-			list: [
-				{ title: '字段1', key: '0-1' },
-				{ title: '字段2', key: '0-2' }
-			]
-		},
-		{
-			title: '数据表2',
-			key: '1',
-			list: [{ title: '字段2', key: '1-1' }]
-		},
-		{
-			title: '数据表3',
-			key: '2',
-			list: [{ title: '字段3', key: '2-1' }]
-		}
-	]);
+	const getConfig = async () => {
+		const params = {
+			id,
+			canvasJson: JSON.stringify({
+				content: canvasData
+			})
+		};
+		const res = await getCanvasConfig(params);
+		setGroupData(transData(res));
+		setAccordData(transData(res));
+	};
+	//获取配置项数据
+	useEffect(() => {
+		getConfig();
+	}, []);
+
+	const transData = (data: any) => {
+		const formatData = data.map((item, index) => {
+			const listArr = item.fields;
+			const list = [];
+			listArr?.forEach((el, i) => {
+				list.push({
+					title: el.fieldName,
+					key: i
+				});
+			});
+			return {
+				title: item.tableCnName,
+				key: index,
+				list: list
+			};
+		});
+		return formatData;
+	};
+	const [groupData, setGroupData] = useState<List[]>();
+	const [accordData, setAccordData] = useState<List[]>();
 
 	const onFinish = (values: any) => {
-		console.log(values);
+		const params = {
+			canvasJson: JSON.stringify({
+				content: canvasData,
+				configs: { [id]: values }
+			}),
+			executeId: id, //当前选中元素id
+			projectId: projectID
+		};
+		getResult(params).then((res: any) => {
+			if (res.head && res.head.length) {
+				//生成columns
+				const colums = res.head.map((item, index) => {
+					return {
+						title: item,
+						dataIndex: item
+					};
+				});
+				// 根据表头和数据拼接成可渲染的表数据
+				// const tableData = transToTableData(res.head, res.data);
+				// updateTable(tableData, colums);
+			}
+		});
 	};
 	const handleOnChange = (value: any) => {
 		if (!id || !setValue) {
