@@ -92,31 +92,20 @@ const Panel: React.FC = () => {
 		}
 		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
 
-		// if (executeType.includes(curType)) {
-		// 	const canvasData = graph.toJSON();
+		if (executeType.includes(curType)) {
+			const canvasData = graph.toJSON();
 
-		// 	const params = {
-		// 		canvasJson: JSON.stringify({
-		// 			content: canvasData
-		// 		}),
-		// 		executeId: id, //当前选中元素id
-		// 		projectId: projectID
-		// 	};
-		// 	getResult(params).then((res: any) => {
-		// 		if (res.head && res.head.length) {
-		// 			//生成columns
-		// 			const colums = res.head.map((item, index) => {
-		// 				return {
-		// 					title: item,
-		// 					dataIndex: item
-		// 				};
-		// 			});
-		// 			// 根据表头和数据拼接成可渲染的表数据
-		// 			const tableData = transToTableData(res.head, res.data);
-		// 			updateTable(tableData, colums);
-		// 		}
-		// 	});
-		// }
+			const params = {
+				canvasJson: JSON.stringify({
+					content: canvasData
+				}),
+				executeId: id, //当前选中元素id
+				projectId: projectID
+			};
+			getResult(params).then((res: any) => {
+				updateTable(res.data, res.head);
+			});
+		}
 	}, [id]);
 
 	if (!showPanel || !graph) {
