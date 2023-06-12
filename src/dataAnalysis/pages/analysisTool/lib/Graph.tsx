@@ -85,7 +85,7 @@ export const GraphContext = createContext<IGraphContext>({
 	graph: null,
 	startDrag: function (
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-		{ label, image, type }: IImageShapes
+		{ label, image, type, labelCn }: IImageShapes
 	): void {
 		throw new Error('Function not implemented.');
 	},
@@ -407,12 +407,15 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 			if (!graph) {
 				return;
 			}
+
+			const text = labelCn || label;
+
 			const node = graph?.createNode({
 				inherit: 'rect',
-				width: type === IImageTypes.TABLE ? label.length * 14 + 40 : 36,
+				width: type === IImageTypes.TABLE ? text.length * 14 + 40 : 36,
 				// height: 38,
 				height: type === IImageTypes.TABLE ? 38 : 58,
-				label: label,
+				label: text,
 				markup: [
 					{
 						tagName: 'rect',
@@ -457,7 +460,8 @@ export const Graph = forwardRef<X6.Graph, X6.Graph.Options & Props>(
 						fill: '#18181F'
 					},
 					custom: {
-						type: type
+						type: type,
+						name: label
 					}
 				},
 				ports: { ...ports }
