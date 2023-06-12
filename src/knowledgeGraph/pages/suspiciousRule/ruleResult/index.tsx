@@ -262,11 +262,11 @@ const GraphCom = () => {
 			});
 			setLoading(false);
 			//是否命中数据
-			setHit(res.isHit);
+			setHit(res.hit);
 			//是否有表
 			setHasList(res.hasList);
 			//命中数据后续处理
-			if (res.isHit) {
+			if (res.hit) {
 				if (res.hasList) {
 					//表头
 					setTableHead(res.head);

@@ -6,21 +6,22 @@ import {
 	useEffect
 } from 'react';
 import { Button, Checkbox, Form, Input, Select, Cascader } from 'antd';
-
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { useConfigContextValue } from '../../NodeDetailPanel';
+import { useConfigContextValue, useUpdateTable } from '../../NodeDetailPanel';
 import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
+import { contentQuotesLinter } from '@ant-design/cssinjs/lib/linters';
 type RowGroupItme = {
 	_key: string;
 	value1: [];
 	value2: string;
 	value3: string;
+	value4: string | number;
 };
 
 type FormData = {
@@ -83,7 +84,8 @@ const data: FormData = {
 				_key: getHash(),
 				value1: [],
 				value2: '',
-				value3: ''
+				value3: '',
+				value4: ''
 			}
 		]
 	],
@@ -148,18 +150,6 @@ const Row = (props: RowProps) => {
 		filterateContext?.addRow(props.groupIndex, props.index);
 	};
 
-	const displayRender = (
-		labels: string[],
-		selectedOptions: DefaultOptionType[]
-	) =>
-		labels.map((label, i) => {
-			const option = selectedOptions[i];
-			if (i === labels.length - 1) {
-				return <span key={option.value}>{label}</span>;
-			}
-			return <span key={option.value}>{label} / </span>;
-		});
-
 	const symbolSelect = [
 		{
 			label: '=',
@@ -203,8 +193,8 @@ const Row = (props: RowProps) => {
 				className={styles['filter-box__row_item']}
 				placeholder="请选择"
 				options={props.configData}
-				defaultValue={[]}
-				displayRender={displayRender}
+				defaultValue={props.defaultValue.value1}
+				// displayRender={displayRender}
 				onChange={(value) => handleChange('value1', value)}
 			/>
 			<Select
@@ -255,7 +245,8 @@ const reducer = (state: FormData, action: any) => {
 				_key: getHash(),
 				value1: [],
 				value2: '',
-				value3: ''
+				value3: '',
+				value4: ''
 			});
 			break;
 		case 'delRow':
@@ -273,7 +264,8 @@ const reducer = (state: FormData, action: any) => {
 							_key: getHash(),
 							value1: [],
 							value2: '',
-							value3: ''
+							value3: '',
+							value4: ''
 						}
 					]
 				],
@@ -297,11 +289,15 @@ export default () => {
 	if (isEmpty(getValue && id && getValue(id))) {
 		initData = cloneDeep(data);
 	}
+	const updateTable = useUpdateTable();
+	console.log({ initData });
 	const [formData, dispatch] = useReducer(reducer, initData);
 	// const [formData, setFormData] = useState(data);
 	const [indeterminate, setIndeterminate] = useState(false);
 	const [checkAll, setCheckAll] = useState(false);
 	const [configData, setConfigData] = useState([]);
+	const [colData, setColData] = useState([]);
+	const [plainOptions, setPlainOptions] = useState([]);
 
 	//获取对应配置数据
 	useEffect(() => {
@@ -312,105 +308,22 @@ export default () => {
 			})
 		};
 
-		const r = [
-			{
-				tableName: 'tableName1',
-				tableCnName: '表名一',
-				fields: [
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段二',
-						id: '2',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					}
-				]
-			},
-			{
-				tableName: 'tableName2',
-				tableCnName: '表名二',
-				fields: [
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段二',
-						id: '2',
-						tableName: '',
-						dataType: '',
-						description: ''
-					}
-				]
-			}
-		];
-		setConfigData(formatCascaderData(r));
 		getCanvasConfig(params).then((res) => {
-			console.log(res, 315315);
+			// console.log(res, 315315);
+			setConfigData(formatCascaderData(res));
+			setColData(formatColData(res));
+			const optionArr = [];
+			res.forEach((item, index) => {
+				item.fields?.forEach((el, i) => {
+					optionArr.push(el.fieldName);
+				});
+			});
+			setPlainOptions(optionArr);
 		});
 	}, []);
 
-	// 拼接为级联选择器形式数据
-	const formatCascaderData = (data: any) => {
+	// 处理列数据
+	const formatColData = (data: any) => {
 		const formatData = data.map((item) => {
 			const childrenArr = item.fields;
 			const children = [];
@@ -430,7 +343,28 @@ export default () => {
 		return formatData;
 	};
 
-	const plainOptions = ['Apple', 'Pear', 'Orange'];
+	// 拼接为级联选择器形式数据
+	const formatCascaderData = (data: any) => {
+		const formatData = data.map((item) => {
+			const childrenArr = item.fields;
+			const children = [];
+			childrenArr?.forEach((el) => {
+				children.push({
+					label: el.description || el.fieldName, //展示描述没有展示名称
+					value: el.fieldName + '#' + el.dataType
+				});
+			});
+			return {
+				label: item.tableCnName,
+				value: item.tableName,
+				children: children
+			};
+		});
+		console.log(formatData, 361361);
+		return formatData;
+	};
+
+	// const plainOptions = ['Apple', 'Pear', 'Orange'];
 
 	// 执行
 	const submit = () => {
@@ -438,18 +372,48 @@ export default () => {
 		formData.row.map((item, index) => {
 			if (item && item.length) {
 				formData.row[index] = item.map((el, i) => {
+					console.log(el.value1[1], 435435435);
 					return {
 						tableName: el.value1[0],
-						tableHeader: el.value1[1],
+						tableHeader: el.value1[1]?.split('#')[0],
 						operator: el.value2,
 						value: el.value3,
-						dataType: 1 //需要从获取的数据对应读取
+						dataType: el.value1[1]?.split('#')[1] //需要从获取的数据对应读取
 					};
 				});
 			}
 		});
 
-		console.log(formData, 480480480);
+		// 查找选中的字段属性
+		const arr = [];
+		colData.forEach((item, index) => {
+			item.children.forEach((el, i) => {
+				if (formData.col.includes(el.value)) {
+					arr.push({ tableName: item.value, fieldName: el.value });
+				}
+			});
+		});
+
+		// 拼接后端需要数据
+		const colTableNameArr = [];
+		arr.forEach((item, index) => {
+			colTableNameArr.push(item.tableName);
+		});
+		// 去重
+		const a = [...new Set(colTableNameArr)];
+		formData.col = a.map((item, index) => {
+			const b = [];
+			arr.forEach((el, i) => {
+				if (item == el.tableName) {
+					b.push(el.fieldName);
+				}
+			});
+			return {
+				tableName: item,
+				headers: b
+			};
+		});
+
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
@@ -461,16 +425,7 @@ export default () => {
 		console.log(params, 490490490);
 		getResult(params).then((res: any) => {
 			if (res.head && res.head.length) {
-				//生成columns
-				const colums = res.head.map((item, index) => {
-					return {
-						title: item,
-						dataIndex: item
-					};
-				});
-				// 根据表头和数据拼接成可渲染的表数据
-				// const tableData = transToTableData(res.head, res.data);
-				// updateTable(tableData, colums);
+				updateTable(res.data, res.head);
 			}
 		});
 	};
@@ -592,7 +547,7 @@ export default () => {
 						value={formData.col}
 						onChange={onChange}
 					/> */}
-					{configData.map((item, index) => {
+					{colData.map((item, index) => {
 						return (
 							<div className={styles['checkbox-group-item']}>
 								<div>{item.label + ':'}</div>

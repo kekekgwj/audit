@@ -92,8 +92,12 @@ interface IGetResult {
 	executeId: number | string;
 	canvasJson: string;
 }
+interface IExeResponse {
+	data: any[];
+	head: string[];
+}
 export function getResult(data: IGetResult) {
-	return post(API_PREFIX + '/blade-tool/dataAnalysis/getResult', {
+	return post<IExeResponse>(API_PREFIX + '/blade-tool/dataAnalysis/getResult', {
 		...data
 	});
 }
