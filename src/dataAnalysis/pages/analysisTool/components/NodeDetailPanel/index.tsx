@@ -130,7 +130,9 @@ const Panel: React.FC = () => {
 	const downLoadData = async () => {
 		try {
 			const params = {
+				executeId: id,
 				projectId: projectID
+				// canvasJson:
 			};
 			const res = await exportData(params);
 			console.log('导出结果：', res);
