@@ -257,6 +257,25 @@ const SelectGroup: React.FC = () => {
 			executeId: id, //当前选中元素id
 			projectId: projectID
 		};
+
+		getResult(params).then((res: any) => {
+			if (res.head && res.head.length) {
+				//生成columns
+				const colums = res.head.map((item, index) => {
+					return {
+						title: item,
+						dataIndex: item
+					};
+				});
+				// 根据表头和数据拼接成可渲染的表数据
+				// const tableData = transToTableData(res.head, res.data);
+				// updateTable(tableData, colums);
+			}
+		});
+		// if (!id || !setValue) {
+		// 	return;
+		// }
+		// setValue(id, value);
 	};
 	const handleOnDelete = (key: number) => {
 		const list = form.getFieldValue('connectionSentences') || [];
