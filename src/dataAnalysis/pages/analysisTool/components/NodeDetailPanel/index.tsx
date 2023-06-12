@@ -14,10 +14,15 @@ import ASSETS from '../../assets/index';
 import { IRootState, onClickCloseConfigPanel } from '@/redux/store';
 import { CloseOutlined } from '@ant-design/icons';
 import { useGraph, useGraphContext, useGraphID } from '../../lib/Graph';
-import { IImageTypes, getNodeTypeById, syncData } from '../../lib/utils';
+import {
+	IImageTypes,
+	getNodeTypeById,
+	syncData,
+	useInitRender
+} from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
 import { exportData, getResult } from '@/api/dataAnalysis/graph';
-import { Divider } from 'rc-menu';
+
 const { DOWNLOAD } = ASSETS;
 interface IConfigContext {
 	type: IImageTypes | null;
@@ -26,6 +31,7 @@ interface IConfigContext {
 	getValue: ((id: string) => any) | null;
 	setValue: ((id: string, value: any) => void) | null;
 	resetValue: (id: string) => void;
+	updateTable: (updateData: any, updateColumn: any) => void;
 }
 const ConfigContext = createContext<IConfigContext>({
 	type: null,
@@ -35,6 +41,9 @@ const ConfigContext = createContext<IConfigContext>({
 	setValue: null,
 	resetValue: function (id: string): void {
 		throw new Error('Function not implemented.');
+	},
+	updateTable: function (updateData: any, updateColumn: any): void {
+		throw new Error('Function not implemented.');
 	}
 });
 
@@ -42,64 +51,43 @@ export const useConfigContextValue = () => {
 	return useContext(ConfigContext);
 };
 const useTableSource = () => {
-	interface DataType {
-		key: React.Key;
-		name: string;
-		age: number;
-		address: string;
-	}
-	const columnsMock: ColumnsType<DataType> = [
-		{
-			title: 'Name',
-			dataIndex: 'name'
-		},
-		{
-			title: 'Age',
-			dataIndex: 'age'
-		},
-		{
-			title: 'Address',
-			dataIndex: 'address'
-		}
-	];
-	const dataMock: DataType[] = [];
-	for (let i = 0; i < 46; i++) {
-		dataMock.push({
-			key: i,
-			name: `Edward King ${i}`,
-			age: 32,
-			address: `London, Park Lane no. ${i}`
-		});
-	}
-	const [data, setData] = useState(dataMock);
-	const [column, setColumn] = useState(columnsMock);
-	const updateTable = (updateData, updateColumn) => {
+	const [data, setData] = useState([]);
+	const [columns, setColumns] = useState([]);
+	const updateTable = (updateData: any, updateColumn: any) => {
 		setData(updateData);
-		setColumn(updateColumn);
+		setColumns(updateColumn);
 	};
-	return [data, column, updateTable];
+	return { data, columns, updateTable };
 };
 
 const Panel: React.FC = () => {
 	const state = useSelector((state: IRootState) => state.dataAnalysis);
 	const graph = useGraph();
-	const [data, columns, updateTable] = useTableSource();
+	const { data, columns, updateTable } = useTableSource();
 	const [showConfig, setShowConfig] = useState(true);
-	// const [hasConfig, setHasConfig] = useState(true); //是否有配置项 table时没有配置项
+
 	const { curSelectedNode: id, showPanel = false } = state || {};
+	const executeType = [IImageTypes.TABLE, IImageTypes.END];
 	const projectID = useGraphID();
 	const { getConfigValue, saveConfigValue, resetConfigValue, getAllConfigs } =
 		useGraphContext();
+
+	const isInit = useInitRender();
+
 	useEffect(() => {
-		syncData(projectID, graph, getAllConfigs);
+		!isInit && syncData(projectID, graph, getAllConfigs);
 	}, [showPanel]);
 	// 点击画布元素触发事件，获取对应表的数据
 	useEffect(() => {
-		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
 		//执行获取表数据
-		if (id && curType == 'TABLE') {
+		if (!id || !projectID || !graph) {
+			return;
+		}
+		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
+
+		if (executeType.includes(curType)) {
 			const canvasData = graph.toJSON();
-			console.log(canvasData, 1010101010);
+
 			const params = {
 				canvasJson: JSON.stringify({
 					content: canvasData
@@ -182,7 +170,7 @@ const Panel: React.FC = () => {
 				</div>
 			</div>
 			<div>
-				{clickNodeType != 'TABLE' ? (
+				{!executeType.includes(clickNodeType) ? (
 					<div
 						className={`${
 							showConfig ? classes.configPanel : classes.hideConfigPanel
@@ -223,7 +211,8 @@ const Panel: React.FC = () => {
 										initValue: null,
 										getValue: getConfigValue,
 										setValue: saveConfigValue,
-										resetValue: resetConfigValue
+										resetValue: resetConfigValue,
+										updateTable: updateTable
 									}}
 								>
 									<ConfigPanel key={id} />

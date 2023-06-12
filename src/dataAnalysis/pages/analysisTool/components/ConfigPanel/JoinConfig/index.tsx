@@ -174,7 +174,8 @@ const SelectGroup: React.FC = () => {
 	const projectID = useGraphID();
 	const canvasData = graph.toJSON();
 	const [form] = Form.useForm();
-	const { id, getValue, setValue, resetValue } = useConfigContextValue();
+	const { id, getValue, setValue, resetValue, updateTable } =
+		useConfigContextValue();
 	const formInitValue = (getValue && id && getValue(id)) || {};
 
 	const [leftOptions, setLeftSelect] = useState([]);

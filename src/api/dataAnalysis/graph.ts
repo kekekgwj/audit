@@ -88,9 +88,9 @@ export function saveAsAuditProject(data: ISaveAsAuditProject) {
 //画布元素执行，获取结果
 
 interface IGetResult {
-	projectId: number;
-	executeId: number;
-	canvasJson?: any;
+	projectId: number | string;
+	executeId: number | string;
+	canvasJson: string;
 }
 export function getResult(data: IGetResult) {
 	return post(API_PREFIX + '/blade-tool/dataAnalysis/getResult', {

@@ -270,6 +270,7 @@ import ASSETS from '../assets/index';
 import { message } from 'antd';
 import { Options } from '@antv/x6/lib/graph/options';
 import { saveProjectCanvas } from '@/api/dataAnalysis/graph';
+import React, { useEffect } from 'react';
 const { FILTER, CONNECT, GROUP, ORDER, END } = ASSETS;
 export const imageShapes: IImageShapes[] = [
 	{
@@ -338,4 +339,11 @@ export const syncData = (
 		projectId: projectID,
 		configs: getAllConfigs()
 	});
+};
+export const useInitRender = () => {
+	const ref = React.useRef({ init: true });
+	useEffect(() => {
+		ref.current.init = false;
+	}, []);
+	return ref.current.init;
 };

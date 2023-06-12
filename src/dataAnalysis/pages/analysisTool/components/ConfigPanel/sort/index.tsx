@@ -7,6 +7,7 @@ import { useConfigContextValue } from '../../NodeDetailPanel';
 const { Panel } = Collapse;
 import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
+import { config } from 'process';
 
 interface SortProps {
 	option?: List[];
@@ -30,31 +31,9 @@ const layout = {
 	labelAlign: 'left'
 };
 
-const tailLayout = {
-	wrapperCol: { offset: 24, span: 0 }
-};
-const mockOption = [
-	{
-		title: '数据表1',
-		list: [
-			{ title: '字段1文字', isUp: false, isDown: false },
-			{ title: '字段2文字很长很长', isUp: false, isDown: false },
-			{ title: '字段3文字很长很长', isUp: false, isDown: false }
-		]
-	},
-	{
-		title: '数据表2',
-		list: [
-			{ title: '字段01文字很长很长', isUp: false, isDown: false },
-			{ title: '字段02文字', isUp: false, isDown: false }
-		]
-	}
-];
 const SortInput: FC<SortProps> = ({ value, onChange, dataList }) => {
-	console.log('sort initvalue', value);
-	console.log(dataList, mockOption, 55555);
-	const [optionList, setOptionList] = useState<List[]>(value || mockOption);
-	// const [optionList, setOptionList] = useState<List[]>(dataList);
+	const [optionList, setOptionList] = useState<List[]>(dataList);
+
 	//通过传入的状态值和下标修改dataList的排序状态
 	const setSortStatus = (
 		data: { isUp: boolean; isDown: boolean },
@@ -67,6 +46,9 @@ const SortInput: FC<SortProps> = ({ value, onChange, dataList }) => {
 
 		setOptionList(newDataList);
 	};
+	useEffect(() => {
+		setOptionList(dataList);
+	}, [dataList]);
 	//监听optionList改变触发onChange
 	useEffect(() => {
 		// let newData: string[] = [];
@@ -77,7 +59,7 @@ const SortInput: FC<SortProps> = ({ value, onChange, dataList }) => {
 		// 		}
 		// 	});
 		// });
-		onChange?.(optionList);
+		// onChange?.(optionList);
 	}, [optionList]);
 	return (
 		<Collapse
@@ -199,10 +181,49 @@ const Sort: FC = () => {
 	const projectID = useGraphID();
 	const canvasData = graph.toJSON();
 	const [form] = Form.useForm();
-	const { id, getValue, setValue, resetValue } = useConfigContextValue();
-	const formInitValue = getValue && id && getValue(id);
+	const { id, getValue, setValue, resetValue, updateTable } =
+		useConfigContextValue();
+	// 存储配置项（包含值）
+	// const formInitValue = getValue && id && getValue(id);
+	// console.log('formInitValue', formInitValue);
+	// 配置项
 	const [dataList, setDataList] = useState([]);
 
+	//转数据形式
+	const transData = (data: any) => {
+		const formatData = data.map((item) => {
+			const listArr = item.fields;
+			const list = [];
+			listArr?.forEach((el) => {
+				list.push({
+					title: el.fieldName,
+					isUp: false,
+					isDown: false
+				});
+			});
+			return {
+				title: item.tableCnName,
+				list: list
+			};
+		});
+		return formatData;
+	};
+	const getConfigForm = async () => {
+		const params = {
+			id,
+			canvasJson: JSON.stringify({
+				content: canvasData
+			})
+		};
+		const configs = await getCanvasConfig(params);
+		const formatForm = transData(configs);
+		setDataList(formatForm);
+	};
+
+	// 获取配置项
+	useEffect(() => {
+		getConfigForm();
+	}, []);
 	const onFinish = (values: any) => {
 		console.log(values);
 		const params = {
@@ -230,132 +251,6 @@ const Sort: FC = () => {
 		});
 	};
 
-	// 获取配置项
-	useEffect(() => {
-		const params = {
-			id,
-			canvasJson: JSON.stringify({
-				content: canvasData
-			})
-		};
-		// getCanvasConfig(params).then((res) => {
-		// 	console.log(res, 215215);
-		// });
-		// 测试数据
-		const res = [
-			{
-				tableName: 'tableName1',
-				tableCnName: '表名一',
-				fields: [
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段二',
-						id: '2',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					}
-				]
-			},
-			{
-				tableName: 'tableName2',
-				tableCnName: '表名二',
-				fields: [
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段二',
-						id: '2',
-						tableName: '',
-						dataType: '',
-						description: ''
-					}
-				]
-			}
-		];
-		setDataList(transData(res));
-	}, []);
-
-	//转数据形式
-	const transData = (data: any) => {
-		const formatData = data.map((item) => {
-			const listArr = item.fields;
-			const list = [];
-			listArr?.forEach((el) => {
-				list.push({
-					title: el.fieldName,
-					isUp: false,
-					isDown: false
-				});
-			});
-			return {
-				title: item.tableCnName,
-				list: list
-			};
-		});
-		return formatData;
-	};
-
 	const onReset = () => {
 		form.resetFields();
 		id && resetValue(id);
@@ -374,14 +269,14 @@ const Sort: FC = () => {
 			onFinish={onFinish}
 			className={classes.fromWrap}
 			initialValues={{
-				sorting: formInitValue
+				sorting: dataList
 			}}
 		>
 			<div className={classes.formList}>
 				<Form.Item name="sorting">
 					<SortInput
 						onChange={handleSortChange}
-						value={formInitValue}
+						value={dataList}
 						dataList={dataList}
 					></SortInput>
 				</Form.Item>
