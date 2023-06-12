@@ -163,116 +163,25 @@ interface IFormValue {
 const Grouping: FC = () => {
 	const graph = useGraph();
 	const projectID = useGraphID();
-	const canvasData = graph.toJSON();
+	const canvasData = graph?.toJSON();
 	const [form] = Form.useForm();
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
-	console.log('formInitValue', formInitValue);
 
-	//获取配置项数据
-	useEffect(() => {
+	const getConfig = async () => {
 		const params = {
 			id,
 			canvasJson: JSON.stringify({
 				content: canvasData
 			})
 		};
-		// getCanvasConfig(params).then((res) => {
-		// 	console.log(res, 215215);
-		// });
-		const res = [
-			{
-				tableName: 'tableName1',
-				tableCnName: '表名一',
-				fields: [
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段二',
-						id: '2',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					}
-				]
-			},
-			{
-				tableName: 'tableName2',
-				tableCnName: '表名二',
-				fields: [
-					{
-						fieldName: '字段一',
-						id: '1',
-						tableName: '',
-						dataType: '',
-						description: ''
-					},
-					{
-						fieldName: '字段二',
-						id: '2',
-						tableName: '',
-						dataType: '',
-						description: ''
-					}
-				]
-			}
-		];
+		const res = await getCanvasConfig(params);
 		setGroupData(transData(res));
 		setAccordData(transData(res));
+	};
+	//获取配置项数据
+	useEffect(() => {
+		getConfig();
 	}, []);
 
 	const transData = (data: any) => {
@@ -293,52 +202,10 @@ const Grouping: FC = () => {
 		});
 		return formatData;
 	};
-	const [groupData, setGroupData] = useState<List[]>([
-		//分组依据列表数据
-		{
-			title: '数据表1',
-			key: '0',
-			list: [
-				{ title: '字段1', key: '0-1' },
-				{ title: '字段2', key: '0-2' }
-			]
-		},
-		{
-			title: '数据表2',
-			key: '1',
-			list: [{ title: '字段2', key: '1-1' }]
-		},
-		{
-			title: '数据表3',
-			key: '2',
-			list: [{ title: '字段3', key: '2-1' }]
-		}
-	]);
-
-	const [accordData, setAccordData] = useState<List[]>([
-		//列数据
-		{
-			title: '数据表1',
-			key: '0',
-			list: [
-				{ title: '字段1', key: '0-1' },
-				{ title: '字段2', key: '0-2' }
-			]
-		},
-		{
-			title: '数据表2',
-			key: '1',
-			list: [{ title: '字段2', key: '1-1' }]
-		},
-		{
-			title: '数据表3',
-			key: '2',
-			list: [{ title: '字段3', key: '2-1' }]
-		}
-	]);
+	const [groupData, setGroupData] = useState<List[]>();
+	const [accordData, setAccordData] = useState<List[]>();
 
 	const onFinish = (values: any) => {
-		console.log(values);
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
@@ -347,7 +214,6 @@ const Grouping: FC = () => {
 			executeId: id, //当前选中元素id
 			projectId: projectID
 		};
-		console.log(params, 216216);
 		getResult(params).then((res: any) => {
 			if (res.head && res.head.length) {
 				//生成columns

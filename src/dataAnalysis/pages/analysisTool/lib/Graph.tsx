@@ -114,7 +114,6 @@ import {
 	getNodeTypeById,
 	handleValidateNode,
 	imageShapes,
-	syncData,
 	validateConnectionRule
 } from './utils';
 import { useGraphPageInfo } from './hooks';
