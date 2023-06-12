@@ -144,7 +144,7 @@ const SQLEditor: React.FC = () => {
 	};
 	return (
 		<div className={classes.container}>
-			<TableSourcePanel />
+			{/* <TableSourcePanel /> */}
 			<div className={classes.editorWrapper}>
 				<div className={classes.editorWrapper_tips}>
 					<div className={classes.hints}>
