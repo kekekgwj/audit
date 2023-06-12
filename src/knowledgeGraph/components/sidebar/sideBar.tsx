@@ -183,6 +183,18 @@ export default (props: Props) => {
 				paths: pathFilter
 			});
 
+			if (data.limited) {
+				if (algorithmName) {
+					message.warning(
+						'您查询的数据量过多，因前端展示效果限制仅针对展示数据做算法应用'
+					);
+				} else {
+					message.warning(
+						'您查询的数据量过多，页面无法显示完整的数据结果，请添加限制条件'
+					);
+				}
+			}
+
 			const nodesData = data.nodes || [];
 			const edgesData = data.edges || [];
 			if (nodesData.length === 0) {
