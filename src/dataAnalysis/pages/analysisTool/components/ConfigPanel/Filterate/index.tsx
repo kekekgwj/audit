@@ -424,9 +424,7 @@ export default () => {
 		};
 		console.log(params, 490490490);
 		getResult(params).then((res: any) => {
-			if (res.head && res.head.length) {
-				updateTable(res.data, res.head);
-			}
+			updateTable(res.data, res.head);
 		});
 	};
 

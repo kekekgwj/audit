@@ -258,9 +258,7 @@ const SelectGroup: React.FC = () => {
 		};
 
 		getResult(params).then((res: any) => {
-			if (res.head && res.head.length) {
-				updateTable(res.data, res.head);
-			}
+			updateTable(res.data, res.head);
 		});
 		// if (!id || !setValue) {
 		// 	return;
