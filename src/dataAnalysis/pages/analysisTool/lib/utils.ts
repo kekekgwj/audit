@@ -15,7 +15,7 @@ export enum IImageTypes {
 export const diffCells = (
 	graph: Graph | null,
 	cells: Metadata[] = [],
-	type: string = 'node'
+	type = 'node'
 ) => {
 	const create: C[] = [];
 	const update: U[] = [];
@@ -264,6 +264,7 @@ export interface IImageShapes {
 	label: string;
 	image: string;
 	type: IImageTypes;
+	labelCn?: string;
 }
 
 import ASSETS from '../assets/index';
@@ -329,7 +330,7 @@ export const saveData: (params: ISaveData) => void = ({
 export const syncData = (
 	projectID: number | null,
 	graph: X6.Graph | null,
-	getAllConfigs: () => void
+	configs: any
 ) => {
 	if (!projectID || !graph) {
 		return;
@@ -337,7 +338,7 @@ export const syncData = (
 	saveData({
 		canvas: graph?.toJSON(),
 		projectId: projectID,
-		configs: getAllConfigs()
+		configs: configs
 	});
 };
 export const useInitRender = () => {

@@ -14,8 +14,13 @@ const GraphWatchEvents = () => {
 	const graph = graphContext?.graph;
 	const container = document.getElementById('x6-graph')!;
 	const projectID = useGraphID();
-	const { getConfigValue, saveConfigValue, resetConfigValue, getAllConfigs } =
-		useGraphContext();
+	const {
+		getConfigValue,
+		saveConfigValue,
+		resetConfigValue,
+		getAllConfigs,
+		syncGraph
+	} = useGraphContext();
 	useEffect(() => {
 		if (!graph) {
 			return;
@@ -69,11 +74,11 @@ const GraphWatchEvents = () => {
 		graph.on(
 			'cell:changed',
 			debounce(() => {
-				syncData(projectID, graph, getAllConfigs);
+				syncGraph();
 			}, 200)
 		);
-		graph.on('cell:added', () => syncData(projectID, graph, getAllConfigs));
-		graph.on('cell:removed', () => syncData(projectID, graph, getAllConfigs));
+		graph.on('cell:added', () => syncGraph());
+		graph.on('cell:removed', () => syncGraph());
 
 		return () => {
 			graph.off('node:mouseenter');

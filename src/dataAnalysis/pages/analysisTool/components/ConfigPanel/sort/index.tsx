@@ -2,12 +2,10 @@ import React, { FC, useState, useEffect } from 'react';
 import classes from './index.module.less';
 import { Button, Form, Collapse } from 'antd';
 import { UpIcon, Downicon, HeartIcon, DelIcon } from './icon';
-import { DownOutlined } from '@ant-design/icons';
 import { useConfigContextValue } from '../../NodeDetailPanel';
 const { Panel } = Collapse;
 import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
-import { config } from 'process';
 
 interface SortProps {
 	option?: List[];
@@ -24,14 +22,13 @@ interface List {
 		isDown: boolean;
 	}[];
 }
-interface ISortAll {}
 const layout = {
 	labelCol: { span: 0 },
 	wrapperCol: { span: 24 },
 	labelAlign: 'left'
 };
 
-const SortInput: FC<SortProps> = ({ value, onChange, dataList }) => {
+const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
 	const [optionList, setOptionList] = useState<List[]>(dataList);
 
 	//通过传入的状态值和下标修改dataList的排序状态
@@ -59,7 +56,7 @@ const SortInput: FC<SortProps> = ({ value, onChange, dataList }) => {
 		// 		}
 		// 	});
 		// });
-		// onChange?.(optionList);
+		onChange?.(optionList);
 	}, [optionList]);
 	return (
 		<Collapse

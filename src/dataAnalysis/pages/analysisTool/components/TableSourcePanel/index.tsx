@@ -41,6 +41,7 @@ const TableItem: React.FC = ({ data }) => {
 									startDrag &&
 									startDrag(e, {
 										label: table.tableName || '',
+										labelCn: table.tableCnName || '',
 										image: TABLE,
 										type: IImageTypes.TABLE,
 										cnLabel: table.tableCnName || ''
@@ -103,7 +104,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 			console.error(e);
 		}
 	};
-	// const data1 = {
+
 	// 	title: '系统数据',
 	// 	tables: [
 	// 		{
