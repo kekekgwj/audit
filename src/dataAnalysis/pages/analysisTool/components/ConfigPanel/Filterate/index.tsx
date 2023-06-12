@@ -6,14 +6,13 @@ import {
 	useEffect
 } from 'react';
 import { Button, Checkbox, Form, Input, Select, Cascader } from 'antd';
-
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { useConfigContextValue } from '../../NodeDetailPanel';
+import { useConfigContextValue, useUpdateTable } from '../../NodeDetailPanel';
 import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 import { contentQuotesLinter } from '@ant-design/cssinjs/lib/linters';
@@ -290,6 +289,7 @@ export default () => {
 	if (isEmpty(getValue && id && getValue(id))) {
 		initData = cloneDeep(data);
 	}
+	const updateTable = useUpdateTable();
 	console.log({ initData });
 	const [formData, dispatch] = useReducer(reducer, initData);
 	// const [formData, setFormData] = useState(data);
@@ -307,98 +307,6 @@ export default () => {
 				content: canvasData
 			})
 		};
-
-		// const r = [
-		// 	{
-		// 		tableName: 'tableName1',
-		// 		tableCnName: '表名一',
-		// 		fields: [
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段二',
-		// 				id: '2',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			}
-		// 		]
-		// 	},
-		// 	{
-		// 		tableName: 'tableName2',
-		// 		tableCnName: '表名二',
-		// 		fields: [
-		// 			{
-		// 				fieldName: '字段一',
-		// 				id: '1',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			},
-		// 			{
-		// 				fieldName: '字段二',
-		// 				id: '2',
-		// 				tableName: '',
-		// 				dataType: '',
-		// 				description: ''
-		// 			}
-		// 		]
-		// 	}
-		// ];
 
 		getCanvasConfig(params).then((res) => {
 			// console.log(res, 315315);
@@ -517,16 +425,7 @@ export default () => {
 		console.log(params, 490490490);
 		getResult(params).then((res: any) => {
 			if (res.head && res.head.length) {
-				//生成columns
-				const colums = res.head.map((item, index) => {
-					return {
-						title: item,
-						dataIndex: item
-					};
-				});
-				// 根据表头和数据拼接成可渲染的表数据
-				// const tableData = transToTableData(res.head, res.data);
-				// updateTable(tableData, colums);
+				updateTable(res.data, res.head);
 			}
 		});
 	};

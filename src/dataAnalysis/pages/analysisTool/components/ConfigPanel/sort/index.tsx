@@ -234,19 +234,9 @@ const Sort: FC = () => {
 			executeId: id, //当前选中元素id
 			projectId: projectID
 		};
-		console.log(params, 216216);
 		getResult(params).then((res: any) => {
 			if (res.head && res.head.length) {
-				//生成columns
-				const colums = res.head.map((item, index) => {
-					return {
-						title: item,
-						dataIndex: item
-					};
-				});
-				// 根据表头和数据拼接成可渲染的表数据
-				// const tableData = transToTableData(res.head, res.data);
-				// updateTable(tableData, colums);
+				updateTable(res.data, res.head);
 			}
 		});
 	};
