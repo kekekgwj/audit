@@ -196,8 +196,6 @@ const SelectGroup: React.FC = () => {
 			// 获取数据第一条作为左表，第二条为右表
 			const configData1 = res[0] || [];
 			const configData2 = res[1] || [];
-			setLeftTableName(res[0].tableName);
-			setRightTableName(res[1].tableName);
 			// 获取下拉选项
 			const leftData = configData1.fields.map((item, index) => {
 				return {
@@ -216,8 +214,8 @@ const SelectGroup: React.FC = () => {
 				leftTableName: configData1?.tableName,
 				rightTableName: configData2?.tableName
 			};
-			setLeftSelect(leftOptions);
-			setRightSelect(rihthOptions);
+			setLeftSelect(leftData);
+			setRightSelect(rightData);
 		});
 	}, []);
 	const handleOnclickAdd = () => {
