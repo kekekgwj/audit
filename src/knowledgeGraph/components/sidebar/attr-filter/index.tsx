@@ -383,7 +383,7 @@ export default (props: IProps) => {
 			const ro = new ResizeObserver((entries, observer) => {
 				for (const entry of entries) {
 					const { width } = entry.contentRect;
-					setWidth(+width + 400);
+					setWidth(+width + 440);
 				}
 			});
 			ro.observe(ref.current);
@@ -421,7 +421,7 @@ export default (props: IProps) => {
 				title="链路筛选"
 				minWidth="700px"
 				width={width}
-				height={400}
+				// height={400}
 				onOk={handleOk}
 				onCancel={() => setOpen(false)}
 			>

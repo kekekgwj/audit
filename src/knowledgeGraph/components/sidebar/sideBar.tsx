@@ -214,7 +214,7 @@ export default (props: Props) => {
 					bodyName: undefined
 				}
 			],
-			level: 4
+			level: 1
 		});
 		// 将链路和算法置灰
 		updateData('');
@@ -243,6 +243,15 @@ export default (props: Props) => {
 		}
 		return Date.now();
 	};
+
+	const handleChangeBodyType = (key: any, e: any) => {
+		if (!e) {
+			const bodys = form.getFieldValue('bodys');
+			bodys[key].bodyName = '';
+			form.setFieldValue('bodyName', bodys);
+		}
+	};
+
 	// 渲染表单
 	const renderForm = () => {
 		return (
@@ -276,6 +285,9 @@ export default (props: Props) => {
 														placeholder="请选择"
 														allowClear
 														options={bodyTypeOptions}
+														onChange={(e) => {
+															handleChangeBodyType(key, e);
+														}}
 													></Select>
 												</Form.Item>
 												<Form.Item
