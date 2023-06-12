@@ -231,8 +231,7 @@ const SelectGroup: React.FC = () => {
 			connectionSentences: nextList
 		});
 	};
-	const onFinish = (value: IFilterAll) => {
-		// 可能需要处理
+	const formatSubmitValue = (value: IFilterAll) => {
 		if (value.connectionSentences && value.connectionSentences.length) {
 			value.connectionSentences = value.connectionSentences.map(
 				(item, index) => {
@@ -249,6 +248,11 @@ const SelectGroup: React.FC = () => {
 		const { leftTableName, rightTableName } = tableNames as unknown as any;
 		value.leftTableName = leftTableName;
 		value.rightTableName = rightTableName;
+		return value;
+	};
+	const onFinish = (value: IFilterAll) => {
+		// 可能需要处理
+		handleOnChange(value);
 
 		const params = {
 			canvasJson: JSON.stringify({
@@ -280,7 +284,8 @@ const SelectGroup: React.FC = () => {
 		if (!id || !setValue) {
 			return;
 		}
-		setValue(id, value);
+
+		setValue(id, formatSubmitValue(value));
 	};
 	const handleReset = () => {
 		form.resetFields();

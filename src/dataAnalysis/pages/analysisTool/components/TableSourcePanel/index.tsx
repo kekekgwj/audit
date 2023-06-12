@@ -43,8 +43,7 @@ const TableItem: React.FC = ({ data }) => {
 										label: table.tableName || '',
 										labelCn: table.tableCnName || '',
 										image: TABLE,
-										type: IImageTypes.TABLE,
-										cnLabel: table.tableCnName || ''
+										type: IImageTypes.TABLE
 									})
 								}
 							>
