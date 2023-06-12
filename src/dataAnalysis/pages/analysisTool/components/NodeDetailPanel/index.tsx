@@ -143,11 +143,15 @@ const Panel: React.FC = () => {
 	};
 
 	const downLoadData = async () => {
+		const canvasData = graph.toJSON();
 		try {
 			const params = {
 				executeId: id,
-				projectId: projectID
-				// canvasJson:
+				projectId: projectID,
+				canvasJson: JSON.stringify({
+					content: canvasData,
+					configs: getAllConfigs()
+				})
 			};
 			const res = await exportData(params);
 			console.log('导出结果：', res);

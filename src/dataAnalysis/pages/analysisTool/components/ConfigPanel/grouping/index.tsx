@@ -178,7 +178,7 @@ const Grouping: FC = () => {
 	const [form] = Form.useForm();
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
-
+	const { syncGraph } = useGraphContext();
 	const getConfig = async () => {
 		const params = {
 			id,
@@ -229,6 +229,7 @@ const Grouping: FC = () => {
 		};
 		const { data, head } = await getResult(params);
 		updateTable(data, head);
+		syncGraph();
 	};
 	const handleOnChange = (value: any) => {
 		if (!id || !setValue) {

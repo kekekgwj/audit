@@ -180,6 +180,7 @@ const Sort: FC = () => {
 	const [form] = Form.useForm();
 	const { id, getValue, setValue, resetValue, updateTable } =
 		useConfigContextValue();
+	const { getAllConfigs, syncGraph } = useGraphContext();
 	// 存储配置项（包含值）
 	// const formInitValue = getValue && id && getValue(id);
 	// console.log('formInitValue', formInitValue);
@@ -233,6 +234,7 @@ const Sort: FC = () => {
 		};
 		getResult(params).then((res: any) => {
 			updateTable(res.data, res.head);
+			syncGraph();
 		});
 	};
 
