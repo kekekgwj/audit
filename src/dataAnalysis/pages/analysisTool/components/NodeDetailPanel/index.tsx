@@ -156,9 +156,7 @@ const Panel: React.FC = () => {
 					configs: getAllConfigs()
 				})
 			};
-			console.log('config:', getAllConfigs());
-			const res = await exportData(params);
-			console.log('导出结果：', res);
+			await exportData(params, '导出结果.xlsx');
 		} catch {
 			console.log('err');
 		}

@@ -1,4 +1,4 @@
-import { appendQueryParams, get, post, postFormData } from '@/utils/request';
+import { appendQueryParams, get, post, download } from '@/utils/request';
 import { Interface } from 'readline';
 import { string } from 'prop-types';
 const env = import.meta.env;
@@ -107,9 +107,19 @@ interface IExportData {
 	projectId: number;
 	canvasJson?: string;
 }
-interface IExportDataResponse {}
-export function exportData(data: IExportData): Promise<IExportDataResponse> {
-	return post(API_PREFIX + '/blade-tool/dataAnalysis/export', data);
+
+export function exportData(data: IExportData, fileName: string) {
+	// return post(API_PREFIX + '/blade-tool/dataAnalysis/export', data);
+	return download(
+		new Request(API_PREFIX + '/blade-tool/dataAnalysis/export', {
+			method: 'post',
+			body: JSON.stringify({ ...data }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}),
+		fileName
+	);
 }
 
 //获取工具组件配置项
