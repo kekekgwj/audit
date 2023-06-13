@@ -2,10 +2,12 @@
 	width: 390px;
 	.sqlBoxContainer {
 		width: 100%;
+		max-height: 500px;
 		padding: 20px 20px 0 20px;
 		border-radius: 4px;
 		box-shadow: 1px 2px 12px 0px rgba(66, 81, 112, 0.15);
 		background: #ffffff;
+		overflow-y: auto;
 		:global(.sql-hl-keyword) {
 			font-size: 14px;
 			color: #ff9d00;
@@ -62,8 +64,9 @@
 		.tableBox {
 			display: flex;
 			align-items: center;
-			padding: 7px 0;
+			padding: 7px 4px;
 			font-size: 14px;
+			overflow: hidden;
 			cursor: pointer;
 			.tableBoxName {
 				margin-right: 8px;

@@ -18,7 +18,8 @@ interface AuditSql {
 interface MySql {
 	id: string;
 	name: string;
-	gmtCreated: string;
+	gmtCreated?: string;
+	gmtModified?: string;
 	sql?: string;
 }
 
@@ -137,10 +138,10 @@ interface Tables {
 }
 
 // 查询数据列表
-export function getTables(queryType: number) {
+export function getTables(data: { queryType: number; orderBy: number }) {
 	return get<Tables[]>(
 		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/getTables', {
-			queryType
+			...data
 		})
 	);
 }
