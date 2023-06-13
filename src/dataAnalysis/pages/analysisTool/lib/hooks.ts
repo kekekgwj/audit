@@ -1,8 +1,16 @@
 import { Graph, Node, Edge } from '@antv/x6';
-import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import {
+	useRef,
+	useEffect,
+	useState,
+	useCallback,
+	useMemo,
+	useContext,
+	createContext
+} from 'react';
 import { diffCells, patch, checkId } from './utils';
 import { useLocation, useNavigate } from 'react-router';
-
+import * as X6 from '@antv/x6';
 type GraphState = {
 	nodes?: Node.Metadata[];
 	edges?: Edge.Metadata[];
@@ -90,3 +98,91 @@ export const useGraphState = (initState: GraphState = {}) => {
 		setGraph
 	};
 };
+
+interface IGraphContext extends IGraphConfig {
+	graph: X6.Graph | null;
+	startDrag: (
+		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+		{ label, image, type }: IImageShapes
+	) => void;
+	projectID: number | null;
+}
+interface IGraphConfig {
+	getConfigValue: (id: string) => any;
+	saveConfigValue: (id: string, value: any) => void;
+	resetConfigValue: (id: string) => void;
+	getAllConfigs: () => void;
+	setAllConfigs: (value: any) => void;
+	syncGraph: () => void;
+}
+export const useGraph = () => {
+	const { graph } = useContext(GraphContext) || {};
+	return graph;
+};
+export const useGraphID = () => {
+	const { projectID } = useContext(GraphContext) || {};
+	return projectID;
+};
+
+export const useGraphContext = () => {
+	return useContext(GraphContext);
+};
+
+export const useNodeConfigValue: () => IGraphConfig = () => {
+	const ref = useRef<Record<string, object>>({});
+
+	const getConfigValue = useCallback((id: string) => {
+		if (ref.current) {
+			return ref.current[id];
+		} else {
+			null;
+		}
+	}, []);
+	const saveConfigValue = useCallback((id: string, value: any) => {
+		ref.current[id] = value;
+	}, []);
+	const resetConfigValue = useCallback((id: string) => {
+		saveConfigValue(id, null);
+	}, []);
+	const getAllConfigs = () => {
+		return ref.current;
+	};
+	const setAllConfigs = (value: any) => {
+		ref.current = value;
+	};
+	return {
+		getConfigValue,
+		saveConfigValue,
+		resetConfigValue,
+		getAllConfigs,
+		setAllConfigs
+	};
+};
+export const GraphContext = createContext<IGraphContext>({
+	graph: null,
+	startDrag: function (
+		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+		{ label, image, type, labelCn }: IImageShapes
+	): void {
+		throw new Error('Function not implemented.');
+	},
+	projectID: null,
+	getConfigValue: function (id: string) {
+		throw new Error('Function not implemented.');
+	},
+	saveConfigValue: function (id: string, value: any): void {
+		throw new Error('Function not implemented.');
+	},
+	resetConfigValue: function (id: string): void {
+		throw new Error('Function not implemented.');
+	},
+	getAllConfigs: function (): void {
+		throw new Error('Function not implemented.');
+	},
+	setAllConfigs: function (value: any): void {
+		throw new Error('Function not implemented.');
+	},
+	syncGraph: function (): void {
+		throw new Error('Function not implemented.');
+	}
+});

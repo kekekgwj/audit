@@ -13,7 +13,7 @@ import { ColumnsType } from 'antd/es/table';
 import ASSETS from '../../assets/index';
 import { IRootState, onClickCloseConfigPanel } from '@/redux/store';
 import { CloseOutlined } from '@ant-design/icons';
-import { useGraph, useGraphContext, useGraphID } from '../../lib/Graph';
+import { useGraph, useGraphContext, useGraphID } from '../../lib/hooks';
 import {
 	IImageTypes,
 	formatDataSource,
