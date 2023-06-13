@@ -225,7 +225,10 @@ const TableBox: FC = () => {
 	}, []);
 
 	const getList = async () => {
-		const res = await getTables(3);
+		const res = await getTables({
+			queryType: 3,
+			orderBy: 1
+		});
 		const list = res.map((item) => ({
 			id: item.id,
 			name: item.tableName,

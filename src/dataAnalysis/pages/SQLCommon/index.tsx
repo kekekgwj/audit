@@ -21,8 +21,9 @@ const { RangePicker } = DatePicker;
 interface DataType {
 	key: string;
 	sqlName: string;
-	gmtCreated: string;
+	gmtCreated?: string;
 	sqlContent?: string;
+	gmtModified?: string;
 }
 
 export default () => {
@@ -49,7 +50,7 @@ export default () => {
 		{
 			title: '创建时间',
 			width: 200,
-			dataIndex: 'gmtCreated'
+			dataIndex: 'gmtModified'
 		},
 		{
 			title: '操作',
@@ -202,7 +203,7 @@ export default () => {
 		const list: DataType[] = res.records.map((item) => ({
 			key: item.id,
 			sqlName: item.name,
-			gmtCreated: item.gmtCreated
+			gmtModified: item.gmtModified
 		}));
 
 		return {
