@@ -12,8 +12,7 @@ import ConfigPanel from '../ConfigPanel';
 import ASSETS from '../../assets/index';
 import { IRootState, onClickCloseConfigPanel } from '@/redux/store';
 import { CloseOutlined } from '@ant-design/icons';
-import { useGraph, useGraphContext, useGraphID } from '../../lib/Graph';
-import { transFilterData } from '../../lib/utils';
+import { useGraph, useGraphContext, useGraphID } from '../../lib/hooks';
 import {
 	IImageTypes,
 	formatDataSource,

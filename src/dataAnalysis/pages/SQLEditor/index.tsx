@@ -21,6 +21,7 @@ import SvgIcon from '@/components/svg-icon';
 import SaveDialog from './components/SaveDialog';
 
 import { saveSql, getResultBySql, exportBySql } from '@/api/dataAnalysis/sql';
+import { DownloadOutlined } from '@ant-design/icons';
 
 export const EditorContext = createContext({});
 
@@ -232,7 +233,7 @@ const SQLEditor: React.FC = () => {
 							<div className={classes.aceResultMid}>
 								<div className={classes.downloadBtn} onClick={handleDownLoad}>
 									<SvgIcon
-										name="see"
+										name="download"
 										className={classes.downloadIcon}
 									></SvgIcon>
 									<span>下载</span>

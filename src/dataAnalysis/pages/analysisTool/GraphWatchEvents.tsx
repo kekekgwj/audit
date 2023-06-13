@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
-import { useGraphContext, useGraphID, useGraphInstance } from './lib/Graph';
+import { useGraphContext } from './lib/hooks';
 import { onClickGraphNode } from '@/redux/store';
 import { debounce } from 'debounce';
-import { syncData } from './lib/utils';
 
 const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
 	for (let i = 0, len = ports.length; i < len; i += 1) {
@@ -10,17 +9,9 @@ const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
 	}
 };
 const GraphWatchEvents = () => {
-	const graphContext = useGraphInstance();
-	const graph = graphContext?.graph;
 	const container = document.getElementById('x6-graph')!;
-	const projectID = useGraphID();
-	const {
-		getConfigValue,
-		saveConfigValue,
-		resetConfigValue,
-		getAllConfigs,
-		syncGraph
-	} = useGraphContext();
+	const { syncGraph, graph } = useGraphContext();
+
 	useEffect(() => {
 		if (!graph) {
 			return;
@@ -40,21 +31,6 @@ const GraphWatchEvents = () => {
 		graph.on('node:dblclick', ({ node }) => {
 			const { id } = node;
 			onClickGraphNode(id);
-			// const cell = graph.getCellById(id);
-			// const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
-
-			// const edges = graph.getEdges();
-			// const sourceNodes: string[] = [];
-			// // 找到节点的所有连接节点
-			// edges.forEach((e) => {
-			// 	const sourceID = e.getSourceCellId();
-			// 	const targetID = e.getTargetCellId();
-			// 	if (targetID === id) {
-			// 		sourceNodes.push(sourceID);
-			// 	}
-			// });
-			// // 获取到所有连接节点的type
-			// const types = getNodeTypeById(graph, sourceNodes);
 		});
 		graph.bindKey(['meta+a', 'ctrl+a'], () => {
 			const nodes = graph.getNodes();
