@@ -399,6 +399,19 @@ export const Graph = forwardRef((props, ref) => {
 		}
 	};
 
+	const getLabelLength = (str: string) => {
+		var Regx = /^[A-Za-z0-9]*$/;
+		let len = 0;
+		for (let i = 0; i < str.length; i++) {
+			if (Regx.test(str.charAt(i))) {
+				len = len + 8;
+			} else {
+				len = len + 14;
+			}
+		}
+		return len;
+	};
+
 	const startDrag = (
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 		{ label, image, type, labelCn }: IImageShapes
@@ -411,7 +424,8 @@ export const Graph = forwardRef((props, ref) => {
 		console.log('length', text.length, text.length * 14 + 40);
 		const node = graph?.createNode({
 			inherit: 'rect',
-			width: type === IImageTypes.TABLE ? text.length * 14 + 40 : 36,
+			// width: type === IImageTypes.TABLE ? text.length * 14 + 40 : 36,
+			width: type === IImageTypes.TABLE ? getLabelLength(text) + 40 : 36,
 			// height: 38,
 			height: type === IImageTypes.TABLE ? 38 : 58,
 			label: text,

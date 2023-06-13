@@ -104,39 +104,6 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 		}
 	};
 
-	// 	title: '系统数据',
-	// 	tables: [
-	// 		{
-	// 			tableName: '数据表名称1'
-	// 		},
-	// 		{
-	// 			tableName: '数据表名称2'
-	// 		},
-	// 		{
-	// 			tableName: '数据表名称3'
-	// 		},
-	// 		{
-	// 			tableName: '数据表名称4'
-	// 		}
-	// 	]
-	// };
-	// const data2 = {
-	// 	title: '我的数据',
-	// 	tables: [
-	// 		{
-	// 			tableName: '数据表名称1'
-	// 		},
-	// 		{
-	// 			tableName: '数据表名称2'
-	// 		},
-	// 		{
-	// 			tableName: '数据表名称3'
-	// 		},
-	// 		{
-	// 			tableName: '数据表名称4'
-	// 		}
-	// 	]
-	// };
 	// 搜索查询
 	const onSearch = async (val: string) => {
 		if (!val) {
@@ -149,7 +116,6 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 				title: '搜索结果',
 				tables: res
 			};
-			console.log(data, 969696);
 			setSearchData(data);
 			setShowSearch(true);
 		} catch (e) {
@@ -188,7 +154,12 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 			)}
 
 			<div className={classes.switch} onClick={onClickSwitch}>
-				{open ? '<<' : '>>'}
+				{/* {open ? '<<' : '>>'} */}
+				{open ? (
+					<SvgIcon name="closeArrow" className={classes.closeIcon}></SvgIcon>
+				) : (
+					<SvgIcon name="openArrow" className={classes.closeIcon}></SvgIcon>
+				)}
 			</div>
 		</div>
 	);
