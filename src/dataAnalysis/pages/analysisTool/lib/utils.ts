@@ -198,7 +198,7 @@ export const validateConnectionRule = (
 	// GROUP BY
 	if (targetType === IImageTypes.GROUP) {
 		if ([IImageTypes.END, IImageTypes.GROUP].includes(sourceType)) {
-			message.error('输入节点类型为除“END”和“GROUP BY”以外的类');
+			openMessage('输入节点类型为除“END”和“GROUP BY”以外的类');
 			return false;
 		}
 		if (targetInEdges && targetInEdges.length >= 1) {
@@ -209,7 +209,7 @@ export const validateConnectionRule = (
 	// ORDER BY
 	if (targetType === IImageTypes.ORDER) {
 		if ([IImageTypes.END, IImageTypes.ORDER].includes(sourceType)) {
-			message.error('输入节点类型为除“END”和“ORDER BY”以外的类型');
+			openMessage('输入节点类型为除“END”和“ORDER BY”以外的类型');
 			return false;
 		}
 		if (targetInEdges && targetInEdges.length >= 1) {

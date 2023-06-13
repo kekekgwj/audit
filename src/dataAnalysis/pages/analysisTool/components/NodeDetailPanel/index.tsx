@@ -17,7 +17,8 @@ import {
 	IImageTypes,
 	formatDataSource,
 	getNodeTypeById,
-	useInitRender
+	useInitRender,
+	transFilterData
 } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
 import { exportData, getResult } from '@/api/dataAnalysis/graph';
