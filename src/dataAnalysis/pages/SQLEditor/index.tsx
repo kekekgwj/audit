@@ -232,7 +232,7 @@ const SQLEditor: React.FC = () => {
 							<div className={classes.aceResultMid}>
 								<div className={classes.downloadBtn} onClick={handleDownLoad}>
 									<SvgIcon
-										name="see"
+										name="download"
 										className={classes.downloadIcon}
 									></SvgIcon>
 									<span>下载</span>

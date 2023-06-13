@@ -234,7 +234,7 @@ export default () => {
 				>
 					<Form.Item
 						name="sqlName"
-						label="审计规则SQL名称"
+						label="SQL名称"
 						labelCol={{ span: 10 }}
 						wrapperCol={{ span: 14 }}
 						colon={false}
