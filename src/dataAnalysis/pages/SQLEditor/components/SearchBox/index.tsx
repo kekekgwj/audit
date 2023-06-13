@@ -278,7 +278,15 @@ const TableBox: FC = () => {
 						className={classes.tableBox}
 					>
 						<span className={classes.tableBoxName}>{name}</span>
-						<span>({zhName})</span>
+						<span
+							style={{
+								overflow: 'hidden',
+								textOverflow: 'ellipsis',
+								whiteSpace: 'nowrap'
+							}}
+						>
+							({zhName})
+						</span>
 					</li>
 				))}
 			</div>
