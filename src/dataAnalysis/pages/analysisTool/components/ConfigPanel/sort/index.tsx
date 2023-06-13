@@ -223,11 +223,11 @@ const Sort: FC = () => {
 		getConfigForm();
 	}, []);
 	const onFinish = (values: any) => {
-		console.log(values);
+		handleSortChange(values.sorting);
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
-				configs: { [id]: values.sorting }
+				configs: getAllConfigs()
 			}),
 			executeId: id, //当前选中元素id
 			projectId: projectID

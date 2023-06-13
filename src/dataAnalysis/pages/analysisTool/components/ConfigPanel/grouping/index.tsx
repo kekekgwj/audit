@@ -178,7 +178,7 @@ const Grouping: FC = () => {
 	const [form] = Form.useForm();
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
-	const { syncGraph } = useGraphContext();
+	const { syncGraph, getAllConfigs } = useGraphContext();
 	const getConfig = async () => {
 		const params = {
 			id,
@@ -219,10 +219,11 @@ const Grouping: FC = () => {
 	const updateTable = useUpdateTable();
 
 	const onFinish = async (values: any) => {
+		handleOnChange(values);
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
-				configs: { [id]: values }
+				configs: getAllConfigs()
 			}),
 			executeId: id, //当前选中元素id
 			projectId: projectID
