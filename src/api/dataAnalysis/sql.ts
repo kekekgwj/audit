@@ -18,7 +18,8 @@ interface AuditSql {
 interface MySql {
 	id: string;
 	name: string;
-	gmtCreated: string;
+	gmtCreated?: string;
+	gmtModified?: string;
 	sql?: string;
 }
 
