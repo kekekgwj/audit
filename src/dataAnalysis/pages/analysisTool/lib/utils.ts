@@ -1,4 +1,5 @@
 import { Graph, Node, Edge, ObjectExt, StringExt } from '@antv/x6';
+import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 import * as X6 from '@antv/x6';
 type Metadata = Node.Metadata | Edge.Metadata;
 type C = Node | Edge;
