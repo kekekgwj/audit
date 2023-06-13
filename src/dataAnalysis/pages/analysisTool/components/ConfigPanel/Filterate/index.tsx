@@ -13,9 +13,8 @@ import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { useConfigContextValue, useUpdateTable } from '../../NodeDetailPanel';
-import { useGraph, useGraphContext, useGraphID } from '../../../lib/hooks';
+import { useGraph, useGraphID } from '../../../lib/hooks';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
-import { contentQuotesLinter } from '@ant-design/cssinjs/lib/linters';
 import { transFilterData } from '../../../lib/utils';
 type RowGroupItme = {
 	_key: string;

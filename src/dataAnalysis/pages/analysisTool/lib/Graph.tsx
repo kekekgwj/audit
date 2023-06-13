@@ -48,6 +48,7 @@ export const Graph = forwardRef((props, ref) => {
 	const DndContainerRef = useRef<HTMLDivElement>(null);
 	const panelDndContainerRef = useRef<HTMLDivElement>(null);
 	const { goBack, pathName, templateName, projectId } = useGraphPageInfo();
+	const isPublicTemplate = !(pathName === '审计模板');
 	const [form] = Form.useForm();
 	const {
 		getConfigValue,
@@ -58,6 +59,14 @@ export const Graph = forwardRef((props, ref) => {
 	} = useNodeConfigValue();
 	// 初始化画布
 	const initializeGraph = () => {
+		const strictTemplate = isPublicTemplate
+			? {
+					interacting: false,
+					translating: {
+						restrict: true
+					}
+			  }
+			: {};
 		if (graphWrapperRef.current && containerRef.current && !graph) {
 			const graph: X6.Graph = new X6.Graph({
 				container: containerRef.current,
@@ -65,6 +74,7 @@ export const Graph = forwardRef((props, ref) => {
 				grid: true,
 				width: graphWrapperRef.current.offsetWidth,
 				height: graphWrapperRef.current.offsetHeight,
+				...strictTemplate,
 				connecting: {
 					router: 'manhattan',
 					connector: {
@@ -113,7 +123,7 @@ export const Graph = forwardRef((props, ref) => {
 				)
 				.use(
 					new Selection({
-						enabled: true,
+						enabled: !isPublicTemplate,
 						rubberband: true,
 						showNodeSelectionBox: true
 					})
@@ -198,6 +208,10 @@ export const Graph = forwardRef((props, ref) => {
 		{ label, image, type, labelCn }: IImageShapes
 	) => {
 		if (!graph) {
+			return;
+		}
+
+		if (isPublicTemplate) {
 			return;
 		}
 
@@ -298,7 +312,8 @@ export const Graph = forwardRef((props, ref) => {
 				resetConfigValue,
 				getAllConfigs,
 				syncGraph,
-				setAllConfigs
+				setAllConfigs,
+				isPublicTemplate
 			}}
 		>
 			<div className={classes['top-breadcrumb']}>
