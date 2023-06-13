@@ -291,7 +291,7 @@ const SelectGroup: React.FC = () => {
 		id && resetValue(id);
 	};
 	return (
-		<div>
+		<div style={{ overflowY: 'auto', height: '300px' }}>
 			<Form
 				name="customized_form_controls"
 				layout="vertical"
@@ -301,7 +301,7 @@ const SelectGroup: React.FC = () => {
 				}}
 				initialValues={{
 					connectionSentences: [{ key: 0, fieldKey: 0 }],
-					connectionType: 'LEFT JOIN',
+					connectionType: 'INNER JOIN',
 					...formInitValue
 				}}
 				form={form}
