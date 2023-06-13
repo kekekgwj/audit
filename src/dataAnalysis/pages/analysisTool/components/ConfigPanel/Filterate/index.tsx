@@ -16,6 +16,7 @@ import { useConfigContextValue, useUpdateTable } from '../../NodeDetailPanel';
 import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 import { contentQuotesLinter } from '@ant-design/cssinjs/lib/linters';
+import { transFilterData } from '../../../lib/utils';
 type RowGroupItme = {
 	_key: string;
 	value1: [];
@@ -280,7 +281,8 @@ const reducer = (state: FormData, action: any) => {
 	return { ...state };
 };
 
-export default () => {
+export default (props: any) => {
+	const { submit } = props;
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const graph = useGraph();
 	const projectID = useGraphID();
@@ -307,9 +309,7 @@ export default () => {
 				content: canvasData
 			})
 		};
-
 		getCanvasConfig(params).then((res) => {
-			// console.log(res, 315315);
 			setConfigData(formatCascaderData(res));
 			setColData(formatColData(res));
 			const optionArr = [];
@@ -364,59 +364,14 @@ export default () => {
 		return formatData;
 	};
 
-	// const plainOptions = ['Apple', 'Pear', 'Orange'];
-
 	// 执行
-	const submit = () => {
-		console.log(formData, 300300);
-		formData.row.map((item, index) => {
-			if (item && item.length) {
-				formData.row[index] = item.map((el, i) => {
-					return {
-						tableName: el.value1[0],
-						tableHeader: el.value1[1]?.split('#')[0],
-						operator: el.value2,
-						value: el.value3,
-						dataType: el.value1[1]?.split('#')[1] //需要从获取的数据对应读取
-					};
-				});
-			}
-		});
-
-		// 查找选中的字段属性
-		const arr = [];
-		colData.forEach((item, index) => {
-			item.children.forEach((el, i) => {
-				if (formData.col.includes(el.value)) {
-					arr.push({ tableName: item.value, fieldName: el.value });
-				}
-			});
-		});
-
-		// 拼接后端需要数据
-		const colTableNameArr = [];
-		arr.forEach((item, index) => {
-			colTableNameArr.push(item.tableName);
-		});
-		// 去重
-		const a = [...new Set(colTableNameArr)];
-		formData.col = a.map((item, index) => {
-			const b = [];
-			arr.forEach((el, i) => {
-				if (item == el.tableName) {
-					b.push(el.fieldName);
-				}
-			});
-			return {
-				tableName: item,
-				headers: b
-			};
-		});
-
+	const handleSubmit = async () => {
+		const configs = await transFilterData(id, canvasData, formData);
+		console.log(configs, 419419419);
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
-				configs: { [id]: formData }
+				configs
 			}),
 			executeId: id, //当前选中元素id
 			projectId: projectID
@@ -572,7 +527,7 @@ export default () => {
 						className={`${styles.btn} ${styles.submit}`}
 						type="primary"
 						htmlType="submit"
-						onClick={submit}
+						onClick={handleSubmit}
 					>
 						执行
 					</Button>

@@ -12,13 +12,13 @@ export default defineConfig(({ mode, command }) => {
 		resolve: {
 			// https://cn.vitejs.dev/config/#resolve-alias
 			alias: {
-				src: '/src',
+				src: './src',
 				// 设置路径
-				'~': path.resolve(__dirname, '/'),
-				'@': path.resolve(__dirname, '/src/'),
+				'~': path.resolve(__dirname, './'),
+				'@': path.resolve(__dirname, './src/'),
 				// 设置别名
-				'@graph': path.resolve(__dirname, '/src/knowledgeGraph'),
-				'@sql': path.resolve(__dirname, '/src/dataAnalysis')
+				'@graph': path.resolve(__dirname, './src/knowledgeGraph'),
+				'@sql': path.resolve(__dirname, './src/dataAnalysis')
 			},
 			// https://cn.vitejs.dev/config/#resolve-extensions
 			extensions: ['.js', '.ts', '.jsx', '.tsx', '.json']

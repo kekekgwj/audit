@@ -12,12 +12,16 @@ interface IProps {
 }
 
 const ConfigByType: () => JSX.Element = () => {
+	const handleSubmit = (a, b, c) => {
+		// 请求接口
+	};
+
 	const { type } = useConfigContextValue();
 	if (type === IImageTypes.CONNECT) {
 		return <JoinConfig />;
 	}
 	if (type === IImageTypes.FILTER) {
-		return <Filterate />;
+		return <Filterate submit={handleSubmit} />;
 	}
 	if (type === IImageTypes.GROUP) {
 		return <Grouping />;

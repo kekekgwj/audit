@@ -1,4 +1,5 @@
 import { Graph, Node, Edge, ObjectExt, StringExt } from '@antv/x6';
+import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 import * as X6 from '@antv/x6';
 type Metadata = Node.Metadata | Edge.Metadata;
 type C = Node | Edge;
@@ -374,4 +375,104 @@ export const formatDataSource = (data: any[], head: string[]) => {
 	});
 
 	return { data: formatData, columns };
+};
+
+// 筛选时的数据处理
+const formatColData = (data: any) => {
+	const formatData = data.map((item) => {
+		const childrenArr = item.fields;
+		const children = [];
+		childrenArr?.forEach((el) => {
+			children.push({
+				label: el.description || el.fieldName, //展示描述没有展示名称
+				value: el.fieldName
+			});
+		});
+		return {
+			label: item.tableCnName,
+			value: item.tableName,
+			children: children
+		};
+	});
+	console.log(formatData, 361361);
+	return formatData;
+};
+
+const formatCascaderData = (data: any) => {
+	const formatData = data.map((item) => {
+		const childrenArr = item.fields;
+		const children = [];
+		childrenArr?.forEach((el) => {
+			children.push({
+				label: el.description || el.fieldName, //展示描述没有展示名称
+				value: el.fieldName + '#' + el.dataType
+			});
+		});
+		return {
+			label: item.tableCnName,
+			value: item.tableName,
+			children: children
+		};
+	});
+	console.log(formatData, 361361);
+	return formatData;
+};
+
+export const transFilterData = async (
+	id: string,
+	canvasData: any,
+	formData: any
+) => {
+	const params = {
+		id,
+		canvasJson: JSON.stringify({
+			content: canvasData
+		})
+	};
+	const res = await getCanvasConfig(params);
+	const colData = formatColData(res);
+	let rowArr = [];
+	formData.row.forEach((item, index) => {
+		if (item && item.length) {
+			const ttt = item.map((el, i) => {
+				return {
+					tableName: el.value1[0],
+					tableHeader: el.value1[1]?.split('#')[0],
+					operator: el.value2,
+					value: el.value3,
+					dataType: el.value1[1]?.split('#')[1] //需要从获取的数据对应读取
+				};
+			});
+			rowArr.push(ttt);
+		}
+	});
+	const arr = [];
+	colData.forEach((item, index) => {
+		item.children.forEach((el, i) => {
+			if (formData.col.includes(el.value)) {
+				arr.push({ tableName: item.value, fieldName: el.value });
+			}
+		});
+	});
+
+	// 拼接后端需要数据
+	const colTableNameArr = [];
+	arr.forEach((item, index) => {
+		colTableNameArr.push(item.tableName);
+	});
+	// 去重
+	const a = [...new Set(colTableNameArr)];
+	const colArr = a.map((item, index) => {
+		const b = [];
+		arr.forEach((el, i) => {
+			if (item == el.tableName) {
+				b.push(el.fieldName);
+			}
+		});
+		return {
+			tableName: item,
+			headers: b
+		};
+	});
+	return { [id]: { col: colArr, row: rowArr } };
 };
