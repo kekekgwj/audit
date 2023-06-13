@@ -247,7 +247,7 @@ const DataManageCom = () => {
 					}}
 				>
 					<Form.Item name="tableName" label="表名称">
-						<Input />
+						<Input placeholder='请输入' />
 					</Form.Item>
 
 					<Form.Item name="gmtCreated" label="创建时间">

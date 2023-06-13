@@ -3,6 +3,7 @@ import { Form, Input } from 'antd';
 import { useEffect } from 'react';
 
 import { getSql } from '@/api/dataAnalysis/sql';
+import { CopyOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 
@@ -24,6 +25,7 @@ export default (props: Props) => {
 	}, [open]);
 
 	const getInfo = async () => {
+		form.resetFields();
 		const res = await getSql(defaultValue.key);
 		form.setFieldsValue({
 			sqlName: res.name,
@@ -45,9 +47,24 @@ export default (props: Props) => {
 					<Form.Item name="sqlName" label="SQL名称">
 						<Input placeholder="请输入" disabled />
 					</Form.Item>
-					<Form.Item name="sqlContent" label="SQL内容">
-						<TextArea rows={4} placeholder="请输入" disabled />
-					</Form.Item>
+					{/* <div style={{ position: 'relative' }}> */}
+						<Form.Item name="sqlContent" label="SQL内容">
+							<TextArea
+								style={{ cursor: 'unset' }}
+								rows={4}
+								placeholder="请输入"
+								disabled
+							></TextArea>
+						</Form.Item>
+						{/* <CopyOutlined
+							style={{
+								position: 'absolute',
+								right: '10px',
+								top: '10px',
+								cursor: 'pointer'
+							}}
+						/> */}
+					{/* </div> */}
 				</Form>
 			</CustomDialog>
 		</div>
