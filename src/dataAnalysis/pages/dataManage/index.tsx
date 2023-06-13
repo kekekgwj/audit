@@ -79,7 +79,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 		},
 		{
 			title: '数据表名称',
-			dataIndex: 'tableName'
+			dataIndex: 'tableCnName'
 		},
 
 		{
