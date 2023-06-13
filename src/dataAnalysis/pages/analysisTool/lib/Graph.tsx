@@ -48,7 +48,7 @@ export const Graph = forwardRef((props, ref) => {
 	const DndContainerRef = useRef<HTMLDivElement>(null);
 	const panelDndContainerRef = useRef<HTMLDivElement>(null);
 	const { goBack, pathName, templateName, projectId } = useGraphPageInfo();
-	const isPublicTemplate = !(pathName === '审计模板');
+	const isPublicTemplate = pathName === '审计模板';
 	const [form] = Form.useForm();
 	const {
 		getConfigValue,
