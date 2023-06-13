@@ -3,6 +3,7 @@ import { Form, Input } from 'antd';
 import { useEffect } from 'react';
 
 import { getSql } from '@/api/dataAnalysis/sql';
+import { CopyOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 
@@ -24,6 +25,7 @@ export default (props: Props) => {
 	}, [open]);
 
 	const getInfo = async () => {
+		form.resetFields();
 		const res = await getSql(defaultValue.key);
 		form.setFieldsValue({
 			sqlName: res.name,

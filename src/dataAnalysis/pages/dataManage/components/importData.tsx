@@ -164,10 +164,10 @@ const ImportCom = React.memo((props: Props) => {
 						name="tableName"
 						rules={[{ required: true, message: '请输入名称' }]}
 					>
-						<Input />
+						<Input placeholder="请输入" />
 					</Form.Item>
 					<Form.Item label="描述" name="description">
-						<TextArea rows={2} />
+						<TextArea placeholder="请输入" rows={2} />
 					</Form.Item>
 				</Form>
 			</CustomDialog>
