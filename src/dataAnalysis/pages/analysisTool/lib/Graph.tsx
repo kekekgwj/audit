@@ -1,13 +1,5 @@
 import * as X6 from '@antv/x6';
-import React, {
-	useRef,
-	createContext,
-	useContext,
-	forwardRef,
-	useEffect,
-	useState,
-	useCallback
-} from 'react';
+import React, { useRef, forwardRef, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Selection } from '@antv/x6-plugin-selection';
@@ -15,112 +7,21 @@ import { Keyboard } from '@antv/x6-plugin-keyboard';
 import { Divider, message, Form, Input } from 'antd';
 import { Dnd } from '@antv/x6-plugin-dnd';
 import { LeftOutlined } from '@ant-design/icons';
-import {
-	saveAsAuditProject,
-	getProjectCanvas,
-	getAuditProjectCanvas
-} from '@/api/dataAnalysis/graph';
+import { saveAsAuditProject } from '@/api/dataAnalysis/graph';
 import CustomDialog from '@/components/custom-dialog';
 
-interface IGraphContext extends IGraphConfig {
-	graph: X6.Graph | null;
-	startDrag: (
-		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-		{ label, image, type }: IImageShapes
-	) => void;
-	projectID: number | null;
-}
-interface IGraphConfig {
-	getConfigValue: (id: string) => any;
-	saveConfigValue: (id: string, value: any) => void;
-	resetConfigValue: (id: string) => void;
-	getAllConfigs: () => void;
-	setAllConfigs: (value: any) => void;
-	syncGraph: () => void;
-}
-export const useGraph = () => {
-	const { graph } = useContext(GraphContext) || {};
-	return graph;
-};
-export const useGraphID = () => {
-	const { projectID } = useContext(GraphContext) || {};
-	return projectID;
-};
-
-export const useGraphContext = () => {
-	return useContext(GraphContext) || {};
-};
-
-export const useNodeConfigValue: () => IGraphConfig = () => {
-	const ref = React.useRef<Record<string, object>>({});
-
-	const getConfigValue = useCallback((id: string) => {
-		if (ref.current) {
-			return ref.current[id];
-		} else {
-			null;
-		}
-	}, []);
-	const saveConfigValue = useCallback((id: string, value: any) => {
-		ref.current[id] = value;
-	}, []);
-	const resetConfigValue = useCallback((id: string) => {
-		saveConfigValue(id, null);
-	}, []);
-	const getAllConfigs = () => {
-		return ref.current;
-	};
-	const setAllConfigs = (value: any) => {
-		ref.current = value;
-	};
-	return {
-		getConfigValue,
-		saveConfigValue,
-		resetConfigValue,
-		getAllConfigs,
-		setAllConfigs
-	};
-};
-export const GraphContext = createContext<IGraphContext>({
-	graph: null,
-	startDrag: function (
-		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-		{ label, image, type, labelCn }: IImageShapes
-	): void {
-		throw new Error('Function not implemented.');
-	},
-	projectID: null,
-	getConfigValue: function (id: string) {
-		throw new Error('Function not implemented.');
-	},
-	saveConfigValue: function (id: string, value: any): void {
-		throw new Error('Function not implemented.');
-	},
-	resetConfigValue: function (id: string): void {
-		throw new Error('Function not implemented.');
-	},
-	getAllConfigs: function (): void {
-		throw new Error('Function not implemented.');
-	},
-	setAllConfigs: function (value: any): void {
-		throw new Error('Function not implemented.');
-	},
-	syncGraph: function (): void {
-		throw new Error('Function not implemented.');
-	}
-});
 import classes from './graph.module.less';
 import TableSourcePanel from '../components/TableSourcePanel';
 import {
 	IImageShapes,
 	IImageTypes,
-	getNodeTypeById,
 	handleValidateNode,
 	imageShapes,
+	ports,
 	syncData,
 	validateConnectionRule
 } from './utils';
-import { useGraphPageInfo } from './hooks';
+import { GraphContext, useGraphPageInfo, useNodeConfigValue } from './hooks';
 
 interface Props {
 	className?: string;
@@ -128,84 +29,6 @@ interface Props {
 	children?: ReactNode;
 	openMessage: (error: string) => void;
 }
-const ports = {
-	groups: {
-		top: {
-			position: 'top',
-			attrs: {
-				circle: {
-					r: 4,
-					magnet: true,
-					stroke: '#5F95FF',
-					strokeWidth: 1,
-					fill: '#fff',
-					style: {
-						visibility: 'hidden'
-					}
-				}
-			}
-		},
-		right: {
-			position: 'right',
-			attrs: {
-				circle: {
-					r: 4,
-					magnet: true,
-					stroke: '#5F95FF',
-					strokeWidth: 1,
-					fill: '#fff',
-					style: {
-						visibility: 'hidden'
-					}
-				}
-			}
-		},
-		bottom: {
-			position: 'bottom',
-			attrs: {
-				circle: {
-					r: 4,
-					magnet: true,
-					stroke: '#5F95FF',
-					strokeWidth: 1,
-					fill: '#fff',
-					style: {
-						visibility: 'hidden'
-					}
-				}
-			}
-		},
-		left: {
-			position: 'left',
-			attrs: {
-				circle: {
-					r: 4,
-					magnet: true,
-					stroke: '#5F95FF',
-					strokeWidth: 1,
-					fill: '#fff',
-					style: {
-						visibility: 'hidden'
-					}
-				}
-			}
-		}
-	},
-	items: [
-		{
-			group: 'top'
-		},
-		{
-			group: 'right'
-		},
-		{
-			group: 'bottom'
-		},
-		{
-			group: 'left'
-		}
-	]
-};
 
 export const Graph = forwardRef((props, ref) => {
 	const [graph, setGraph] = useState<X6.Graph | null>(null);
@@ -233,8 +56,8 @@ export const Graph = forwardRef((props, ref) => {
 		getAllConfigs,
 		setAllConfigs
 	} = useNodeConfigValue();
-	// 初始化画布和dnd
-	useEffect(() => {
+	// 初始化画布
+	const initializeGraph = () => {
 		if (graphWrapperRef.current && containerRef.current && !graph) {
 			const graph: X6.Graph = new X6.Graph({
 				container: containerRef.current,
@@ -280,18 +103,6 @@ export const Graph = forwardRef((props, ref) => {
 						return validateConnectionRule(graph, args, openMessage);
 					}
 				}
-				// highlighting: {
-				// 	magnetAdsorbed: {
-				// 		name: 'stroke',
-				// 		args: {
-				// 			attrs: {
-				// 				fill: '#5F95FF',
-				// 				stroke: '#5F95FF'
-				// 			}
-				// 		}
-				// 	}
-				// },
-				// ...other
 			});
 			graph
 				.use(
@@ -334,41 +145,12 @@ export const Graph = forwardRef((props, ref) => {
 				setPanelDnd(dnd);
 			}
 		}
-		//初始化画布元素
-		// if (projectId) {
-		// 	getProjectCanvas({ projectId }).then((res) => {
-		// 		if (res.canvasJson) {
-		// 			const data = JSON.parse(res.canvasJson);
-		// 			graph.fromJSON(data.content);
-		// 		}
-		// 	});
-		// }
-	}, [graph, other, ref]);
+	};
+	// 初始化画布和dnd
 	useEffect(() => {
-		if (!graph || !projectId) {
-			return;
-		}
-		// 这里要分我的模板和审计模板
-		if (pathName == '我的模板') {
-			(async () => {
-				const res = await getProjectCanvas({ projectId });
-				const { canvasJson } = res;
-				const { content, configs } = JSON.parse(canvasJson);
-				graph.fromJSON(content);
-				setAllConfigs(configs || {});
-			})();
-		} else if (pathName == '审计模板') {
-			(async () => {
-				const res = await getAuditProjectCanvas({
-					auditProjectId: projectId
-				});
-				const { canvasJson } = res;
-				const { content, configs } = JSON.parse(canvasJson);
-				graph.fromJSON(content);
-				setAllConfigs(configs || {});
-			})();
-		}
-	}, [projectId, graph]);
+		initializeGraph();
+	}, [graph, other, ref]);
+
 	// 监听画布尺寸
 	useEffect(() => {
 		window.addEventListener('resize', handleResize);
@@ -395,8 +177,20 @@ export const Graph = forwardRef((props, ref) => {
 				maxoffsetHeight = Math.max(y + graphOffsetHeight, maxoffsetHeight);
 			});
 			graph.resize(maxOffsetWidth, maxoffsetHeight);
-			// graph?.resize(containWidth, containHeight);
 		}
+	};
+
+	const getLabelLength = (str: string) => {
+		var Regx = /^[A-Za-z0-9]*$/;
+		let len = 0;
+		for (let i = 0; i < str.length; i++) {
+			if (Regx.test(str.charAt(i))) {
+				len = len + 8;
+			} else {
+				len = len + 14;
+			}
+		}
+		return len;
 	};
 
 	const startDrag = (
@@ -408,10 +202,11 @@ export const Graph = forwardRef((props, ref) => {
 		}
 
 		const text = labelCn || label;
-		console.log('length', text.length, text.length * 14 + 40);
+
 		const node = graph?.createNode({
 			inherit: 'rect',
-			width: type === IImageTypes.TABLE ? text.length * 14 + 40 : 36,
+			// width: type === IImageTypes.TABLE ? text.length * 14 + 40 : 36,
+			width: type === IImageTypes.TABLE ? getLabelLength(text) + 40 : 36,
 			// height: 38,
 			height: type === IImageTypes.TABLE ? 38 : 58,
 			label: text,
@@ -502,7 +297,8 @@ export const Graph = forwardRef((props, ref) => {
 				saveConfigValue,
 				resetConfigValue,
 				getAllConfigs,
-				syncGraph
+				syncGraph,
+				setAllConfigs
 			}}
 		>
 			<div className={classes['top-breadcrumb']}>
@@ -608,5 +404,3 @@ export const Graph = forwardRef((props, ref) => {
 		</GraphContext.Provider>
 	);
 });
-
-export const useGraphInstance = () => useContext(GraphContext);

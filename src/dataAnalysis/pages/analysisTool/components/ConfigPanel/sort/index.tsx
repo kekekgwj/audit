@@ -4,7 +4,7 @@ import { Button, Form, Collapse } from 'antd';
 import { UpIcon, Downicon, HeartIcon, DelIcon } from './icon';
 import { useConfigContextValue } from '../../NodeDetailPanel';
 const { Panel } = Collapse;
-import { useGraph, useGraphContext, useGraphID } from '../../../lib/Graph';
+import { useGraph, useGraphContext, useGraphID } from '../../../lib/hooks';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 
 interface SortProps {

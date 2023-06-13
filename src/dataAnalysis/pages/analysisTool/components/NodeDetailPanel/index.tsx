@@ -9,17 +9,16 @@ import { Table } from 'antd';
 import { useSelector } from 'react-redux';
 import classes from './index.module.less';
 import ConfigPanel from '../ConfigPanel';
-import { ColumnsType } from 'antd/es/table';
 import ASSETS from '../../assets/index';
 import { IRootState, onClickCloseConfigPanel } from '@/redux/store';
 import { CloseOutlined } from '@ant-design/icons';
-import { useGraph, useGraphContext, useGraphID } from '../../lib/Graph';
-import { transFilterData } from '../../lib/utils';
+import { useGraph, useGraphContext, useGraphID } from '../../lib/hooks';
 import {
 	IImageTypes,
 	formatDataSource,
 	getNodeTypeById,
-	useInitRender
+	useInitRender,
+	transFilterData
 } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
 import { exportData, getResult } from '@/api/dataAnalysis/graph';
