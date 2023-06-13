@@ -14,6 +14,7 @@ import ASSETS from '../../assets/index';
 import { IRootState, onClickCloseConfigPanel } from '@/redux/store';
 import { CloseOutlined } from '@ant-design/icons';
 import { useGraph, useGraphContext, useGraphID } from '../../lib/Graph';
+import { transFilterData } from '../../lib/utils';
 import {
 	IImageTypes,
 	formatDataSource,
@@ -147,19 +148,40 @@ const Panel: React.FC = () => {
 
 	const downLoadData = async () => {
 		const canvasData = graph.toJSON();
-		try {
-			const params = {
-				executeId: id,
-				projectId: projectID,
-				canvasJson: JSON.stringify({
-					content: canvasData,
-					configs: getAllConfigs()
-				})
-			};
-			const res = await exportData(params);
-			console.log('导出结果：', res);
-		} catch {
-			console.log('err');
+		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
+		console.log(curType, 150150);
+		// 如果是筛选组件 需要特殊处理数据
+		if (curType == 'FILTER') {
+			const filterData = getAllConfigs();
+			const formData = filterData[id];
+			const cnofig = await transFilterData(id, canvasData, formData);
+			try {
+				const params = {
+					executeId: id,
+					projectId: projectID,
+					canvasJson: JSON.stringify({
+						content: canvasData,
+						configs: cnofig
+					})
+				};
+				await exportData(params, '导出结果.xlsx');
+			} catch {
+				console.log('err');
+			}
+		} else {
+			try {
+				const params = {
+					executeId: id,
+					projectId: projectID,
+					canvasJson: JSON.stringify({
+						content: canvasData,
+						configs: getAllConfigs()
+					})
+				};
+				await exportData(params, '导出结果.xlsx');
+			} catch {
+				console.log('err');
+			}
 		}
 	};
 
