@@ -1,32 +1,37 @@
 import {
 	createContext,
 	useContext,
+	useEffect,
 	useReducer,
-	useState,
-	useEffect
+	useState
 } from 'react';
-import { Button, Checkbox, Form, Input, Select, Cascader } from 'antd';
-import isEmpty from 'lodash/isEmpty';
-import cloneDeep from 'lodash/cloneDeep';
+import { Button, Cascader, Checkbox, Form, Input, Select } from 'antd';
+import { isEmpty, cloneDeep } from 'lodash';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { useConfigContextValue, useUpdateTable } from '../../NodeDetailPanel';
-import { useGraph, useGraphID } from '../../../lib/hooks';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
-import { transFilterData } from '../../../lib/utils';
+import { useConfigContextValue, useUpdateTable } from '../../NodeDetailPanel';
+import { useGraph, useGraphContext, useGraphID } from '../../../lib';
+
 type RowGroupItme = {
 	_key: string;
-	value1: [];
-	value2: string;
-	value3: string;
-	value4: string | number;
+	tableName: string; // 表名
+	tableHeader: string; // 表头
+	operator: string; // 符号
+	value: string; // 值
+	dataType: string | number;
+};
+
+type ColItem = {
+	tableName: string;
+	headers: Array<string | number | CheckboxValueType>;
 };
 
 type FormData = {
 	row: Array<Array<RowGroupItme>>;
-	col: Array<CheckboxValueType>;
+	col: Array<ColItem>;
 };
 
 type setRowData = (
@@ -42,7 +47,6 @@ type addRow = (rowGroupIndex: number, rowIndex: number) => void;
 interface GroupProps {
 	index: number;
 	rowGroup: Array<RowGroupItme>;
-	configData: []; //配置选项
 }
 
 interface RowProps {
@@ -57,6 +61,7 @@ interface FilterateContext {
 	delGroup: delGroup;
 	delRow: delRow;
 	addRow: addRow;
+	cascaderOptions: any;
 }
 
 const CheckboxGroup = Checkbox.Group;
@@ -82,10 +87,11 @@ const data: FormData = {
 		[
 			{
 				_key: getHash(),
-				value1: [],
-				value2: '',
-				value3: '',
-				value4: ''
+				tableName: '', // 表名
+				tableHeader: '', // 表头
+				operator: '', // 符号
+				value: '', // 值
+				dataType: ''
 			}
 		]
 	],
@@ -119,7 +125,6 @@ const Group = (props: GroupProps) => {
 							index={itemIndex}
 							defaultValue={item}
 							delRow={delRow}
-							configData={props.configData}
 						></Row>
 					);
 				})}
@@ -134,28 +139,20 @@ const Group = (props: GroupProps) => {
 const Row = (props: RowProps) => {
 	const filterateContext = useContext(FilterateContext);
 
-	const handleChange = (key: string, val: string) => {
-		console.log(val, 127127);
-		filterateContext?.setRowData(props.groupIndex, props.index, {
-			...props.defaultValue,
-			[key]: val
-		});
-	};
+	let cascaderDefaultValue: [string, string] | [] = [];
 
-	const handleDel = () => {
-		props.delRow(props.groupIndex, props.index);
-	};
-
-	const handleAdd = () => {
-		filterateContext?.addRow(props.groupIndex, props.index);
-	};
+	if (props.defaultValue.tableName) {
+		cascaderDefaultValue = [
+			props.defaultValue.tableName,
+			`${props.defaultValue.tableHeader}#${props.defaultValue.dataType}`
+		];
+	}
 
 	const symbolSelect = [
 		{
 			label: '=',
 			value: '='
 		},
-
 		{
 			label: '>',
 			value: '>'
@@ -174,6 +171,33 @@ const Row = (props: RowProps) => {
 		}
 	];
 
+	const handleChange = (key: string, val: string | Array<any>) => {
+		let newData = {
+			[key]: val
+		};
+		if (key === 'table') {
+			const field = val[1].split('#');
+			newData = {
+				tableName: val[0],
+				tableHeader: field[0],
+				dataType: field[1]
+			};
+		}
+
+		filterateContext?.setRowData(props.groupIndex, props.index, {
+			...props.defaultValue,
+			...newData
+		});
+	};
+
+	const handleDel = () => {
+		props.delRow(props.groupIndex, props.index);
+	};
+
+	const handleAdd = () => {
+		filterateContext?.addRow(props.groupIndex, props.index);
+	};
+
 	return (
 		<div className={styles['filter-box__row']}>
 			{/* <Select
@@ -188,27 +212,25 @@ const Row = (props: RowProps) => {
 				]}
 				onChange={(value) => handleChange('value1', value)}
 			/> */}
-			{/* 这里是级联选择，先选表，再选字段 */}
 			<Cascader
 				className={styles['filter-box__row_item']}
 				placeholder="请选择"
-				options={props.configData}
-				defaultValue={props.defaultValue.value1}
-				// displayRender={displayRender}
-				onChange={(value) => handleChange('value1', value)}
+				options={filterateContext?.cascaderOptions}
+				defaultValue={cascaderDefaultValue}
+				onChange={(value) => handleChange('table', value)}
 			/>
 			<Select
 				className={styles['filter-box__row_item']}
-				defaultValue={props.defaultValue.value2}
+				defaultValue={props.defaultValue.operator}
 				placeholder="请选择"
 				options={symbolSelect}
-				onChange={(value) => handleChange('value2', value)}
+				onChange={(value) => handleChange('operator', value)}
 			/>
 			<Input
-				defaultValue={props.defaultValue.value3}
+				defaultValue={props.defaultValue.value}
 				className={styles['filter-box__row_item']}
 				placeholder="请输入"
-				onChange={(e) => handleChange('value3', e.target.value)}
+				onChange={(e) => handleChange('value', e.target.value)}
 			/>
 			<div className={styles['filter-box__row_btns']}>
 				<div className={styles['add-row']} onClick={handleAdd}>
@@ -234,19 +256,22 @@ const reducer = (state: FormData, action: any) => {
 			state.row.push([
 				{
 					_key: getHash(),
-					value1: [],
-					value2: '',
-					value3: ''
+					tableName: '', // 表名
+					tableHeader: '', // 表头
+					operator: '', // 符号
+					value: '', // 值
+					dataType: ''
 				}
 			]);
 			break;
 		case 'addRow':
 			state.row[action.groupIndex].splice(action.rowIndex + 1, 0, {
 				_key: getHash(),
-				value1: [],
-				value2: '',
-				value3: '',
-				value4: ''
+				tableName: '', // 表名
+				tableHeader: '', // 表头
+				operator: '', // 符号
+				value: '', // 值
+				dataType: ''
 			});
 			break;
 		case 'delRow':
@@ -262,10 +287,11 @@ const reducer = (state: FormData, action: any) => {
 					[
 						{
 							_key: getHash(),
-							value1: [],
-							value2: '',
-							value3: '',
-							value4: ''
+							tableName: '', // 表名
+							tableHeader: '', // 表头
+							operator: '', // 符号
+							value: '', // 值
+							dataType: ''
 						}
 					]
 				],
@@ -280,73 +306,69 @@ const reducer = (state: FormData, action: any) => {
 	return { ...state };
 };
 
-export default (props: any) => {
-	const { submit } = props;
+export default () => {
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
-	const graph = useGraph();
+	const { getAllConfigs } = useGraphContext();
 	const projectID = useGraphID();
-	const canvasData = graph.toJSON();
+	const graph = useGraph();
+	const canvasData = graph?.toJSON();
+	const updateTable = useUpdateTable();
 	let initData = getValue && id && getValue(id);
 	if (isEmpty(getValue && id && getValue(id))) {
 		initData = cloneDeep(data);
 	}
-	const updateTable = useUpdateTable();
-	console.log({ initData });
 	const [formData, dispatch] = useReducer(reducer, initData);
-	// const [formData, setFormData] = useState(data);
 	const [indeterminate, setIndeterminate] = useState(false);
 	const [checkAll, setCheckAll] = useState(false);
-	const [configData, setConfigData] = useState([]);
-	const [colData, setColData] = useState([]);
-	const [plainOptions, setPlainOptions] = useState([]);
+
+	const [cascaderOptions, setCascaderOptions] = useState([]);
+	const [colOptions, setColOptions] = useState([]);
 
 	//获取对应配置数据
 	useEffect(() => {
-		const params = {
-			id,
+		getCanvasConfig({
+			id: id || '',
 			canvasJson: JSON.stringify({
 				content: canvasData
 			})
-		};
-		getCanvasConfig(params).then((res) => {
-			setConfigData(formatCascaderData(res));
-			setColData(formatColData(res));
-			const optionArr = [];
-			res.forEach((item, index) => {
-				item.fields?.forEach((el, i) => {
-					optionArr.push(el.fieldName);
-				});
-			});
-			setPlainOptions(optionArr);
+		}).then((res) => {
+			setCascaderOptions(formatCascaderData(res));
+			setColOptions(formatColData(res));
 		});
 	}, []);
 
 	// 处理列数据
 	const formatColData = (data: any) => {
-		const formatData = data.map((item) => {
+		return data.map((item) => {
 			const childrenArr = item.fields;
-			const children = [];
+			const children: Array<{ label: string; value: string }> = [];
+			const allValue: Array<string | number> = [];
 			childrenArr?.forEach((el) => {
 				children.push({
 					label: el.description || el.fieldName, //展示描述没有展示名称
 					value: el.fieldName
 				});
+				allValue.push(el.fieldName);
 			});
+			const defaultValue = formData.col.find(
+				(colItem) => colItem.tableName === item.tableName
+			);
 			return {
+				_key: getHash(),
 				label: item.tableCnName,
 				value: item.tableName,
-				children: children
+				children: children,
+				allValue,
+				defaultValue: defaultValue ? defaultValue.headers : []
 			};
 		});
-		console.log(formatData, 361361);
-		return formatData;
 	};
 
 	// 拼接为级联选择器形式数据
 	const formatCascaderData = (data: any) => {
-		const formatData = data.map((item) => {
+		return data.map((item) => {
 			const childrenArr = item.fields;
-			const children = [];
+			const children: Array<{ label: string; value: string }> = [];
 			childrenArr?.forEach((el) => {
 				children.push({
 					label: el.description || el.fieldName, //展示描述没有展示名称
@@ -359,23 +381,18 @@ export default (props: any) => {
 				children: children
 			};
 		});
-		console.log(formatData, 361361);
-		return formatData;
 	};
 
 	// 执行
-	const handleSubmit = async () => {
-		const configs = await transFilterData(id, canvasData, formData);
-		console.log(configs, 419419419);
+	const submit = () => {
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
-				configs
+				configs: getAllConfigs()
 			}),
 			executeId: id, //当前选中元素id
 			projectId: projectID
 		};
-		console.log(params, 490490490);
 		getResult(params).then((res: any) => {
 			updateTable(res.data, res.head);
 		});
@@ -431,16 +448,57 @@ export default (props: any) => {
 	};
 
 	const onCheckAllChange = (e: CheckboxChangeEvent) => {
-		dispatch({ type: 'setCol', data: e.target.checked ? plainOptions : [] });
+		const checkedAll = e.target.checked;
+		const formCol = [];
+		const newColOptions = [];
+
+		colOptions.forEach((item) => {
+			if (checkedAll) {
+				formCol.push({
+					tableName: item.value,
+					headers: item.allValue
+				});
+			}
+
+			newColOptions.push({
+				...item,
+				_key: getHash(),
+				defaultValue: checkedAll ? item.allValue : []
+			});
+		});
+
+		setColOptions(newColOptions);
+		dispatch({ type: 'setCol', data: formCol || [] });
 		setIndeterminate(false);
 		setCheckAll(e.target.checked);
 		set();
 	};
 
-	const onChange = (list: CheckboxValueType[]) => {
-		dispatch({ type: 'setCol', data: list });
-		setIndeterminate(!!list.length && list.length < plainOptions.length);
-		setCheckAll(list.length === plainOptions.length);
+	const onChange = (tableName: string, list: CheckboxValueType[]) => {
+		const optionCurrent = colOptions.find((item) => item.value === tableName);
+		optionCurrent.defaultValue = list;
+
+		setColOptions(colOptions);
+
+		const formCurrent = formData.col.find(
+			(item) => item.tableName === tableName
+		);
+		if (formCurrent) {
+			formCurrent.headers = list;
+		} else {
+			formData.col.push({
+				tableName,
+				headers: list
+			});
+		}
+
+		const isIndeter = colOptions.some(
+			(item) => item.allValue.length !== item.defaultValue.length
+		);
+
+		dispatch({ type: 'setCol', data: formData.col });
+		setIndeterminate(isIndeter);
+		setCheckAll(!isIndeter);
 		set();
 	};
 
@@ -451,7 +509,8 @@ export default (props: any) => {
 					setRowData,
 					delGroup,
 					delRow,
-					addRow
+					addRow,
+					cascaderOptions
 				}}
 			>
 				<div className={styles['filter-box']}>
@@ -466,7 +525,6 @@ export default (props: any) => {
 								key={rowGroupIndex}
 								index={rowGroupIndex}
 								rowGroup={rowGroup}
-								configData={configData}
 							></Group>
 						);
 					})}
@@ -493,21 +551,18 @@ export default (props: any) => {
 						</div>
 					</div>
 
-					{/* <CheckboxGroup
-						options={plainOptions}
-						value={formData.col}
-						onChange={onChange}
-					/> */}
-					{colData.map((item, index) => {
+					{colOptions.map(({ _key, label, value, children, defaultValue }) => {
 						return (
-							<div className={styles['checkbox-group-item']}>
-								<div>{item.label + ':'}</div>
+							<div key={_key} className={styles['checkbox-group-item']}>
+								<div>{label + ':'}</div>
 								<div>
 									<CheckboxGroup
 										className={styles['checkbox-group']}
-										options={item.children}
-										value={formData.col}
-										onChange={onChange}
+										options={children}
+										defaultValue={defaultValue}
+										onChange={(val) => {
+											onChange(value, val);
+										}}
 									/>
 								</div>
 							</div>
@@ -526,7 +581,7 @@ export default (props: any) => {
 						className={`${styles.btn} ${styles.submit}`}
 						type="primary"
 						htmlType="submit"
-						onClick={handleSubmit}
+						onClick={submit}
 					>
 						执行
 					</Button>
