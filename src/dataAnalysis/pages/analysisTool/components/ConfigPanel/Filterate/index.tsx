@@ -445,7 +445,7 @@ export default (props: any) => {
 	};
 
 	return (
-		<>
+		<div style={{ overflowY: 'auto', height: '300px' }}>
 			<FilterateContext.Provider
 				value={{
 					setRowData,
@@ -516,6 +516,7 @@ export default (props: any) => {
 				</div>
 				<div className={styles.controlRow}>
 					<Button
+						style={{ marginRight: '10px' }}
 						className={`${styles.btn} ${styles.reset}`}
 						htmlType="button"
 						onClick={reset}
@@ -532,6 +533,6 @@ export default (props: any) => {
 					</Button>
 				</div>
 			</FilterateContext.Provider>
-		</>
+		</div>
 	);
 };

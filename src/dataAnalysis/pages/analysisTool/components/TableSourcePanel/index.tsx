@@ -142,14 +142,16 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 							onChange={changeSearch}
 						/>
 					</div>
-					{showSearch ? (
-						<TableItem data={searchData}></TableItem>
-					) : (
-						<>
-							<TableItem data={systemData}></TableItem>
-							<TableItem data={myData}></TableItem>
-						</>
-					)}
+					<div style={{ height: ' calc(100% - 32px)', overflowY: 'auto' }}>
+						{showSearch ? (
+							<TableItem data={searchData}></TableItem>
+						) : (
+							<>
+								<TableItem data={systemData}></TableItem>
+								<TableItem data={myData}></TableItem>
+							</>
+						)}
+					</div>
 				</div>
 			)}
 
