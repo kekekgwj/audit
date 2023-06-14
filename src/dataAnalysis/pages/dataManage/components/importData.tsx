@@ -77,6 +77,7 @@ const ImportCom = React.memo((props: Props) => {
 				setOpenImport(false);
 				refresh();
 			});
+			form.resetFields()
 		});
 	};
 
