@@ -287,15 +287,37 @@ export const Graph = forwardRef((props, ref) => {
 	//保存为审计模板
 	const saveAsAuditTem = () => {
 		setOpenSave(true);
-		form.resetFields();
 	};
 
 	const handleSave = async () => {
+		const canvasData = graph?.toJSON();
+		let cellData = canvasData.cells?.filter((item, index) => {
+			return item.shape == 'rect';
+		});
+		const typeArr = [];
+		cellData.forEach((el) => {
+			typeArr.push(el.attrs.custom.type);
+		});
+
+		if (!typeArr.includes('END')) {
+			//必须包含end 否则不让保存
+			message.error('必须包含结束组件');
+			return;
+		}
 		const data = form.getFieldsValue();
+		const params = {
+			canvasJson: JSON.stringify({
+				content: canvasData,
+				configs: getAllConfigs()
+			}),
+			projectId,
+			name: data.name
+		};
 		try {
-			const res = await saveAsAuditProject({ projectId, name: data.name });
+			const res = await saveAsAuditProject(params);
 			message.success('保存成功');
 			setOpenSave(false);
+			form.resetFields();
 		} catch (e) {
 			console.error(e);
 		}

@@ -464,7 +464,8 @@ const formatColData = (data: any) => {
 		childrenArr?.forEach((el) => {
 			children.push({
 				label: el.description || el.fieldName, //展示描述没有展示名称
-				value: el.fieldName
+				value: el.fieldName,
+				id: el.id
 			});
 		});
 		return {
@@ -508,7 +509,7 @@ export const transFilterData = async (
 	const arr = [];
 	colData.forEach((item, index) => {
 		item.children.forEach((el, i) => {
-			if (formData.col.includes(el.value)) {
+			if (formData.col.includes(el.id)) {
 				arr.push({ tableName: item.value, fieldName: el.value });
 			}
 		});

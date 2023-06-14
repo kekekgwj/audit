@@ -148,19 +148,22 @@ const Panel: React.FC = () => {
 	const downLoadData = async () => {
 		const canvasData = graph.toJSON();
 		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
-		console.log(curType, 150150);
+		const a = getAllConfigs();
+		console.log(a, 152152152152);
 		// 如果是筛选组件 需要特殊处理数据
 		if (curType == 'FILTER') {
-			const filterData = getAllConfigs();
-			const formData = filterData[id];
+			const allConfigData = getAllConfigs();
+			const formData = allConfigData[id];
 			const cnofig = await transFilterData(id, canvasData, formData);
+			allConfigData[id] = cnofig[id];
+			console.log(allConfigData, 159159159);
 			try {
 				const params = {
 					executeId: id,
 					projectId: projectID,
 					canvasJson: JSON.stringify({
 						content: canvasData,
-						configs: cnofig
+						configs: allConfigData
 					})
 				};
 				await exportData(params, '导出结果.xlsx');

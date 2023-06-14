@@ -163,7 +163,7 @@ const MyTemplate = () => {
 				setOpen(false);
 				getTemplateList();
 			});
-		} else if (curTitle == '新增模板') {
+		} else if (curTitle == '新建模板') {
 			saveProject({ name: data.name }).then(() => {
 				message.success('新建成功');
 				form.resetFields();
