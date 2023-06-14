@@ -539,3 +539,15 @@ export const transFilterData = async (
 	});
 	return { [id]: { col: colArr, row: rowArr } };
 };
+export const getLabelLength = (str: string) => {
+	const Regx = /^[A-Za-z0-9]*$/;
+	let len = 0;
+	for (let i = 0; i < str.length; i++) {
+		if (Regx.test(str.charAt(i))) {
+			len = len + 8;
+		} else {
+			len = len + 14;
+		}
+	}
+	return len;
+};
