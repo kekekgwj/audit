@@ -7,7 +7,6 @@ export default defineConfig(({ mode, command }) => {
 	const env = loadEnv(mode, process.cwd());
 	return {
 		// plugins: [createVitePlugins(env.VITE_APP_ENV, command)],
-		base: './',
 		plugins: [createVitePlugins(env.VITE_APP_ENV, command), removeConsole()],
 		resolve: {
 			// https://cn.vitejs.dev/config/#resolve-alias

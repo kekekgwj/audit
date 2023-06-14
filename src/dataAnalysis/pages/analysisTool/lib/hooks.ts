@@ -114,6 +114,7 @@ interface IGraphConfig {
 	getAllConfigs: () => void;
 	setAllConfigs: (value: any) => void;
 	syncGraph: () => void;
+	isPublicTemplate: boolean;
 }
 export const useGraph = () => {
 	const { graph } = useContext(GraphContext) || {};
@@ -160,6 +161,7 @@ export const useNodeConfigValue: () => IGraphConfig = () => {
 };
 export const GraphContext = createContext<IGraphContext>({
 	graph: null,
+	isPublicTemplate: false,
 	startDrag: function (
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 		{ label, image, type, labelCn }: IImageShapes

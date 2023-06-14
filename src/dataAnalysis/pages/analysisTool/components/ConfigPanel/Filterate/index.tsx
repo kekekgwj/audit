@@ -13,9 +13,8 @@ import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { useConfigContextValue, useUpdateTable } from '../../NodeDetailPanel';
-import { useGraph, useGraphContext, useGraphID } from '../../../lib/hooks';
+import { useGraph, useGraphID } from '../../../lib/hooks';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
-import { contentQuotesLinter } from '@ant-design/cssinjs/lib/linters';
 import { transFilterData } from '../../../lib/utils';
 type RowGroupItme = {
 	_key: string;
@@ -293,6 +292,7 @@ export default (props: any) => {
 	}
 	const updateTable = useUpdateTable();
 	console.log({ initData });
+
 	const [formData, dispatch] = useReducer(reducer, initData);
 	// const [formData, setFormData] = useState(data);
 	const [indeterminate, setIndeterminate] = useState(false);
@@ -319,6 +319,9 @@ export default (props: any) => {
 				});
 			});
 			setPlainOptions(optionArr);
+			setCheckAll(true);
+			dispatch({ type: 'setCol', data: optionArr });
+			console.log(res);
 		});
 	}, []);
 
@@ -396,6 +399,10 @@ export default (props: any) => {
 		}
 		resetValue(id);
 		dispatch({ type: 'reset' });
+		dispatch({ type: 'setCol', data: plainOptions });
+		setIndeterminate(false);
+		setCheckAll(true);
+		set();
 	};
 
 	// 更新表单值
@@ -446,7 +453,7 @@ export default (props: any) => {
 	};
 
 	return (
-		<>
+		<div style={{ overflowY: 'auto', height: '300px' }}>
 			<FilterateContext.Provider
 				value={{
 					setRowData,
@@ -517,6 +524,7 @@ export default (props: any) => {
 				</div>
 				<div className={styles.controlRow}>
 					<Button
+						style={{ marginRight: '10px' }}
 						className={`${styles.btn} ${styles.reset}`}
 						htmlType="button"
 						onClick={reset}
@@ -533,6 +541,6 @@ export default (props: any) => {
 					</Button>
 				</div>
 			</FilterateContext.Provider>
-		</>
+		</div>
 	);
 };

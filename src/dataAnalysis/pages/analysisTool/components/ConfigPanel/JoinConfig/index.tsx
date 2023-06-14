@@ -224,8 +224,10 @@ const SelectGroup: React.FC = () => {
 		const list = form.getFieldValue('connectionSentences') || [];
 		const nextList = list.concat({
 			key: list.length,
-			fieldKey: list.length
+			fieldKey: list.length,
+			operator: '='
 		});
+		console.log(nextList);
 		form.setFieldsValue({
 			connectionSentences: nextList
 		});
@@ -252,7 +254,7 @@ const SelectGroup: React.FC = () => {
 	const onFinish = (value: IFilterAll) => {
 		// 可能需要处理
 		handleOnChange(value);
-
+		console.log(value);
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
@@ -291,7 +293,7 @@ const SelectGroup: React.FC = () => {
 		id && resetValue(id);
 	};
 	return (
-		<div>
+		<div style={{ overflowY: 'auto', height: '300px' }}>
 			<Form
 				name="customized_form_controls"
 				layout="vertical"
@@ -300,8 +302,8 @@ const SelectGroup: React.FC = () => {
 					handleOnChange(value);
 				}}
 				initialValues={{
-					connectionSentences: [{ key: 0, fieldKey: 0 }],
-					connectionType: 'LEFT JOIN',
+					connectionSentences: [{ key: 0, fieldKey: 0, operator: '=' }],
+					connectionType: 'INNER JOIN',
 					...formInitValue
 				}}
 				form={form}
@@ -337,7 +339,11 @@ const SelectGroup: React.FC = () => {
 					<span>添加连接语句</span>
 				</div>
 				<div className={classes.addRow}>
-					<span style={{ fontSize: 14, fontWeight: 'bold' }}>连接类型</span>
+					<span
+						style={{ fontSize: 14, fontWeight: 'bold', marginBottom: '24px' }}
+					>
+						连接类型
+					</span>
 					<Form.Item name={'connectionType'}>
 						<Select style={{ width: 395, marginLeft: 0 }}>
 							<Select.Option value="INNER JOIN">内连接</Select.Option>
