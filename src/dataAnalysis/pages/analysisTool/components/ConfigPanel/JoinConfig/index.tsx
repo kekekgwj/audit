@@ -224,7 +224,8 @@ const SelectGroup: React.FC = () => {
 		const list = form.getFieldValue('connectionSentences') || [];
 		const nextList = list.concat({
 			key: list.length,
-			fieldKey: list.length
+			fieldKey: list.length,
+			operator: '='
 		});
 		console.log(nextList);
 		form.setFieldsValue({
@@ -251,6 +252,8 @@ const SelectGroup: React.FC = () => {
 		return value;
 	};
 	const onFinish = (value: IFilterAll) => {
+		console.log(value);
+		return
 		// 可能需要处理
 		handleOnChange(value);
 
@@ -301,7 +304,7 @@ const SelectGroup: React.FC = () => {
 					handleOnChange(value);
 				}}
 				initialValues={{
-					connectionSentences: [{ key: 0, fieldKey: 0 }],
+					connectionSentences: [{ key: 0, fieldKey: 0, operator: '=' }],
 					connectionType: 'INNER JOIN',
 					...formInitValue
 				}}
