@@ -66,7 +66,6 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 		tableRealName: string,
 		tableCnName: string
 	) => {
-		console.log('item', item);
 		if (
 			!dataList.some((res) => {
 				return res.key == item.key;
@@ -173,23 +172,18 @@ interface IFormValue {
 }
 const Grouping: FC = () => {
 	const graph = useGraph();
-	const projectID = useGraphID();
-	const canvasData = graph?.toJSON();
 	const [form] = Form.useForm();
-	const { id, getValue, setValue, resetValue, executeByNodeConfig } =
-		useConfigContextValue();
-	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
-	const { syncGraph, getAllConfigs } = useGraphContext();
-	const getConfig = async () => {
-		const params = {
-			id,
-			canvasJson: JSON.stringify({
-				content: canvasData
-			})
-		};
-		const res = await getCanvasConfig(params);
-		setGroupData(transData(res));
-		setAccordData(transData(res));
+	const {
+		id,
+		setValue,
+		resetValue,
+		executeByNodeConfig,
+		initValue = {},
+		config
+	} = useConfigContextValue();
+	const getConfig = () => {
+		setGroupData(transData(config));
+		setAccordData(transData(config));
 	};
 	//获取配置项数据
 	useEffect(() => {
@@ -217,20 +211,19 @@ const Grouping: FC = () => {
 	};
 	const [groupData, setGroupData] = useState<List[]>();
 	const [accordData, setAccordData] = useState<List[]>();
-	const updateTable = useUpdateTable();
 
-	const onFinish = async (values: any) => {
+	const onFinish = async () => {
 		executeByNodeConfig();
 	};
 	const handleOnChange = (value: any) => {
 		if (!id || !setValue) {
 			return;
 		}
-		setValue(id, value);
+		setValue(value);
 	};
 	const onReset = () => {
 		form.resetFields();
-		id && resetValue(id);
+		id && resetValue();
 	};
 
 	return (
@@ -244,9 +237,9 @@ const Grouping: FC = () => {
 				handleOnChange(value);
 			}}
 			initialValues={{
-				conditions: formInitValue.conditions || [],
-				funcType: formInitValue.funcType,
-				column: formInitValue.column || []
+				conditions: initValue.conditions || [],
+				funcType: initValue.funcType,
+				column: initValue.column || []
 			}}
 		>
 			<div className={classes.formList}>

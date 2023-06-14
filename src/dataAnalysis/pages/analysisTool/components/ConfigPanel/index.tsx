@@ -5,6 +5,7 @@ import Sort from './sort';
 import Filterate from './Filterate';
 import { IImageTypes } from '../../lib/utils';
 import { useConfigContextValue } from '../NodeDetailPanel';
+import { Spin } from 'antd';
 interface IProps {
 	type: IImageTypes;
 	id: string;
@@ -16,7 +17,10 @@ const ConfigByType: () => JSX.Element = () => {
 		// 请求接口
 	};
 
-	const { type } = useConfigContextValue();
+	const { type, config } = useConfigContextValue();
+	if (!config) {
+		return <Spin tip="Loading" size="large"></Spin>;
+	}
 	if (type === IImageTypes.CONNECT) {
 		return <JoinConfig />;
 	}

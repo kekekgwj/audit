@@ -291,7 +291,6 @@ export default (props: any) => {
 		initData = cloneDeep(data);
 	}
 	const updateTable = useUpdateTable();
-	console.log({ initData });
 	const [formData, dispatch] = useReducer(reducer, initData);
 	// const [formData, setFormData] = useState(data);
 	const [indeterminate, setIndeterminate] = useState(false);

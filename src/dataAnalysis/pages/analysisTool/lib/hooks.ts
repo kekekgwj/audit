@@ -114,6 +114,8 @@ interface IGraphConfig {
 	getAllConfigs: () => void;
 	setAllConfigs: (value: any) => void;
 	syncGraph: () => void;
+	getLastestVersion: any;
+	updateNodeConfigVersion: any;
 	isPublicTemplate: boolean;
 }
 export const useGraph = () => {
@@ -131,7 +133,14 @@ export const useGraphContext = () => {
 
 export const useNodeConfigValue: () => IGraphConfig = () => {
 	const ref = useRef<Record<string, object>>({});
+	const latestNodeVersion = useRef<Record<string, string>>({});
 
+	const updateNodeConfigVersion = (id: string, version: number) => {
+		latestNodeVersion.current[id] = version;
+	};
+	const getLastestVersion = () => {
+		return latestNodeVersion.current;
+	};
 	const getConfigValue = useCallback((id: string) => {
 		if (ref.current) {
 			return ref.current[id];
@@ -152,7 +161,8 @@ export const useNodeConfigValue: () => IGraphConfig = () => {
 	return {
 		getConfigValue,
 		saveConfigValue,
-
+		updateNodeConfigVersion,
+		getLastestVersion,
 		getAllConfigs,
 		setAllConfigs
 	};

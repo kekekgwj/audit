@@ -3,6 +3,7 @@ import React, {
 	useCallback,
 	useContext,
 	useEffect,
+	useRef,
 	useState
 } from 'react';
 import { Table } from 'antd';
@@ -18,7 +19,8 @@ import {
 	formatDataSource,
 	getNodeTypeById,
 	useInitRender,
-	transFilterData
+	transFilterData,
+	encodeNodeSources
 } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
 import {
@@ -32,9 +34,9 @@ interface IConfigContext {
 	type: IImageTypes | null;
 	id: string | null;
 	initValue: any;
-	getValue: ((id: string) => any) | null;
-	setValue: ((id: string, value: any) => void) | null;
-	resetValue: (id: string) => void;
+	getValue: () => any;
+	setValue: ((value: any) => void) | null;
+	resetValue: () => void;
 	updateTable: (updateData: any, updateColumn: any) => void;
 	executeByNodeConfig: () => void;
 }
@@ -44,7 +46,7 @@ const ConfigContext = createContext<IConfigContext>({
 	initValue: undefined,
 	getValue: null,
 	setValue: null,
-	resetValue: function (id: string): void {
+	resetValue: function (): void {
 		throw new Error('Function not implemented.');
 	},
 	updateTable: function (updateData: any, updateColumn: any): void {
@@ -62,6 +64,16 @@ export const useUpdateTable = () => {
 	return useContext(ConfigContext).updateTable;
 };
 
+const useNodeKey = () => {
+	const nodeKey = useRef<null | number>(null);
+	const setNodeKeyFrozen = () => (nodeKey.current = null);
+	const isNodeKeyReady = () => nodeKey.current !== null;
+	const getNodeKey = () => {
+		return nodeKey.current;
+	};
+	const setNodeKey = (key: number) => (nodeKey.current = key);
+	return { getNodeKey, setNodeKeyFrozen, isNodeKeyReady, setNodeKey };
+};
 const useTableSource = () => {
 	const [data, setData] = useState([]);
 	const [columns, setColumns] = useState([]);
@@ -76,27 +88,43 @@ const useTableSource = () => {
 
 const Panel: React.FC = () => {
 	const state = useSelector((state: IRootState) => state.dataAnalysis);
+
 	const graph = useGraph();
 	const { data, columns, updateTable } = useTableSource();
 
 	const [showConfig, setShowConfig] = useState(true);
 
-	const { curSelectedNode: id, showPanel = false } = state || {};
+	const { curSelectedNode: id, showPanel = false, time } = state || {};
 	const executeType = [IImageTypes.TABLE, IImageTypes.END];
 	const projectID = useGraphID();
-	const { getConfigValue, saveConfigValue, syncGraph, getAllConfigs } =
-		useGraphContext();
+	const {
+		getConfigValue,
+		saveConfigValue,
+		syncGraph,
+		getAllConfigs,
+		updateNodeConfigVersion,
+		getLastestVersion
+	} = useGraphContext();
 
+	const [nodeConfig, setNodeConfig] = useState({});
+	const { getNodeKey, setNodeKeyFrozen, isNodeKeyReady, setNodeKey } =
+		useNodeKey();
 	const isInit = useInitRender();
+	// const valueChangeReady = isNodeKeyReady() && id;
 
 	useEffect(() => {
 		!isInit && syncGraph();
 	}, [showPanel]);
 
 	useEffect(() => {
-		handleGetNodeConfig();
-	}, []);
+		// setNodeKeyFrozen();
+		// handleGetNodeConfig();
+	}, [time]);
 	const handleGetNodeConfig = async () => {
+		if (!graph) {
+			return;
+		}
+
 		const canvasData = graph?.toJSON();
 		const params = {
 			id,
@@ -104,41 +132,54 @@ const Panel: React.FC = () => {
 				content: canvasData
 			})
 		};
-		const config = await getCanvasConfig(params);
-		console.log(config);
-		// const key = encodeNodeSources();
+		const config: any = await getCanvasConfig(params);
+		setNodeConfig(config);
+		const tableNames = config.map((item) => item.tableName);
+		const key = encodeNodeSources([...tableNames, id]);
+		setNodeKey(key);
 	};
-	const setValue = (id: string, key: number, value: any) => {
-		if (!getConfigValue(id)) {
-			saveConfigValue(id, {});
-		}
-		const configValue = getConfigValue(id);
-		saveConfigValue(id, {
-			...configValue,
-			[key]: value
-		});
-	};
-	const getValue = (id: string, key: number) => {
-		if (!id || !key) {
+
+	const setValue = (nodeKey: number, value: any) => {
+		console.log('setvalue', 'id:', id, 'nodekey:', nodeKey);
+		if (!nodeKey || !id) {
 			return;
 		}
-		return getConfigValue(id)?.key;
+
+		saveConfigValue(id, { ...value, key: nodeKey });
 	};
-	const resetValue = (id: string, key: numebr, value: any) => {
-		if (!getConfigValue(id)) {
-			saveConfigValue(id, {});
+	const getValue = (nodeKey: number) => {
+		if (!nodeKey || !id) {
+			return {};
 		}
-		const configValue = getConfigValue(id);
-		saveConfigValue(id, {
-			...configValue,
-			[key]: null
-		});
+		const curConfig = getConfigValue(id);
+		console.log(
+			'get: id:',
+			id,
+			'nodeKey',
+			nodeKey,
+			'get, curConfig',
+			curConfig
+		);
+		if (!curConfig || curConfig.key !== nodeKey) {
+			return {};
+		}
+		return curConfig;
+	};
+	const resetValue = (value: any) => {
+		if (!isNodeKeyReady() || !id) {
+			return;
+		}
+		saveConfigValue(id, null);
 	};
 	const executeByNodeConfig = async () => {
+		if (!graph) {
+			return;
+		}
 		const canvasData = graph?.toJSON();
 		if (!canvasData || !id || !projectID) {
 			return;
 		}
+
 		type getParameterFirst<T> = T extends [infer first, ...infer rest]
 			? first
 			: null;
@@ -164,11 +205,10 @@ const Panel: React.FC = () => {
 		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
 		if (executeType.includes(curType)) {
 			executeByNodeConfig();
+		} else {
+			//需要将表数据清空
+			updateTable([], []);
 		}
-		// } else {
-		// 	//需要将表数据清空
-		// 	updateTable([], []);
-		// }
 	}, [id]);
 
 	if (!showPanel || !graph) {
@@ -218,7 +258,8 @@ const Panel: React.FC = () => {
 	};
 
 	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
-
+	const initValue = getValue();
+	console.log('initValue', initValue);
 	return (
 		<div className={classes.container}>
 			<div className={classes.data}>
@@ -279,7 +320,8 @@ const Panel: React.FC = () => {
 									value={{
 										type: clickNodeType,
 										id: id,
-										initValue: null,
+										initValue,
+										config: nodeConfig,
 										getValue,
 										setValue,
 										resetValue,
@@ -287,7 +329,7 @@ const Panel: React.FC = () => {
 										executeByNodeConfig
 									}}
 								>
-									<ConfigPanel key={id} />
+									<ConfigPanel />
 								</ConfigContext.Provider>
 							</div>
 						) : null}

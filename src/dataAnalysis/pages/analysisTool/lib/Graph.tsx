@@ -56,7 +56,9 @@ export const Graph = forwardRef((props, ref) => {
 		saveConfigValue,
 		resetConfigValue,
 		getAllConfigs,
-		setAllConfigs
+		setAllConfigs,
+		updateNodeConfigVersion,
+		getLastestVersion
 	} = useNodeConfigValue();
 	// 初始化画布
 	const initializeGraph = () => {
@@ -303,7 +305,9 @@ export const Graph = forwardRef((props, ref) => {
 				getAllConfigs,
 				syncGraph,
 				setAllConfigs,
-				isPublicTemplate
+				isPublicTemplate,
+				updateNodeConfigVersion,
+				getLastestVersion
 			}}
 		>
 			<div className={classes['top-breadcrumb']}>

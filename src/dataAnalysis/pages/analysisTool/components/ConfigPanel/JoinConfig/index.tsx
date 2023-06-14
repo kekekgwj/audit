@@ -21,12 +21,13 @@ interface IRowCondition {
 	rightHeaderName: string;
 	rightTableName: string;
 }
-interface IFilterAll {
+interface IExecuteConfig {
 	connectionSentences: IRowCondition[];
 	connectionType: string;
 	leftTableName: string;
 	rightTableName: string;
 }
+type IForm = Pick<IExecuteConfig, 'connectionSentences' | 'connectionType'>;
 const AddIcon = (
 	<svg
 		version="1.1"
@@ -137,124 +138,94 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 		</div>
 	);
 };
-const options = {
-	leftSelect: [
-		{
-			label: 'id',
-			value: 'id'
-		}
-	],
-	rightSelect: [
-		{
-			label: 'id',
-			value: 'id'
-		}
-	],
-	symbolSelect: [
-		{
-			label: '=',
-			value: '='
-		},
-		{
-			label: '!=',
-			value: '!='
-		},
-		{
-			label: '>',
-			value: '>'
-		},
-		{
-			label: '<',
-			value: '<'
-		}
-	]
-};
 
 const SelectGroup: React.FC = () => {
-	// const graph = useGraph();
-	// const projectID = useGraphID();
-	// const canvasData = graph.toJSON();
 	const [form] = Form.useForm();
-	const {
-		id,
-		getValue,
-		setValue,
-		resetValue,
-		formInitValue,
-		executeByNodeConfig
-	} = useConfigContextValue();
-	// const { getAllConfigs, syncGraph } = useGraphContext();
-	// const formInitValue = (getValue && id && getValue(id)) || {};
+	const graph = useGraph();
+	const { id, setValue, resetValue, getValue, executeByNodeConfig } =
+		useConfigContextValue();
 
+	const [nodeKey, setNodeKey] = useState<number | null>(null);
+	const [config, setConfig] = useState<any>();
+	// const [initValue, setInitValue] = useState<any>();
+	const handleGetNodeConfig = async () => {
+		if (!graph) {
+			return;
+		}
+
+		const canvasData = graph?.toJSON();
+		const params = {
+			id,
+			canvasJson: JSON.stringify({
+				content: canvasData
+			})
+		};
+		const config: any = await getCanvasConfig(params);
+		setConfig(config);
+		const tableNames = config.map((item) => item.tableName);
+		const key = encodeNodeSources([...tableNames, id]);
+		setNodeKey(key);
+		const configData1 = config[0] || [];
+		const configData2 = config[1] || [];
+		// 获取下拉选项
+		const leftData = configData1?.fields?.map((item, index) => {
+			return {
+				label: item.description || item.fieldName, //展示描述没有展示名称
+				value: item.fieldName
+			};
+		});
+		const rightData = configData2?.fields?.map((item, index) => {
+			return {
+				label: item.description || item.fieldName, //展示描述没有展示名称
+				value: item.fieldName
+			};
+		});
+		setLeftSelect(leftData);
+		setRightSelect(rightData);
+	};
 	const [leftOptions, setLeftSelect] = useState([]);
 	const [rightOptions, setRightSelect] = useState([]);
 
-	const ref = useRef<Record<string, object>>({});
-
-	//获取配置项
 	useEffect(() => {
-		// const params = {
-		// 	id,
-		// 	canvasJson: JSON.stringify({
-		// 		content: canvasData
-		// 	})
-		// };
-		// getCanvasConfig(params).then((res) => {
-		// 	// 获取数据第一条作为左表，第二条为右表
-		// 	const configData1 = res[0] || [];
-		// 	const configData2 = res[1] || [];
-		// 	// 获取下拉选项
-		// 	const leftData = configData1.fields.map((item, index) => {
-		// 		return {
-		// 			label: item.description || item.fieldName, //展示描述没有展示名称
-		// 			value: item.fieldName
-		// 		};
-		// 	});
-		// 	const rightData = configData2?.fields?.map((item, index) => {
-		// 		return {
-		// 			label: item.description || item.fieldName, //展示描述没有展示名称
-		// 			value: item.fieldName
-		// 		};
-		// 	});
-		// 	ref.current['tableNames'] = {
-		// 		leftTableName: configData1?.tableName,
-		// 		rightTableName: configData2?.tableName
-		// 	};
-		// 	setLeftSelect(leftData);
-		// 	setRightSelect(rightData);
-		// });
+		handleGetNodeConfig();
 	}, []);
+	const [leftTableName, rightTableName] = config
+		? config?.map((item) => item.tableName)
+		: [null, null];
+
 	const handleOnclickAdd = () => {
 		const list = form.getFieldValue('connectionSentences') || [];
 		const nextList = list.concat({
 			key: list.length,
 			fieldKey: list.length
 		});
-		console.log(nextList);
+
 		form.setFieldsValue({
 			connectionSentences: nextList
 		});
 	};
-	const formatSubmitValue = (value: IFilterAll) => {
-		if (value.connectionSentences && value.connectionSentences.length) {
-			value.connectionSentences = value.connectionSentences.map(
-				(item, index) => {
-					return {
-						leftHeaderName: item.leftHeaderName,
-						operator: item.operator,
-						rightHeaderName: item.rightHeaderName
-					};
-				}
-			);
+	const formatSubmitValue = (value: IForm): IExecuteConfig | null => {
+		const { connectionSentences, connectionType } = value;
+		if (connectionSentences && connectionSentences.length) {
+			const formatValue = value.connectionSentences.map((item, index) => {
+				return {
+					leftTableName,
+					rightTableName,
+					leftHeaderName: item.leftHeaderName,
+					operator: item.operator,
+					rightHeaderName: item.rightHeaderName
+				};
+			});
+			return {
+				connectionSentences: formatValue,
+				leftTableName: leftTableName,
+				rightTableName: rightTableName,
+				connectionType
+			};
 		}
-
-		const tableNames = ref.current['tableNames'];
-		const { leftTableName, rightTableName } = tableNames as unknown as any;
-		value.leftTableName = leftTableName;
-		value.rightTableName = rightTableName;
-		return value;
+		return null;
 	};
-	const onFinish = (value: IFilterAll) => {
+	const onFinish = () => {
 		executeByNodeConfig();
 	};
 	const handleOnDelete = (key: number) => {
@@ -269,20 +240,20 @@ const SelectGroup: React.FC = () => {
 			connectionSentences: nextList
 		});
 	};
-	const handleOnChange = (value: IFilterAll) => {
+	const handleOnChange = (value: IForm) => {
 		if (!id || !setValue) {
 			return;
 		}
-		const tableNames = ref.current['tableNames'];
-		const { leftTableName, rightTableName } = tableNames;
-		const key = encodeNodeSources([leftTableName, rightTableName]);
-		console.log('key', key, leftTableName, rightTableName);
-		setValue(id, formatSubmitValue(value));
+
+		setValue(nodeKey, formatSubmitValue(value));
 	};
 	const handleReset = () => {
 		form.resetFields();
-		id && resetValue(id);
+		id && resetValue();
 	};
+
+	const initValue = getValue(nodeKey);
+	console.log('join init', initValue);
 	return (
 		<div style={{ overflowY: 'auto', height: '300px' }}>
 			<Form
@@ -295,7 +266,7 @@ const SelectGroup: React.FC = () => {
 				initialValues={{
 					connectionSentences: [{ key: 0, fieldKey: 0 }],
 					connectionType: 'INNER JOIN',
-					...formInitValue
+					...getValue(nodeKey)
 				}}
 				form={form}
 			>

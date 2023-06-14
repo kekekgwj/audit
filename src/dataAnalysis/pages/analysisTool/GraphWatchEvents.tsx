@@ -16,6 +16,7 @@ const GraphWatchEvents = () => {
 		if (!graph) {
 			return;
 		}
+
 		graph.on('node:mouseenter', () => {
 			const ports = container.querySelectorAll(
 				'.x6-port-body'

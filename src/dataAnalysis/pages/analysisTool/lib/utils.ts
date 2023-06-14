@@ -553,7 +553,7 @@ export const getLabelLength = (str: string) => {
 	return len;
 };
 
-export const encodeNodeSources = (sources: string[]): number | string => {
+export const encodeNodeSources = (sources: string[]): number => {
 	const sourcesStr = sources.join('-');
 	return hashCode().value(sourcesStr);
 };

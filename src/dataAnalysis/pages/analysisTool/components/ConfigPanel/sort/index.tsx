@@ -6,6 +6,7 @@ import { useConfigContextValue } from '../../NodeDetailPanel';
 const { Panel } = Collapse;
 import { useGraph, useGraphContext, useGraphID } from '../../../lib/hooks';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
+import { encodeNodeSources } from '../../../lib/utils';
 
 interface SortProps {
 	option?: List[];
@@ -28,9 +29,9 @@ const layout = {
 	labelAlign: 'left'
 };
 
-const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
-	const [optionList, setOptionList] = useState<List[]>(dataList);
-
+const SortInput: FC<SortProps> = ({ value, onChange }) => {
+	const [optionList, setOptionList] = useState<List[]>(value || []);
+	console.log('value', value);
 	//通过传入的状态值和下标修改dataList的排序状态
 	const setSortStatus = (
 		data: { isUp: boolean; isDown: boolean },
@@ -43,9 +44,9 @@ const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
 
 		setOptionList(newDataList);
 	};
-	useEffect(() => {
-		setOptionList(dataList);
-	}, [dataList]);
+	// useEffect(() => {
+	// 	setOptionList(dataList);
+	// }, [dataList]);
 	//监听optionList改变触发onChange
 	useEffect(() => {
 		// let newData: string[] = [];
@@ -174,27 +175,40 @@ const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
 };
 
 const Sort: FC = () => {
-	const graph = useGraph();
-	const projectID = useGraphID();
-	const canvasData = graph.toJSON();
 	const [form] = Form.useForm();
-	const {
-		id,
-		getValue,
-		setValue,
-		resetValue,
-		updateTable,
-		executeByNodeConfig
-	} = useConfigContextValue();
-	const { getAllConfigs, syncGraph } = useGraphContext();
-	// 存储配置项（包含值）
-	// const formInitValue = getValue && id && getValue(id);
-	// console.log('formInitValue', formInitValue);
-	// 配置项
-	const [dataList, setDataList] = useState([]);
 
+	const { id, setValue, resetValue, executeByNodeConfig, getValue } =
+		useConfigContextValue();
+	const graph = useGraph();
+	const [config, setConfig] = useState();
+	const [nodeKey, setNodeKey] = useState<number | null>(null);
+	const initValue = getValue(nodeKey);
+	const handleGetConfig = async () => {
+		if (!graph) {
+			return;
+		}
+
+		const canvasData = graph?.toJSON();
+		const params = {
+			id,
+			canvasJson: JSON.stringify({
+				content: canvasData
+			})
+		};
+		const curConfig: any = await getCanvasConfig(params);
+		setConfig(curConfig);
+		const tableNames = curConfig.map((item) => item.tableName);
+		const key = encodeNodeSources([...tableNames, id]);
+		setNodeKey(key);
+	};
+	useEffect(() => {
+		handleGetConfig();
+	}, []);
 	//转数据形式
 	const transData = (data: any) => {
+		if (!data || !Array.isArray(data)) {
+			return [];
+		}
 		const formatData = data.map((item) => {
 			const listArr = item.fields;
 			const list = [];
@@ -212,23 +226,8 @@ const Sort: FC = () => {
 		});
 		return formatData;
 	};
-	const getConfigForm = async () => {
-		const params = {
-			id,
-			canvasJson: JSON.stringify({
-				content: canvasData
-			})
-		};
-		const configs = await getCanvasConfig(params);
-		const formatForm = transData(configs);
-		setDataList(formatForm);
-	};
 
-	// 获取配置项
-	useEffect(() => {
-		getConfigForm();
-	}, []);
-	const onFinish = (values: any) => {
+	const onFinish = () => {
 		executeByNodeConfig();
 	};
 
@@ -240,7 +239,7 @@ const Sort: FC = () => {
 		if (!id || !setValue) {
 			return;
 		}
-		setValue(id, v);
+		setValue(nodeKey, { sorting: v });
 	};
 	return (
 		<Form
@@ -250,16 +249,12 @@ const Sort: FC = () => {
 			onFinish={onFinish}
 			className={classes.fromWrap}
 			initialValues={{
-				sorting: dataList
+				sorting: initValue.sorting ? initValue.sorting : transData(config)
 			}}
 		>
 			<div className={classes.formList}>
 				<Form.Item name="sorting">
-					<SortInput
-						onChange={handleSortChange}
-						value={dataList}
-						dataList={dataList}
-					></SortInput>
+					<SortInput onChange={handleSortChange}></SortInput>
 				</Form.Item>
 			</div>
 
