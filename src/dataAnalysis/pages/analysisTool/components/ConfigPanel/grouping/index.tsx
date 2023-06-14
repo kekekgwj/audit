@@ -20,6 +20,7 @@ interface List {
 	tableName: string;
 	key: string;
 	list: {
+		description: string;
 		title: string;
 		key: string;
 	}[];
@@ -146,10 +147,11 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 											key={items.title}
 											className={classes.sortTxt}
 											onClick={() => {
-												setData(items, tableRealName, tableName);
+												dataList.length == 0 &&
+													setData(items, tableRealName, tableName);
 											}}
 										>
-											<span>{items.title}</span>
+											<span>{items.description}</span>
 										</div>
 									);
 								})}
@@ -178,6 +180,7 @@ const Grouping: FC = () => {
 	const [form] = Form.useForm();
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
+	form.setFieldsValue(formInitValue);
 	const { syncGraph, getAllConfigs } = useGraphContext();
 	const getConfig = async () => {
 		const params = {
@@ -201,6 +204,7 @@ const Grouping: FC = () => {
 			const list = [];
 			listArr?.forEach((el, i) => {
 				list.push({
+					description: el.description || el.fieldName,
 					title: el.fieldName,
 					key: i
 				});
@@ -216,6 +220,7 @@ const Grouping: FC = () => {
 	};
 	const [groupData, setGroupData] = useState<List[]>();
 	const [accordData, setAccordData] = useState<List[]>();
+
 	const updateTable = useUpdateTable();
 
 	const onFinish = async (values: any) => {
@@ -242,7 +247,6 @@ const Grouping: FC = () => {
 		form.resetFields();
 		id && resetValue(id);
 	};
-
 	return (
 		<Form
 			{...layout}
@@ -253,11 +257,11 @@ const Grouping: FC = () => {
 			onValuesChange={(_, value) => {
 				handleOnChange(value);
 			}}
-			initialValues={{
-				conditions: formInitValue.conditions || [],
-				funcType: formInitValue.funcType,
-				column: formInitValue.column || []
-			}}
+			// initialValues={{
+			// 	conditions: formInitValue.conditions || [],
+			// 	funcType: formInitValue.funcType,
+			// 	column: formInitValue.column || []
+			// }}
 		>
 			<div className={classes.formList}>
 				<Form.Item

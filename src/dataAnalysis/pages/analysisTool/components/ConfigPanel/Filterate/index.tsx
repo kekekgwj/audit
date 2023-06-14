@@ -412,6 +412,10 @@ export default () => {
 		}
 		resetValue(id);
 		dispatch({ type: 'reset' });
+		dispatch({ type: 'setCol', data: plainOptions });
+		setIndeterminate(false);
+		setCheckAll(true);
+		set();
 	};
 
 	// 更新表单值
@@ -503,7 +507,7 @@ export default () => {
 	};
 
 	return (
-		<>
+		<div style={{ overflowY: 'auto', height: '300px' }}>
 			<FilterateContext.Provider
 				value={{
 					setRowData,
@@ -571,6 +575,7 @@ export default () => {
 				</div>
 				<div className={styles.controlRow}>
 					<Button
+						style={{ marginRight: '10px' }}
 						className={`${styles.btn} ${styles.reset}`}
 						htmlType="button"
 						onClick={reset}
@@ -587,6 +592,6 @@ export default () => {
 					</Button>
 				</div>
 			</FilterateContext.Provider>
-		</>
+		</div>
 	);
 };

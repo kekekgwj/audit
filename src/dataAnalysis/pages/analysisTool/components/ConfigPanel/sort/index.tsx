@@ -16,7 +16,9 @@ interface SortProps {
 
 interface List {
 	title: string;
+	cnTitle: string;
 	list: {
+		description: string;
 		title: string;
 		isUp: boolean;
 		isDown: boolean;
@@ -84,7 +86,7 @@ const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
 											return (
 												(items.isUp || items.isDown) && (
 													<div className={classes.label} key={items.title}>
-														{items.title}
+														{items.description}
 														<div style={{ marginLeft: '6px' }}>
 															{items.isUp && <UpIcon />}
 															{items.isDown && <Downicon />}
@@ -125,11 +127,11 @@ const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
 				>
 					{optionList.map((item, index) => {
 						return (
-							<Panel header={item.title} key={index + 1}>
+							<Panel header={item.cnTitle} key={index + 1}>
 								{item.list.map((items, childrenIndex) => {
 									return (
 										<div key={items.title} className={classes.sortTxt}>
-											<span>{items.title}</span>
+											<span>{items.description}</span>
 											<div className={classes.sortWrap}>
 												<div
 													style={{ marginRight: '10px' }}
@@ -194,13 +196,15 @@ const Sort: FC = () => {
 			const list = [];
 			listArr?.forEach((el) => {
 				list.push({
+					description: el.description || el.fieldName,
 					title: el.fieldName,
 					isUp: false,
 					isDown: false
 				});
 			});
 			return {
-				title: item.tableCnName,
+				cnTitle: item.tableCnName,
+				title: item.tableName,
 				list: list
 			};
 		});
@@ -214,6 +218,7 @@ const Sort: FC = () => {
 			})
 		};
 		const configs = await getCanvasConfig(params);
+		console.log(configs, 218218);
 		const formatForm = transData(configs);
 		setDataList(formatForm);
 	};
