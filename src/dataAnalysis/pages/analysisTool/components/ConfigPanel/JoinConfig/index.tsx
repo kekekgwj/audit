@@ -226,6 +226,7 @@ const SelectGroup: React.FC = () => {
 			key: list.length,
 			fieldKey: list.length
 		});
+		console.log(nextList);
 		form.setFieldsValue({
 			connectionSentences: nextList
 		});
