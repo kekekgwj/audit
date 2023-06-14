@@ -108,7 +108,9 @@ export const validateConnectionRule = (
 	params: Options.ValidateConnectionArgs,
 	openMessage: (error: string) => void
 ): boolean => {
-	const { sourceCell, targetCell } = params;
+	const { sourceCell, targetCell, edge } = params;
+	const edgeID = edge?.id;
+
 	if (!sourceCell || !targetCell) {
 		return false;
 	}
@@ -140,9 +142,12 @@ export const validateConnectionRule = (
 
 	const sourceType = sourceCellAttrs.custom?.type as IImageTypes;
 	const targetType = targetCellAttrs.custom?.type as IImageTypes;
+	const targetInEdgesIDs = targetInEdges
+		? targetInEdges.map((edge) => edge.id).filter((id) => id !== edgeID)
+		: [];
 	//  “TABLE”节点：无输入，仅输出（支持多输出，输出可以接任意节点类型）
 	if (targetType === IImageTypes.TABLE) {
-		openMessage('table不能有输入结点');
+		openMessage('表不能有输入结点');
 		return false;
 	}
 	// if (sourceType === IImageTypes.TABLE && targetType === IImageTypes.TABLE) {
@@ -153,17 +158,17 @@ export const validateConnectionRule = (
 	// JOIN
 	if (sourceType === IImageTypes.CONNECT) {
 		if ([IImageTypes.CONNECT, IImageTypes.TABLE].includes(targetType)) {
-			openMessage('JOIN的输出不能为table或者join');
+			openMessage('连接的输出不能为表或者连接');
 			return false;
 		}
 		if (sourceOutEdges && sourceOutEdges.length > 1) {
-			openMessage('JOIN输出限制数量为1');
+			openMessage('连接输出限制数量为1');
 			return false;
 		}
 	}
 	if (targetType === IImageTypes.CONNECT) {
-		if (targetInEdges && targetInEdges.length >= 2) {
-			openMessage('JOIN支持最多两个table输入');
+		if (targetInEdgesIDs.length > 1) {
+			openMessage('连接支持最多两个表输入');
 			return false;
 		}
 	}
@@ -174,23 +179,22 @@ export const validateConnectionRule = (
 				targetType
 			)
 		) {
-			openMessage(
-				'输出可以接节点类型为“GROUP BY”类型或者“ORDER BY”类型或者“END”类型'
-			);
+			openMessage('输出可以接节点类型为“分组”类型或者“排序”类型或者“结束”类型');
 			return false;
 		}
 		if (sourceOutEdges && sourceOutEdges.length > 1) {
-			openMessage('filter输出限制数量为1');
+			openMessage('筛选输出限制数量为1');
 			return false;
 		}
 	}
 	if (targetType === IImageTypes.FILTER) {
 		if (![IImageTypes.CONNECT, IImageTypes.TABLE].includes(sourceType)) {
-			openMessage('filter的输入结点只能为table或者join');
+			openMessage('筛选的输入结点只能为table或者join');
 			return false;
 		}
-		if (targetInEdges && targetInEdges.length > 0) {
-			openMessage('filter输入限制数量为1');
+
+		if (targetInEdgesIDs.length > 0) {
+			openMessage('筛选输入限制数量为1');
 			return false;
 		}
 	}
@@ -198,34 +202,34 @@ export const validateConnectionRule = (
 	// GROUP BY
 	if (targetType === IImageTypes.GROUP) {
 		if ([IImageTypes.END, IImageTypes.GROUP].includes(sourceType)) {
-			openMessage('输入节点类型为除“END”和“GROUP BY”以外的类');
+			openMessage('输入节点类型为除“结束”和“分组”以外的类');
 			return false;
 		}
-		if (targetInEdges && targetInEdges.length >= 1) {
-			openMessage('GROUP BY输入限制数量为1');
+		if (targetInEdgesIDs.length > 0) {
+			openMessage('分组输入限制数量为1');
 			return false;
 		}
 	}
 	// ORDER BY
 	if (targetType === IImageTypes.ORDER) {
 		if ([IImageTypes.END, IImageTypes.ORDER].includes(sourceType)) {
-			openMessage('输入节点类型为除“END”和“ORDER BY”以外的类型');
+			openMessage('输入节点类型为除“结束”和“排序”以外的类型');
 			return false;
 		}
-		if (targetInEdges && targetInEdges.length >= 1) {
-			openMessage('ORDER BY输入限制数量为1');
+		if (targetInEdgesIDs.length > 0) {
+			openMessage('排序输入限制数量为1');
 			return false;
 		}
 	}
 	// END
 	if (targetType === IImageTypes.END) {
-		if (targetInEdges && targetInEdges.length >= 1) {
-			openMessage('END输入限制数量为1');
+		if (targetInEdgesIDs.length > 0) {
+			openMessage('结束输入限制数量为1');
 			return false;
 		}
 	}
 	if (sourceType === IImageTypes.END) {
-		openMessage('END不能有输出');
+		openMessage('结束不能有输出');
 		return false;
 	}
 
