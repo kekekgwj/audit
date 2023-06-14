@@ -4,6 +4,7 @@ import classes from './index.module.less';
 import { useConfigContextValue } from '../../NodeDetailPanel';
 import { useGraph, useGraphContext, useGraphID } from '../../../lib/hooks';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
+import { encodeNodeSources } from '../../../lib/utils';
 
 interface ISelectRowProps {
 	value?: any;
@@ -170,14 +171,20 @@ const options = {
 };
 
 const SelectGroup: React.FC = () => {
-	const graph = useGraph();
-	const projectID = useGraphID();
-	const canvasData = graph.toJSON();
+	// const graph = useGraph();
+	// const projectID = useGraphID();
+	// const canvasData = graph.toJSON();
 	const [form] = Form.useForm();
-	const { id, getValue, setValue, resetValue, updateTable } =
-		useConfigContextValue();
-	const { getAllConfigs, syncGraph } = useGraphContext();
-	const formInitValue = (getValue && id && getValue(id)) || {};
+	const {
+		id,
+		getValue,
+		setValue,
+		resetValue,
+		formInitValue,
+		executeByNodeConfig
+	} = useConfigContextValue();
+	// const { getAllConfigs, syncGraph } = useGraphContext();
+	// const formInitValue = (getValue && id && getValue(id)) || {};
 
 	const [leftOptions, setLeftSelect] = useState([]);
 	const [rightOptions, setRightSelect] = useState([]);
@@ -186,39 +193,36 @@ const SelectGroup: React.FC = () => {
 
 	//获取配置项
 	useEffect(() => {
-		const params = {
-			id,
-			canvasJson: JSON.stringify({
-				content: canvasData
-			})
-		};
-
-		getCanvasConfig(params).then((res) => {
-			console.log(res, 164164164);
-			// 获取数据第一条作为左表，第二条为右表
-			const configData1 = res[0] || [];
-			const configData2 = res[1] || [];
-			// 获取下拉选项
-			const leftData = configData1.fields.map((item, index) => {
-				return {
-					label: item.description || item.fieldName, //展示描述没有展示名称
-					value: item.fieldName
-				};
-			});
-
-			const rightData = configData2?.fields?.map((item, index) => {
-				return {
-					label: item.description || item.fieldName, //展示描述没有展示名称
-					value: item.fieldName
-				};
-			});
-			ref.current['tableNames'] = {
-				leftTableName: configData1?.tableName,
-				rightTableName: configData2?.tableName
-			};
-			setLeftSelect(leftData);
-			setRightSelect(rightData);
-		});
+		// const params = {
+		// 	id,
+		// 	canvasJson: JSON.stringify({
+		// 		content: canvasData
+		// 	})
+		// };
+		// getCanvasConfig(params).then((res) => {
+		// 	// 获取数据第一条作为左表，第二条为右表
+		// 	const configData1 = res[0] || [];
+		// 	const configData2 = res[1] || [];
+		// 	// 获取下拉选项
+		// 	const leftData = configData1.fields.map((item, index) => {
+		// 		return {
+		// 			label: item.description || item.fieldName, //展示描述没有展示名称
+		// 			value: item.fieldName
+		// 		};
+		// 	});
+		// 	const rightData = configData2?.fields?.map((item, index) => {
+		// 		return {
+		// 			label: item.description || item.fieldName, //展示描述没有展示名称
+		// 			value: item.fieldName
+		// 		};
+		// 	});
+		// 	ref.current['tableNames'] = {
+		// 		leftTableName: configData1?.tableName,
+		// 		rightTableName: configData2?.tableName
+		// 	};
+		// 	setLeftSelect(leftData);
+		// 	setRightSelect(rightData);
+		// });
 	}, []);
 	const handleOnclickAdd = () => {
 		const list = form.getFieldValue('connectionSentences') || [];
@@ -251,22 +255,7 @@ const SelectGroup: React.FC = () => {
 		return value;
 	};
 	const onFinish = (value: IFilterAll) => {
-		// 可能需要处理
-		handleOnChange(value);
-
-		const params = {
-			canvasJson: JSON.stringify({
-				content: canvasData,
-				configs: getAllConfigs()
-			}),
-			executeId: id, //当前选中元素id
-			projectId: projectID
-		};
-
-		getResult(params).then((res: any) => {
-			updateTable(res.data, res.head);
-		});
-		syncGraph();
+		executeByNodeConfig();
 	};
 	const handleOnDelete = (key: number) => {
 		const list = form.getFieldValue('connectionSentences') || [];
@@ -284,7 +273,10 @@ const SelectGroup: React.FC = () => {
 		if (!id || !setValue) {
 			return;
 		}
-
+		const tableNames = ref.current['tableNames'];
+		const { leftTableName, rightTableName } = tableNames;
+		const key = encodeNodeSources([leftTableName, rightTableName]);
+		console.log('key', key, leftTableName, rightTableName);
 		setValue(id, formatSubmitValue(value));
 	};
 	const handleReset = () => {

@@ -178,8 +178,14 @@ const Sort: FC = () => {
 	const projectID = useGraphID();
 	const canvasData = graph.toJSON();
 	const [form] = Form.useForm();
-	const { id, getValue, setValue, resetValue, updateTable } =
-		useConfigContextValue();
+	const {
+		id,
+		getValue,
+		setValue,
+		resetValue,
+		updateTable,
+		executeByNodeConfig
+	} = useConfigContextValue();
 	const { getAllConfigs, syncGraph } = useGraphContext();
 	// 存储配置项（包含值）
 	// const formInitValue = getValue && id && getValue(id);
@@ -223,19 +229,7 @@ const Sort: FC = () => {
 		getConfigForm();
 	}, []);
 	const onFinish = (values: any) => {
-		handleSortChange(values.sorting);
-		const params = {
-			canvasJson: JSON.stringify({
-				content: canvasData,
-				configs: getAllConfigs()
-			}),
-			executeId: id, //当前选中元素id
-			projectId: projectID
-		};
-		getResult(params).then((res: any) => {
-			updateTable(res.data, res.head);
-			syncGraph();
-		});
+		executeByNodeConfig();
 	};
 
 	const onReset = () => {

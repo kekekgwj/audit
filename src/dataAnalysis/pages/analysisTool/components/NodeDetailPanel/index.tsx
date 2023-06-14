@@ -21,7 +21,11 @@ import {
 	transFilterData
 } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
-import { exportData, getResult } from '@/api/dataAnalysis/graph';
+import {
+	exportData,
+	getCanvasConfig,
+	getResult
+} from '@/api/dataAnalysis/graph';
 
 const { DOWNLOAD } = ASSETS;
 interface IConfigContext {
@@ -32,6 +36,7 @@ interface IConfigContext {
 	setValue: ((id: string, value: any) => void) | null;
 	resetValue: (id: string) => void;
 	updateTable: (updateData: any, updateColumn: any) => void;
+	executeByNodeConfig: () => void;
 }
 const ConfigContext = createContext<IConfigContext>({
 	type: null,
@@ -44,6 +49,9 @@ const ConfigContext = createContext<IConfigContext>({
 	},
 	updateTable: function (updateData: any, updateColumn: any): void {
 		throw new Error('Function not implemented.');
+	},
+	executeByNodeConfig: function (): void {
+		throw new Error('Function not implemented.');
 	}
 });
 
@@ -54,28 +62,6 @@ export const useUpdateTable = () => {
 	return useContext(ConfigContext).updateTable;
 };
 
-export const useExecuteComponentNUpdateTable = (
-	id: string,
-	configValue: any
-) => {
-	// const { graph, syncGraph, getAllConfigs } = useGraphContext();
-	// const projectID = useGraphID();
-	// const canvasData = graph.toJSON();
-	// const updateTable = useUpdateTable();
-	// const params = {
-	// 	canvasJson: JSON.stringify({
-	// 		content: canvasData,
-	// 		// configs: { [id]: configValue }
-	// 		configs: getAllConfigs()
-	// 	}),
-	// 	executeId: id, //当前选中元素id
-	// 	projectId: projectID
-	// };
-	// getResult(params).then((res: any) => {
-	// 	updateTable(res.data, res.head);
-	// });
-	// syncGraph();
-};
 const useTableSource = () => {
 	const [data, setData] = useState([]);
 	const [columns, setColumns] = useState([]);
@@ -98,19 +84,77 @@ const Panel: React.FC = () => {
 	const { curSelectedNode: id, showPanel = false } = state || {};
 	const executeType = [IImageTypes.TABLE, IImageTypes.END];
 	const projectID = useGraphID();
-	const {
-		getConfigValue,
-		saveConfigValue,
-		resetConfigValue,
-		syncGraph,
-		getAllConfigs
-	} = useGraphContext();
+	const { getConfigValue, saveConfigValue, syncGraph, getAllConfigs } =
+		useGraphContext();
 
 	const isInit = useInitRender();
 
 	useEffect(() => {
 		!isInit && syncGraph();
 	}, [showPanel]);
+
+	useEffect(() => {
+		handleGetNodeConfig();
+	}, []);
+	const handleGetNodeConfig = async () => {
+		const canvasData = graph?.toJSON();
+		const params = {
+			id,
+			canvasJson: JSON.stringify({
+				content: canvasData
+			})
+		};
+		const config = await getCanvasConfig(params);
+		console.log(config);
+		// const key = encodeNodeSources();
+	};
+	const setValue = (id: string, key: number, value: any) => {
+		if (!getConfigValue(id)) {
+			saveConfigValue(id, {});
+		}
+		const configValue = getConfigValue(id);
+		saveConfigValue(id, {
+			...configValue,
+			[key]: value
+		});
+	};
+	const getValue = (id: string, key: number) => {
+		if (!id || !key) {
+			return;
+		}
+		return getConfigValue(id)?.key;
+	};
+	const resetValue = (id: string, key: numebr, value: any) => {
+		if (!getConfigValue(id)) {
+			saveConfigValue(id, {});
+		}
+		const configValue = getConfigValue(id);
+		saveConfigValue(id, {
+			...configValue,
+			[key]: null
+		});
+	};
+	const executeByNodeConfig = async () => {
+		const canvasData = graph?.toJSON();
+		if (!canvasData || !id || !projectID) {
+			return;
+		}
+		type getParameterFirst<T> = T extends [infer first, ...infer rest]
+			? first
+			: null;
+		type paramsType = getParameterFirst<Parameters<typeof getResult>>;
+		const params: paramsType = {
+			canvasJson: JSON.stringify({
+				content: canvasData,
+				configs: getAllConfigs()
+			}),
+			executeId: id, //当前选中元素id
+			projectId: projectID
+		};
+		const { data, head } = await getResult(params);
+		updateTable(data, head);
+	};
+
 	// 点击画布元素触发事件，获取对应表的数据
 	useEffect(() => {
 		//执行获取表数据
@@ -119,22 +163,12 @@ const Panel: React.FC = () => {
 		}
 		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
 		if (executeType.includes(curType)) {
-			const canvasData = graph.toJSON();
-			const params = {
-				canvasJson: JSON.stringify({
-					content: canvasData,
-					configs: getAllConfigs()
-				}),
-				executeId: id, //当前选中元素id
-				projectId: projectID
-			};
-			getResult(params).then((res: any) => {
-				updateTable(res.data, res.head);
-			});
-		} else {
-			//需要将表数据清空
-			updateTable([], []);
+			executeByNodeConfig();
 		}
+		// } else {
+		// 	//需要将表数据清空
+		// 	updateTable([], []);
+		// }
 	}, [id]);
 
 	if (!showPanel || !graph) {
@@ -148,7 +182,6 @@ const Panel: React.FC = () => {
 	const downLoadData = async () => {
 		const canvasData = graph.toJSON();
 		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
-		console.log(curType, 150150);
 		// 如果是筛选组件 需要特殊处理数据
 		if (curType == 'FILTER') {
 			const filterData = getAllConfigs();
@@ -247,10 +280,11 @@ const Panel: React.FC = () => {
 										type: clickNodeType,
 										id: id,
 										initValue: null,
-										getValue: getConfigValue,
-										setValue: saveConfigValue,
-										resetValue: resetConfigValue,
-										updateTable: updateTable
+										getValue,
+										setValue,
+										resetValue,
+										updateTable,
+										executeByNodeConfig
 									}}
 								>
 									<ConfigPanel key={id} />
@@ -260,49 +294,6 @@ const Panel: React.FC = () => {
 					</div>
 				) : null}
 			</div>
-
-			{/* <div
-				className={`${
-					showConfig ? classes.configPanel : classes.hideConfigPanel
-				}`}
-			>
-				<div className={classes.configPanel_title}>
-					{!showConfig ? (
-						<span
-							onClick={() => toggleConfig()}
-							className={classes.svgIcon}
-							style={{ marginRight: '5px' }}
-						>
-							<SvgIcon
-								name="closeArrow"
-								className={classes.closeIcon}
-							></SvgIcon>
-						</span>
-					) : null}
-					<span className={classes.configPanel_title_text}>参数配置</span>
-					{showConfig ? (
-						<span onClick={() => toggleConfig()} className={classes.svgIcon}>
-							<SvgIcon name="openArrow" className={classes.closeIcon}></SvgIcon>
-						</span>
-					) : null}
-				</div>
-				{showConfig ? (
-					<div className={classes.configWrapper}>
-						<ConfigContext.Provider
-							value={{
-								type: clickNodeType,
-								id: id,
-								initValue: null,
-								getValue: getConfigValue,
-								setValue: saveConfigValue,
-								resetValue: resetConfigValue
-							}}
-						>
-							<ConfigPanel key={id} />
-						</ConfigContext.Provider>
-					</div>
-				) : null}
-			</div> */}
 		</div>
 	);
 };

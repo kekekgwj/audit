@@ -1,6 +1,7 @@
 import { Graph, Node, Edge, ObjectExt, StringExt } from '@antv/x6';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 import * as X6 from '@antv/x6';
+import { hashCode } from 'hashcode';
 type Metadata = Node.Metadata | Edge.Metadata;
 type C = Node | Edge;
 type T = C | { [key: string]: any };
@@ -550,4 +551,9 @@ export const getLabelLength = (str: string) => {
 		}
 	}
 	return len;
+};
+
+export const encodeNodeSources = (sources: string[]): number | string => {
+	const sourcesStr = sources.join('-');
+	return hashCode().value(sourcesStr);
 };

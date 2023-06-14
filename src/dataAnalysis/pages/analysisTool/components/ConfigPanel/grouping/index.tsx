@@ -176,7 +176,8 @@ const Grouping: FC = () => {
 	const projectID = useGraphID();
 	const canvasData = graph?.toJSON();
 	const [form] = Form.useForm();
-	const { id, getValue, setValue, resetValue } = useConfigContextValue();
+	const { id, getValue, setValue, resetValue, executeByNodeConfig } =
+		useConfigContextValue();
 	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
 	const { syncGraph, getAllConfigs } = useGraphContext();
 	const getConfig = async () => {
@@ -219,18 +220,7 @@ const Grouping: FC = () => {
 	const updateTable = useUpdateTable();
 
 	const onFinish = async (values: any) => {
-		handleOnChange(values);
-		const params = {
-			canvasJson: JSON.stringify({
-				content: canvasData,
-				configs: getAllConfigs()
-			}),
-			executeId: id, //当前选中元素id
-			projectId: projectID
-		};
-		const { data, head } = await getResult(params);
-		updateTable(data, head);
-		syncGraph();
+		executeByNodeConfig();
 	};
 	const handleOnChange = (value: any) => {
 		if (!id || !setValue) {

@@ -24,9 +24,9 @@ interface IGraphInfo {
 }
 export const useGraphPageInfo = (): IGraphInfo => {
 	const location = useLocation();
-	const pathName = location.state.path; //上一级界面名称
-	const templateName = location.state.name; //模板名称
-	const projectId = location.state.id;
+	const pathName = location?.state?.path; //上一级界面名称
+	const templateName = location?.state?.name; //模板名称
+	const projectId = location?.state?.id;
 	const navigate = useNavigate();
 	const goBack = () => {
 		navigate(-1);
@@ -110,7 +110,7 @@ interface IGraphContext extends IGraphConfig {
 interface IGraphConfig {
 	getConfigValue: (id: string) => any;
 	saveConfigValue: (id: string, value: any) => void;
-	resetConfigValue: (id: string) => void;
+	resetConfigValue: (id: string, updateValue: any) => void;
 	getAllConfigs: () => void;
 	setAllConfigs: (value: any) => void;
 	syncGraph: () => void;
@@ -142,9 +142,7 @@ export const useNodeConfigValue: () => IGraphConfig = () => {
 	const saveConfigValue = useCallback((id: string, value: any) => {
 		ref.current[id] = value;
 	}, []);
-	const resetConfigValue = useCallback((id: string) => {
-		saveConfigValue(id, null);
-	}, []);
+
 	const getAllConfigs = () => {
 		return ref.current;
 	};
@@ -154,7 +152,7 @@ export const useNodeConfigValue: () => IGraphConfig = () => {
 	return {
 		getConfigValue,
 		saveConfigValue,
-		resetConfigValue,
+
 		getAllConfigs,
 		setAllConfigs
 	};
@@ -173,9 +171,6 @@ export const GraphContext = createContext<IGraphContext>({
 		throw new Error('Function not implemented.');
 	},
 	saveConfigValue: function (id: string, value: any): void {
-		throw new Error('Function not implemented.');
-	},
-	resetConfigValue: function (id: string): void {
 		throw new Error('Function not implemented.');
 	},
 	getAllConfigs: function (): void {
