@@ -221,11 +221,11 @@ const Grouping: FC = () => {
 	const updateTable = useUpdateTable();
 
 	const onFinish = async (values: any) => {
-		console.log({ configs: { [id]: values } });
+		handleOnChange(values);
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
-				configs: { [id]: values }
+				configs: getAllConfigs()
 			}),
 			executeId: id, //当前选中元素id
 			projectId: projectID
