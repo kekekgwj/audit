@@ -252,8 +252,6 @@ const SelectGroup: React.FC = () => {
 		return value;
 	};
 	const onFinish = (value: IFilterAll) => {
-		console.log(value);
-		return
 		// 可能需要处理
 		handleOnChange(value);
 
