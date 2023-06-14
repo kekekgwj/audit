@@ -44,13 +44,13 @@ const MyTemplate = () => {
 	}, [templateList]);
 	//获取内容区域
 	useEffect(() => {
-		let dom = document.querySelector('#mainContain');
+		const dom = document.querySelector('#mainContain');
 		// 当前界面每行可容纳个数
 		const rowNum = Math.floor(dom?.scrollWidth / 220);
 		// 每列可容纳个数
 		const colNum = Math.floor(dom?.scrollHeight / 220);
 		//每页数量
-		let size = rowNum * colNum;
+		const size = rowNum * colNum;
 		setPageSize(size);
 		//第一次获取数据
 		getTemplateListFirst(size);
@@ -63,7 +63,7 @@ const MyTemplate = () => {
 
 	// 滚动事件
 	const handleScroll = () => {
-		let dom = document.querySelector('#mainContain');
+		const dom = document.querySelector('#mainContain');
 		const scrollDistance =
 			dom?.scrollHeight - dom?.scrollTop - dom?.clientHeight;
 		console.log(scrollDistance, 696969);
@@ -143,7 +143,7 @@ const MyTemplate = () => {
 	//新增
 	const handleAdd = () => {
 		setCurId('');
-		setCurTitle('新增模板');
+		setCurTitle('新建模板');
 		setOpen(true);
 	};
 	//复制
