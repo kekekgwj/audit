@@ -254,9 +254,9 @@ const DataManageCom = () => {
 						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
 					</Form.Item>
 
-					<Form.Item name="updateTime" label="更新时间">
+					{/* <Form.Item name="updateTime" label="更新时间">
 						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
-					</Form.Item>
+					</Form.Item> */}
 				</Form>
 				<div className={styles['search-handle-box']}>
 					<Button htmlType="button" onClick={onReset}>

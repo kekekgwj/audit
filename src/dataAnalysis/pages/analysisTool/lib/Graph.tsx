@@ -76,6 +76,10 @@ export const Graph = forwardRef((props, ref) => {
 				width: graphWrapperRef.current.offsetWidth,
 				height: graphWrapperRef.current.offsetHeight,
 				...strictTemplate,
+				mousewheel: {
+					enabled: true,
+					modifiers: ['ctrl', 'meta']
+				},
 				connecting: {
 					router: 'manhattan',
 					connector: {
