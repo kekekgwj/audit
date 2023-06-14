@@ -178,6 +178,7 @@ const SelectGroup: React.FC = () => {
 		useConfigContextValue();
 	const { getAllConfigs, syncGraph } = useGraphContext();
 	const formInitValue = (getValue && id && getValue(id)) || {};
+	const [showTips, setShowTips] = useState<boolean>(false);
 
 	const [leftOptions, setLeftSelect] = useState([]);
 	const [rightOptions, setRightSelect] = useState([]);
@@ -227,7 +228,11 @@ const SelectGroup: React.FC = () => {
 			fieldKey: list.length,
 			operator: '='
 		});
-		console.log(nextList);
+		if (nextList.length > 1) {
+			setShowTips(true);
+		} else {
+			setShowTips(false);
+		}
 		form.setFieldsValue({
 			connectionSentences: nextList
 		});
@@ -275,7 +280,11 @@ const SelectGroup: React.FC = () => {
 			return;
 		}
 		const nextList = list.slice();
-
+		if (nextList.length > 2) {
+			setShowTips(true);
+		} else {
+			setShowTips(false);
+		}
 		nextList.splice(key, 1);
 		form.setFieldsValue({
 			connectionSentences: nextList
@@ -308,10 +317,12 @@ const SelectGroup: React.FC = () => {
 				}}
 				form={form}
 			>
-				<div style={{ fontSize: '14px', marginBottom: 20 }}>
-					<span style={{ fontWeight: 'bold' }}>连接语句: </span>
-					<span>多行之间是"且"的关系</span>
-				</div>
+				{showTips && (
+					<div style={{ fontSize: '14px', marginBottom: 20 }}>
+						<span style={{ fontWeight: 'bold' }}>连接语句: </span>
+						<span>多行之间是"且"的关系</span>
+					</div>
+				)}
 				<Form.List name="connectionSentences">
 					{(fields, { add, remove }) => (
 						<>
