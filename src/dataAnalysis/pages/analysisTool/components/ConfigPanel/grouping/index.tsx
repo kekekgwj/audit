@@ -180,7 +180,7 @@ const Grouping: FC = () => {
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
 	form.setFieldsValue(formInitValue);
-	const { syncGraph } = useGraphContext();
+	const { syncGraph, getAllConfigs } = useGraphContext();
 	const getConfig = async () => {
 		const params = {
 			id,
@@ -218,6 +218,7 @@ const Grouping: FC = () => {
 	};
 	const [groupData, setGroupData] = useState<List[]>();
 	const [accordData, setAccordData] = useState<List[]>();
+
 	const updateTable = useUpdateTable();
 
 	const onFinish = async (values: any) => {
