@@ -20,6 +20,7 @@ interface List {
 	tableName: string;
 	key: string;
 	list: {
+		description: string;
 		title: string;
 		key: string;
 	}[];
@@ -149,7 +150,7 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 												setData(items, tableRealName, tableName);
 											}}
 										>
-											<span>{items.title}</span>
+											<span>{items.description}</span>
 										</div>
 									);
 								})}
@@ -201,6 +202,7 @@ const Grouping: FC = () => {
 			const list = [];
 			listArr?.forEach((el, i) => {
 				list.push({
+					description: el.description || el.fieldName,
 					title: el.fieldName,
 					key: i
 				});
