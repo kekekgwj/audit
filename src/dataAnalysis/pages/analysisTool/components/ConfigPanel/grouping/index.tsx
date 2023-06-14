@@ -146,7 +146,8 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 											key={items.title}
 											className={classes.sortTxt}
 											onClick={() => {
-												setData(items, tableRealName, tableName);
+												dataList.length == 0 &&
+													setData(items, tableRealName, tableName);
 											}}
 										>
 											<span>{items.title}</span>
@@ -178,6 +179,7 @@ const Grouping: FC = () => {
 	const [form] = Form.useForm();
 	const { id, getValue, setValue, resetValue } = useConfigContextValue();
 	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
+	form.setFieldsValue(formInitValue);
 	const { syncGraph } = useGraphContext();
 	const getConfig = async () => {
 		const params = {
@@ -219,6 +221,7 @@ const Grouping: FC = () => {
 	const updateTable = useUpdateTable();
 
 	const onFinish = async (values: any) => {
+		console.log({ configs: { [id]: values } });
 		const params = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
@@ -241,7 +244,6 @@ const Grouping: FC = () => {
 		form.resetFields();
 		id && resetValue(id);
 	};
-
 	return (
 		<Form
 			{...layout}
@@ -252,11 +254,11 @@ const Grouping: FC = () => {
 			onValuesChange={(_, value) => {
 				handleOnChange(value);
 			}}
-			initialValues={{
-				conditions: formInitValue.conditions || [],
-				funcType: formInitValue.funcType,
-				column: formInitValue.column || []
-			}}
+			// initialValues={{
+			// 	conditions: formInitValue.conditions || [],
+			// 	funcType: formInitValue.funcType,
+			// 	column: formInitValue.column || []
+			// }}
 		>
 			<div className={classes.formList}>
 				<Form.Item
