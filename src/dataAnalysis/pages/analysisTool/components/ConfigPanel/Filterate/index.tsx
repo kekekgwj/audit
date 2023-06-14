@@ -292,10 +292,11 @@ export default (props: any) => {
 	}
 	const updateTable = useUpdateTable();
 	console.log({ initData });
+
 	const [formData, dispatch] = useReducer(reducer, initData);
 	// const [formData, setFormData] = useState(data);
 	const [indeterminate, setIndeterminate] = useState(false);
-	const [checkAll, setCheckAll] = useState(true);
+	const [checkAll, setCheckAll] = useState(false);
 	const [configData, setConfigData] = useState([]);
 	const [colData, setColData] = useState([]);
 	const [plainOptions, setPlainOptions] = useState([]);
@@ -318,6 +319,9 @@ export default (props: any) => {
 				});
 			});
 			setPlainOptions(optionArr);
+			setCheckAll(true);
+			dispatch({ type: 'setCol', data: optionArr });
+			console.log(res);
 		});
 	}, []);
 
@@ -395,6 +399,10 @@ export default (props: any) => {
 		}
 		resetValue(id);
 		dispatch({ type: 'reset' });
+		dispatch({ type: 'setCol', data: plainOptions });
+		setIndeterminate(false);
+		setCheckAll(true);
+		set();
 	};
 
 	// 更新表单值
