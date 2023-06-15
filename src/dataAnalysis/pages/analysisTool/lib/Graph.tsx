@@ -222,7 +222,6 @@ export const Graph = forwardRef((props, ref) => {
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 		{ label, image, type, labelCn, activeImage }: IImageShapes
 	) => {
-		console.log({ type });
 		if (!graph) {
 			return;
 		}
