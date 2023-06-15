@@ -97,16 +97,10 @@ const Panel: React.FC = () => {
 	const { curSelectedNode: id, showPanel = false, time } = state || {};
 	const executeType = [IImageTypes.TABLE, IImageTypes.END];
 	const projectID = useGraphID();
-	const {
-		getConfigValue,
-		saveConfigValue,
-		syncGraph,
-		getAllConfigs,
-		updateNodeConfigVersion,
-		getLastestVersion
-	} = useGraphContext();
+	const { getConfigValue, saveConfigValue, syncGraph, getAllConfigs } =
+		useGraphContext();
 
-	const [nodeConfig, setNodeConfig] = useState({});
+	const [nodeConfig, setNodeConfig] = useState(null);
 	const { getNodeKey, setNodeKeyFrozen, isNodeKeyReady, setNodeKey } =
 		useNodeKey();
 	const isInit = useInitRender();
@@ -118,7 +112,7 @@ const Panel: React.FC = () => {
 
 	useEffect(() => {
 		// setNodeKeyFrozen();
-		// handleGetNodeConfig();
+		handleGetNodeConfig();
 	}, [time]);
 	const handleGetNodeConfig = async () => {
 		if (!graph) {
@@ -132,6 +126,7 @@ const Panel: React.FC = () => {
 				content: canvasData
 			})
 		};
+		setNodeKeyFrozen();
 		const config: any = await getCanvasConfig(params);
 		setNodeConfig(config);
 		const tableNames = config.map((item) => item.tableName);
@@ -139,30 +134,25 @@ const Panel: React.FC = () => {
 		setNodeKey(key);
 	};
 
-	const setValue = (nodeKey: number, value: any) => {
-		console.log('setvalue', 'id:', id, 'nodekey:', nodeKey);
+	const setValue = (value: any) => {
+		if (!value) return;
+		const nodeKey = getNodeKey();
 		if (!nodeKey || !id) {
 			return;
 		}
 
 		saveConfigValue(id, { ...value, key: nodeKey });
 	};
-	const getValue = (nodeKey: number) => {
+	const getValue = () => {
+		const nodeKey = getNodeKey();
 		if (!nodeKey || !id) {
 			return {};
 		}
 		const curConfig = getConfigValue(id);
-		console.log(
-			'get: id:',
-			id,
-			'nodeKey',
-			nodeKey,
-			'get, curConfig',
-			curConfig
-		);
 		if (!curConfig || curConfig.key !== nodeKey) {
 			return {};
 		}
+
 		return curConfig;
 	};
 	const resetValue = (value: any) => {
@@ -259,7 +249,7 @@ const Panel: React.FC = () => {
 
 	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
 	const initValue = getValue();
-	console.log('initValue', initValue);
+
 	return (
 		<div className={classes.container}>
 			<div className={classes.data}>
@@ -329,7 +319,7 @@ const Panel: React.FC = () => {
 										executeByNodeConfig
 									}}
 								>
-									<ConfigPanel />
+									<ConfigPanel key={getNodeKey()} />
 								</ConfigContext.Provider>
 							</div>
 						) : null}

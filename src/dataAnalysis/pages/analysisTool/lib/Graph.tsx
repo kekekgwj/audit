@@ -270,7 +270,17 @@ export const Graph = forwardRef((props, ref) => {
 		dnd?.start(node, e.nativeEvent as any);
 	};
 	const syncGraph = () => {
-		syncData(projectId, graph, getAllConfigs());
+		const allConfigs = getAllConfigs();
+		const graphNodesID = graph?.getNodes().map((node) => node.id);
+		const validConfig = {};
+		graphNodesID?.forEach((id: string) => {
+			const config = allConfigs[id];
+			if (config) {
+				validConfig[id] = config;
+			}
+		});
+
+		syncData(projectId, graph, validConfig);
 	};
 	//保存为审计模板
 	const saveAsAuditTem = () => {

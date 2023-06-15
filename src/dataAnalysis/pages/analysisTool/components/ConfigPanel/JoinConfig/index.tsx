@@ -141,30 +141,12 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 
 const SelectGroup: React.FC = () => {
 	const [form] = Form.useForm();
-	const graph = useGraph();
-	const { id, setValue, resetValue, getValue, executeByNodeConfig } =
+	const { id, setValue, resetValue, executeByNodeConfig, config, initValue } =
 		useConfigContextValue();
+	const [leftOptions, setLeftSelect] = useState([]);
+	const [rightOptions, setRightSelect] = useState([]);
 
-	const [nodeKey, setNodeKey] = useState<number | null>(null);
-	const [config, setConfig] = useState<any>();
-	// const [initValue, setInitValue] = useState<any>();
-	const handleGetNodeConfig = async () => {
-		if (!graph) {
-			return;
-		}
-
-		const canvasData = graph?.toJSON();
-		const params = {
-			id,
-			canvasJson: JSON.stringify({
-				content: canvasData
-			})
-		};
-		const config: any = await getCanvasConfig(params);
-		setConfig(config);
-		const tableNames = config.map((item) => item.tableName);
-		const key = encodeNodeSources([...tableNames, id]);
-		setNodeKey(key);
+	const handleGetNodeConfig = () => {
 		const configData1 = config[0] || [];
 		const configData2 = config[1] || [];
 		// 获取下拉选项
@@ -183,15 +165,10 @@ const SelectGroup: React.FC = () => {
 		setLeftSelect(leftData);
 		setRightSelect(rightData);
 	};
-	const [leftOptions, setLeftSelect] = useState([]);
-	const [rightOptions, setRightSelect] = useState([]);
 
 	useEffect(() => {
 		handleGetNodeConfig();
 	}, []);
-	const [leftTableName, rightTableName] = config
-		? config?.map((item) => item.tableName)
-		: [null, null];
 
 	const handleOnclickAdd = () => {
 		const list = form.getFieldValue('connectionSentences') || [];
@@ -205,6 +182,9 @@ const SelectGroup: React.FC = () => {
 		});
 	};
 	const formatSubmitValue = (value: IForm): IExecuteConfig | null => {
+		const [leftTableName, rightTableName] = config
+			? config?.map((item) => item.tableName)
+			: [null, null];
 		const { connectionSentences, connectionType } = value;
 		if (connectionSentences && connectionSentences.length) {
 			const formatValue = value.connectionSentences.map((item, index) => {
@@ -245,15 +225,13 @@ const SelectGroup: React.FC = () => {
 			return;
 		}
 
-		setValue(nodeKey, formatSubmitValue(value));
+		setValue(formatSubmitValue(value));
 	};
 	const handleReset = () => {
 		form.resetFields();
 		id && resetValue();
 	};
 
-	const initValue = getValue(nodeKey);
-	console.log('join init', initValue);
 	return (
 		<div style={{ overflowY: 'auto', height: '300px' }}>
 			<Form
@@ -266,7 +244,7 @@ const SelectGroup: React.FC = () => {
 				initialValues={{
 					connectionSentences: [{ key: 0, fieldKey: 0 }],
 					connectionType: 'INNER JOIN',
-					...getValue(nodeKey)
+					...initValue
 				}}
 				form={form}
 			>

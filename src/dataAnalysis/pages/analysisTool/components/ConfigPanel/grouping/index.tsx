@@ -171,7 +171,6 @@ interface IFormValue {
 	funcType: string;
 }
 const Grouping: FC = () => {
-	const graph = useGraph();
 	const [form] = Form.useForm();
 	const {
 		id,
@@ -181,6 +180,9 @@ const Grouping: FC = () => {
 		initValue = {},
 		config
 	} = useConfigContextValue();
+	useEffect(() => {
+		console.log(initValue);
+	}, [initValue]);
 	const getConfig = () => {
 		setGroupData(transData(config));
 		setAccordData(transData(config));

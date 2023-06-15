@@ -238,6 +238,8 @@ export const validateConnectionRule = (
 	// 	message.error('sql不能连接sql');
 	// 	return false;
 	// }
+	// 连接成功 -> 可能改变source -> 需要关闭重新执行
+	onClickCloseConfigPanel();
 	return true;
 };
 
@@ -278,6 +280,7 @@ import { message } from 'antd';
 import { Options } from '@antv/x6/lib/graph/options';
 import { saveProjectCanvas } from '@/api/dataAnalysis/graph';
 import React, { useEffect } from 'react';
+import { onClickCloseConfigPanel } from '@/redux/store';
 const { FILTER, CONNECT, GROUP, ORDER, END } = ASSETS;
 export const imageShapes: IImageShapes[] = [
 	{

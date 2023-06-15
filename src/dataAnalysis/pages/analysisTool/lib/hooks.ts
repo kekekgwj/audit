@@ -133,14 +133,7 @@ export const useGraphContext = () => {
 
 export const useNodeConfigValue: () => IGraphConfig = () => {
 	const ref = useRef<Record<string, object>>({});
-	const latestNodeVersion = useRef<Record<string, string>>({});
 
-	const updateNodeConfigVersion = (id: string, version: number) => {
-		latestNodeVersion.current[id] = version;
-	};
-	const getLastestVersion = () => {
-		return latestNodeVersion.current;
-	};
 	const getConfigValue = useCallback((id: string) => {
 		if (ref.current) {
 			return ref.current[id];
@@ -156,13 +149,12 @@ export const useNodeConfigValue: () => IGraphConfig = () => {
 		return ref.current;
 	};
 	const setAllConfigs = (value: any) => {
+		console.log('setAllConfigs', value);
 		ref.current = value;
 	};
 	return {
 		getConfigValue,
 		saveConfigValue,
-		updateNodeConfigVersion,
-		getLastestVersion,
 		getAllConfigs,
 		setAllConfigs
 	};
