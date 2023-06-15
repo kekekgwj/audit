@@ -178,7 +178,7 @@ const AuditTemplate = () => {
 							<Row gutter={20} style={{ width: '100%' }}>
 								{templateList.map((item) => {
 									return (
-										<Col md={12} lg={8} xl={6} xxl={4}>
+										<Col xs={12} sm={12} md={12} lg={8} xl={6} xxl={4}>
 											<Card key={item.id} className={styles['card-item']}>
 												<div
 													className={styles['card-content']}

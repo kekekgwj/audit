@@ -221,7 +221,7 @@ const MyTemplate = () => {
 		<div className={styles['my-template-page']}>
 			<div className={styles['main-contain']} id="mainContain">
 				<Row gutter={20} style={{ width: '100%' }}>
-					<Col md={12} lg={8} xl={6} xxl={4}>
+					<Col xs={12} sm={12} md={12} lg={8} xl={6} xxl={4}>
 						<div className={styles['add-item']}>
 							<div
 								className={styles['add-content-box']}
@@ -240,7 +240,7 @@ const MyTemplate = () => {
 						templateList.length > 0 &&
 						templateList.map((item) => {
 							return (
-								<Col md={12} lg={8} xl={6} xxl={4}>
+								<Col xs={12} sm={12} md={12} lg={8} xl={6} xxl={4}>
 									<Card key={item.id} className={styles['card-item']}>
 										<div
 											className={styles['card-content']}
