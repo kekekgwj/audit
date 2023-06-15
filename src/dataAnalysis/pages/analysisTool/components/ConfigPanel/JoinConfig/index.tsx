@@ -179,7 +179,7 @@ const SelectGroup: React.FC = () => {
 			fieldKey: list.length,
 			operator: '='
 		});
-		if (nextList.length > 1) {
+		if (nextList.length > 0) {
 			setShowTips(true);
 		} else {
 			setShowTips(false);
@@ -222,7 +222,7 @@ const SelectGroup: React.FC = () => {
 			return;
 		}
 		const nextList = list.slice();
-		if (nextList.length > 2) {
+		if (nextList.length > 1) {
 			setShowTips(true);
 		} else {
 			setShowTips(false);
@@ -254,7 +254,7 @@ const SelectGroup: React.FC = () => {
 					handleOnChange(value);
 				}}
 				initialValues={{
-					connectionSentences: [{ key: 0, fieldKey: 0, operator: '=' }],
+					connectionSentences: [],
 					connectionType: 'INNER JOIN',
 					...initValue
 				}}
