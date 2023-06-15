@@ -1,6 +1,7 @@
 import { Pagination } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import styles from './index.module.less';
 
 interface Props {
 	columns: ColumnsType<any>;
@@ -59,24 +60,16 @@ const DataTable = forwardRef((props: Props, ref) => {
 	};
 
 	return (
-		<div>
+		<div className={styles['data-table']}>
 			<Table
 				columns={columns}
 				dataSource={dataSource}
 				loading={loading}
 				pagination={false}
+				className={styles['data-table__table']}
 			/>
 			{dataSource.length ? (
-				<div
-					style={{
-						textAlign: 'center',
-						marginTop: '20px',
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'space-between',
-						fontSize: '14px'
-					}}
-				>
+				<div className={styles['data-table__pagination']}>
 					<div>
 						<span style={{ marginRight: '10px' }}>共{total}条记录</span>
 						<span>

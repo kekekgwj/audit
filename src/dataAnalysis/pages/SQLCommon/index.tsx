@@ -225,7 +225,7 @@ export default () => {
 	};
 
 	return (
-		<div style={{ padding: '20px' }}>
+		<div className={styles.page} style={{ padding: '20px' }}>
 			<div className={styles.searchForm}>
 				<Form
 					form={searchForm}
@@ -270,7 +270,12 @@ export default () => {
 				新增SQL
 			</Button>
 
-			<DataTable ref={tableRef} columns={columns} getData={getData}></DataTable>
+			<DataTable
+				ref={tableRef}
+				columns={columns}
+				getData={getData}
+				className={styles.table}
+			></DataTable>
 
 			{contextHolder}
 
