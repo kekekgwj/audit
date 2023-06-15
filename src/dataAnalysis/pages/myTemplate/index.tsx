@@ -196,6 +196,8 @@ const MyTemplate = () => {
 		});
 	};
 
+	const date2str = (str) => str.replace(/-/gi, '/');
+
 	return (
 		<div className={styles['my-template-page']}>
 			<div className={styles['main-contain']} id="mainContain">
@@ -226,7 +228,7 @@ const MyTemplate = () => {
 									</div>
 									<div className={styles['text-name']}>{item.name}</div>
 									<div className={styles['text-time']}>
-										最近更新：{item.gmtModified}
+										最近更新：{date2str(item.gmtModified)}
 									</div>
 								</div>
 								<div className={styles['card-footer']}>
