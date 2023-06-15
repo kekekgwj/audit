@@ -1,6 +1,5 @@
 import React, {
 	createContext,
-	useCallback,
 	useContext,
 	useEffect,
 	useRef,
@@ -94,6 +93,7 @@ const Panel: React.FC = () => {
 	const [showConfig, setShowConfig] = useState(true);
 
 	const { curSelectedNode: id, showPanel = false, time } = state || {};
+
 	const executeType = [IImageTypes.TABLE, IImageTypes.END];
 	const projectID = useGraphID();
 	const { getConfigValue, saveConfigValue, syncGraph, getAllConfigs } =
@@ -103,7 +103,6 @@ const Panel: React.FC = () => {
 	const { getNodeKey, setNodeKeyFrozen, isNodeKeyReady, setNodeKey } =
 		useNodeKey();
 	const isInit = useInitRender();
-	// const valueChangeReady = isNodeKeyReady() && id;
 
 	useEffect(() => {
 		!isInit && syncGraph();

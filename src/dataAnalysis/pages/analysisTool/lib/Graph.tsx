@@ -23,6 +23,7 @@ import {
 	validateConnectionRule
 } from './utils';
 import { GraphContext, useGraphPageInfo, useNodeConfigValue } from './hooks';
+import { onClickCloseConfigPanel } from '@/redux/store';
 
 interface Props {
 	className?: string;
@@ -63,10 +64,12 @@ export const Graph = forwardRef((props, ref) => {
 
 	const cleanGoBack = () => {
 		graph?.off('cell:removed');
+		onClickCloseConfigPanel();
 		setTimeout(() => {
 			goBack();
 		}, 200);
 	};
+
 	// 初始化画布
 	const initializeGraph = () => {
 		const strictTemplate = isPublicTemplate
