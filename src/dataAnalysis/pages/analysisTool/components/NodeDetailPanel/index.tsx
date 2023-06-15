@@ -119,18 +119,21 @@ const Panel: React.FC = () => {
 		}
 
 		const canvasData = graph?.toJSON();
-		const params = {
-			id,
-			canvasJson: JSON.stringify({
-				content: canvasData
-			})
-		};
+
 		setNodeKeyFrozen();
-		const config: any = await getCanvasConfig(params);
-		setNodeConfig(config);
-		const tableNames = config.map((item) => item.tableName);
-		const key = encodeNodeSources([...tableNames, id]);
-		setNodeKey(key);
+		if (id) {
+			const params = {
+				id,
+				canvasJson: JSON.stringify({
+					content: canvasData
+				})
+			};
+			const config: any = await getCanvasConfig(params);
+			setNodeConfig(config);
+			const tableNames = config.map((item) => item.tableName);
+			const key = encodeNodeSources([...tableNames, id]);
+			setNodeKey(key);
+		}
 	};
 
 	const setValue = (value: any) => {
