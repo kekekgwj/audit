@@ -10,16 +10,16 @@ interface SortProps {
 	value?: string[];
 	onChange?: (value: string[]) => void;
 }
-
-interface List {
-	titleName: string;
+interface IListItem {
+	description?: string;
 	title: string;
-	list: {
-		description?: string;
-		title: string;
-		isUp: boolean;
-		isDown: boolean;
-	}[];
+	isUp: boolean;
+	isDown: boolean;
+}
+interface List {
+	tableName: string;
+	title: string;
+	list: IListItem[];
 }
 interface IConfigRaw {
 	fields: {
@@ -27,7 +27,7 @@ interface IConfigRaw {
 		description: string;
 		fieldName: string;
 		id: number;
-		tableName: 'string';
+		tableName: string;
 	}[];
 	tableCnName: string;
 	tableName: string;
@@ -244,15 +244,15 @@ const Sort: FC = () => {
 		if (!data || !Array.isArray(data)) {
 			return [];
 		}
+
 		const formatData = data.map((item) => {
-			const listArr = item.fields;
-			const list = [];
-			listArr?.forEach((el) => {
+			const { fields, tableCnName, tableName } = item;
+			const list: IListItem[] = [];
+			fields?.forEach((el) => {
 				let [isDownValue, isUpValue] = [false, false];
 				const { tableName } = item;
-				const { fieldName } = el;
+				const { fieldName, description } = el;
 				if (initConfig) {
-					console.log(initConfig, item.tableName, el.fieldName);
 					if (initConfig[tableName] && initConfig[tableName][fieldName]) {
 						const init = initConfig[tableName][fieldName];
 						if (init) {
@@ -261,18 +261,19 @@ const Sort: FC = () => {
 					}
 				}
 				list.push({
-					description: el.description || el.fieldName,
-					title: el.fieldName,
+					description: description || fieldName,
+					title: fieldName,
 					isUp: isUpValue,
 					isDown: isDownValue
 				});
 			});
 			return {
-				tableName: item.tableName,
-				title: item.tableCnName,
+				tableName: tableName,
+				title: tableCnName,
 				list: list
 			};
 		});
+
 		return formatData;
 	};
 

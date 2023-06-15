@@ -114,7 +114,7 @@ const Panel: React.FC = () => {
 		handleGetNodeConfig();
 	}, [time]);
 	const handleGetNodeConfig = async () => {
-		if (!graph) {
+		if (!graph || !id) {
 			return;
 		}
 

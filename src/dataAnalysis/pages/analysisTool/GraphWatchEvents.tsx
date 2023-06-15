@@ -57,8 +57,8 @@ const GraphWatchEvents = () => {
 				syncGraph();
 			}, 200)
 		);
-		graph.on('cell:added', () => syncGraph());
-		graph.on('cell:removed', () => syncGraph());
+		// graph.on('cell:added', () => syncGraph());
+		// graph.on('cell:removed', () => syncGraph());
 
 		return () => {
 			graph.off('node:mouseenter');
