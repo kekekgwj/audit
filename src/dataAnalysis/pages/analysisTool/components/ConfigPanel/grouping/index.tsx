@@ -15,6 +15,7 @@ interface SortProps {
 	value?: ICondition[];
 	onChange?: (value: string[]) => void;
 	label: string;
+	isMulti?: boolean;
 }
 interface List {
 	tableName: string;
@@ -56,7 +57,13 @@ const HeartIcon = (props: Partial<CustomIconComponentProps>) => (
 	<Icon component={HeartSvg} {...props} />
 );
 
-const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
+const SortInput: FC<SortProps> = ({
+	option = [],
+	value,
+	onChange,
+	label,
+	isMulti = false
+}) => {
 	const [dataList, setDataList] = useState<ICondition[]>(value || []);
 
 	const setData = (
@@ -146,8 +153,13 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 											key={items.title}
 											className={classes.sortTxt}
 											onClick={() => {
-												dataList.length == 0 &&
+												if (isMulti) {
 													setData(items, tableRealName, tableName);
+												} else {
+													if (dataList.length == 0) {
+														setData(items, tableRealName, tableName);
+													}
+												}
 											}}
 										>
 											<span>{items.description}</span>
@@ -252,7 +264,7 @@ const Grouping: FC = () => {
 					name="conditions"
 					label=""
 				>
-					<SortInput label="分组依据" option={groupData}></SortInput>
+					<SortInput isMulti label="分组依据" option={groupData}></SortInput>
 				</Form.Item>
 				<Form.Item
 					className={classes.funcType}
