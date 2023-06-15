@@ -268,6 +268,7 @@ export const getAllNodeOfGraph = (graph: X6.Graph): Set<string | null> => {
 export interface IImageShapes {
 	label: string;
 	image: string;
+	activeImage?: string;
 	type: IImageTypes;
 	labelCn?: string;
 }
@@ -277,31 +278,47 @@ import { message } from 'antd';
 import { Options } from '@antv/x6/lib/graph/options';
 import { saveProjectCanvas } from '@/api/dataAnalysis/graph';
 import React, { useEffect } from 'react';
-const { FILTER, CONNECT, GROUP, ORDER, END } = ASSETS;
+const {
+	FILTER,
+	CONNECT,
+	GROUP,
+	ORDER,
+	END,
+	CONNECTACTIVE,
+	FILTERACTIVE,
+	ENDACTIVE,
+	GROUPACTIVE,
+	ORDERACTIVE
+} = ASSETS;
 export const imageShapes: IImageShapes[] = [
 	{
 		label: '连接',
 		image: CONNECT,
+		activeImage: CONNECTACTIVE,
 		type: IImageTypes.CONNECT
 	},
 	{
 		label: '筛选',
 		image: FILTER,
+		activeImage: FILTERACTIVE,
 		type: IImageTypes.FILTER
 	},
 	{
 		label: '排序',
 		image: ORDER,
+		activeImage: ORDERACTIVE,
 		type: IImageTypes.ORDER
 	},
 	{
 		label: '分组',
 		image: GROUP,
+		activeImage: GROUPACTIVE,
 		type: IImageTypes.GROUP
 	},
 	{
 		label: '结束',
 		image: END,
+		activeImage: ENDACTIVE,
 		type: IImageTypes.END
 	}
 ];
