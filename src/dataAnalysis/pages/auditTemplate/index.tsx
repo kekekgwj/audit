@@ -1,5 +1,15 @@
 import React, { useEffect, useRef } from 'react';
-import { Card, Divider, Form, Input, Pagination, Empty, message } from 'antd';
+import {
+	Card,
+	Divider,
+	Form,
+	Input,
+	Pagination,
+	Empty,
+	message,
+	Col,
+	Row
+} from 'antd';
 import fileImg from '@/assets/img/file.png';
 import styles from './index.module.less';
 import SvgIcon from '@/components/svg-icon';
@@ -42,7 +52,16 @@ const AuditTemplate = () => {
 		// getTemplateList();
 		const dom = document.querySelector('#mianbox');
 		// 当前界面每行可容纳个数
-		const rowNum = Math.floor(dom?.scrollWidth / 220);
+		let rowNum;
+		if (dom?.scrollWidth < 992) {
+			rowNum = 2;
+		} else if (dom?.scrollWidth < 1200 && dom?.scrollWidth >= 992) {
+			rowNum = 3;
+		} else if (dom?.scrollWidth < 1600 && dom?.scrollWidth >= 1200) {
+			rowNum = 4;
+		} else {
+			rowNum = 6;
+		}
 		// 每列可容纳个数
 		const colNum = Math.floor(dom?.scrollHeight / 220);
 		//每页数量
@@ -156,51 +175,42 @@ const AuditTemplate = () => {
 				{templateList?.length > 0 ? (
 					<div className={styles['template-list-page']}>
 						<div className={styles['main-contain']} id="mainContain">
-							{templateList.map((item) => {
-								return (
-									<Card key={item.id} className={styles['card-item']}>
-										<div
-											className={styles['card-content']}
-											onClick={() => toDetail(item)}
-										>
-											<div className={styles['img-icon']}>
-												<img src={fileImg} alt="" />
-											</div>
-											<div className={styles['text-name']}>{item.name}</div>
-											<div className={styles['text-time']}>
-												最近更新：{item.gmtModified}
-											</div>
-										</div>
-										<div className={styles['card-footer']}>
-											<span
-												className={styles['operate-item']}
-												onClick={() => handleCopy(item)}
-											>
-												<SvgIcon name="copy" color="#24A36F"></SvgIcon>
-												<span style={{ marginLeft: '2px' }}>复制</span>
-											</span>
-										</div>
-									</Card>
-								);
-							})}
+							<Row gutter={20} style={{ width: '100%' }}>
+								{templateList.map((item) => {
+									return (
+										<Col md={12} lg={8} xl={6} xxl={4}>
+											<Card key={item.id} className={styles['card-item']}>
+												<div
+													className={styles['card-content']}
+													onClick={() => toDetail(item)}
+												>
+													<div className={styles['img-icon']}>
+														<img src={fileImg} alt="" />
+													</div>
+													<div className={styles['text-name']}>{item.name}</div>
+													<div
+														style={{ textAlign: 'center' }}
+														className={styles['text-time']}
+													>
+														最近更新<br></br>
+														{item.gmtModified}
+													</div>
+												</div>
+												<div className={styles['card-footer']}>
+													<span
+														className={styles['operate-item']}
+														onClick={() => handleCopy(item)}
+													>
+														<SvgIcon name="copy" color="#24A36F"></SvgIcon>
+														<span style={{ marginLeft: '2px' }}>复制</span>
+													</span>
+												</div>
+											</Card>
+										</Col>
+									);
+								})}
+							</Row>
 						</div>
-						{/* <div className={styles['foot-pagination-box']}>
-							<div>
-								<span style={{ marginRight: '10px' }}>共{total}条记录</span>
-								<span>
-									第{current}/{Math.ceil(total / 10)}页
-								</span>
-							</div>
-							<div className={styles['pagination-box']}>
-								<Pagination
-									total={total}
-									showSizeChanger
-									pageSizeOptions={[10]}
-									onChange={onChange}
-									showQuickJumper
-								/>
-							</div>
-						</div> */}
 					</div>
 				) : (
 					<Empty
