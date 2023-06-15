@@ -12,15 +12,10 @@ interface SearchData {
 	size: number;
 }
 export function getDataList(data: SearchData) {
-	const formData = new FormData();
-	for (const key in data) {
-		if (Object.prototype.hasOwnProperty.call(data, key)) {
-			formData.append(key, data[key]);
-		}
-	}
-	return postFormData(
-		API_PREFIX + '/blade-tool/dataAnalysis/listMyTables',
-		formData
+	return get(
+		API_PREFIX +
+			`/blade-tool/dataAnalysis/listMyTables?tableName=${data.tableName}&createdBeginTime=${data.createdBeginTime}&createdEndTime=${data.createdEndTime}`,
+		{}
 	);
 }
 
