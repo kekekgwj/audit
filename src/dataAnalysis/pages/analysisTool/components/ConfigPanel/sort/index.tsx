@@ -41,7 +41,6 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 		setOptionList(newDataList);
 	};
 	const transSubmitData = (rawData) => {
-		console.log(rawData);
 		const formatData = [];
 		rawData.forEach(({ list, tableName }) => {
 			list.forEach((item) => {
@@ -192,16 +191,22 @@ const Sort: FC = () => {
 	} = useConfigContextValue();
 	const [option, setOption] = useState();
 	useEffect(() => {
-		const init =
-			initValue.sorting && initValue.sorting.length > 0
-				? initValue.sorting
-				: transData(config);
+		const initSortingValue = initValue.sorting;
+		const initConfig = {};
+		console.log('initSortingValue', initSortingValue);
+		if (initSortingValue) {
+			initSortingValue.forEach(({ tableName, title, isDown, isUp }) => {
+				initConfig[tableName] = { [title]: { isDown, isUp } };
+			});
+		}
 
-		setOption(init);
+		const formatData = transData(config, initConfig);
+
+		setOption(formatData);
 	}, []);
 
 	//转数据形式
-	const transData = (data: any) => {
+	const transData = (data: any, initConfig: any) => {
 		if (!data || !Array.isArray(data)) {
 			return [];
 		}
@@ -209,10 +214,22 @@ const Sort: FC = () => {
 			const listArr = item.fields;
 			const list = [];
 			listArr?.forEach((el) => {
+				let [isDownValue, isUpValue] = [false, false];
+				const { tableName } = item;
+				const { fieldName } = el;
+				if (initConfig) {
+					console.log(initConfig, item.tableName, el.fieldName);
+					if (initConfig[tableName] && initConfig[tableName][fieldName]) {
+						const init = initConfig[tableName][fieldName];
+						if (init) {
+							[isDownValue, isUpValue] = [init.isDown, init.isUp];
+						}
+					}
+				}
 				list.push({
 					title: el.fieldName,
-					isUp: false,
-					isDown: false
+					isUp: isUpValue,
+					isDown: isDownValue
 				});
 			});
 			return {

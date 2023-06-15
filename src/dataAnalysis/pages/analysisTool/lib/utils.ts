@@ -194,10 +194,10 @@ export const validateConnectionRule = (
 			return false;
 		}
 
-		if (targetInEdgesIDs.length > 0) {
-			openMessage('筛选输入限制数量为1');
-			return false;
-		}
+		// if (targetInEdgesIDs.length > 0) {
+		// 	openMessage('筛选输入限制数量为1');
+		// 	return false;
+		// }
 	}
 
 	// GROUP BY
