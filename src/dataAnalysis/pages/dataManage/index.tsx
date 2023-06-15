@@ -178,8 +178,6 @@ const DataManageCom = () => {
 			tableName: searchFormData.tableName || '',
 			createdBeginTime: '',
 			createdEndTime: '',
-			modifiedBeginTime: '',
-			modifiedEndTime: ''
 		};
 		if (searchFormData.gmtCreated && searchFormData.gmtCreated.length > 0) {
 			searchData.createdBeginTime =
@@ -187,13 +185,6 @@ const DataManageCom = () => {
 			searchData.createdEndTime =
 				searchFormData.gmtCreated[1].format('YYYY-MM-DD');
 		}
-		if (searchFormData.updateTime && searchFormData.updateTime.length > 0) {
-			searchData.modifiedBeginTime =
-				searchFormData.updateTime[0].format('YYYY-MM-DD');
-			searchData.modifiedEndTime =
-				searchFormData.updateTime[1].format('YYYY-MM-DD');
-		}
-
 		const data = {
 			current: current,
 			size: size,
