@@ -254,7 +254,12 @@ const Grouping: FC = () => {
 				>
 					<SortInput label="分组依据" option={groupData}></SortInput>
 				</Form.Item>
-				<Form.Item name="funcType" label="函数类型">
+				<Form.Item
+					className={classes.funcType}
+					wrapperCol={{ offset: 0, span: 24 }}
+					name="funcType"
+					label="函数类型"
+				>
 					<Select placeholder="请选择" allowClear>
 						<Option value="SUM">求和</Option>
 						<Option value="MAX">最大</Option>
