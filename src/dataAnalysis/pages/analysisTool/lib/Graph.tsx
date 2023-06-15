@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Keyboard } from '@antv/x6-plugin-keyboard';
-import { Divider, message, Form, Input } from 'antd';
+import { Divider, message, Form, Input, Button } from 'antd';
 import { Dnd } from '@antv/x6-plugin-dnd';
 import { LeftOutlined } from '@ant-design/icons';
 import { saveAsAuditProject } from '@/api/dataAnalysis/graph';
@@ -416,14 +416,15 @@ export const Graph = forwardRef((props, ref) => {
 					style={{ width: `calc(100% - ${openLeftPanel ? 240 : 0}px)` }}
 				>
 					<div className={classes['control-wrapper']}>
-						<div
+						<Button
+							disabled={pathName == '审计模板'}
 							className={classes['save-btn']}
 							onClick={() => {
 								saveAsAuditTem();
 							}}
 						>
 							保存为审计模板
-						</div>
+						</Button>
 						<div
 							className="x6-dnd"
 							ref={DndContainerRef}
