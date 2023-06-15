@@ -12,14 +12,43 @@ interface SortProps {
 }
 
 interface List {
+	titleName: string;
 	title: string;
-	cnTitle: string;
 	list: {
-		description: string;
+		description?: string;
 		title: string;
 		isUp: boolean;
 		isDown: boolean;
 	}[];
+}
+interface IConfigRaw {
+	fields: {
+		dataType: number;
+		description: string;
+		fieldName: string;
+		id: number;
+		tableName: 'string';
+	}[];
+	tableCnName: string;
+	tableName: string;
+}
+interface ISortInitValue {
+	isDown: boolean;
+	isUp: boolean;
+	tableName: string;
+	title: string;
+}
+
+interface IInitValue {
+	sorting: ISortInitValue[];
+}
+interface IFormatInitValue {
+	[key: string]: {
+		[name: string]: {
+			isDown: boolean;
+			isUp: boolean;
+		};
+	};
 }
 const layout = {
 	labelCol: { span: 0 },
@@ -191,11 +220,11 @@ const Sort: FC = () => {
 		config,
 		initValue
 	} = useConfigContextValue();
-	const [option, setOption] = useState();
+	const [option, setOption] = useState<List[]>();
 	useEffect(() => {
-		const initSortingValue = initValue.sorting;
-		const initConfig = {};
-		console.log('initSortingValue', initSortingValue);
+		const initSortingValue: ISortInitValue[] = initValue.sorting;
+		const initConfig: IFormatInitValue = {};
+
 		if (initSortingValue) {
 			initSortingValue.forEach(({ tableName, title, isDown, isUp }) => {
 				initConfig[tableName] = { [title]: { isDown, isUp } };
@@ -208,7 +237,10 @@ const Sort: FC = () => {
 	}, []);
 
 	//转数据形式
-	const transData = (data: any, initConfig: any) => {
+	const transData = (
+		data: IConfigRaw[],
+		initConfig: IFormatInitValue
+	): List[] => {
 		if (!data || !Array.isArray(data)) {
 			return [];
 		}
