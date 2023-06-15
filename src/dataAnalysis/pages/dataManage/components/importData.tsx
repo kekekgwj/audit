@@ -72,12 +72,16 @@ const ImportCom = React.memo((props: Props) => {
 			formData.append('tableName', data.tableName);
 			formData.append('file', data.file.originFileObj);
 			formData.append('description', data.description);
-			importTable(formData).then((res) => {
-				message.success('导入成功');
-				setOpenImport(false);
-				refresh();
-			});
-			form.resetFields()
+			importTable(formData)
+				.then((res) => {
+					message.success('导入成功');
+					setOpenImport(false);
+					form.resetFields();
+					refresh();
+				})
+				.catch((err) => {
+					console.log(err);
+				});
 		});
 	};
 
