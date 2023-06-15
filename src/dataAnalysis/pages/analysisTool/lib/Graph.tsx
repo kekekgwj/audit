@@ -15,6 +15,7 @@ import TableSourcePanel from '../components/TableSourcePanel';
 import {
 	IImageShapes,
 	IImageTypes,
+	getLabelLength,
 	handleValidateNode,
 	imageShapes,
 	ports,
@@ -55,7 +56,9 @@ export const Graph = forwardRef((props, ref) => {
 		saveConfigValue,
 		resetConfigValue,
 		getAllConfigs,
-		setAllConfigs
+		setAllConfigs,
+		updateNodeConfigVersion,
+		getLastestVersion
 	} = useNodeConfigValue();
 	// 初始化画布
 	const initializeGraph = () => {
@@ -195,7 +198,7 @@ export const Graph = forwardRef((props, ref) => {
 	};
 
 	const getLabelLength = (str: string) => {
-		var Regx = /^[A-Za-z0-9]*$/;
+		const Regx = /^[A-Za-z0-9]*$/;
 		let len = 0;
 		for (let i = 0; i < str.length; i++) {
 			if (Regx.test(str.charAt(i))) {
@@ -207,10 +210,19 @@ export const Graph = forwardRef((props, ref) => {
 		return len;
 	};
 
+	const NodeColorOptions = {
+		CONNECT: ['#F8F9FA', '#24A36F'],
+		FILTER: ['#24A36F', '#24A36F'],
+		ORDER: ['#24A36F', '#24A36F'],
+		GROUP: ['#24A36F', '#24A36F'],
+		END: ['#FF8683', '#FF8683']
+	};
+
 	const startDrag = (
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-		{ label, image, type, labelCn }: IImageShapes
+		{ label, image, type, labelCn, activeImage }: IImageShapes
 	) => {
+		console.log({ type });
 		if (!graph) {
 			return;
 		}
@@ -220,12 +232,16 @@ export const Graph = forwardRef((props, ref) => {
 		}
 
 		const text = labelCn || label;
+		let bgColor = '#fff';
+		let textColor = '18181F';
+
+		if (type !== IImageTypes.TABLE) {
+			[bgColor, textColor] = NodeColorOptions[type];
+		}
 
 		const node = graph?.createNode({
 			inherit: 'rect',
-			// width: type === IImageTypes.TABLE ? text.length * 14 + 40 : 36,
 			width: type === IImageTypes.TABLE ? getLabelLength(text) + 40 : 36,
-			// height: 38,
 			height: type === IImageTypes.TABLE ? 38 : 58,
 			label: text,
 			markup: [
@@ -233,6 +249,10 @@ export const Graph = forwardRef((props, ref) => {
 					tagName: 'rect',
 					selector: 'body'
 				},
+				// {
+				// 	tagName: 'rect',
+				// 	selector: 'item'
+				// },
 				{
 					tagName: 'image',
 					selector: 'img'
@@ -244,32 +264,42 @@ export const Graph = forwardRef((props, ref) => {
 			],
 			attrs: {
 				body: {
-					stroke: '#ccc',
-					fill: '#fff',
-					strokeWidth: 1,
+					stroke: type === IImageTypes.TABLE ? '#ccc' : 'transparent',
+					fill: type === IImageTypes.TABLE ? '#fff' : 'transparent',
+					strokeWidth: type === IImageTypes.TABLE ? 1 : 0,
 					rx: 4,
 					ry: 4,
 					overflow: 'auto'
 				},
+				// item: {
+				// 	fill: bgColor,
+				// 	strokeWidth: 0,
+				// 	rx: 4,
+				// 	ry: 4,
+				// 	width: 30,
+				// 	height: 30,
+				// 	y: 0,
+				// 	x: 3
+				// },
 				img: {
-					'xlink:href': image,
-					width: 20,
-					height: 20,
-					y: 10,
-					x: 6
+					'xlink:href': type === IImageTypes.TABLE ? image : activeImage,
+					width: type === IImageTypes.TABLE ? 20 : 30,
+					height: type === IImageTypes.TABLE ? 20 : 30,
+					y: type === IImageTypes.TABLE ? 10 : 0,
+					x: type === IImageTypes.TABLE ? 6 : 3
 				},
 				label: {
 					refX: 22,
 					refY: 6,
 					fontWeight: 400,
-					color: '#18181F',
+					color: textColor,
 					lineHeight: '22px',
 					textAnchor: 'left',
 					textVerticalAnchor: 'top',
 					fontSize: 14,
 					x: type === IImageTypes.TABLE ? 12 : -18,
 					y: type === IImageTypes.TABLE ? 10 : 30,
-					fill: '#18181F'
+					fill: textColor
 				},
 				custom: {
 					type: type,
@@ -282,20 +312,52 @@ export const Graph = forwardRef((props, ref) => {
 		dnd?.start(node, e.nativeEvent as any);
 	};
 	const syncGraph = () => {
-		syncData(projectId, graph, getAllConfigs());
+		const allConfigs = getAllConfigs();
+		const graphNodesID = graph?.getNodes().map((node) => node.id);
+		const validConfig = {};
+		graphNodesID?.forEach((id: string) => {
+			const config = allConfigs[id];
+			if (config) {
+				validConfig[id] = config;
+			}
+		});
+
+		syncData(projectId, graph, validConfig);
 	};
 	//保存为审计模板
 	const saveAsAuditTem = () => {
 		setOpenSave(true);
-		form.resetFields();
 	};
 
 	const handleSave = async () => {
+		const canvasData = graph?.toJSON();
+		const cellData = canvasData.cells?.filter((item, index) => {
+			return item.shape == 'rect';
+		});
+		const typeArr = [];
+		cellData.forEach((el) => {
+			typeArr.push(el.attrs.custom.type);
+		});
+
+		if (!typeArr.includes('END')) {
+			//必须包含end 否则不让保存
+			message.error('必须包含结束组件');
+			return;
+		}
 		const data = form.getFieldsValue();
+		const params = {
+			canvasJson: JSON.stringify({
+				content: canvasData,
+				configs: getAllConfigs()
+			}),
+			projectId,
+			name: data.name
+		};
 		try {
-			const res = await saveAsAuditProject({ projectId, name: data.name });
+			const res = await saveAsAuditProject(params);
 			message.success('保存成功');
 			setOpenSave(false);
+			form.resetFields();
 		} catch (e) {
 			console.error(e);
 		}
@@ -317,7 +379,9 @@ export const Graph = forwardRef((props, ref) => {
 				getAllConfigs,
 				syncGraph,
 				setAllConfigs,
-				isPublicTemplate
+				isPublicTemplate,
+				updateNodeConfigVersion,
+				getLastestVersion
 			}}
 		>
 			<div className={classes['top-breadcrumb']}>
@@ -366,12 +430,14 @@ export const Graph = forwardRef((props, ref) => {
 							>
 								工具栏
 							</span>
-							{imageShapes.map(({ label, image, type }, index) => {
+							{imageShapes.map(({ label, image, type, activeImage }, index) => {
 								return (
 									<div
 										style={{ display: 'flex', alignItems: 'center' }}
 										key={type}
-										onMouseDown={(e) => startDrag(e, { label, image, type })}
+										onMouseDown={(e) =>
+											startDrag(e, { label, image, type, activeImage })
+										}
 									>
 										<img src={image}></img>
 										<span style={{ marginLeft: '8px', pointerEvents: 'none' }}>

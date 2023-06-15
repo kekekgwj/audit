@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useGraphContext } from './lib/hooks';
 import { onClickGraphNode } from '@/redux/store';
 import { debounce } from 'debounce';
+import { onClickCloseConfigPanel } from '@/redux/store';
 
 const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
 	for (let i = 0, len = ports.length; i < len; i += 1) {
@@ -16,6 +17,7 @@ const GraphWatchEvents = () => {
 		if (!graph) {
 			return;
 		}
+
 		graph.on('node:mouseenter', () => {
 			const ports = container.querySelectorAll(
 				'.x6-port-body'
@@ -38,6 +40,8 @@ const GraphWatchEvents = () => {
 				graph.select(nodes);
 			}
 		});
+		// 点击画布，关闭配置
+		graph.on('blank:click', onClickCloseConfigPanel);
 
 		// delete
 		graph.bindKey('backspace', () => {

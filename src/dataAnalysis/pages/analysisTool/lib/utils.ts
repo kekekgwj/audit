@@ -1,6 +1,7 @@
 import { Graph, Node, Edge, ObjectExt, StringExt } from '@antv/x6';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 import * as X6 from '@antv/x6';
+import { hashCode } from 'hashcode';
 type Metadata = Node.Metadata | Edge.Metadata;
 type C = Node | Edge;
 type T = C | { [key: string]: any };
@@ -88,14 +89,14 @@ export const handleValidateNode: (
 	const currentNodesType = getAllNodeOfGraph(graph);
 	// todo: error提示
 	if ([IImageTypes.GROUP, IImageTypes.ORDER, IImageTypes.END].includes(type)) {
-		// if (currentNodesType.has(IImageTypes.GROUP) && type === IImageTypes.GROUP) {
-		// 	message.error('不能存在多个分组');
-		// 	return false;
-		// }
-		// // if (currentNodesType.has(IImageTypes.ORDER) && type === IImageTypes.ORDER) {
-		// 	message.error('不能存在多个排序');
-		// 	return false;
-		// }
+		if (currentNodesType.has(IImageTypes.GROUP) && type === IImageTypes.GROUP) {
+			message.error('不能存在多个分组');
+			return false;
+		}
+		if (currentNodesType.has(IImageTypes.ORDER) && type === IImageTypes.ORDER) {
+			message.error('不能存在多个排序');
+			return false;
+		}
 		if (currentNodesType.has(IImageTypes.END) && type === IImageTypes.END) {
 			message.error('不能存在多个END');
 			return false;
@@ -108,7 +109,9 @@ export const validateConnectionRule = (
 	params: Options.ValidateConnectionArgs,
 	openMessage: (error: string) => void
 ): boolean => {
-	const { sourceCell, targetCell } = params;
+	const { sourceCell, targetCell, edge } = params;
+	const edgeID = edge?.id;
+
 	if (!sourceCell || !targetCell) {
 		return false;
 	}
@@ -140,9 +143,12 @@ export const validateConnectionRule = (
 
 	const sourceType = sourceCellAttrs.custom?.type as IImageTypes;
 	const targetType = targetCellAttrs.custom?.type as IImageTypes;
+	const targetInEdgesIDs = targetInEdges
+		? targetInEdges.map((edge) => edge.id).filter((id) => id !== edgeID)
+		: [];
 	//  “TABLE”节点：无输入，仅输出（支持多输出，输出可以接任意节点类型）
 	if (targetType === IImageTypes.TABLE) {
-		openMessage('table不能有输入结点');
+		openMessage('表不能有输入结点');
 		return false;
 	}
 	// if (sourceType === IImageTypes.TABLE && targetType === IImageTypes.TABLE) {
@@ -153,17 +159,17 @@ export const validateConnectionRule = (
 	// JOIN
 	if (sourceType === IImageTypes.CONNECT) {
 		if ([IImageTypes.CONNECT, IImageTypes.TABLE].includes(targetType)) {
-			openMessage('JOIN的输出不能为table或者join');
+			openMessage('连接的输出不能为表或者连接');
 			return false;
 		}
 		if (sourceOutEdges && sourceOutEdges.length > 1) {
-			openMessage('JOIN输出限制数量为1');
+			openMessage('连接输出限制数量为1');
 			return false;
 		}
 	}
 	if (targetType === IImageTypes.CONNECT) {
-		if (targetInEdges && targetInEdges.length >= 2) {
-			openMessage('JOIN支持最多两个table输入');
+		if (targetInEdgesIDs.length > 1) {
+			openMessage('连接支持最多两个表输入');
 			return false;
 		}
 	}
@@ -174,23 +180,22 @@ export const validateConnectionRule = (
 				targetType
 			)
 		) {
-			openMessage(
-				'输出可以接节点类型为“GROUP BY”类型或者“ORDER BY”类型或者“END”类型'
-			);
+			openMessage('输出可以接节点类型为“分组”类型或者“排序”类型或者“结束”类型');
 			return false;
 		}
 		if (sourceOutEdges && sourceOutEdges.length > 1) {
-			openMessage('filter输出限制数量为1');
+			openMessage('筛选输出限制数量为1');
 			return false;
 		}
 	}
 	if (targetType === IImageTypes.FILTER) {
 		if (![IImageTypes.CONNECT, IImageTypes.TABLE].includes(sourceType)) {
-			openMessage('filter的输入结点只能为table或者join');
+			openMessage('筛选的输入结点只能为table或者join');
 			return false;
 		}
-		if (targetInEdges && targetInEdges.length > 0) {
-			openMessage('filter输入限制数量为1');
+
+		if (targetInEdgesIDs.length > 0) {
+			openMessage('筛选输入限制数量为1');
 			return false;
 		}
 	}
@@ -198,34 +203,34 @@ export const validateConnectionRule = (
 	// GROUP BY
 	if (targetType === IImageTypes.GROUP) {
 		if ([IImageTypes.END, IImageTypes.GROUP].includes(sourceType)) {
-			openMessage('输入节点类型为除“END”和“GROUP BY”以外的类');
+			openMessage('输入节点类型为除“结束”和“分组”以外的类');
 			return false;
 		}
-		if (targetInEdges && targetInEdges.length >= 1) {
-			openMessage('GROUP BY输入限制数量为1');
+		if (targetInEdgesIDs.length > 0) {
+			openMessage('分组输入限制数量为1');
 			return false;
 		}
 	}
 	// ORDER BY
 	if (targetType === IImageTypes.ORDER) {
 		if ([IImageTypes.END, IImageTypes.ORDER].includes(sourceType)) {
-			openMessage('输入节点类型为除“END”和“ORDER BY”以外的类型');
+			openMessage('输入节点类型为除“结束”和“排序”以外的类型');
 			return false;
 		}
-		if (targetInEdges && targetInEdges.length >= 1) {
-			openMessage('ORDER BY输入限制数量为1');
+		if (targetInEdgesIDs.length > 0) {
+			openMessage('排序输入限制数量为1');
 			return false;
 		}
 	}
 	// END
 	if (targetType === IImageTypes.END) {
-		if (targetInEdges && targetInEdges.length >= 1) {
-			openMessage('END输入限制数量为1');
+		if (targetInEdgesIDs.length > 0) {
+			openMessage('结束输入限制数量为1');
 			return false;
 		}
 	}
 	if (sourceType === IImageTypes.END) {
-		openMessage('END不能有输出');
+		openMessage('结束不能有输出');
 		return false;
 	}
 
@@ -233,6 +238,8 @@ export const validateConnectionRule = (
 	// 	message.error('sql不能连接sql');
 	// 	return false;
 	// }
+	// 连接成功 -> 可能改变source -> 需要关闭重新执行
+	onClickCloseConfigPanel();
 	return true;
 };
 
@@ -264,6 +271,7 @@ export const getAllNodeOfGraph = (graph: X6.Graph): Set<string | null> => {
 export interface IImageShapes {
 	label: string;
 	image: string;
+	activeImage?: string;
 	type: IImageTypes;
 	labelCn?: string;
 }
@@ -273,31 +281,49 @@ import { message } from 'antd';
 import { Options } from '@antv/x6/lib/graph/options';
 import { saveProjectCanvas } from '@/api/dataAnalysis/graph';
 import React, { useEffect } from 'react';
-const { FILTER, CONNECT, GROUP, ORDER, END } = ASSETS;
+import { onClickCloseConfigPanel } from '@/redux/store';
+
+const {
+	FILTER,
+	CONNECT,
+	GROUP,
+	ORDER,
+	END,
+	CONNECTACTIVE,
+	FILTERACTIVE,
+	ENDACTIVE,
+	GROUPACTIVE,
+	ORDERACTIVE
+} = ASSETS;
 export const imageShapes: IImageShapes[] = [
 	{
 		label: '连接',
 		image: CONNECT,
+		activeImage: CONNECTACTIVE,
 		type: IImageTypes.CONNECT
 	},
 	{
 		label: '筛选',
 		image: FILTER,
+		activeImage: FILTERACTIVE,
 		type: IImageTypes.FILTER
 	},
 	{
 		label: '排序',
 		image: ORDER,
+		activeImage: ORDERACTIVE,
 		type: IImageTypes.ORDER
 	},
 	{
 		label: '分组',
 		image: GROUP,
+		activeImage: GROUPACTIVE,
 		type: IImageTypes.GROUP
 	},
 	{
 		label: '结束',
 		image: END,
+		activeImage: ENDACTIVE,
 		type: IImageTypes.END
 	}
 ];
@@ -456,82 +482,20 @@ export const ports = {
 	]
 };
 
-// 筛选时的数据处理
-const formatColData = (data: any) => {
-	const formatData = data.map((item) => {
-		const childrenArr = item.fields;
-		const children = [];
-		childrenArr?.forEach((el) => {
-			children.push({
-				label: el.description || el.fieldName, //展示描述没有展示名称
-				value: el.fieldName
-			});
-		});
-		return {
-			label: item.tableCnName,
-			value: item.tableName,
-			children: children
-		};
-	});
-	console.log(formatData, 361361);
-	return formatData;
+export const getLabelLength = (str: string) => {
+	const Regx = /^[A-Za-z0-9]*$/;
+	let len = 0;
+	for (let i = 0; i < str.length; i++) {
+		if (Regx.test(str.charAt(i))) {
+			len = len + 8;
+		} else {
+			len = len + 14;
+		}
+	}
+	return len;
 };
 
-export const transFilterData = async (
-	id: string,
-	canvasData: any,
-	formData: any
-) => {
-	const params = {
-		id,
-		canvasJson: JSON.stringify({
-			content: canvasData
-		})
-	};
-	const res = await getCanvasConfig(params);
-	const colData = formatColData(res);
-	let rowArr = [];
-	formData.row.forEach((item, index) => {
-		if (item && item.length) {
-			const ttt = item.map((el, i) => {
-				return {
-					tableName: el.value1[0],
-					tableHeader: el.value1[1]?.split('#')[0],
-					operator: el.value2,
-					value: el.value3,
-					dataType: el.value1[1]?.split('#')[1] //需要从获取的数据对应读取
-				};
-			});
-			rowArr.push(ttt);
-		}
-	});
-	const arr = [];
-	colData.forEach((item, index) => {
-		item.children.forEach((el, i) => {
-			if (formData.col.includes(el.value)) {
-				arr.push({ tableName: item.value, fieldName: el.value });
-			}
-		});
-	});
-
-	// 拼接后端需要数据
-	const colTableNameArr = [];
-	arr.forEach((item, index) => {
-		colTableNameArr.push(item.tableName);
-	});
-	// 去重
-	const a = [...new Set(colTableNameArr)];
-	const colArr = a.map((item, index) => {
-		const b = [];
-		arr.forEach((el, i) => {
-			if (item == el.tableName) {
-				b.push(el.fieldName);
-			}
-		});
-		return {
-			tableName: item,
-			headers: b
-		};
-	});
-	return { [id]: { col: colArr, row: rowArr } };
+export const encodeNodeSources = (sources: string[]): number => {
+	const sourcesStr = sources.join('-');
+	return hashCode().value(sourcesStr);
 };

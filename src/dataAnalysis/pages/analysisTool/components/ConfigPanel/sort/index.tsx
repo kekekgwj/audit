@@ -4,19 +4,18 @@ import { Button, Form, Collapse } from 'antd';
 import { UpIcon, Downicon, HeartIcon, DelIcon } from './icon';
 import { useConfigContextValue } from '../../NodeDetailPanel';
 const { Panel } = Collapse;
-import { useGraph, useGraphContext, useGraphID } from '../../../lib/hooks';
-import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 
 interface SortProps {
-	option?: List[];
+	option: List[];
 	value?: string[];
 	onChange?: (value: string[]) => void;
-	dataList: [];
 }
 
 interface List {
 	title: string;
+	cnTitle: string;
 	list: {
+		description: string;
 		title: string;
 		isUp: boolean;
 		isDown: boolean;
@@ -28,8 +27,8 @@ const layout = {
 	labelAlign: 'left'
 };
 
-const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
-	const [optionList, setOptionList] = useState<List[]>(dataList);
+const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
+	const [optionList, setOptionList] = useState<List[]>(option);
 
 	//通过传入的状态值和下标修改dataList的排序状态
 	const setSortStatus = (
@@ -43,20 +42,25 @@ const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
 
 		setOptionList(newDataList);
 	};
-	useEffect(() => {
-		setOptionList(dataList);
-	}, [dataList]);
+	const transSubmitData = (rawData) => {
+		console.log(rawData);
+		const formatData = [];
+		rawData.forEach(({ list, tableName }) => {
+			list.forEach((item) => {
+				formatData.push({
+					tableName: tableName,
+					title: item.title,
+					isDown: item.isDown,
+					isUp: item.isUp
+				});
+			});
+		});
+		return formatData;
+	};
 	//监听optionList改变触发onChange
 	useEffect(() => {
-		// let newData: string[] = [];
-		// optionList.forEach((res) => {
-		// 	res.list.forEach((ress) => {
-		// 		if (ress.isDown || ress.isUp) {
-		// 			newData.push(ress.title);
-		// 		}
-		// 	});
-		// });
-		onChange?.(optionList);
+		if (!optionList) return;
+		onChange?.(transSubmitData(optionList));
 	}, [optionList]);
 	return (
 		<Collapse
@@ -71,7 +75,8 @@ const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
 					<div className={classes.inputWrap}>
 						<div>排序</div>
 						<div className={classes.rightInput}>
-							{optionList.every((res) => {
+							{optionList &&
+							optionList.every((res) => {
 								return res.list.every((ress) => {
 									return !ress.isDown && !ress.isUp;
 								});
@@ -79,31 +84,32 @@ const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
 								<div className={classes.defaultTxt}>请选择</div>
 							) : (
 								<div className={classes.left}>
-									{optionList.map((item, index) => {
-										return item.list.map((items, childrenIndex) => {
-											return (
-												(items.isUp || items.isDown) && (
-													<div className={classes.label} key={items.title}>
-														{items.title}
-														<div style={{ marginLeft: '6px' }}>
-															{items.isUp && <UpIcon />}
-															{items.isDown && <Downicon />}
+									{optionList &&
+										optionList.map((item, index) => {
+											return item.list.map((items, childrenIndex) => {
+												return (
+													(items.isUp || items.isDown) && (
+														<div className={classes.label} key={items.title}>
+															{items.title}
+															<div style={{ marginLeft: '6px' }}>
+																{items.isUp && <UpIcon />}
+																{items.isDown && <Downicon />}
+															</div>
+															<DelIcon
+																onClick={() => {
+																	setSortStatus(
+																		{ isUp: false, isDown: false },
+																		index,
+																		childrenIndex
+																	);
+																}}
+																className={classes.delIcon}
+															></DelIcon>
 														</div>
-														<DelIcon
-															onClick={() => {
-																setSortStatus(
-																	{ isUp: false, isDown: false },
-																	index,
-																	childrenIndex
-																);
-															}}
-															className={classes.delIcon}
-														></DelIcon>
-													</div>
-												)
-											);
-										});
-									})}
+													)
+												);
+											});
+										})}
 								</div>
 							)}
 						</div>
@@ -123,50 +129,51 @@ const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
 						/>
 					)}
 				>
-					{optionList.map((item, index) => {
-						return (
-							<Panel header={item.title} key={index + 1}>
-								{item.list.map((items, childrenIndex) => {
-									return (
-										<div key={items.title} className={classes.sortTxt}>
-											<span>{items.title}</span>
-											<div className={classes.sortWrap}>
-												<div
-													style={{ marginRight: '10px' }}
-													onClick={() => {
-														setSortStatus(
-															{ isUp: !items.isUp, isDown: false },
-															index,
-															childrenIndex
-														);
-													}}
-													className={`${classes.sortBtn} ${
-														items.isUp && classes.activeBtn
-													}`}
-												>
-													升 <UpIcon />
-												</div>
-												<div
-													onClick={() => {
-														setSortStatus(
-															{ isUp: false, isDown: !items.isDown },
-															index,
-															childrenIndex
-														);
-													}}
-													className={`${classes.sortBtn} ${
-														items.isDown && classes.activeBtn
-													}`}
-												>
-													降 <Downicon />
+					{optionList &&
+						optionList.map((item, index) => {
+							return (
+								<Panel header={item.title} key={index + 1}>
+									{item.list.map((items, childrenIndex) => {
+										return (
+											<div key={items.title} className={classes.sortTxt}>
+												<span>{items.title}</span>
+												<div className={classes.sortWrap}>
+													<div
+														style={{ marginRight: '10px' }}
+														onClick={() => {
+															setSortStatus(
+																{ isUp: !items.isUp, isDown: false },
+																index,
+																childrenIndex
+															);
+														}}
+														className={`${classes.sortBtn} ${
+															items.isUp && classes.activeBtn
+														}`}
+													>
+														升 <UpIcon />
+													</div>
+													<div
+														onClick={() => {
+															setSortStatus(
+																{ isUp: false, isDown: !items.isDown },
+																index,
+																childrenIndex
+															);
+														}}
+														className={`${classes.sortBtn} ${
+															items.isDown && classes.activeBtn
+														}`}
+													>
+														降 <Downicon />
+													</div>
 												</div>
 											</div>
-										</div>
-									);
-								})}
-							</Panel>
-						);
-					})}
+										);
+									})}
+								</Panel>
+							);
+						})}
 				</Collapse>
 			</Panel>
 		</Collapse>
@@ -174,79 +181,65 @@ const SortInput: FC<SortProps> = ({ onChange, dataList }) => {
 };
 
 const Sort: FC = () => {
-	const graph = useGraph();
-	const projectID = useGraphID();
-	const canvasData = graph.toJSON();
 	const [form] = Form.useForm();
-	const { id, getValue, setValue, resetValue, updateTable } =
-		useConfigContextValue();
-	const { getAllConfigs, syncGraph } = useGraphContext();
-	// 存储配置项（包含值）
-	// const formInitValue = getValue && id && getValue(id);
-	// console.log('formInitValue', formInitValue);
-	// 配置项
-	const [dataList, setDataList] = useState([]);
+
+	const {
+		id,
+		setValue,
+		resetValue,
+		executeByNodeConfig,
+		getValue,
+		config,
+		initValue
+	} = useConfigContextValue();
+	const [option, setOption] = useState();
+	useEffect(() => {
+		const init =
+			initValue.sorting && initValue.sorting.length > 0
+				? initValue.sorting
+				: transData(config);
+
+		setOption(init);
+	}, []);
 
 	//转数据形式
 	const transData = (data: any) => {
+		if (!data || !Array.isArray(data)) {
+			return [];
+		}
 		const formatData = data.map((item) => {
 			const listArr = item.fields;
 			const list = [];
 			listArr?.forEach((el) => {
 				list.push({
+					description: el.description || el.fieldName,
 					title: el.fieldName,
 					isUp: false,
 					isDown: false
 				});
 			});
 			return {
+				tableName: item.tableName,
 				title: item.tableCnName,
 				list: list
 			};
 		});
 		return formatData;
 	};
-	const getConfigForm = async () => {
-		const params = {
-			id,
-			canvasJson: JSON.stringify({
-				content: canvasData
-			})
-		};
-		const configs = await getCanvasConfig(params);
-		const formatForm = transData(configs);
-		setDataList(formatForm);
-	};
 
-	// 获取配置项
-	useEffect(() => {
-		getConfigForm();
-	}, []);
-	const onFinish = (values: any) => {
-		handleSortChange(values.sorting);
-		const params = {
-			canvasJson: JSON.stringify({
-				content: canvasData,
-				configs: getAllConfigs()
-			}),
-			executeId: id, //当前选中元素id
-			projectId: projectID
-		};
-		getResult(params).then((res: any) => {
-			updateTable(res.data, res.head);
-			syncGraph();
-		});
+	const onFinish = () => {
+		executeByNodeConfig();
 	};
 
 	const onReset = () => {
 		form.resetFields();
-		id && resetValue(id);
+		id && resetValue();
 	};
 	const handleSortChange = (v) => {
 		if (!id || !setValue) {
 			return;
 		}
-		setValue(id, v);
+		setValue(v);
 	};
 	return (
 		<Form
@@ -255,17 +248,13 @@ const Sort: FC = () => {
 			name="control"
 			onFinish={onFinish}
 			className={classes.fromWrap}
-			initialValues={{
-				sorting: dataList
+			onValuesChange={(_, value) => {
+				handleSortChange(value);
 			}}
 		>
 			<div className={classes.formList}>
 				<Form.Item name="sorting">
-					<SortInput
-						onChange={handleSortChange}
-						value={dataList}
-						dataList={dataList}
-					></SortInput>
+					<SortInput option={option} key={option}></SortInput>
 				</Form.Item>
 			</div>
 

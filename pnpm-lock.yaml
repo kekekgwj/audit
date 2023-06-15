@@ -61,6 +61,9 @@ dependencies:
   eslint-plugin:
     specifier: ^1.0.1
     version: 1.0.1
+  hashcode:
+    specifier: ^1.0.3
+    version: 1.0.3
   html2canvas:
     specifier: ^1.4.1
     version: 1.4.1
@@ -4310,6 +4313,13 @@ packages:
     dependencies:
       function-bind: 1.1.1
     dev: true
+
+  /hashcode@1.0.3:
+    resolution:
+      {
+        integrity: sha512-tfCzdiaz69Ii8eIdtYSCEnU0jw5RrYRd0u3sHRvs5Oqu/bQPk+aonT5jgRUT2MIuphjSvjB5lmixhHl7+X4ruw==
+      }
+    dev: false
 
   /he@1.2.0:
     resolution:

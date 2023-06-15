@@ -20,6 +20,7 @@ interface List {
 	tableName: string;
 	key: string;
 	list: {
+		description: string;
 		title: string;
 		key: string;
 	}[];
@@ -66,7 +67,6 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 		tableRealName: string,
 		tableCnName: string
 	) => {
-		console.log('item', item);
 		if (
 			!dataList.some((res) => {
 				return res.key == item.key;
@@ -150,7 +150,7 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 													setData(items, tableRealName, tableName);
 											}}
 										>
-											<span>{items.title}</span>
+											<span>{items.description}</span>
 										</div>
 									);
 								})}
@@ -173,24 +173,21 @@ interface IFormValue {
 	funcType: string;
 }
 const Grouping: FC = () => {
-	const graph = useGraph();
-	const projectID = useGraphID();
-	const canvasData = graph?.toJSON();
 	const [form] = Form.useForm();
-	const { id, getValue, setValue, resetValue } = useConfigContextValue();
-	const formInitValue: IFormValue = (getValue && id && getValue(id)) || {};
-	form.setFieldsValue(formInitValue);
-	const { syncGraph, getAllConfigs } = useGraphContext();
-	const getConfig = async () => {
-		const params = {
-			id,
-			canvasJson: JSON.stringify({
-				content: canvasData
-			})
-		};
-		const res = await getCanvasConfig(params);
-		setGroupData(transData(res));
-		setAccordData(transData(res));
+	const {
+		id,
+		setValue,
+		resetValue,
+		executeByNodeConfig,
+		initValue = {},
+		config
+	} = useConfigContextValue();
+	useEffect(() => {
+		console.log(initValue);
+	}, [initValue]);
+	const getConfig = () => {
+		setGroupData(transData(config));
+		setAccordData(transData(config));
 	};
 	//获取配置项数据
 	useEffect(() => {
@@ -203,6 +200,7 @@ const Grouping: FC = () => {
 			const list = [];
 			listArr?.forEach((el, i) => {
 				list.push({
+					description: el.description || el.fieldName,
 					title: el.fieldName,
 					key: i
 				});
@@ -219,31 +217,18 @@ const Grouping: FC = () => {
 	const [groupData, setGroupData] = useState<List[]>();
 	const [accordData, setAccordData] = useState<List[]>();
 
-	const updateTable = useUpdateTable();
-
-	const onFinish = async (values: any) => {
-		handleOnChange(values);
-		const params = {
-			canvasJson: JSON.stringify({
-				content: canvasData,
-				configs: getAllConfigs()
-			}),
-			executeId: id, //当前选中元素id
-			projectId: projectID
-		};
-		const { data, head } = await getResult(params);
-		updateTable(data, head);
-		syncGraph();
+	const onFinish = async () => {
+		executeByNodeConfig();
 	};
 	const handleOnChange = (value: any) => {
 		if (!id || !setValue) {
 			return;
 		}
-		setValue(id, value);
+		setValue(value);
 	};
 	const onReset = () => {
 		form.resetFields();
-		id && resetValue(id);
+		id && resetValue();
 	};
 	return (
 		<Form
@@ -255,11 +240,11 @@ const Grouping: FC = () => {
 			onValuesChange={(_, value) => {
 				handleOnChange(value);
 			}}
-			// initialValues={{
-			// 	conditions: formInitValue.conditions || [],
-			// 	funcType: formInitValue.funcType,
-			// 	column: formInitValue.column || []
-			// }}
+			initialValues={{
+				conditions: initValue.conditions || [],
+				funcType: initValue.funcType,
+				column: initValue.column || []
+			}}
 		>
 			<div className={classes.formList}>
 				<Form.Item

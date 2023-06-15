@@ -215,6 +215,8 @@ const MyTemplate = () => {
 		});
 	};
 
+	const date2str = (str) => str.replace(/-/gi, '/');
+
 	return (
 		<div className={styles['my-template-page']}>
 			<div className={styles['main-contain']} id="mainContain">
