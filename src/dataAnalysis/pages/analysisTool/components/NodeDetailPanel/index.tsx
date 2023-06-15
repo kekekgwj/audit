@@ -238,10 +238,10 @@ const Panel: React.FC = () => {
 					<span className={classes.download_text} onClick={downLoadData}>
 						下载
 					</span>
-					<CloseOutlined
+					{/* <CloseOutlined
 						className={classes.closeIcon}
 						onClick={onClickCloseConfigPanel}
-					/>
+					/> */}
 				</div>
 				<div className={classes.tableWrapper}>
 					<Table
@@ -251,7 +251,7 @@ const Panel: React.FC = () => {
 					/>
 				</div>
 			</div>
-			<div>
+			<div className={classes.rightConfigBox}>
 				{!executeType.includes(clickNodeType) ? (
 					<div
 						className={`${

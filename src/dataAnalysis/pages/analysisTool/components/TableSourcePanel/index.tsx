@@ -79,7 +79,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 	//系统数据
 	const getSystemData = async () => {
 		try {
-			const res = await getTablesData({ queryType: 1 });
+			const res = await getTablesData({ queryType: 1, orderBy: 2 });
 			const data = {
 				title: '系统数据',
 				tables: res
@@ -92,7 +92,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 
 	const getMyData = async () => {
 		try {
-			const res = await getTablesData({ queryType: 2 });
+			const res = await getTablesData({ queryType: 2, orderBy: 2 });
 			const data = {
 				title: '我的数据',
 				tables: res
@@ -111,7 +111,11 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 			return;
 		}
 		try {
-			const res = await getTablesData({ queryType: 3, tableCnName: val });
+			const res = await getTablesData({
+				queryType: 3,
+				tableCnName: val,
+				orderBy: 2
+			});
 			const data = {
 				title: '搜索结果',
 				tables: res
