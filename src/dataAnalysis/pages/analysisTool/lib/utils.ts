@@ -1,6 +1,7 @@
 import { Graph, Node, Edge, ObjectExt, StringExt } from '@antv/x6';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 import * as X6 from '@antv/x6';
+import { hashCode } from 'hashcode';
 type Metadata = Node.Metadata | Edge.Metadata;
 type C = Node | Edge;
 type T = C | { [key: string]: any };
@@ -237,6 +238,8 @@ export const validateConnectionRule = (
 	// 	message.error('sql不能连接sql');
 	// 	return false;
 	// }
+	// 连接成功 -> 可能改变source -> 需要关闭重新执行
+	onClickCloseConfigPanel();
 	return true;
 };
 
@@ -278,6 +281,8 @@ import { message } from 'antd';
 import { Options } from '@antv/x6/lib/graph/options';
 import { saveProjectCanvas } from '@/api/dataAnalysis/graph';
 import React, { useEffect } from 'react';
+import { onClickCloseConfigPanel } from '@/redux/store';
+
 const {
 	FILTER,
 	CONNECT,
@@ -475,4 +480,22 @@ export const ports = {
 			group: 'left'
 		}
 	]
+};
+
+export const getLabelLength = (str: string) => {
+	const Regx = /^[A-Za-z0-9]*$/;
+	let len = 0;
+	for (let i = 0; i < str.length; i++) {
+		if (Regx.test(str.charAt(i))) {
+			len = len + 8;
+		} else {
+			len = len + 14;
+		}
+	}
+	return len;
+};
+
+export const encodeNodeSources = (sources: string[]): number => {
+	const sourcesStr = sources.join('-');
+	return hashCode().value(sourcesStr);
 };

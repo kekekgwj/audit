@@ -31,6 +31,7 @@
 		"codemirror": "^6.0.1",
 		"debounce": "^1.2.1",
 		"eslint-plugin": "^1.0.1",
+		"hashcode": "^1.0.3",
 		"html2canvas": "^1.4.1",
 		"insert-css": "^2.0.0",
 		"interweave": "^13.1.0",

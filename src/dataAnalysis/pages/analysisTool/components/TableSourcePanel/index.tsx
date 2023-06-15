@@ -97,7 +97,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 				title: '我的数据',
 				tables: res
 			};
-			console.log(data, 969696);
+
 			setMyData(data);
 		} catch (e) {
 			console.error(e);

@@ -15,6 +15,7 @@ import TableSourcePanel from '../components/TableSourcePanel';
 import {
 	IImageShapes,
 	IImageTypes,
+	getLabelLength,
 	handleValidateNode,
 	imageShapes,
 	ports,
@@ -55,7 +56,9 @@ export const Graph = forwardRef((props, ref) => {
 		saveConfigValue,
 		resetConfigValue,
 		getAllConfigs,
-		setAllConfigs
+		setAllConfigs,
+		updateNodeConfigVersion,
+		getLastestVersion
 	} = useNodeConfigValue();
 	// 初始化画布
 	const initializeGraph = () => {
@@ -238,9 +241,7 @@ export const Graph = forwardRef((props, ref) => {
 
 		const node = graph?.createNode({
 			inherit: 'rect',
-			// width: type === IImageTypes.TABLE ? text.length * 14 + 40 : 36,
 			width: type === IImageTypes.TABLE ? getLabelLength(text) + 40 : 36,
-			// height: 38,
 			height: type === IImageTypes.TABLE ? 38 : 58,
 			label: text,
 			markup: [
@@ -311,7 +312,17 @@ export const Graph = forwardRef((props, ref) => {
 		dnd?.start(node, e.nativeEvent as any);
 	};
 	const syncGraph = () => {
-		syncData(projectId, graph, getAllConfigs());
+		const allConfigs = getAllConfigs();
+		const graphNodesID = graph?.getNodes().map((node) => node.id);
+		const validConfig = {};
+		graphNodesID?.forEach((id: string) => {
+			const config = allConfigs[id];
+			if (config) {
+				validConfig[id] = config;
+			}
+		});
+
+		syncData(projectId, graph, validConfig);
 	};
 	//保存为审计模板
 	const saveAsAuditTem = () => {
@@ -368,7 +379,9 @@ export const Graph = forwardRef((props, ref) => {
 				getAllConfigs,
 				syncGraph,
 				setAllConfigs,
-				isPublicTemplate
+				isPublicTemplate,
+				updateNodeConfigVersion,
+				getLastestVersion
 			}}
 		>
 			<div className={classes['top-breadcrumb']}>

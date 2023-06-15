@@ -3,6 +3,7 @@ import React, {
 	useCallback,
 	useContext,
 	useEffect,
+	useRef,
 	useState
 } from 'react';
 import { Table } from 'antd';
@@ -17,20 +18,26 @@ import {
 	IImageTypes,
 	formatDataSource,
 	getNodeTypeById,
-	useInitRender
+	useInitRender,
+	encodeNodeSources
 } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
-import { exportData, getResult } from '@/api/dataAnalysis/graph';
+import {
+	exportData,
+	getCanvasConfig,
+	getResult
+} from '@/api/dataAnalysis/graph';
 
 const { DOWNLOAD } = ASSETS;
 interface IConfigContext {
 	type: IImageTypes | null;
 	id: string | null;
 	initValue: any;
-	getValue: ((id: string) => any) | null;
-	setValue: ((id: string, value: any) => void) | null;
-	resetValue: (id: string) => void;
+	getValue: () => any;
+	setValue: ((value: any) => void) | null;
+	resetValue: () => void;
 	updateTable: (updateData: any, updateColumn: any) => void;
+	executeByNodeConfig: () => void;
 }
 const ConfigContext = createContext<IConfigContext>({
 	type: null,
@@ -38,10 +45,13 @@ const ConfigContext = createContext<IConfigContext>({
 	initValue: undefined,
 	getValue: null,
 	setValue: null,
-	resetValue: function (id: string): void {
+	resetValue: function (): void {
 		throw new Error('Function not implemented.');
 	},
 	updateTable: function (updateData: any, updateColumn: any): void {
+		throw new Error('Function not implemented.');
+	},
+	executeByNodeConfig: function (): void {
 		throw new Error('Function not implemented.');
 	}
 });
@@ -53,27 +63,15 @@ export const useUpdateTable = () => {
 	return useContext(ConfigContext).updateTable;
 };
 
-export const useExecuteComponentNUpdateTable = (
-	id: string,
-	configValue: any
-) => {
-	// const { graph, syncGraph, getAllConfigs } = useGraphContext();
-	// const projectID = useGraphID();
-	// const canvasData = graph.toJSON();
-	// const updateTable = useUpdateTable();
-	// const params = {
-	// 	canvasJson: JSON.stringify({
-	// 		content: canvasData,
-	// 		// configs: { [id]: configValue }
-	// 		configs: getAllConfigs()
-	// 	}),
-	// 	executeId: id, //当前选中元素id
-	// 	projectId: projectID
-	// };
-	// getResult(params).then((res: any) => {
-	// 	updateTable(res.data, res.head);
-	// });
-	// syncGraph();
+const useNodeKey = () => {
+	const nodeKey = useRef<null | number>(null);
+	const setNodeKeyFrozen = () => (nodeKey.current = null);
+	const isNodeKeyReady = () => nodeKey.current !== null;
+	const getNodeKey = () => {
+		return nodeKey.current;
+	};
+	const setNodeKey = (key: number) => (nodeKey.current = key);
+	return { getNodeKey, setNodeKeyFrozen, isNodeKeyReady, setNodeKey };
 };
 const useTableSource = () => {
 	const [data, setData] = useState([]);
@@ -89,27 +87,104 @@ const useTableSource = () => {
 
 const Panel: React.FC = () => {
 	const state = useSelector((state: IRootState) => state.dataAnalysis);
+
 	const graph = useGraph();
 	const { data, columns, updateTable } = useTableSource();
 
 	const [showConfig, setShowConfig] = useState(true);
 
-	const { curSelectedNode: id, showPanel = false } = state || {};
+	const { curSelectedNode: id, showPanel = false, time } = state || {};
 	const executeType = [IImageTypes.TABLE, IImageTypes.END];
 	const projectID = useGraphID();
-	const {
-		getConfigValue,
-		saveConfigValue,
-		resetConfigValue,
-		syncGraph,
-		getAllConfigs
-	} = useGraphContext();
+	const { getConfigValue, saveConfigValue, syncGraph, getAllConfigs } =
+		useGraphContext();
 
+	const [nodeConfig, setNodeConfig] = useState(null);
+	const { getNodeKey, setNodeKeyFrozen, isNodeKeyReady, setNodeKey } =
+		useNodeKey();
 	const isInit = useInitRender();
+	// const valueChangeReady = isNodeKeyReady() && id;
 
 	useEffect(() => {
 		!isInit && syncGraph();
 	}, [showPanel]);
+
+	useEffect(() => {
+		// setNodeKeyFrozen();
+		handleGetNodeConfig();
+	}, [time]);
+	const handleGetNodeConfig = async () => {
+		if (!graph) {
+			return;
+		}
+
+		const canvasData = graph?.toJSON();
+		const params = {
+			id,
+			canvasJson: JSON.stringify({
+				content: canvasData
+			})
+		};
+		setNodeKeyFrozen();
+		const config: any = await getCanvasConfig(params);
+		setNodeConfig(config);
+		const tableNames = config.map((item) => item.tableName);
+		const key = encodeNodeSources([...tableNames, id]);
+		setNodeKey(key);
+	};
+
+	const setValue = (value: any) => {
+		if (!value) return;
+		const nodeKey = getNodeKey();
+		if (!nodeKey || !id) {
+			return;
+		}
+
+		saveConfigValue(id, { ...value, key: nodeKey });
+	};
+	const getValue = () => {
+		const nodeKey = getNodeKey();
+		if (!nodeKey || !id) {
+			return {};
+		}
+		const curConfig = getConfigValue(id);
+		if (!curConfig || curConfig.key !== nodeKey) {
+			return {};
+		}
+
+		return curConfig;
+	};
+	const resetValue = (value: any) => {
+		if (!isNodeKeyReady() || !id) {
+			return;
+		}
+		saveConfigValue(id, null);
+	};
+	const executeByNodeConfig = async () => {
+		if (!graph) {
+			return;
+		}
+		const canvasData = graph?.toJSON();
+		if (!canvasData || !id || !projectID) {
+			return;
+		}
+
+		type getParameterFirst<T> = T extends [infer first, ...infer rest]
+			? first
+			: null;
+		type paramsType = getParameterFirst<Parameters<typeof getResult>>;
+		const params: paramsType = {
+			canvasJson: JSON.stringify({
+				content: canvasData,
+				configs: getAllConfigs()
+			}),
+			executeId: id, //当前选中元素id
+			projectId: projectID
+		};
+		const { data, head } = await getResult(params);
+		updateTable(data, head);
+	};
+
 	// 点击画布元素触发事件，获取对应表的数据
 	useEffect(() => {
 		//执行获取表数据
@@ -118,18 +193,7 @@ const Panel: React.FC = () => {
 		}
 		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
 		if (executeType.includes(curType)) {
-			const canvasData = graph.toJSON();
-			const params = {
-				canvasJson: JSON.stringify({
-					content: canvasData,
-					configs: getAllConfigs()
-				}),
-				executeId: id, //当前选中元素id
-				projectId: projectID
-			};
-			getResult(params).then((res: any) => {
-				updateTable(res.data, res.head);
-			});
+			executeByNodeConfig();
 		} else {
 			//需要将表数据清空
 			updateTable([], []);
@@ -162,6 +226,7 @@ const Panel: React.FC = () => {
 	};
 
 	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
+	const initValue = getValue();
 
 	return (
 		<div className={classes.container}>
@@ -223,63 +288,22 @@ const Panel: React.FC = () => {
 									value={{
 										type: clickNodeType,
 										id: id,
-										initValue: null,
-										getValue: getConfigValue,
-										setValue: saveConfigValue,
-										resetValue: resetConfigValue,
-										updateTable: updateTable
+										initValue,
+										config: nodeConfig,
+										getValue,
+										setValue,
+										resetValue,
+										updateTable,
+										executeByNodeConfig
 									}}
 								>
-									<ConfigPanel key={id} />
+									<ConfigPanel key={getNodeKey()} />
 								</ConfigContext.Provider>
 							</div>
 						) : null}
 					</div>
 				) : null}
 			</div>
-
-			{/* <div
-				className={`${
-					showConfig ? classes.configPanel : classes.hideConfigPanel
-				}`}
-			>
-				<div className={classes.configPanel_title}>
-					{!showConfig ? (
-						<span
-							onClick={() => toggleConfig()}
-							className={classes.svgIcon}
-							style={{ marginRight: '5px' }}
-						>
-							<SvgIcon
-								name="closeArrow"
-								className={classes.closeIcon}
-							></SvgIcon>
-						</span>
-					) : null}
-					<span className={classes.configPanel_title_text}>参数配置</span>
-					{showConfig ? (
-						<span onClick={() => toggleConfig()} className={classes.svgIcon}>
-							<SvgIcon name="openArrow" className={classes.closeIcon}></SvgIcon>
-						</span>
-					) : null}
-				</div>
-				{showConfig ? (
-					<div className={classes.configWrapper}>
-						<ConfigContext.Provider
-							value={{
-								type: clickNodeType,
-								id: id,
-								initValue: null,
-								getValue: getConfigValue,
-								setValue: saveConfigValue,
-								resetValue: resetConfigValue
-							}}
-						>
-							<ConfigPanel key={id} />
-						</ConfigContext.Provider>
-					</div>
-				) : null}
-			</div> */}
 		</div>
 	);
 };
