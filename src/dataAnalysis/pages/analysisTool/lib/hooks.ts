@@ -149,7 +149,6 @@ export const useNodeConfigValue: () => IGraphConfig = () => {
 		return ref.current;
 	};
 	const setAllConfigs = (value: any) => {
-		console.log('setAllConfigs', value);
 		ref.current = value;
 	};
 	return {

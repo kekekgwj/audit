@@ -1,11 +1,7 @@
 import { Button, Form, Select } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import classes from './index.module.less';
 import { useConfigContextValue } from '../../NodeDetailPanel';
-import { useGraph, useGraphContext, useGraphID } from '../../../lib/hooks';
-import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
-import { encodeNodeSources } from '../../../lib/utils';
-
 interface ISelectRowProps {
 	value?: any;
 	onChange?: any;
@@ -231,6 +227,9 @@ const SelectGroup: React.FC = () => {
 		form.setFieldsValue({
 			connectionSentences: nextList
 		});
+		// 删除不会触发onValueChange 手动触发
+		const formValues = form.getFieldsValue();
+		handleOnChange(formValues);
 	};
 	const handleOnChange = (value: IForm) => {
 		if (!id || !setValue) {

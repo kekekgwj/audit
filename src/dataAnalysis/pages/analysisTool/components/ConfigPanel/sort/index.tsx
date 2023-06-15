@@ -10,16 +10,45 @@ interface SortProps {
 	value?: string[];
 	onChange?: (value: string[]) => void;
 }
-
-interface List {
+interface IListItem {
+	description?: string;
 	title: string;
-	cnTitle: string;
-	list: {
+	isUp: boolean;
+	isDown: boolean;
+}
+interface List {
+	tableName: string;
+	title: string;
+	list: IListItem[];
+}
+interface IConfigRaw {
+	fields: {
+		dataType: number;
 		description: string;
-		title: string;
-		isUp: boolean;
-		isDown: boolean;
+		fieldName: string;
+		id: number;
+		tableName: string;
 	}[];
+	tableCnName: string;
+	tableName: string;
+}
+interface ISortInitValue {
+	isDown: boolean;
+	isUp: boolean;
+	tableName: string;
+	title: string;
+}
+
+interface IInitValue {
+	sorting: ISortInitValue[];
+}
+interface IFormatInitValue {
+	[key: string]: {
+		[name: string]: {
+			isDown: boolean;
+			isUp: boolean;
+		};
+	};
 }
 const layout = {
 	labelCol: { span: 0 },
@@ -43,7 +72,6 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 		setOptionList(newDataList);
 	};
 	const transSubmitData = (rawData) => {
-		console.log(rawData);
 		const formatData = [];
 		rawData.forEach(({ list, tableName }) => {
 			list.forEach((item) => {
@@ -192,38 +220,60 @@ const Sort: FC = () => {
 		config,
 		initValue
 	} = useConfigContextValue();
-	const [option, setOption] = useState();
+	const [option, setOption] = useState<List[]>();
 	useEffect(() => {
-		const init =
-			initValue.sorting && initValue.sorting.length > 0
-				? initValue.sorting
-				: transData(config);
+		const initSortingValue: ISortInitValue[] = initValue.sorting;
+		const initConfig: IFormatInitValue = {};
 
-		setOption(init);
+		if (initSortingValue) {
+			initSortingValue.forEach(({ tableName, title, isDown, isUp }) => {
+				initConfig[tableName] = { [title]: { isDown, isUp } };
+			});
+		}
+
+		const formatData = transData(config, initConfig);
+
+		setOption(formatData);
 	}, []);
 
 	//转数据形式
-	const transData = (data: any) => {
+	const transData = (
+		data: IConfigRaw[],
+		initConfig: IFormatInitValue
+	): List[] => {
 		if (!data || !Array.isArray(data)) {
 			return [];
 		}
+
 		const formatData = data.map((item) => {
-			const listArr = item.fields;
-			const list = [];
-			listArr?.forEach((el) => {
+			const { fields, tableCnName, tableName } = item;
+			const list: IListItem[] = [];
+			fields?.forEach((el) => {
+				let [isDownValue, isUpValue] = [false, false];
+				const { tableName } = item;
+				const { fieldName, description } = el;
+				if (initConfig) {
+					if (initConfig[tableName] && initConfig[tableName][fieldName]) {
+						const init = initConfig[tableName][fieldName];
+						if (init) {
+							[isDownValue, isUpValue] = [init.isDown, init.isUp];
+						}
+					}
+				}
 				list.push({
-					description: el.description || el.fieldName,
-					title: el.fieldName,
-					isUp: false,
-					isDown: false
+					description: description || fieldName,
+					title: fieldName,
+					isUp: isUpValue,
+					isDown: isDownValue
 				});
 			});
 			return {
-				tableName: item.tableName,
-				title: item.tableCnName,
+				tableName: tableName,
+				title: tableCnName,
 				list: list
 			};
 		});
+
 		return formatData;
 	};
 

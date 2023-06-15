@@ -15,7 +15,7 @@ import {
 	Divider
 } from 'antd';
 import type { PaginationProps } from 'antd';
-import emptyPage from '@/assets/img/empty.png';
+import emptyPage from '@/assets/img/no-data.png';
 const { RangePicker } = DatePicker;
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import SvgIcon from '@/components/svg-icon';

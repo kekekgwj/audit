@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { Snapline } from '@antv/x6-plugin-snapline';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Keyboard } from '@antv/x6-plugin-keyboard';
-import { Divider, message, Form, Input } from 'antd';
+import { Divider, message, Form, Input, Button } from 'antd';
 import { Dnd } from '@antv/x6-plugin-dnd';
 import { LeftOutlined } from '@ant-design/icons';
 import { saveAsAuditProject } from '@/api/dataAnalysis/graph';
@@ -23,6 +23,7 @@ import {
 	validateConnectionRule
 } from './utils';
 import { GraphContext, useGraphPageInfo, useNodeConfigValue } from './hooks';
+import { onClickCloseConfigPanel } from '@/redux/store';
 
 interface Props {
 	className?: string;
@@ -60,6 +61,15 @@ export const Graph = forwardRef((props, ref) => {
 		updateNodeConfigVersion,
 		getLastestVersion
 	} = useNodeConfigValue();
+
+	const cleanGoBack = () => {
+		graph?.off('cell:removed');
+		onClickCloseConfigPanel();
+		setTimeout(() => {
+			goBack();
+		}, 200);
+	};
+
 	// 初始化画布
 	const initializeGraph = () => {
 		const strictTemplate = isPublicTemplate
@@ -197,18 +207,18 @@ export const Graph = forwardRef((props, ref) => {
 		}
 	};
 
-	const getLabelLength = (str: string) => {
-		const Regx = /^[A-Za-z0-9]*$/;
-		let len = 0;
-		for (let i = 0; i < str.length; i++) {
-			if (Regx.test(str.charAt(i))) {
-				len = len + 8;
-			} else {
-				len = len + 14;
-			}
-		}
-		return len;
-	};
+	// const getLabelLength = (str: string) => {
+	// 	const Regx = /^[A-Za-z0-9]*$/;
+	// 	let len = 0;
+	// 	for (let i = 0; i < str.length; i++) {
+	// 		if (Regx.test(str.charAt(i))) {
+	// 			len = len + 8;
+	// 		} else {
+	// 			len = len + 14;
+	// 		}
+	// 	}
+	// 	return len;
+	// };
 
 	const NodeColorOptions = {
 		CONNECT: ['#F8F9FA', '#24A36F'],
@@ -222,7 +232,6 @@ export const Graph = forwardRef((props, ref) => {
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 		{ label, image, type, labelCn, activeImage }: IImageShapes
 	) => {
-		console.log({ type });
 		if (!graph) {
 			return;
 		}
@@ -385,7 +394,8 @@ export const Graph = forwardRef((props, ref) => {
 			}}
 		>
 			<div className={classes['top-breadcrumb']}>
-				<div onClick={() => goBack && goBack()} className={classes['top-back']}>
+				{/* <div onClick={() => goBack && goBack()} className={classes['top-back']}> */}
+				<div onClick={() => cleanGoBack()} className={classes['top-back']}>
 					<span>
 						<LeftOutlined />
 						<span style={{ marginLeft: '8px', cursor: 'pointer' }}>返回</span>
@@ -406,14 +416,15 @@ export const Graph = forwardRef((props, ref) => {
 					style={{ width: `calc(100% - ${openLeftPanel ? 240 : 0}px)` }}
 				>
 					<div className={classes['control-wrapper']}>
-						<div
+						<Button
+							disabled={pathName == '审计模板'}
 							className={classes['save-btn']}
 							onClick={() => {
 								saveAsAuditTem();
 							}}
 						>
 							保存为审计模板
-						</div>
+						</Button>
 						<div
 							className="x6-dnd"
 							ref={DndContainerRef}

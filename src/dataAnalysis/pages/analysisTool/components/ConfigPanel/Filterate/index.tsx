@@ -11,9 +11,7 @@ import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
-import { useConfigContextValue, useUpdateTable } from '../../NodeDetailPanel';
-import { useGraph, useGraphContext, useGraphID } from '../../../lib';
+import { useConfigContextValue } from '../../NodeDetailPanel';
 
 type RowGroupItme = {
 	_key: string;
@@ -307,14 +305,10 @@ const reducer = (state: FormData, action: any) => {
 };
 
 export default () => {
-	const { id, getValue, setValue, resetValue } = useConfigContextValue();
-	const { getAllConfigs } = useGraphContext();
-	const projectID = useGraphID();
-	const graph = useGraph();
-	const canvasData = graph?.toJSON();
-	const updateTable = useUpdateTable();
-	let initData = getValue && id && getValue(id);
-	if (isEmpty(getValue && id && getValue(id))) {
+	const { id, setValue, resetValue, executeByNodeConfig, config, initValue } =
+		useConfigContextValue();
+	let initData = initValue;
+	if (isEmpty(initValue)) {
 		initData = cloneDeep(data);
 	}
 	const [formData, dispatch] = useReducer(reducer, initData);
@@ -326,15 +320,8 @@ export default () => {
 
 	//获取对应配置数据
 	useEffect(() => {
-		getCanvasConfig({
-			id: id || '',
-			canvasJson: JSON.stringify({
-				content: canvasData
-			})
-		}).then((res) => {
-			setCascaderOptions(formatCascaderData(res));
-			setColOptions(formatColData(res));
-		});
+		setCascaderOptions(formatCascaderData(config));
+		setColOptions(formatColData(config));
 	}, []);
 
 	// 处理列数据
@@ -385,24 +372,25 @@ export default () => {
 
 	// 执行
 	const submit = () => {
-		const params = {
-			canvasJson: JSON.stringify({
-				content: canvasData,
-				configs: getAllConfigs()
-			}),
-			executeId: id, //当前选中元素id
-			projectId: projectID
-		};
-		getResult(params).then((res: any) => {
-			updateTable(res.data, res.head);
-		});
+		// const params = {
+		// 	canvasJson: JSON.stringify({
+		// 		content: canvasData,
+		// 		configs: getAllConfigs()
+		// 	}),
+		// 	executeId: id, //当前选中元素id
+		// 	projectId: projectID
+		// };
+		// getResult(params).then((res: any) => {
+		// 	updateTable(res.data, res.head);
+		// });
+		executeByNodeConfig();
 	};
 
 	const set = () => {
 		if (!id || !setValue) {
 			return;
 		}
-		setValue(id, formData);
+		setValue(formData);
 	};
 
 	// 重置
@@ -410,7 +398,7 @@ export default () => {
 		if (!id || !setValue) {
 			return;
 		}
-		resetValue(id);
+		resetValue();
 		dispatch({ type: 'reset' });
 		dispatch({ type: 'setCol', data: plainOptions });
 		setIndeterminate(false);

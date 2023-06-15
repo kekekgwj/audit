@@ -1,6 +1,5 @@
 import React, {
 	createContext,
-	useCallback,
 	useContext,
 	useEffect,
 	useRef,
@@ -94,6 +93,7 @@ const Panel: React.FC = () => {
 	const [showConfig, setShowConfig] = useState(true);
 
 	const { curSelectedNode: id, showPanel = false, time } = state || {};
+
 	const executeType = [IImageTypes.TABLE, IImageTypes.END];
 	const projectID = useGraphID();
 	const { getConfigValue, saveConfigValue, syncGraph, getAllConfigs } =
@@ -103,7 +103,6 @@ const Panel: React.FC = () => {
 	const { getNodeKey, setNodeKeyFrozen, isNodeKeyReady, setNodeKey } =
 		useNodeKey();
 	const isInit = useInitRender();
-	// const valueChangeReady = isNodeKeyReady() && id;
 
 	useEffect(() => {
 		!isInit && syncGraph();
@@ -114,23 +113,26 @@ const Panel: React.FC = () => {
 		handleGetNodeConfig();
 	}, [time]);
 	const handleGetNodeConfig = async () => {
-		if (!graph) {
+		if (!graph || !id) {
 			return;
 		}
 
 		const canvasData = graph?.toJSON();
-		const params = {
-			id,
-			canvasJson: JSON.stringify({
-				content: canvasData
-			})
-		};
+
 		setNodeKeyFrozen();
-		const config: any = await getCanvasConfig(params);
-		setNodeConfig(config);
-		const tableNames = config.map((item) => item.tableName);
-		const key = encodeNodeSources([...tableNames, id]);
-		setNodeKey(key);
+		if (id) {
+			const params = {
+				id,
+				canvasJson: JSON.stringify({
+					content: canvasData
+				})
+			};
+			const config: any = await getCanvasConfig(params);
+			setNodeConfig(config);
+			const tableNames = config.map((item) => item.tableName);
+			const key = encodeNodeSources([...tableNames, id]);
+			setNodeKey(key);
+		}
 	};
 
 	const setValue = (value: any) => {
@@ -168,6 +170,8 @@ const Panel: React.FC = () => {
 		if (!canvasData || !id || !projectID) {
 			return;
 		}
+
+		console.log(getAllConfigs());
 
 		type getParameterFirst<T> = T extends [infer first, ...infer rest]
 			? first
