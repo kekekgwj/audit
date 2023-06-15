@@ -23,6 +23,7 @@ import {
 	validateConnectionRule
 } from './utils';
 import { GraphContext, useGraphPageInfo, useNodeConfigValue } from './hooks';
+import { onClickCloseConfigPanel } from '@/redux/store';
 
 interface Props {
 	className?: string;
@@ -60,6 +61,15 @@ export const Graph = forwardRef((props, ref) => {
 		updateNodeConfigVersion,
 		getLastestVersion
 	} = useNodeConfigValue();
+
+	const cleanGoBack = () => {
+		graph?.off('cell:removed');
+		onClickCloseConfigPanel();
+		setTimeout(() => {
+			goBack();
+		}, 200);
+	};
+
 	// 初始化画布
 	const initializeGraph = () => {
 		const strictTemplate = isPublicTemplate
@@ -197,18 +207,18 @@ export const Graph = forwardRef((props, ref) => {
 		}
 	};
 
-	const getLabelLength = (str: string) => {
-		const Regx = /^[A-Za-z0-9]*$/;
-		let len = 0;
-		for (let i = 0; i < str.length; i++) {
-			if (Regx.test(str.charAt(i))) {
-				len = len + 8;
-			} else {
-				len = len + 14;
-			}
-		}
-		return len;
-	};
+	// const getLabelLength = (str: string) => {
+	// 	const Regx = /^[A-Za-z0-9]*$/;
+	// 	let len = 0;
+	// 	for (let i = 0; i < str.length; i++) {
+	// 		if (Regx.test(str.charAt(i))) {
+	// 			len = len + 8;
+	// 		} else {
+	// 			len = len + 14;
+	// 		}
+	// 	}
+	// 	return len;
+	// };
 
 	const NodeColorOptions = {
 		CONNECT: ['#F8F9FA', '#24A36F'],
@@ -384,7 +394,8 @@ export const Graph = forwardRef((props, ref) => {
 			}}
 		>
 			<div className={classes['top-breadcrumb']}>
-				<div onClick={() => goBack && goBack()} className={classes['top-back']}>
+				{/* <div onClick={() => goBack && goBack()} className={classes['top-back']}> */}
+				<div onClick={() => cleanGoBack()} className={classes['top-back']}>
 					<span>
 						<LeftOutlined />
 						<span style={{ marginLeft: '8px', cursor: 'pointer' }}>返回</span>
