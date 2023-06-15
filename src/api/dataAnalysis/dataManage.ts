@@ -12,9 +12,16 @@ interface SearchData {
 	size: number;
 }
 export function getDataList(data: SearchData) {
-	return post(API_PREFIX + '/blade-tool/dataAnalysis/listMyTables', {
-		...data
-	});
+	const formData = new FormData();
+	for (const key in data) {
+		if (Object.prototype.hasOwnProperty.call(data, key)) {
+			formData.append(key, data[key]);
+		}
+	}
+	return postFormData(
+		API_PREFIX + '/blade-tool/dataAnalysis/listMyTables',
+		formData
+	);
 }
 
 // 删除数据
