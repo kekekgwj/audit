@@ -1,5 +1,14 @@
 import React, { useEffect, useRef } from 'react';
-import { Card, Divider, Form, Input, message, Pagination } from 'antd';
+import {
+	Card,
+	Divider,
+	Form,
+	Input,
+	message,
+	Pagination,
+	Col,
+	Row
+} from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import fileImg from '@/assets/img/file.png';
@@ -46,7 +55,17 @@ const MyTemplate = () => {
 	useEffect(() => {
 		const dom = document.querySelector('#mainContain');
 		// 当前界面每行可容纳个数
-		const rowNum = Math.floor(dom?.scrollWidth / 220);
+		// md={12} lg={8} xl={6} xxl={4}
+		let rowNum;
+		if (dom?.scrollWidth < 992) {
+			rowNum = 2;
+		} else if (dom?.scrollWidth < 1200 && dom?.scrollWidth >= 992) {
+			rowNum = 3;
+		} else if (dom?.scrollWidth < 1600 && dom?.scrollWidth >= 1200) {
+			rowNum = 4;
+		} else {
+			rowNum = 6;
+		}
 		// 每列可容纳个数
 		const colNum = Math.floor(dom?.scrollHeight / 220);
 		//每页数量
@@ -201,87 +220,80 @@ const MyTemplate = () => {
 	return (
 		<div className={styles['my-template-page']}>
 			<div className={styles['main-contain']} id="mainContain">
-				<div className={styles['add-item']}>
-					<div
-						className={styles['add-content-box']}
-						onClick={() => handleAdd()}
-					>
-						<div>
-							<PlusCircleOutlined
-								style={{ fontSize: '40px', color: '#24A36F' }}
-							></PlusCircleOutlined>
+				<Row gutter={20} style={{ width: '100%' }}>
+					<Col xs={12} sm={12} md={12} lg={8} xl={6} xxl={4}>
+						<div className={styles['add-item']}>
+							<div
+								className={styles['add-content-box']}
+								onClick={() => handleAdd()}
+							>
+								<div>
+									<PlusCircleOutlined
+										style={{ fontSize: '40px', color: '#24A36F' }}
+									></PlusCircleOutlined>
+								</div>
+								<div className={styles['text-name']}>新建模板</div>
+							</div>
 						</div>
-						<div className={styles['text-name']}>新建模板</div>
-					</div>
-				</div>
-				{templateList &&
-					templateList.length > 0 &&
-					templateList.map((item) => {
-						return (
-							<Card key={item.id} className={styles['card-item']}>
-								<div
-									className={styles['card-content']}
-									onClick={() => toDetail(item)}
-								>
-									<div className={styles['img-icon']}>
-										<img src={fileImg} alt="" />
-									</div>
-									<div className={styles['text-name']}>{item.name}</div>
-									<div className={styles['text-time']}>
-										最近更新：{date2str(item.gmtModified)}
-									</div>
-								</div>
-								<div className={styles['card-footer']}>
-									<span
-										className={styles['operate-item']}
-										onClick={() => handleCopy(item)}
-									>
-										<SvgIcon name="copy" color="#24A36F"></SvgIcon>
-										<span style={{ marginLeft: '2px' }}>复制</span>
-									</span>
-									<span>
-										<Divider type="vertical" />
-									</span>
-									<span
-										className={styles['operate-item']}
-										onClick={() => handleEdit(item)}
-									>
-										<SvgIcon name="edit" color="#24A36F"></SvgIcon>
-										<span style={{ marginLeft: '2px' }}>编辑</span>
-									</span>
-									<span>
-										<Divider type="vertical" />
-									</span>
-									<span
-										className={styles['operate-item']}
-										onClick={() => handleDelete(item)}
-									>
-										<SvgIcon name="delete" color="#24A36F"></SvgIcon>
-										<span style={{ marginLeft: '2px' }}>删除</span>
-									</span>
-								</div>
-							</Card>
-						);
-					})}
+					</Col>
+					{templateList &&
+						templateList.length > 0 &&
+						templateList.map((item) => {
+							return (
+								<Col xs={12} sm={12} md={12} lg={8} xl={6} xxl={4}>
+									<Card key={item.id} className={styles['card-item']}>
+										<div
+											className={styles['card-content']}
+											onClick={() => toDetail(item)}
+										>
+											<div className={styles['img-icon']}>
+												<img src={fileImg} alt="" />
+											</div>
+											<div className={styles['text-name']}>{item.name}</div>
+											<div
+												style={{ textAlign: 'center' }}
+												className={styles['text-time']}
+											>
+												最近更新
+												<br></br>
+												{item.gmtModified}
+											</div>
+										</div>
+										<div className={styles['card-footer']}>
+											<span
+												className={styles['operate-item']}
+												onClick={() => handleCopy(item)}
+											>
+												<SvgIcon name="copy" color="#24A36F"></SvgIcon>
+												<span style={{ marginLeft: '2px' }}>复制</span>
+											</span>
+											<span>
+												<Divider type="vertical" />
+											</span>
+											<span
+												className={styles['operate-item']}
+												onClick={() => handleEdit(item)}
+											>
+												<SvgIcon name="edit" color="#24A36F"></SvgIcon>
+												<span style={{ marginLeft: '2px' }}>编辑</span>
+											</span>
+											<span>
+												<Divider type="vertical" />
+											</span>
+											<span
+												className={styles['operate-item']}
+												onClick={() => handleDelete(item)}
+											>
+												<SvgIcon name="delete" color="#24A36F"></SvgIcon>
+												<span style={{ marginLeft: '2px' }}>删除</span>
+											</span>
+										</div>
+									</Card>
+								</Col>
+							);
+						})}
+				</Row>
 			</div>
-
-			{/* <div className={styles['foot-pagination-box']}>
-				<div>
-					<span style={{ marginRight: '10px' }}>共{total}条记录</span>
-					<span>
-						第{current}/{Math.ceil(total / 10)}页
-					</span>
-				</div>
-				<div className={styles['pagination-box']}>
-					<Pagination
-						total={total}
-						showSizeChanger
-						pageSizeOptions={[10]}
-						onChange={onChange}
-						showQuickJumper
-					/>
-				</div>
-			</div> */}
 			<Delete
 				open={openDel}
 				handleCancle={handleCancleDel}

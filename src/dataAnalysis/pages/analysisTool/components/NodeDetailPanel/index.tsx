@@ -169,6 +169,8 @@ const Panel: React.FC = () => {
 			return;
 		}
 
+		console.log(getAllConfigs());
+
 		type getParameterFirst<T> = T extends [infer first, ...infer rest]
 			? first
 			: null;
