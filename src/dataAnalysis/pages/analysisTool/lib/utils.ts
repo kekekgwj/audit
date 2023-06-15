@@ -1,6 +1,7 @@
 import { Graph, Node, Edge, ObjectExt, StringExt } from '@antv/x6';
 import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
 import * as X6 from '@antv/x6';
+import { hashCode } from 'hashcode';
 type Metadata = Node.Metadata | Edge.Metadata;
 type C = Node | Edge;
 type T = C | { [key: string]: any };
@@ -237,6 +238,8 @@ export const validateConnectionRule = (
 	// 	message.error('sql不能连接sql');
 	// 	return false;
 	// }
+	// 连接成功 -> 可能改变source -> 需要关闭重新执行
+	onClickCloseConfigPanel();
 	return true;
 };
 
@@ -268,6 +271,7 @@ export const getAllNodeOfGraph = (graph: X6.Graph): Set<string | null> => {
 export interface IImageShapes {
 	label: string;
 	image: string;
+	activeImage?: string;
 	type: IImageTypes;
 	labelCn?: string;
 }
@@ -277,31 +281,49 @@ import { message } from 'antd';
 import { Options } from '@antv/x6/lib/graph/options';
 import { saveProjectCanvas } from '@/api/dataAnalysis/graph';
 import React, { useEffect } from 'react';
-const { FILTER, CONNECT, GROUP, ORDER, END } = ASSETS;
+import { onClickCloseConfigPanel } from '@/redux/store';
+
+const {
+	FILTER,
+	CONNECT,
+	GROUP,
+	ORDER,
+	END,
+	CONNECTACTIVE,
+	FILTERACTIVE,
+	ENDACTIVE,
+	GROUPACTIVE,
+	ORDERACTIVE
+} = ASSETS;
 export const imageShapes: IImageShapes[] = [
 	{
 		label: '连接',
 		image: CONNECT,
+		activeImage: CONNECTACTIVE,
 		type: IImageTypes.CONNECT
 	},
 	{
 		label: '筛选',
 		image: FILTER,
+		activeImage: FILTERACTIVE,
 		type: IImageTypes.FILTER
 	},
 	{
 		label: '排序',
 		image: ORDER,
+		activeImage: ORDERACTIVE,
 		type: IImageTypes.ORDER
 	},
 	{
 		label: '分组',
 		image: GROUP,
+		activeImage: GROUPACTIVE,
 		type: IImageTypes.GROUP
 	},
 	{
 		label: '结束',
 		image: END,
+		activeImage: ENDACTIVE,
 		type: IImageTypes.END
 	}
 ];
@@ -458,4 +480,22 @@ export const ports = {
 			group: 'left'
 		}
 	]
+};
+
+export const getLabelLength = (str: string) => {
+	const Regx = /^[A-Za-z0-9]*$/;
+	let len = 0;
+	for (let i = 0; i < str.length; i++) {
+		if (Regx.test(str.charAt(i))) {
+			len = len + 8;
+		} else {
+			len = len + 14;
+		}
+	}
+	return len;
+};
+
+export const encodeNodeSources = (sources: string[]): number => {
+	const sourcesStr = sources.join('-');
+	return hashCode().value(sourcesStr);
 };
