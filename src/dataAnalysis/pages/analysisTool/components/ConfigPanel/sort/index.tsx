@@ -8,7 +8,7 @@ const { Panel } = Collapse;
 interface SortProps {
 	option: List[];
 	value?: string[];
-	onChange?: (value: string[]) => void;
+	onChange?: (value: ISortInitValue[]) => void;
 }
 interface IListItem {
 	description?: string;
@@ -71,8 +71,8 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 
 		setOptionList(newDataList);
 	};
-	const transSubmitData = (rawData) => {
-		const formatData = [];
+	const transSubmitData = (rawData: List[]): ISortInitValue[] => {
+		const formatData: ISortInitValue[] = [];
 		rawData.forEach(({ list, tableName }) => {
 			list.forEach((item) => {
 				formatData.push({
@@ -227,10 +227,13 @@ const Sort: FC = () => {
 
 		if (initSortingValue) {
 			initSortingValue.forEach(({ tableName, title, isDown, isUp }) => {
-				initConfig[tableName] = { [title]: { isDown, isUp } };
+				initConfig[tableName] = {
+					...initConfig[tableName],
+					[title]: { isDown, isUp }
+				};
 			});
 		}
-
+		console.log('initConfig', initSortingValue, initConfig);
 		const formatData = transData(config, initConfig);
 
 		setOption(formatData);
@@ -273,7 +276,7 @@ const Sort: FC = () => {
 				list: list
 			};
 		});
-
+		console.log('formatdata', formatData, initConfig);
 		return formatData;
 	};
 

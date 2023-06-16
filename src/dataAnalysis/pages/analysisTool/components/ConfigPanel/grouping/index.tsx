@@ -5,9 +5,8 @@ import { DelIcon } from '../sort/icon';
 import Icon, {
 	CustomIconComponentProps
 } from '@ant-design/icons/lib/components/Icon';
-import { useConfigContextValue, useUpdateTable } from '../../NodeDetailPanel';
-import { useGraph, useGraphContext, useGraphID } from '../../../lib/hooks';
-import { getCanvasConfig, getResult } from '@/api/dataAnalysis/graph';
+import { useConfigContextValue } from '../../NodeDetailPanel';
+
 const { Panel } = Collapse;
 const { Option } = Select;
 interface SortProps {
