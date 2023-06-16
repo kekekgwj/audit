@@ -5,7 +5,7 @@ import React, {
 	useRef,
 	useState
 } from 'react';
-import { Table } from 'antd';
+import { Table, message } from 'antd';
 import { useSelector } from 'react-redux';
 import classes from './index.module.less';
 import ConfigPanel from '../ConfigPanel';
@@ -92,6 +92,9 @@ const Panel: React.FC = () => {
 
 	const [showConfig, setShowConfig] = useState(true);
 
+	// 是否配置为空
+	const [isEmptyConfig, setIsEmptyConfig] = useState(true);
+
 	const { curSelectedNode: id, showPanel = false, time } = state || {};
 
 	const executeType = [IImageTypes.TABLE, IImageTypes.END];
@@ -128,6 +131,11 @@ const Panel: React.FC = () => {
 				})
 			};
 			const config: any = await getCanvasConfig(params);
+			if (!config || config.length < 1) {
+				setIsEmptyConfig(true);
+			} else {
+				setIsEmptyConfig(false);
+			}
 			setNodeConfig(config);
 			const tableNames = config.map((item) => item.tableName);
 			const key = encodeNodeSources([...tableNames, id]);
@@ -304,7 +312,11 @@ const Panel: React.FC = () => {
 										executeByNodeConfig
 									}}
 								>
-									<ConfigPanel key={getNodeKey()} />
+									{!isEmptyConfig ? (
+										<ConfigPanel key={getNodeKey()} />
+									) : (
+										<div className={classes.emptyConfig}>缺少数据表配置</div>
+									)}
 								</ConfigContext.Provider>
 							</div>
 						) : null}
