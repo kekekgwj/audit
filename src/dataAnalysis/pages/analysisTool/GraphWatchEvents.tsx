@@ -20,7 +20,10 @@ const GraphWatchEvents = () => {
 
 		nodes.forEach((node) => {
 			const custom = node.store.data.attrs.custom;
-			if (custom.type !== IImageTypes.TABLE) {
+			if (custom.type === IImageTypes.TABLE) {
+				node.attr('body/stroke', '#18181F');
+				node.attr('label/fill', '#18181F');
+			} else {
 				const defaultImage = custom.defaultImage;
 				node.attr('img/xlink:href', defaultImage);
 			}
@@ -33,11 +36,15 @@ const GraphWatchEvents = () => {
 		}
 
 		graph.on('node:click', ({ node }) => {
-			const custom = node.store.data.attrs.custom;
-			if (custom.type === IImageTypes.TABLE) return;
 			resetGraph();
-			const activeImage = custom.activeImage;
-			node.attr('img/xlink:href', activeImage);
+			const custom = node.store.data.attrs.custom;
+			if (custom.type === IImageTypes.TABLE) {
+				node.attr('body/stroke', '#24a36f');
+				node.attr('label/fill', '#24a36f');
+			} else {
+				const activeImage = custom.activeImage;
+				node.attr('img/xlink:href', activeImage);
+			}
 		});
 
 		graph.on('node:mouseenter', () => {
