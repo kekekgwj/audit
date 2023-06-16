@@ -230,7 +230,7 @@ export const Graph = forwardRef((props, ref) => {
 
 	const startDrag = (
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-		{ label, image, type, labelCn, activeImage }: IImageShapes
+		{ label, image, type, labelCn, activeImage, defaultImage }: IImageShapes
 	) => {
 		if (!graph) {
 			return;
@@ -291,7 +291,7 @@ export const Graph = forwardRef((props, ref) => {
 				// 	x: 3
 				// },
 				img: {
-					'xlink:href': type === IImageTypes.TABLE ? image : activeImage,
+					'xlink:href': type === IImageTypes.TABLE ? image : defaultImage,
 					width: type === IImageTypes.TABLE ? 20 : 30,
 					height: type === IImageTypes.TABLE ? 20 : 30,
 					y: type === IImageTypes.TABLE ? 10 : 0,
@@ -312,6 +312,8 @@ export const Graph = forwardRef((props, ref) => {
 				},
 				custom: {
 					type: type,
+					defaultImage: defaultImage,
+					activeImage: activeImage,
 					label: label,
 					labelCn: labelCn
 				}
@@ -441,25 +443,35 @@ export const Graph = forwardRef((props, ref) => {
 							>
 								工具栏
 							</span>
-							{imageShapes.map(({ label, image, type, activeImage }, index) => {
-								return (
-									<div
-										style={{ display: 'flex', alignItems: 'center' }}
-										key={type}
-										onMouseDown={(e) =>
-											startDrag(e, { label, image, type, activeImage })
-										}
-									>
-										<img src={image}></img>
-										<span style={{ marginLeft: '8px', pointerEvents: 'none' }}>
-											{label}
-										</span>
-										{index + 1 !== imageShapes.length && (
-											<Divider type="vertical" />
-										)}
-									</div>
-								);
-							})}
+							{imageShapes.map(
+								({ label, image, type, activeImage, defaultImage }, index) => {
+									return (
+										<div
+											style={{ display: 'flex', alignItems: 'center' }}
+											key={type}
+											onMouseDown={(e) =>
+												startDrag(e, {
+													label,
+													image,
+													type,
+													activeImage,
+													defaultImage
+												})
+											}
+										>
+											<img src={image}></img>
+											<span
+												style={{ marginLeft: '8px', pointerEvents: 'none' }}
+											>
+												{label}
+											</span>
+											{index + 1 !== imageShapes.length && (
+												<Divider type="vertical" />
+											)}
+										</div>
+									);
+								}
+							)}
 						</div>
 					</div>
 					<div

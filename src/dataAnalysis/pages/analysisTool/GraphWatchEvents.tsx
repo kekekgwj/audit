@@ -13,10 +13,26 @@ const GraphWatchEvents = () => {
 	const container = document.getElementById('x6-graph')!;
 	const { syncGraph, graph } = useGraphContext();
 
+	const resetGraph = () => {
+		if (!graph) return;
+		const nodes = graph.getNodes();
+
+		nodes.forEach((node) => {
+			const defaultImage = node.store.data.attrs.custom.defaultImage;
+			node.attr('img/xlink:href', defaultImage);
+		});
+	};
+
 	useEffect(() => {
 		if (!graph) {
 			return;
 		}
+
+		graph.on('node:click', ({ node }) => {
+			resetGraph();
+			const activeImage = node.store.data.attrs.custom.activeImage;
+			node.attr('img/xlink:href', activeImage);
+		});
 
 		graph.on('node:mouseenter', () => {
 			const ports = container.querySelectorAll(
@@ -41,7 +57,10 @@ const GraphWatchEvents = () => {
 			}
 		});
 		// 点击画布，关闭配置
-		graph.on('blank:click', onClickCloseConfigPanel);
+		graph.on('blank:click', () => {
+			resetGraph();
+			onClickCloseConfigPanel();
+		});
 
 		// delete
 		graph.bindKey('backspace', () => {
@@ -61,6 +80,7 @@ const GraphWatchEvents = () => {
 		graph.on('cell:removed', () => syncGraph());
 
 		return () => {
+			graph.off('node:click');
 			graph.off('node:mouseenter');
 			graph.off('node:mouseleave');
 			graph.off('cell:changed');
