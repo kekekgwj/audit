@@ -14,7 +14,7 @@ interface SearchData {
 export function getDataList(data: SearchData) {
 	return get(
 		API_PREFIX +
-			`/blade-tool/dataAnalysis/listMyTables?tableName=${data.tableName}&createdBeginTime=${data.createdBeginTime}&createdEndTime=${data.createdEndTime}`,
+			`/blade-tool/dataAnalysis/listMyTables?current=${data.current}&size=${data.size}&tableName=${data.tableName}&createdBeginTime=${data.createdBeginTime}&createdEndTime=${data.createdEndTime}`,
 		{}
 	);
 }
