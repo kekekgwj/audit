@@ -394,12 +394,16 @@ export const formatDataSource = (data: any[], head: string[]) => {
 		title: string;
 		dataIndex: string;
 		key: string;
+		ellipsis: boolean;
+		width: number;
 	}
 	const columns: IColumn[] = head.map((item, index) => {
 		return {
 			title: item,
 			dataIndex: item,
-			key: item
+			key: item,
+			ellipsis: true,
+			width: 100
 		};
 	});
 	const columnsName = columns.map((c) => c.dataIndex);
