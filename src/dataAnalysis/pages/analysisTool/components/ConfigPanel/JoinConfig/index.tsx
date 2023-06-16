@@ -267,12 +267,11 @@ const SelectGroup: React.FC = () => {
 				}}
 				form={form}
 			>
-				{showTips && (
-					<div style={{ fontSize: '14px', marginBottom: 20 }}>
-						<span style={{ fontWeight: 'bold' }}>连接语句: </span>
-						<span>多行之间是"且"的关系</span>
-					</div>
-				)}
+				<div style={{ fontSize: '14px', marginBottom: 20 }}>
+					<span style={{ fontWeight: 'bold' }}>连接语句: </span>
+					<span>多行之间是"且"的关系</span>
+				</div>
+
 				<Form.List name="connectionSentences">
 					{(fields, { add, remove }) => (
 						<>
