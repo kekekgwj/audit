@@ -236,8 +236,8 @@ export default () => {
 					<Form.Item
 						name="sqlName"
 						label="SQL名称"
-						labelCol={{ span: 10 }}
-						wrapperCol={{ span: 14 }}
+						labelCol={{ span: 6 }}
+						wrapperCol={{ span: 18 }}
 						colon={false}
 					>
 						<Input placeholder="请输入" />

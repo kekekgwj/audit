@@ -70,9 +70,9 @@ const SortInput: FC<SortProps> = ({
 		item: {
 			key: string;
 			title: string;
+			description: string;
 		},
-		tableRealName: string,
-		tableCnName: string
+		tableRealName: string
 	) => {
 		if (
 			!dataList.some((res) => {
@@ -84,7 +84,8 @@ const SortInput: FC<SortProps> = ({
 				{
 					title: item.title,
 					key: item.key,
-					tableName: tableRealName
+					tableName: tableRealName,
+					description: item.description
 				}
 			]);
 		}
@@ -112,7 +113,7 @@ const SortInput: FC<SortProps> = ({
 									dataList.map((item, index) => {
 										return (
 											<div className={classes.label} key={item.key}>
-												{item.title}
+												{item.description}
 												<DelIcon
 													onClick={() => {
 														const newData = JSON.parse(
@@ -183,6 +184,7 @@ interface ICondition {
 	title: string;
 	key: string;
 	tableName: string;
+	description: string;
 }
 interface IFormValue {
 	column: ICondition[];

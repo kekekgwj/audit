@@ -76,6 +76,7 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 		rawData.forEach(({ list, tableName }) => {
 			list.forEach((item) => {
 				formatData.push({
+					description: item.description,
 					tableName: tableName,
 					title: item.title,
 					isDown: item.isDown,
@@ -117,7 +118,8 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 												return (
 													(items.isUp || items.isDown) && (
 														<div className={classes.label} key={items.title}>
-															{items.title}
+															{/* {items.title} */}
+															{items.description}
 															<div style={{ marginLeft: '6px' }}>
 																{items.isUp && <UpIcon />}
 																{items.isDown && <Downicon />}
@@ -163,7 +165,8 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 									{item.list.map((items, childrenIndex) => {
 										return (
 											<div key={items.title} className={classes.sortTxt}>
-												<span>{items.title}</span>
+												{/* <span>{items.title}</span> */}
+												<span>{items.description}</span>
 												<div className={classes.sortWrap}>
 													<div
 														style={{ marginRight: '10px' }}
