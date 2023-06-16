@@ -23,7 +23,13 @@ export default (props: DialogProps) => {
 			width={width}
 			footer={false}
 			wrapClassName={wrapClassName}
-			closeIcon={<SvgIcon name="close" color="#24A36F"></SvgIcon>}
+			closeIcon={
+				<SvgIcon
+					name="close"
+					color="#24A36F"
+					className={styles['dialog-close-icon']}
+				></SvgIcon>
+			}
 			onCancel={handleCancle}
 			className={styles['custom-dialog']}
 		>
