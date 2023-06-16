@@ -242,7 +242,7 @@ export const Graph = forwardRef((props, ref) => {
 
 		const text = labelCn || label;
 		let bgColor = '#fff';
-		let textColor = '18181F';
+		let textColor = '#767676';
 
 		if (type !== IImageTypes.TABLE) {
 			[bgColor, textColor] = NodeColorOptions[type];

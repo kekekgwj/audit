@@ -302,6 +302,7 @@ export default () => {
 		initData = cloneDeep(data);
 	}
 	const [formData, dispatch] = useReducer(reducer, initData);
+	// return;
 	const [indeterminate, setIndeterminate] = useState(false);
 	const [checkAll, setCheckAll] = useState(formData.isAll);
 
@@ -338,8 +339,8 @@ export default () => {
 
 			if (formData.isFirst) {
 				formCol.push({
-					tableName: item.value,
-					headers: [allValue]
+					tableName: item.tableName,
+					headers: [...allValue]
 				});
 			}
 
@@ -360,7 +361,7 @@ export default () => {
 		if (formData.isFirst) {
 			setIndeterminate(false);
 			setCheckAll(true);
-			dispatch({ type: 'setCol', data: { ...formCol } || [], isAll: true });
+			dispatch({ type: 'setCol', data: formCol || [], isAll: true });
 		}
 
 		return list;
@@ -414,9 +415,9 @@ export default () => {
 		if (!id || !setValue) {
 			return;
 		}
+		dispatch({ type: 'reset' });
 		resetValue();
 		onCheckAllChange(true);
-		// dispatch({ type: 'reset' });
 		// dispatch({ type: 'setCol', data: plainOptions });
 		// setIndeterminate(false);
 		// setCheckAll(true);

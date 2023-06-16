@@ -166,7 +166,7 @@ const SortInput: FC<SortProps> = ({
 												if (isMulti) {
 													setData(items, tableRealName, tableName);
 												} else {
-													if (dataList && dataList.length == 0) {
+													if (!dataList) {
 														setData(items, tableRealName, tableName);
 													}
 												}

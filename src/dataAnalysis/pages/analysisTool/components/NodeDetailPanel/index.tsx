@@ -107,6 +107,8 @@ const Panel: React.FC = () => {
 		useNodeKey();
 	const isInit = useInitRender();
 
+	const [tableLoading, setTableLoading] = useState<boolean>(false);
+
 	useEffect(() => {
 		!isInit && syncGraph();
 	}, [showPanel]);
@@ -130,12 +132,14 @@ const Panel: React.FC = () => {
 					content: canvasData
 				})
 			};
+			setTableLoading(true);
 			const config: any = await getCanvasConfig(params);
 			if (!config || config.length < 1) {
 				setIsEmptyConfig(true);
 			} else {
 				setIsEmptyConfig(false);
 			}
+			setTableLoading(false);
 			setNodeConfig(config);
 			const tableNames = config.map((item) => item.tableName);
 			const key = encodeNodeSources([...tableNames, id]);
@@ -258,6 +262,7 @@ const Panel: React.FC = () => {
 
 				<div className={classes.tableWrapper}>
 					<Table
+						loading={tableLoading}
 						columns={columns}
 						dataSource={data}
 						pagination={{ defaultPageSize: 4 }}

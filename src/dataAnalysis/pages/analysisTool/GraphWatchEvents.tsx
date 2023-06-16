@@ -3,6 +3,7 @@ import { useGraphContext } from './lib/hooks';
 import { onClickGraphNode } from '@/redux/store';
 import { debounce } from 'debounce';
 import { onClickCloseConfigPanel } from '@/redux/store';
+import { IImageTypes } from './lib/utils';
 
 const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
 	for (let i = 0, len = ports.length; i < len; i += 1) {
@@ -18,8 +19,14 @@ const GraphWatchEvents = () => {
 		const nodes = graph.getNodes();
 
 		nodes.forEach((node) => {
-			const defaultImage = node.store.data.attrs.custom.defaultImage;
-			node.attr('img/xlink:href', defaultImage);
+			const custom = node.store.data.attrs.custom;
+			if (custom.type === IImageTypes.TABLE) {
+				node.attr('body/stroke', '#ccc');
+				node.attr('label/fill', '#767676');
+			} else {
+				const defaultImage = custom.defaultImage;
+				node.attr('img/xlink:href', defaultImage);
+			}
 		});
 	};
 
@@ -30,8 +37,14 @@ const GraphWatchEvents = () => {
 
 		graph.on('node:click', ({ node }) => {
 			resetGraph();
-			const activeImage = node.store.data.attrs.custom.activeImage;
-			node.attr('img/xlink:href', activeImage);
+			const custom = node.store.data.attrs.custom;
+			if (custom.type === IImageTypes.TABLE) {
+				node.attr('body/stroke', '#24a36f');
+				node.attr('label/fill', '#24a36f');
+			} else {
+				const activeImage = custom.activeImage;
+				node.attr('img/xlink:href', activeImage);
+			}
 		});
 
 		graph.on('node:mouseenter', () => {
