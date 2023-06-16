@@ -109,6 +109,14 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 		{
 			label: '<',
 			value: '<'
+		},
+		{
+			lable: '>=',
+			value: '>='
+		},
+		{
+			lable: '<=',
+			value: '<='
 		}
 	];
 
