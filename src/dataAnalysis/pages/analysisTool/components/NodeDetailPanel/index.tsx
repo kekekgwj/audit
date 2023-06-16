@@ -11,7 +11,7 @@ import classes from './index.module.less';
 import ConfigPanel from '../ConfigPanel';
 import ASSETS from '../../assets/index';
 import { IRootState, onClickCloseConfigPanel } from '@/redux/store';
-import { CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useGraph, useGraphContext, useGraphID } from '../../lib/hooks';
 import {
 	IImageTypes,
@@ -236,15 +236,21 @@ const Panel: React.FC = () => {
 		<div className={classes.container}>
 			<div className={classes.data}>
 				<div className={classes.download}>
-					<img src={DOWNLOAD} className={classes.download_icon}></img>
-					<span className={classes.download_text} onClick={downLoadData}>
-						下载
-					</span>
-					{/* <CloseOutlined
-						className={classes.closeIcon}
-						onClick={onClickCloseConfigPanel}
-					/> */}
+					<div
+						onClick={downLoadData}
+						style={{
+							cursor: 'pointer',
+							display: 'flex',
+							alignItems: 'center',
+							height: '100%'
+						}}
+					>
+						{/* <img src={DOWNLOAD} className={classes.download_icon}></img> */}
+						<DownloadOutlined style={{ color: '#24A36F', fontSize: '20px' }} />
+						<span className={classes.download_text}>下载</span>
+					</div>
 				</div>
+
 				<div className={classes.tableWrapper}>
 					<Table
 						columns={columns}

@@ -7,15 +7,17 @@
 	background-color: #fff;
 	.data {
 		overflow: auto;
-		width: 600px;
+		// width: 600px;
 		position: relative;
 		flex: 1;
 		.download {
+			position: relative;
 			padding-left: 40px;
 			height: 50px;
 			background: #f8f9fa;
 			display: flex;
 			align-items: center;
+			justify-content: flex-start;
 			&_icon {
 				width: 20px;
 				height: 20px;
@@ -52,7 +54,7 @@
 	// 	max-width: calc(100% - 600px);
 	// }
 	.configPanel {
-		flex: 1;
+		width: 510px;
 		background-color: #fff;
 		position: relative;
 
@@ -70,7 +72,7 @@
 			}
 		}
 		.configWrapper {
-			width: 600px;
+			width: 510px;
 			padding: 20px;
 			overflow: auto;
 
@@ -78,7 +80,7 @@
 		}
 		.closeIcon {
 			position: absolute;
-			right: 40px;
+			right: 20px;
 		}
 	}
 	.hideConfigPanel {
