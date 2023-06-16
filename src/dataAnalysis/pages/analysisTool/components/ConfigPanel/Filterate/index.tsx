@@ -415,9 +415,9 @@ export default () => {
 		if (!id || !setValue) {
 			return;
 		}
+		dispatch({ type: 'reset' });
 		resetValue();
 		onCheckAllChange(true);
-		// dispatch({ type: 'reset' });
 		// dispatch({ type: 'setCol', data: plainOptions });
 		// setIndeterminate(false);
 		// setCheckAll(true);
