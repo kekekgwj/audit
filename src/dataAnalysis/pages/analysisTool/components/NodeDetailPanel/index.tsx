@@ -145,12 +145,12 @@ const Panel: React.FC = () => {
 		saveConfigValue(id, { ...value, key: nodeKey });
 	};
 	const getValue = () => {
-		const nodeKey = getNodeKey();
-		if (!nodeKey || !id) {
+		if (!getNodeKey() || !id) {
 			return {};
 		}
+
 		const curConfig = getConfigValue(id);
-		if (!curConfig || curConfig.key !== nodeKey) {
+		if (!curConfig || curConfig.key !== getNodeKey()) {
 			return {};
 		}
 
@@ -170,8 +170,6 @@ const Panel: React.FC = () => {
 		if (!canvasData || !id || !projectID) {
 			return;
 		}
-
-		console.log(getAllConfigs());
 
 		type getParameterFirst<T> = T extends [infer first, ...infer rest]
 			? first
@@ -231,7 +229,6 @@ const Panel: React.FC = () => {
 
 	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
 	const initValue = getValue();
-
 	return (
 		<div className={classes.container}>
 			<div className={classes.data}>
