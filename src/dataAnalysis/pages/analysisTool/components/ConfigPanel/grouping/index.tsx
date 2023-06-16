@@ -98,10 +98,9 @@ const SortInput: FC<SortProps> = ({
 	return (
 		<Collapse
 			collapsible="icon"
-			activeKey={'1'}
 			className={classes.wrapBoxCollapse}
 			ghost
-			expandIcon={() => <div></div>}
+			expandIcon={() => <div className={classes.expandIcon}></div>}
 		>
 			<Panel
 				header={
@@ -109,21 +108,27 @@ const SortInput: FC<SortProps> = ({
 						<div className={classes.inputLabel}>{label}</div>
 						<div className={classes.rightInput}>
 							<div className={classes.left}>
-								{dataList.map((item, index) => {
-									return (
-										<div className={classes.label} key={item.key}>
-											{item.title}
-											<DelIcon
-												onClick={() => {
-													const newData = JSON.parse(JSON.stringify(dataList));
-													newData.splice(index, 1);
-													setDataList(newData);
-												}}
-												className={classes.delIcon}
-											></DelIcon>
-										</div>
-									);
-								})}
+								{dataList.length > 0 ? (
+									dataList.map((item, index) => {
+										return (
+											<div className={classes.label} key={item.key}>
+												{item.title}
+												<DelIcon
+													onClick={() => {
+														const newData = JSON.parse(
+															JSON.stringify(dataList)
+														);
+														newData.splice(index, 1);
+														setDataList(newData);
+													}}
+													className={classes.delIcon}
+												></DelIcon>
+											</div>
+										);
+									})
+								) : (
+									<div className={classes.tip}>请选择</div>
+								)}
 							</div>
 						</div>
 					</div>

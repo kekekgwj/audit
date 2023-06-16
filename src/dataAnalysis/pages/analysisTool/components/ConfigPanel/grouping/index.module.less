@@ -206,6 +206,7 @@
 		width: 56px;
 	}
 	.rightInput {
+		cursor: pointer;
 		margin-left: 14px;
 		flex: 1;
 		min-height: 32px;
@@ -239,6 +240,7 @@
 				line-height: 14px;
 				margin: 4px;
 				.delIcon {
+					z-index: 9;
 					position: absolute;
 					right: -5px;
 					top: -3px;
@@ -264,4 +266,20 @@
 			margin-right: 10px !important;
 		}
 	}
+}
+.tip {
+	margin-left: 4px;
+	font-size: 14px;
+	font-family: Noto Sans-Regular, Noto Sans;
+	font-weight: 400;
+	color: rgba(10, 10, 12, 0.2);
+	line-height: 32px;
+}
+.expandIcon {
+	z-index: 1;
+	width: calc(100% - 66px);
+	height: 100%;
+	position: absolute;
+	right: 0;
+	top: 0;
 }

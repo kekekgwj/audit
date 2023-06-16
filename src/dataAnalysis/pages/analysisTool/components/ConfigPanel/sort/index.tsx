@@ -93,10 +93,9 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 	return (
 		<Collapse
 			collapsible="icon"
-			activeKey={'1'}
 			className={classes.wrapBoxCollapse}
 			ghost
-			expandIcon={() => <div></div>}
+			expandIcon={() => <div className={classes.expandIcon}></div>}
 		>
 			<Panel
 				header={
