@@ -30,6 +30,8 @@ type ColItem = {
 type FormData = {
 	row: Array<Array<RowGroupItme>>;
 	col: Array<ColItem>;
+	isFirst: boolean;
+	isAll: boolean;
 };
 
 type setRowData = (
@@ -81,20 +83,11 @@ const getHash = () => {
 };
 
 const data: FormData = {
-	row: [
-		[
-			{
-				_key: getHash(),
-				tableName: '', // 表名
-				tableHeader: '', // 表头
-				operator: '', // 符号
-				value: '', // 值
-				dataType: ''
-			}
-		]
-	],
+	row: [],
 
-	col: []
+	col: [],
+	isFirst: true,
+	isAll: true
 };
 
 const Group = (props: GroupProps) => {
@@ -246,9 +239,11 @@ const reducer = (state: FormData, action: any) => {
 	switch (action.type) {
 		case 'setRowData':
 			state.row[action.groupIndex][action.rowIndex] = action.data;
+			state.isFirst = false;
 			break;
 		case 'delGroup':
 			state.row.splice(action.groupIndex, 1);
+			state.isFirst = false;
 			break;
 		case 'addGroup':
 			state.row.push([
@@ -261,6 +256,7 @@ const reducer = (state: FormData, action: any) => {
 					dataType: ''
 				}
 			]);
+			state.isFirst = false;
 			break;
 		case 'addRow':
 			state.row[action.groupIndex].splice(action.rowIndex + 1, 0, {
@@ -271,30 +267,24 @@ const reducer = (state: FormData, action: any) => {
 				value: '', // 值
 				dataType: ''
 			});
+			state.isFirst = false;
 			break;
 		case 'delRow':
 			state.row[action.groupIndex].splice(action.rowIndex, 1);
+			state.isFirst = false;
 			break;
 
 		case 'setCol':
 			state.col = action.data;
+			state.isFirst = false;
+			state.isAll = action.isAll || false;
 			break;
 		case 'reset':
 			state = {
-				row: [
-					[
-						{
-							_key: getHash(),
-							tableName: '', // 表名
-							tableHeader: '', // 表头
-							operator: '', // 符号
-							value: '', // 值
-							dataType: ''
-						}
-					]
-				],
-
-				col: []
+				row: [],
+				col: [],
+				isFirst: true,
+				isAll: true
 			};
 			break;
 		default:
@@ -313,7 +303,7 @@ export default () => {
 	}
 	const [formData, dispatch] = useReducer(reducer, initData);
 	const [indeterminate, setIndeterminate] = useState(false);
-	const [checkAll, setCheckAll] = useState(false);
+	const [checkAll, setCheckAll] = useState(formData.isAll);
 
 	const [cascaderOptions, setCascaderOptions] = useState([]);
 	const [colOptions, setColOptions] = useState([]);
@@ -324,9 +314,14 @@ export default () => {
 		setColOptions(formatColData(config));
 	}, []);
 
+	useEffect(() => {
+		set();
+	}, [formData]);
+
 	// 处理列数据
 	const formatColData = (data: any) => {
-		return data.map((item) => {
+		const formCol = [];
+		const list = data.map((item) => {
 			const childrenArr = item.fields;
 			const children: Array<{ label: string; value: string }> = [];
 			const allValue: Array<string | number> = [];
@@ -340,15 +335,35 @@ export default () => {
 			const defaultValue = formData.col.find(
 				(colItem) => colItem.tableName === item.tableName
 			);
+
+			if (formData.isFirst) {
+				formCol.push({
+					tableName: item.value,
+					headers: [allValue]
+				});
+			}
+
 			return {
 				_key: getHash(),
 				label: item.tableCnName,
 				value: item.tableName,
 				children: children,
 				allValue,
-				defaultValue: defaultValue ? defaultValue.headers : []
+				defaultValue: formData.isFirst
+					? allValue
+					: defaultValue
+					? defaultValue.headers
+					: []
 			};
 		});
+
+		if (formData.isFirst) {
+			setIndeterminate(false);
+			setCheckAll(true);
+			dispatch({ type: 'setCol', data: { ...formCol } || [], isAll: true });
+		}
+
+		return list;
 	};
 
 	// 拼接为级联选择器形式数据
@@ -390,6 +405,7 @@ export default () => {
 		if (!id || !setValue) {
 			return;
 		}
+
 		setValue(formData);
 	};
 
@@ -399,11 +415,12 @@ export default () => {
 			return;
 		}
 		resetValue();
-		dispatch({ type: 'reset' });
-		dispatch({ type: 'setCol', data: plainOptions });
-		setIndeterminate(false);
-		setCheckAll(true);
-		set();
+		onCheckAllChange(true);
+		// dispatch({ type: 'reset' });
+		// dispatch({ type: 'setCol', data: plainOptions });
+		// setIndeterminate(false);
+		// setCheckAll(true);
+		// set();
 	};
 
 	// 更新表单值
@@ -413,7 +430,7 @@ export default () => {
 		data: RowGroupItme
 	) => {
 		dispatch({ type: 'setRowData', groupIndex, rowIndex, data });
-		set();
+		// set();
 	};
 
 	// 删除组
@@ -424,23 +441,22 @@ export default () => {
 	// 增加组
 	const addGroup = () => {
 		dispatch({ type: 'addGroup' });
-		set();
+		// set();
 	};
 
 	// 删除行
 	const delRow = (groupIndex: number, rowIndex: number) => {
 		dispatch({ type: 'delRow', groupIndex, rowIndex });
-		set();
+		// set();
 	};
 
 	// 新增行
 	const addRow = (groupIndex: number, rowIndex: number) => {
 		dispatch({ type: 'addRow', groupIndex, rowIndex });
-		set();
+		// set();
 	};
 
-	const onCheckAllChange = (e: CheckboxChangeEvent) => {
-		const checkedAll = e.target.checked;
+	const onCheckAllChange = (checkedAll: boolean) => {
 		const formCol = [];
 		const newColOptions = [];
 
@@ -448,22 +464,22 @@ export default () => {
 			if (checkedAll) {
 				formCol.push({
 					tableName: item.value,
-					headers: item.allValue
+					headers: [...item.allValue]
 				});
 			}
 
 			newColOptions.push({
 				...item,
 				_key: getHash(),
-				defaultValue: checkedAll ? item.allValue : []
+				defaultValue: checkedAll ? [...item.allValue] : []
 			});
 		});
 
-		setColOptions(newColOptions);
-		dispatch({ type: 'setCol', data: formCol || [] });
 		setIndeterminate(false);
-		setCheckAll(e.target.checked);
-		set();
+		setCheckAll(checkedAll);
+		setColOptions(newColOptions);
+		dispatch({ type: 'setCol', data: formCol || [], isAll: true });
+		// set();
 	};
 
 	const onChange = (tableName: string, list: CheckboxValueType[]) => {
@@ -488,10 +504,10 @@ export default () => {
 			(item) => item.allValue.length !== item.defaultValue.length
 		);
 
-		dispatch({ type: 'setCol', data: formData.col });
+		dispatch({ type: 'setCol', data: formData.col, isAll: !isIndeter });
 		setIndeterminate(isIndeter);
 		setCheckAll(!isIndeter);
-		set();
+		// set();
 	};
 
 	return (
@@ -535,7 +551,9 @@ export default () => {
 						<div>
 							<Checkbox
 								indeterminate={indeterminate}
-								onChange={onCheckAllChange}
+								onChange={(e) => {
+									onCheckAllChange(e.target.checked);
+								}}
 								checked={checkAll}
 							>
 								全选
