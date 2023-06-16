@@ -63,9 +63,9 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 		item: {
 			key: string;
 			title: string;
+			description: string;
 		},
-		tableRealName: string,
-		tableCnName: string
+		tableRealName: string
 	) => {
 		if (
 			!dataList.some((res) => {
@@ -77,7 +77,8 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 				{
 					title: item.title,
 					key: item.key,
-					tableName: tableRealName
+					tableName: tableRealName,
+					description: item.description
 				}
 			]);
 		}
@@ -105,7 +106,7 @@ const SortInput: FC<SortProps> = ({ option = [], value, onChange, label }) => {
 								{dataList.map((item, index) => {
 									return (
 										<div className={classes.label} key={item.key}>
-											{item.title}
+											{item.description}
 											<DelIcon
 												onClick={() => {
 													const newData = JSON.parse(JSON.stringify(dataList));
