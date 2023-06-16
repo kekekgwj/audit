@@ -70,9 +70,9 @@ const SortInput: FC<SortProps> = ({
 		item: {
 			key: string;
 			title: string;
+			description: string;
 		},
-		tableRealName: string,
-		tableCnName: string
+		tableRealName: string
 	) => {
 		const curDataList = dataList || [];
 		if (
@@ -85,7 +85,8 @@ const SortInput: FC<SortProps> = ({
 				{
 					title: item.title,
 					key: item.key,
-					tableName: tableRealName
+					tableName: tableRealName,
+					description: item.description
 				}
 			]);
 		}
@@ -102,10 +103,9 @@ const SortInput: FC<SortProps> = ({
 	return (
 		<Collapse
 			collapsible="icon"
-			activeKey={'1'}
 			className={classes.wrapBoxCollapse}
 			ghost
-			expandIcon={() => <div></div>}
+			expandIcon={() => <div className={classes.expandIcon}></div>}
 		>
 			<Panel
 				header={
@@ -113,7 +113,7 @@ const SortInput: FC<SortProps> = ({
 						<div className={classes.inputLabel}>{label}</div>
 						<div className={classes.rightInput}>
 							<div className={classes.left}>
-								{dataList &&
+								{dataList && dataList.length > 0 ? (
 									dataList.map((item, index) => {
 										return (
 											<div className={classes.label} key={item.key}>
@@ -130,7 +130,10 @@ const SortInput: FC<SortProps> = ({
 												></DelIcon>
 											</div>
 										);
-									})}
+									})
+								) : (
+									<div className={classes.tip}>请选择</div>
+								)}
 							</div>
 						</div>
 					</div>
@@ -185,6 +188,7 @@ interface ICondition {
 	title: string;
 	key: string;
 	tableName: string;
+	description: string;
 }
 interface IFormValue {
 	column: ICondition[];

@@ -272,6 +272,7 @@ export interface IImageShapes {
 	label: string;
 	image: string;
 	activeImage?: string;
+	defaultImage?: string;
 	type: IImageTypes;
 	labelCn?: string;
 }
@@ -293,36 +294,46 @@ const {
 	FILTERACTIVE,
 	ENDACTIVE,
 	GROUPACTIVE,
-	ORDERACTIVE
+	ORDERACTIVE,
+	CONNECTDEFAULT,
+	FILTERDEFAULT,
+	ENDDEFAULT,
+	GROUPDEFAULT,
+	ORDERDEFAULT
 } = ASSETS;
 export const imageShapes: IImageShapes[] = [
 	{
 		label: '连接',
 		image: CONNECT,
+		defaultImage: CONNECTDEFAULT,
 		activeImage: CONNECTACTIVE,
 		type: IImageTypes.CONNECT
 	},
 	{
 		label: '筛选',
 		image: FILTER,
+		defaultImage: FILTERDEFAULT,
 		activeImage: FILTERACTIVE,
 		type: IImageTypes.FILTER
 	},
 	{
 		label: '排序',
 		image: ORDER,
+		defaultImage: ORDERDEFAULT,
 		activeImage: ORDERACTIVE,
 		type: IImageTypes.ORDER
 	},
 	{
 		label: '分组',
 		image: GROUP,
+		defaultImage: GROUPDEFAULT,
 		activeImage: GROUPACTIVE,
 		type: IImageTypes.GROUP
 	},
 	{
 		label: '结束',
 		image: END,
+		defaultImage: ENDDEFAULT,
 		activeImage: ENDACTIVE,
 		type: IImageTypes.END
 	}
@@ -383,12 +394,16 @@ export const formatDataSource = (data: any[], head: string[]) => {
 		title: string;
 		dataIndex: string;
 		key: string;
+		ellipsis: boolean;
+		width: number;
 	}
 	const columns: IColumn[] = head.map((item, index) => {
 		return {
 			title: item,
 			dataIndex: item,
-			key: item
+			key: item,
+			ellipsis: true,
+			width: 100
 		};
 	});
 	const columnsName = columns.map((c) => c.dataIndex);
