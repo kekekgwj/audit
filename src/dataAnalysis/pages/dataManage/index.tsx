@@ -124,15 +124,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 				dataSource={data}
 				pagination={false}
 			></Table>
-			<div
-				style={{
-					textAlign: 'center',
-					marginTop: '20px',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between'
-				}}
-			>
+			<div className={styles['pagination-box']}>
 				<div>
 					<span style={{ marginRight: '10px' }}>共{total}条记录</span>
 					<span>
@@ -177,7 +169,7 @@ const DataManageCom = () => {
 		const searchData = {
 			tableName: searchFormData.tableName || '',
 			createdBeginTime: '',
-			createdEndTime: '',
+			createdEndTime: ''
 		};
 		if (searchFormData.gmtCreated && searchFormData.gmtCreated.length > 0) {
 			searchData.createdBeginTime =
