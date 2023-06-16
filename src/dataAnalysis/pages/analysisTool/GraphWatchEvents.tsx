@@ -21,8 +21,8 @@ const GraphWatchEvents = () => {
 		nodes.forEach((node) => {
 			const custom = node.store.data.attrs.custom;
 			if (custom.type === IImageTypes.TABLE) {
-				node.attr('body/stroke', '#18181F');
-				node.attr('label/fill', '#18181F');
+				node.attr('body/stroke', '#ccc');
+				node.attr('label/fill', '#767676');
 			} else {
 				const defaultImage = custom.defaultImage;
 				node.attr('img/xlink:href', defaultImage);
