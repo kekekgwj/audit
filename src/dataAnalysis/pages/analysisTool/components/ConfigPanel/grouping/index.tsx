@@ -12,7 +12,7 @@ const { Option } = Select;
 interface SortProps {
 	option?: List[];
 	value?: ICondition[];
-	onChange?: (value: string[]) => void;
+	onChange?: (value: ICondition[]) => void;
 	label: string;
 	isMulti?: boolean;
 }
@@ -63,7 +63,8 @@ const SortInput: FC<SortProps> = ({
 	label,
 	isMulti = false
 }) => {
-	const [dataList, setDataList] = useState<ICondition[]>(value || []);
+	// 设置为undefined， 避免useEffect中空值重置保存的config value
+	const [dataList, setDataList] = useState<ICondition[] | undefined>(value);
 
 	const setData = (
 		item: {
@@ -73,13 +74,14 @@ const SortInput: FC<SortProps> = ({
 		tableRealName: string,
 		tableCnName: string
 	) => {
+		const curDataList = dataList || [];
 		if (
-			!dataList.some((res) => {
+			!curDataList.some((res) => {
 				return res.key == item.key;
 			})
 		) {
 			setDataList([
-				...dataList,
+				...curDataList,
 				{
 					title: item.title,
 					key: item.key,
@@ -91,6 +93,9 @@ const SortInput: FC<SortProps> = ({
 
 	//监听dataList改变触发onChange
 	useEffect(() => {
+		// !避免回显错误
+		if (!dataList) return;
+		// !
 		onChange?.(dataList);
 	}, [dataList]);
 
@@ -108,21 +113,24 @@ const SortInput: FC<SortProps> = ({
 						<div className={classes.inputLabel}>{label}</div>
 						<div className={classes.rightInput}>
 							<div className={classes.left}>
-								{dataList.map((item, index) => {
-									return (
-										<div className={classes.label} key={item.key}>
-											{item.title}
-											<DelIcon
-												onClick={() => {
-													const newData = JSON.parse(JSON.stringify(dataList));
-													newData.splice(index, 1);
-													setDataList(newData);
-												}}
-												className={classes.delIcon}
-											></DelIcon>
-										</div>
-									);
-								})}
+								{dataList &&
+									dataList.map((item, index) => {
+										return (
+											<div className={classes.label} key={item.key}>
+												{item.title}
+												<DelIcon
+													onClick={() => {
+														const newData = JSON.parse(
+															JSON.stringify(dataList)
+														);
+														newData.splice(index, 1);
+														setDataList(newData);
+													}}
+													className={classes.delIcon}
+												></DelIcon>
+											</div>
+										);
+									})}
 							</div>
 						</div>
 					</div>
@@ -155,7 +163,7 @@ const SortInput: FC<SortProps> = ({
 												if (isMulti) {
 													setData(items, tableRealName, tableName);
 												} else {
-													if (dataList.length == 0) {
+													if (dataList && dataList.length == 0) {
 														setData(items, tableRealName, tableName);
 													}
 												}
@@ -193,9 +201,7 @@ const Grouping: FC = () => {
 		initValue = {},
 		config
 	} = useConfigContextValue();
-	useEffect(() => {
-		console.log(initValue);
-	}, [initValue]);
+
 	const getConfig = () => {
 		setGroupData(transData(config));
 		setAccordData(transData(config));
@@ -235,6 +241,7 @@ const Grouping: FC = () => {
 		if (!id || !setValue) {
 			return;
 		}
+
 		setValue(value);
 	};
 	const onReset = () => {
@@ -252,9 +259,9 @@ const Grouping: FC = () => {
 				handleOnChange(value);
 			}}
 			initialValues={{
-				conditions: initValue.conditions || [],
+				conditions: initValue.conditions,
 				funcType: initValue.funcType,
-				column: initValue.column || []
+				column: initValue.column
 			}}
 		>
 			<div className={classes.formList}>

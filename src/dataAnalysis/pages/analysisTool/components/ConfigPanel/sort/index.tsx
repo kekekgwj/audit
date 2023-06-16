@@ -223,6 +223,7 @@ const Sort: FC = () => {
 	const [option, setOption] = useState<List[]>();
 	useEffect(() => {
 		const initSortingValue: ISortInitValue[] = initValue.sorting;
+
 		const initConfig: IFormatInitValue = {};
 
 		if (initSortingValue) {
@@ -233,7 +234,6 @@ const Sort: FC = () => {
 				};
 			});
 		}
-		console.log('initConfig', initSortingValue, initConfig);
 		const formatData = transData(config, initConfig);
 
 		setOption(formatData);
@@ -276,7 +276,6 @@ const Sort: FC = () => {
 				list: list
 			};
 		});
-		console.log('formatdata', formatData, initConfig);
 		return formatData;
 	};
 
