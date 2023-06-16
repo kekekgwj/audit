@@ -149,6 +149,12 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 				<Collapse
 					className={classes.boxCollapse}
 					ghost
+					defaultActiveKey={
+						optionList &&
+						optionList.map((res, index) => {
+							return index + 1;
+						})
+					}
 					expandIcon={({ isActive }) => (
 						<HeartIcon
 							style={{
