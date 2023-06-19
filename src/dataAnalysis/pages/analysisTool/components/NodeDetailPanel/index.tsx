@@ -97,6 +97,9 @@ const Panel: React.FC = () => {
 
 	const [showConfig, setShowConfig] = useState(true);
 
+	// 是否配置为空
+	const [isEmptyConfig, setIsEmptyConfig] = useState(true);
+
 	const { curSelectedNode: id, showPanel = false, time } = state || {};
 
 	const executeType = [IImageTypes.TABLE, IImageTypes.END];
@@ -136,6 +139,11 @@ const Panel: React.FC = () => {
 			};
 			setTableLoading(true);
 			const config: any = await getCanvasConfig(params);
+			if (!config || config.length < 1) {
+				setIsEmptyConfig(true);
+			} else {
+				setIsEmptyConfig(false);
+			}
 			setTableLoading(false);
 			setNodeConfig(config);
 			const tableNames = config.map((item) => item.tableName);
@@ -380,7 +388,11 @@ const Panel: React.FC = () => {
 										executeByNodeConfig
 									}}
 								>
-									<ConfigPanel key={getNodeKey()} />
+									{!isEmptyConfig ? (
+										<ConfigPanel key={getNodeKey()} />
+									) : (
+										<div className={classes.emptyConfig}>缺少数据表配置</div>
+									)}
 								</ConfigContext.Provider>
 							</div>
 						) : null}

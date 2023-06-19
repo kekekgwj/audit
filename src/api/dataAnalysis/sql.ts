@@ -153,7 +153,8 @@ export function exportBySql(sql: string, fileName: string) {
 			method: 'post',
 			body: JSON.stringify({ sql }),
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				'Blade-Auth': `${localStorage.getItem('token')}`
 			}
 		}),
 		fileName

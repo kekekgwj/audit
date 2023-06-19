@@ -8,6 +8,7 @@ import { toImgStyle } from '@/utils/other';
 import styles from './index.module.less';
 import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
 import CustomDialog from '@/components/custom-dialog';
+import { useLocation } from 'react-router';
 
 interface SaveProps {
 	open: boolean;
@@ -81,6 +82,14 @@ interface GraphinRef {
 }
 
 const RelationShipCom = () => {
+	const location = useLocation();
+
+	if (location.pathname === '/relationShip') {
+		const searchParams = new URLSearchParams(location.search);
+
+		localStorage.setItem('token', searchParams.get('token') || '');
+	}
+
 	// 数据来源
 	const [data, setDate] = useState<GraphinData>();
 	const [barOpen, setBarOpen] = useState(true);

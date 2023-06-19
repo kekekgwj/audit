@@ -9,7 +9,7 @@ import {
 	Col,
 	Row
 } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import fileImg from '@/assets/img/file.png';
 import styles from './index.module.less';
@@ -25,6 +25,14 @@ import {
 } from '@/api/dataAnalysis/myTemplate';
 
 const MyTemplate = () => {
+	const location = useLocation();
+
+	if (location.pathname === '/sql/dataVisualization/myTemplate') {
+		const searchParams = new URLSearchParams(location.search);
+
+		localStorage.setItem('token', searchParams.get('token') || '');
+	}
+
 	const [templateList, setTemplateList] = React.useState([]);
 	const [curId, setCurId] = React.useState(); //当前炒作数据id
 	const [openDel, setOpenDel] = React.useState(false); // 删除

@@ -251,7 +251,7 @@ const reducer = (state: FormData, action: any) => {
 					_key: getHash(),
 					tableName: '', // 表名
 					tableHeader: '', // 表头
-					operator: '', // 符号
+					operator: '=', // 符号
 					value: '', // 值
 					dataType: ''
 				}
@@ -263,7 +263,7 @@ const reducer = (state: FormData, action: any) => {
 				_key: getHash(),
 				tableName: '', // 表名
 				tableHeader: '', // 表头
-				operator: '', // 符号
+				operator: '=', // 符号
 				value: '', // 值
 				dataType: ''
 			});

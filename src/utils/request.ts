@@ -40,7 +40,12 @@ export async function download(request: RequestInfo, fileName: string) {
 
 export async function get<T>(
 	path: string,
-	args: RequestInit = { method: 'get' }
+	args: RequestInit = {
+		method: 'get',
+		headers: {
+			'Blade-Auth': `${localStorage.getItem('token')}`
+		}
+	}
 ): Promise<T> {
 	return await http<T>(new Request(path, args));
 }
@@ -51,7 +56,8 @@ export async function post<T>(
 		method: 'post',
 		body: JSON.stringify(body),
 		headers: {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			'Blade-Auth': `${localStorage.getItem('token')}`
 		}
 	}
 ): Promise<T> {
@@ -63,7 +69,10 @@ export async function postFormData<T>(
 	formData: any,
 	args: RequestInit = {
 		method: 'post',
-		body: formData
+		body: formData,
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem('token')}`
+		}
 	}
 	// 不设置Content-Type 浏览器自动识别
 ): Promise<T> {

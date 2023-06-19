@@ -117,7 +117,7 @@ const SortInput: FC<SortProps> = ({
 									dataList.map((item, index) => {
 										return (
 											<div className={classes.label} key={item.key}>
-												{item.title}
+												{item.description}
 												<DelIcon
 													onClick={() => {
 														const newData = JSON.parse(
