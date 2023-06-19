@@ -115,7 +115,8 @@ export function exportData(data: IExportData, fileName: string) {
 			method: 'post',
 			body: JSON.stringify({ ...data }),
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('token')}`
 			}
 		}),
 		fileName
