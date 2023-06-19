@@ -336,7 +336,7 @@ const Panel: React.FC = () => {
 						loading={tableLoading}
 						columns={columns}
 						dataSource={data}
-						pagination={{ defaultPageSize: 4 }}
+						pagination={{ defaultPageSize: 10 }}
 					/>
 				</div>
 			</div>
