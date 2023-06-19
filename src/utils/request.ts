@@ -43,7 +43,7 @@ export async function get<T>(
 	args: RequestInit = {
 		method: 'get',
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			'Blade-Auth': `${localStorage.getItem('token')}`
 		}
 	}
 ): Promise<T> {
@@ -57,7 +57,7 @@ export async function post<T>(
 		body: JSON.stringify(body),
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			'Blade-Auth': `${localStorage.getItem('token')}`
 		}
 	}
 ): Promise<T> {
