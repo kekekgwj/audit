@@ -26,7 +26,7 @@ import {
 	getCanvasConfig,
 	getResult
 } from '@/api/dataAnalysis/graph';
-import emptyPage from '@/assets/img/noWhiteData.png';
+import emptyPage from '@/assets/img/empty-data.png';
 import MyTable from '../myTable/';
 
 const { DOWNLOAD } = ASSETS;
