@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react';
-import { Button, Form, Input } from 'antd';
+import { useRef, useState, useEffect } from 'react';
+import { Button, Form, Input, Table, Pagination } from 'antd';
+import type { PaginationProps } from 'antd';
 import SvgIcon from '@/components/svg-icon';
-import DataTable from '@/components/data-table';
+// import DataTable from '@/components/data-table';
 import Show from './components/show';
 
 import { getAuditSqlPage } from '@/api/dataAnalysis/sql';
@@ -20,12 +21,21 @@ export default () => {
 	const [searchForm] = Form.useForm();
 	const [currentRow, setCurrentRow] = useState<DataType>();
 	const [openShow, setOpenShow] = useState(false);
+	// 表数据
+	const [tableData, setTableData] = useState([]);
+	const [current, setCurrent] = useState(1);
+	const [size, setSize] = useState(10);
+	const [total, setTotal] = useState(0);
+
+	useEffect(() => {
+		getData();
+	}, [current, size]);
 
 	const columns = [
 		{
 			title: '序号',
 			width: 100,
-			render: (text, record, index) => index + 1
+			render: (text, record, index) => `${(current - 1) * size + index + 1}`
 		},
 		{
 			title: '审计规则SQL名称',
@@ -69,10 +79,10 @@ export default () => {
 		setOpenShow(false);
 	};
 
-	const getData = async (pageIndex: number, pageSize: number) => {
+	const getData = async () => {
 		const res = await getAuditSqlPage({
-			current: pageIndex,
-			size: pageSize,
+			current: current,
+			size: size,
 			name: searchForm.getFieldsValue().sqlName || ''
 		});
 
@@ -82,23 +92,45 @@ export default () => {
 			useTo: item.effect
 		}));
 
-		return {
-			list,
-			total: res.total
-		};
+		// return {
+		// 	list,
+		// 	total: res.total
+		// };
+		setTableData(list);
+		setTotal(res.total);
 	};
 
-	const tableRefresh = () => {
-		tableRef.current.refresh();
+	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
+		current: number,
+		pageSize: number
+	) => {
+		setSize(pageSize);
+	};
+
+	const onChange: PaginationProps['onChange'] = (pageNumber: number) => {
+		console.log('Page: ', pageNumber);
+		setCurrent(pageNumber);
 	};
 
 	const onReset = () => {
 		searchForm.resetFields();
-		tableRefresh();
+		getData();
 	};
+
 	const search = () => {
-		tableRefresh();
+		setCurrent(1);
+		getData();
 	};
+	// const tableRefresh = () => {
+	// 	tableRef.current.refresh();
+	// };
+	// const onReset = () => {
+	// 	searchForm.resetFields();
+	// 	tableRefresh();
+	// };
+	// const search = () => {
+	// 	tableRefresh();
+	// };
 
 	return (
 		<div style={{ padding: '20px' }}>
@@ -138,7 +170,30 @@ export default () => {
 				</div>
 			</div>
 
-			<DataTable ref={tableRef} columns={columns} getData={getData}></DataTable>
+			{/* <DataTable ref={tableRef} columns={columns} getData={getData}></DataTable> */}
+			<div className={styles['my-table-box']}>
+				<Table
+					className={styles['my-table']}
+					columns={columns}
+					dataSource={tableData}
+					pagination={false}
+				></Table>
+				<div className={styles['pagination-box']}>
+					<div>
+						<span style={{ marginRight: '10px' }}>共{total}条记录</span>
+						<span>
+							第{current}/{Math.ceil(total / size)}页
+						</span>
+					</div>
+					<Pagination
+						total={total}
+						showSizeChanger
+						onShowSizeChange={onShowSizeChange}
+						onChange={onChange}
+						showQuickJumper
+					/>
+				</div>
+			</div>
 
 			<Show
 				open={openShow}

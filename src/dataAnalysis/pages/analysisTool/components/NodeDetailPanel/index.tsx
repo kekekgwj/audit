@@ -5,7 +5,8 @@ import React, {
 	useRef,
 	useState
 } from 'react';
-import { Table, message } from 'antd';
+import { Resizable } from 'react-resizable';
+import { Table, message, ConfigProvider } from 'antd';
 import { useSelector } from 'react-redux';
 import classes from './index.module.less';
 import ConfigPanel from '../ConfigPanel';
@@ -26,6 +27,8 @@ import {
 	getCanvasConfig,
 	getResult
 } from '@/api/dataAnalysis/graph';
+import emptyPage from '@/assets/img/empty-data.png';
+import MyTable from '../myTable/';
 
 const { DOWNLOAD } = ASSETS;
 interface IConfigContext {
@@ -241,6 +244,13 @@ const Panel: React.FC = () => {
 
 	const clickNodeType = getNodeTypeById(graph, id)[0] as IImageTypes;
 	const initValue = getValue();
+	const customizeRenderEmpty = () => (
+		//这里面就是我们自己定义的空状态
+		<div className={classes.emptyTableBox}>
+			<img src={emptyPage} alt="" />
+		</div>
+	);
+
 	return (
 		<div className={classes.container}>
 			<div className={classes.data}>
@@ -261,12 +271,14 @@ const Panel: React.FC = () => {
 				</div>
 
 				<div className={classes.tableWrapper}>
-					<Table
-						loading={tableLoading}
-						columns={columns}
-						dataSource={data}
-						pagination={{ defaultPageSize: 4 }}
-					/>
+					<ConfigProvider renderEmpty={customizeRenderEmpty}>
+						<Table
+							loading={tableLoading}
+							columns={columns}
+							dataSource={data}
+							pagination={{ defaultPageSize: 10 }}
+						/>
+					</ConfigProvider>
 				</div>
 			</div>
 			<div className={classes.rightConfigBox}>
