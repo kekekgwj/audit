@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { routes, CustomRoute } from '@/routers/routes';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
+import { useBaseState } from '@/redux/store';
 
 interface MenuItem {
 	path?: string;
@@ -13,7 +14,7 @@ interface MenuItem {
 	children?: MenuItem[] | undefined;
 }
 
-const initMenu = (routes: CustomRoute[], parentPath = '') => {
+const initMenu = (routes: CustomRoute[], parentPath = '', isAdmin = false) => {
 	const arr: MenuItem[] = [];
 
 	routes.forEach((route: CustomRoute) => {
@@ -26,8 +27,10 @@ const initMenu = (routes: CustomRoute[], parentPath = '') => {
 			title: route?.meta?.title,
 			icon: route?.meta?.icon,
 			active: active,
-			hidden: route?.meta?.hidden,
-			children: route?.children && initMenu(route.children, active)
+			hidden:
+				route?.meta?.hidden ||
+				(!isAdmin && route?.meta?.rules?.includes('admin')),
+			children: route?.children && initMenu(route.children, active, isAdmin)
 		});
 	});
 
@@ -51,10 +54,13 @@ const findMenu = (menus: MenuItem[], path: string): false | MenuItem => {
 };
 
 export default () => {
+	const state = useBaseState();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const [activeMenu, setActiveMenu] = useState<MenuItem>();
-	const [menu] = useState<MenuItem[]>(initMenu(routes));
+	const [menu] = useState<MenuItem[]>(
+		initMenu(routes, undefined, state.isAdmin)
+	);
 
 	useEffect(() => {
 		const menuItem = findMenu(menu, location.pathname);

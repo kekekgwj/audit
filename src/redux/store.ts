@@ -13,7 +13,7 @@ import {
 	toDoubleClickNode
 } from './reducers/dataAnalysis';
 import { IStoreGraph } from './reducers/knowLedgeGraphSlice';
-import { IBaseState } from './reducers/base';
+import { IBaseState, saveIsAdmin } from './reducers/base';
 import { useSelector } from 'react-redux';
 import {
 	IFocusCenter,
@@ -63,4 +63,8 @@ export const onSetSelectID = ({
 	selectID: string | null;
 }) => {
 	dispatch(toSetSelectID({ selectID }));
+};
+
+export const changeIsAdmin = (isAdmin: false) => {
+	dispatch(saveIsAdmin({ isAdmin }));
 };
