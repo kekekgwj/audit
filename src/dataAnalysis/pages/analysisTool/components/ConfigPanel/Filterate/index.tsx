@@ -235,68 +235,70 @@ const Row = (props: RowProps) => {
 	);
 };
 
-const reducer = (state: FormData, action: any) => {
-	switch (action.type) {
-		case 'setRowData':
-			state.row[action.groupIndex][action.rowIndex] = action.data;
-			state.isFirst = false;
-			break;
-		case 'delGroup':
-			state.row.splice(action.groupIndex, 1);
-			state.isFirst = false;
-			break;
-		case 'addGroup':
-			state.row.push([
-				{
-					_key: getHash(),
-					tableName: '', // 表名
-					tableHeader: '', // 表头
-					operator: '', // 符号
-					value: '', // 值
-					dataType: ''
-				}
-			]);
-			state.isFirst = false;
-			break;
-		case 'addRow':
-			state.row[action.groupIndex].splice(action.rowIndex + 1, 0, {
-				_key: getHash(),
-				tableName: '', // 表名
-				tableHeader: '', // 表头
-				operator: '', // 符号
-				value: '', // 值
-				dataType: ''
-			});
-			state.isFirst = false;
-			break;
-		case 'delRow':
-			state.row[action.groupIndex].splice(action.rowIndex, 1);
-			state.isFirst = false;
-			break;
-
-		case 'setCol':
-			state.col = action.data;
-			state.isFirst = false;
-			state.isAll = action.isAll || false;
-			break;
-		case 'reset':
-			state = {
-				row: [],
-				col: [],
-				isFirst: true,
-				isAll: true
-			};
-			break;
-		default:
-			break;
-	}
-
-	return { ...state };
-};
-
 export default () => {
 	const { id, setValue, resetValue, executeByNodeConfig, config, initValue } =
 		useConfigContextValue();
+	const reducer = (state: FormData, action: any) => {
+		switch (action.type) {
+			case 'setRowData':
+				state.row[action.groupIndex][action.rowIndex] = action.data;
+				state.isFirst = false;
+				break;
+			case 'delGroup':
+				state.row.splice(action.groupIndex, 1);
+				state.isFirst = false;
+				break;
+			case 'addGroup':
+				state.row.push([
+					{
+						_key: getHash(),
+						tableName: '', // 表名
+						tableHeader: '', // 表头
+						operator: '=', // 符号
+						value: '', // 值
+						dataType: ''
+					}
+				]);
+				state.isFirst = false;
+				break;
+			case 'addRow':
+				state.row[action.groupIndex].splice(action.rowIndex + 1, 0, {
+					_key: getHash(),
+					tableName: '', // 表名
+					tableHeader: '', // 表头
+					operator: '=', // 符号
+					value: '', // 值
+					dataType: ''
+				});
+				state.isFirst = false;
+				break;
+			case 'delRow':
+				state.row[action.groupIndex].splice(action.rowIndex, 1);
+				state.isFirst = false;
+				break;
+
+			case 'setCol':
+				state.col = action.data;
+				state.isFirst = false;
+				state.isAll = action.isAll || false;
+				break;
+			case 'reset':
+				state = {
+					row: [],
+					col: [],
+					isFirst: true,
+					isAll: true
+				};
+				break;
+			default:
+				break;
+		}
+
+		setValue({ ...state });
+
+		return { ...state };
+	};
+
 	let initData = initValue;
 	if (isEmpty(initValue)) {
 		initData = cloneDeep(data);
@@ -315,9 +317,9 @@ export default () => {
 		setColOptions(formatColData(config));
 	}, []);
 
-	useEffect(() => {
-		set();
-	}, [formData]);
+	// useEffect(() => {
+	// 	set();
+	// }, [formData]);
 
 	// 处理列数据
 	const formatColData = (data: any) => {
@@ -402,13 +404,13 @@ export default () => {
 		executeByNodeConfig();
 	};
 
-	const set = () => {
-		if (!id || !setValue) {
-			return;
-		}
+	// const set = () => {
+	// 	if (!id || !setValue) {
+	// 		return;
+	// 	}
 
-		setValue(formData);
-	};
+	// 	setValue(formData);
+	// };
 
 	// 重置
 	const reset = () => {
@@ -437,6 +439,7 @@ export default () => {
 	// 删除组
 	const delGroup = (groupIndex: number) => {
 		dispatch({ type: 'delGroup', groupIndex });
+		// set();
 	};
 
 	// 增加组

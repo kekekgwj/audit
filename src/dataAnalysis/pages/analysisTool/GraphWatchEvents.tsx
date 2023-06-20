@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGraphContext } from './lib/hooks';
 import { onClickGraphNode } from '@/redux/store';
 import { debounce } from 'debounce';
@@ -20,6 +20,7 @@ const GraphWatchEvents = () => {
 
 		nodes.forEach((node) => {
 			const custom = node.store.data.attrs.custom;
+			custom.isSelected = false;
 			if (custom.type === IImageTypes.TABLE) {
 				node.attr('body/stroke', '#ccc');
 				node.attr('label/fill', '#767676');
@@ -38,6 +39,7 @@ const GraphWatchEvents = () => {
 		graph.on('node:click', ({ node }) => {
 			resetGraph();
 			const custom = node.store.data.attrs.custom;
+			custom.isSelected = true;
 			if (custom.type === IImageTypes.TABLE) {
 				node.attr('body/stroke', '#24a36f');
 				node.attr('label/fill', '#24a36f');
@@ -90,7 +92,12 @@ const GraphWatchEvents = () => {
 			}, 200)
 		);
 		graph.on('cell:added', () => syncGraph());
-		graph.on('cell:removed', () => syncGraph());
+		graph.on('cell:removed', ({ cell, index, options }) => {
+			const custom = cell.store.data.attrs.custom;
+			if (custom && custom.isSelected) {
+				syncGraph();
+			}
+		});
 
 		return () => {
 			graph.off('node:click');

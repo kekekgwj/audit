@@ -56,8 +56,10 @@ const layout = {
 	labelAlign: 'left'
 };
 
-const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
+const SortInput: FC<SortProps> = ({ value, onChange, option, initSort }) => {
 	const [optionList, setOptionList] = useState<List[]>(option);
+
+	const [showOption, setShowOption] = useState<List[]>(initSort || []);
 
 	//通过传入的状态值和下标修改dataList的排序状态
 	const setSortStatus = (
@@ -69,28 +71,43 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 		newDataList[index].list[childrenIndex].isUp = data.isUp;
 		newDataList[index].list[childrenIndex].isDown = data.isDown;
 
+		const current = newDataList[index].list[childrenIndex];
+
+		const showOptionIndex = showOption.findIndex(
+			(item) => item.title === current.title
+		);
+
+		if (showOptionIndex !== -1) {
+			if (current.isUp | current.isDown) {
+				showOption[showOptionIndex] = {
+					...current,
+					tableName: newDataList[index].tableName,
+					parentIndex: index,
+					childrenIndex: childrenIndex
+				};
+			} else {
+				showOption.splice(showOptionIndex, 1);
+			}
+		} else {
+			if (current.isUp | current.isDown) {
+				showOption.push({
+					...current,
+					tableName: newDataList[index].tableName,
+					parentIndex: index,
+					childrenIndex: childrenIndex
+				});
+			}
+		}
+
+		setShowOption([...showOption]);
 		setOptionList(newDataList);
 	};
-	const transSubmitData = (rawData: List[]): ISortInitValue[] => {
-		const formatData: ISortInitValue[] = [];
-		rawData.forEach(({ list, tableName }) => {
-			list.forEach((item) => {
-				formatData.push({
-					description: item.description,
-					tableName: tableName,
-					title: item.title,
-					isDown: item.isDown,
-					isUp: item.isUp
-				});
-			});
-		});
-		return formatData;
-	};
+
 	//监听optionList改变触发onChange
 	useEffect(() => {
-		if (!optionList) return;
-		onChange?.(transSubmitData(optionList));
-	}, [optionList]);
+		if (!showOption.length) return;
+		onChange?.(showOption);
+	}, [showOption]);
 	return (
 		<Collapse
 			collapsible="icon"
@@ -103,42 +120,34 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 					<div className={classes.inputWrap}>
 						<div>排序</div>
 						<div className={classes.rightInput}>
-							{optionList &&
-							optionList.every((res) => {
-								return res.list.every((ress) => {
-									return !ress.isDown && !ress.isUp;
-								});
-							}) ? (
+							{showOption.length === 0 ? (
 								<div className={classes.defaultTxt}>请选择</div>
 							) : (
 								<div className={classes.left}>
-									{optionList &&
-										optionList.map((item, index) => {
-											return item.list.map((items, childrenIndex) => {
-												return (
-													(items.isUp || items.isDown) && (
-														<div className={classes.label} key={items.title}>
-															{/* {items.title} */}
-															{items.description}
-															<div style={{ marginLeft: '6px' }}>
-																{items.isUp && <UpIcon />}
-																{items.isDown && <Downicon />}
-															</div>
-															<DelIcon
-																onClick={() => {
-																	setSortStatus(
-																		{ isUp: false, isDown: false },
-																		index,
-																		childrenIndex
-																	);
-																}}
-																className={classes.delIcon}
-															></DelIcon>
-														</div>
-													)
-												);
-											});
-										})}
+									{showOption.map((option) => {
+										return (
+											(option.isUp || option.isDown) && (
+												<div className={classes.label} key={option.title}>
+													{/* {items.title} */}
+													{option.description}
+													<div style={{ marginLeft: '6px' }}>
+														{option.isUp && <UpIcon />}
+														{option.isDown && <Downicon />}
+													</div>
+													<DelIcon
+														onClick={() => {
+															setSortStatus(
+																{ isUp: false, isDown: false },
+																option.parentIndex,
+																option.childrenIndex
+															);
+														}}
+														className={classes.delIcon}
+													></DelIcon>
+												</div>
+											)
+										);
+									})}
 								</div>
 							)}
 						</div>
@@ -149,6 +158,12 @@ const SortInput: FC<SortProps> = ({ value, onChange, option }) => {
 				<Collapse
 					className={classes.boxCollapse}
 					ghost
+					defaultActiveKey={
+						optionList &&
+						optionList.map((res, index) => {
+							return index + 1;
+						})
+					}
 					expandIcon={({ isActive }) => (
 						<HeartIcon
 							style={{
@@ -236,6 +251,7 @@ const Sort: FC = () => {
 				};
 			});
 		}
+
 		const formatData = transData(config, initConfig);
 
 		setOption(formatData);
@@ -308,7 +324,11 @@ const Sort: FC = () => {
 		>
 			<div className={classes.formList}>
 				<Form.Item name="sorting">
-					<SortInput option={option} key={option}></SortInput>
+					<SortInput
+						option={option}
+						initSort={initValue.sorting}
+						key={option}
+					></SortInput>
 				</Form.Item>
 			</div>
 

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import classes from './index.module.less';
-import { Collapse, Input } from 'antd';
+import { Collapse, Input, Tooltip } from 'antd';
 const { Search } = Input;
 const { Panel } = Collapse;
 import { GraphContext } from '../../lib';
@@ -48,9 +48,15 @@ const TableItem: React.FC = ({ data }) => {
 								}
 							>
 								<span className={classes.iconTable}></span>
-								<span className={classes.tableName}>
-									{table.tableCnName ? table.tableCnName : table.tableName}
-								</span>
+								<Tooltip
+									title={
+										table.tableCnName ? table.tableCnName : table.tableName
+									}
+								>
+									<span className={classes.tableName}>
+										{table.tableCnName ? table.tableCnName : table.tableName}
+									</span>
+								</Tooltip>
 							</div>
 						);
 					})

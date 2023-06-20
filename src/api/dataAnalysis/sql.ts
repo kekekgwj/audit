@@ -1,4 +1,5 @@
 import { appendQueryParams, get, post, download } from '@/utils/request';
+import Cookies from 'js-cookie';
 const env = import.meta.env;
 const { VITE_API_PREFIX: API_PREFIX } = env;
 
@@ -153,7 +154,8 @@ export function exportBySql(sql: string, fileName: string) {
 			method: 'post',
 			body: JSON.stringify({ sql }),
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				'Blade-Auth': `${Cookies.get('token')}`
 			}
 		}),
 		fileName

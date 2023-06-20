@@ -5,7 +5,6 @@ import React, {
 	useRef,
 	useState
 } from 'react';
-import { Resizable } from 'react-resizable';
 import { Table, message, ConfigProvider } from 'antd';
 import { useSelector } from 'react-redux';
 import classes from './index.module.less';
@@ -27,7 +26,7 @@ import {
 	getCanvasConfig,
 	getResult
 } from '@/api/dataAnalysis/graph';
-import emptyPage from '@/assets/img/empty-data.png';
+import emptyPage from '@/assets/img/noWhiteData.png';
 import MyTable from '../myTable/';
 
 const { DOWNLOAD } = ASSETS;
