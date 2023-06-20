@@ -145,7 +145,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 		try {
 			const res = await getTablesData({
 				queryType: 3,
-				tableCnName: val,
+				keyword: val,
 				orderBy: 2
 			});
 			const data = {
