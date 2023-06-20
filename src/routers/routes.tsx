@@ -65,13 +65,19 @@ export const routes: CustomRoute[] = [
 	{
 		path: '/sql',
 		component: lazy(() => import('@sql/layout')),
-		meta: { title: '数据分析工具', icon: 'atlas' },
+		meta: {
+			title: '数据分析工具',
+			icon: 'atlas'
+		},
+		redirect: '/sql/dataVisualization/myTemplate',
+
 		children: [
 			{
 				// path: 'analysis',
 				path: 'dataVisualization',
 				component: lazy(() => import('@sql/pages/dataVisualization')),
 				meta: { title: '数据可视化', icon: 'body' },
+
 				children: [
 					{
 						path: 'myTemplate',

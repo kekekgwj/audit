@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface MenuItem {
 	path?: string;
@@ -22,7 +22,6 @@ const SidebarItem = (props: Props) => {
 	const { menu, activeMenu, parentMenu } = props;
 	const [toggle, setToggle] = useState(false);
 	const navigate = useNavigate();
-
 	const handleNavigate = (path: string | undefined) => {
 		if (path) {
 			navigate(path);

@@ -1,12 +1,22 @@
-import { useRef, useState } from 'react';
-import DataTable from '@/components/data-table';
+import { useRef, useState, useEffect } from 'react';
+// import DataTable from '@/components/data-table';
 import Delete from '@/components/delete-dialog';
 import Edit from './components/edit';
 import Show from './components/show';
 import Add from './components/add';
 
 import styles from './index.module.less';
-import { Button, DatePicker, Divider, Form, Input, message } from 'antd';
+import {
+	Button,
+	DatePicker,
+	Divider,
+	Form,
+	Input,
+	message,
+	Table,
+	Pagination
+} from 'antd';
+import type { PaginationProps } from 'antd';
 import SvgIcon from '@/components/svg-icon';
 
 import {
@@ -36,12 +46,16 @@ export default () => {
 	const [openEdit, setOpenEdit] = useState(false);
 	const [openShow, setOpenShow] = useState(false);
 	const [openAdd, setOpenAdd] = useState(false);
-
+	// 表数据
+	const [tableData, setTableData] = useState([]);
+	const [current, setCurrent] = useState(1);
+	const [size, setSize] = useState(10);
+	const [total, setTotal] = useState(0);
 	const columns = [
 		{
 			title: '序号',
 			width: 100,
-			render: (text, record, index) => index + 1
+			render: (text, record, index) => `${(current - 1) * size + index + 1}`
 		},
 		{
 			title: 'SQL名称',
@@ -98,6 +112,10 @@ export default () => {
 		}
 	];
 
+	useEffect(() => {
+		getData();
+	}, [current, size]);
+
 	// 打开新增弹框
 	const handleAdd = () => {
 		setOpenAdd(true);
@@ -115,7 +133,7 @@ export default () => {
 		});
 
 		setOpenAdd(false);
-		tableRefresh();
+		getData();
 	};
 
 	// 取消编辑
@@ -154,7 +172,7 @@ export default () => {
 		});
 
 		setOpenEdit(false);
-		tableRefresh();
+		getData();
 	};
 
 	// 取消编辑
@@ -182,15 +200,16 @@ export default () => {
 			content: '删除成功'
 		});
 		setOpenDel(false);
-		tableRefresh();
+		// tableRefresh();
+		getData();
 	};
 
-	const getData = async (pageIndex: number, pageSize: number) => {
+	const getData = async () => {
 		const query = searchForm.getFieldsValue();
 
 		const res = await getSqlPage({
-			current: pageIndex,
-			size: pageSize,
+			current: current,
+			size: size,
 			name: query.sqlName || '',
 			startTime: query.createdDate
 				? query.createdDate[0].format('YYYY-MM-DD')
@@ -206,23 +225,46 @@ export default () => {
 			gmtModified: item.gmtModified
 		}));
 
-		return {
-			list,
-			total: res.total
-		};
+		// return {
+		// 	list,
+		// 	total: res.total
+		// };
+		setTableData(list);
+		setTotal(res.total);
 	};
 
-	const tableRefresh = () => {
-		tableRef.current.refresh();
+	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
+		current: number,
+		pageSize: number
+	) => {
+		setSize(pageSize);
+	};
+
+	const onChange: PaginationProps['onChange'] = (pageNumber: number) => {
+		setCurrent(pageNumber);
 	};
 
 	const onReset = () => {
 		searchForm.resetFields();
-		tableRefresh();
+		getData();
 	};
+
 	const search = () => {
-		tableRefresh();
+		setCurrent(1);
+		getData();
 	};
+
+	// const tableRefresh = () => {
+	// 	tableRef.current.refresh();
+	// };
+
+	// const onReset = () => {
+	// 	searchForm.resetFields();
+	// 	tableRefresh();
+	// };
+	// const search = () => {
+	// 	tableRefresh();
+	// };
 
 	return (
 		<div className={styles.page} style={{ padding: '20px' }}>
@@ -270,13 +312,35 @@ export default () => {
 				新增SQL
 			</Button>
 
-			<DataTable
+			{/* <DataTable
 				ref={tableRef}
 				columns={columns}
 				getData={getData}
 				className={styles.table}
-			></DataTable>
-
+			></DataTable> */}
+			<div className={styles['my-table-box']}>
+				<Table
+					className={styles['my-table']}
+					columns={columns}
+					dataSource={tableData}
+					pagination={false}
+				></Table>
+				<div className={styles['pagination-box']}>
+					<div>
+						<span style={{ marginRight: '10px' }}>共{total}条记录</span>
+						<span>
+							第{current}/{Math.ceil(total / size)}页
+						</span>
+					</div>
+					<Pagination
+						total={total}
+						showSizeChanger
+						onShowSizeChange={onShowSizeChange}
+						onChange={onChange}
+						showQuickJumper
+					/>
+				</div>
+			</div>
 			{contextHolder}
 
 			<Delete

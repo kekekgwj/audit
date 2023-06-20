@@ -31,7 +31,7 @@ const TableItem: React.FC = ({ data }) => {
 				className={classes.itemTitle}
 				key="panel"
 			>
-				{data.tables &&
+				{data.tables && data.tables.length ? (
 					data.tables.map((table, index) => {
 						return (
 							<div
@@ -59,7 +59,33 @@ const TableItem: React.FC = ({ data }) => {
 								</Tooltip>
 							</div>
 						);
-					})}
+					})
+				) : (
+					<div className={classes.textWrapper}>暂无数据</div>
+				)}
+				{/* {data.tables &&
+					data.tables.map((table, index) => {
+						return (
+							<div
+								className={classes.textWrapper}
+								key={index}
+								onMouseDown={(e) =>
+									startDrag &&
+									startDrag(e, {
+										label: table.tableName || '',
+										labelCn: table.tableCnName || '',
+										image: TABLE,
+										type: IImageTypes.TABLE
+									})
+								}
+							>
+								<span className={classes.iconTable}></span>
+								<span className={classes.tableName}>
+									{table.tableCnName ? table.tableCnName : table.tableName}
+								</span>
+							</div>
+						);
+					})} */}
 			</Panel>
 		</Collapse>
 	);
@@ -119,7 +145,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 		try {
 			const res = await getTablesData({
 				queryType: 3,
-				tableCnName: val,
+				keyword: val,
 				orderBy: 2
 			});
 			const data = {

@@ -66,6 +66,7 @@ export default () => {
 	const [activeMenu, setActiveMenu] = useState<MenuItem>();
 	const [parentMenu, setParentMenu] = useState<MenuItem | undefined | null>();
 	const [menus] = useState<MenuItem[]>(initMenu(routes));
+	const [defaultOpen, setDefaultOpen] = useState(false);
 
 	useEffect(() => {
 		const res = findMenu(menus, location.pathname, null);
@@ -73,6 +74,7 @@ export default () => {
 			const { parent, active } = res;
 			setActiveMenu(active);
 			setParentMenu(parent);
+			console.log(active, parent, 77777);
 		}
 	}, [location]);
 
@@ -82,6 +84,8 @@ export default () => {
 	// 	}
 	// };
 	const menu = menus[1];
+
+	console.log(menu, 868686);
 
 	return (
 		<div>
@@ -97,6 +101,7 @@ export default () => {
 			<div className="menu-list">
 				{menu.children?.map((m) => (
 					<SidebarItem
+						defaultOpen={defaultOpen}
 						key={m.path}
 						menu={m}
 						parentMenu={parentMenu}

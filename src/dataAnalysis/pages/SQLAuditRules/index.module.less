@@ -27,3 +27,32 @@
 		}
 	}
 }
+.my-table-box {
+	.my-table {
+		max-height: calc(100vh - 300px);
+		overflow-y: auto;
+	}
+	:global {
+		.ant-pagination .ant-pagination-item {
+			border: 1px solid #d9d9d9;
+		}
+		.ant-pagination .ant-pagination-item-active {
+			background: #24a36f;
+			border: none;
+			a {
+				color: #fff;
+			}
+		}
+	}
+	.pagination-box {
+		position: absolute;
+		bottom: 24px;
+		width: 100%;
+		text-align: center;
+		margin-top: 20px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-right: 45px;
+	}
+}
