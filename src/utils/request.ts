@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import Cookies from 'js-cookie';
 
 // http request
 export async function http<T>(request: RequestInfo): Promise<T> {
@@ -43,7 +44,7 @@ export async function get<T>(
 	args: RequestInit = {
 		method: 'get',
 		headers: {
-			'Blade-Auth': `${localStorage.getItem('token')}`
+			'Blade-Auth': `${Cookies.get('token')}`
 		}
 	}
 ): Promise<T> {
@@ -57,7 +58,7 @@ export async function post<T>(
 		body: JSON.stringify(body),
 		headers: {
 			'Content-Type': 'application/json',
-			'Blade-Auth': `${localStorage.getItem('token')}`
+			'Blade-Auth': `${Cookies.get('token')}`
 		}
 	}
 ): Promise<T> {
@@ -71,7 +72,7 @@ export async function postFormData<T>(
 		method: 'post',
 		body: formData,
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			'Blade-Auth': `${Cookies.get('token')}`
 		}
 	}
 	// 不设置Content-Type 浏览器自动识别

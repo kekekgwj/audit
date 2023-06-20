@@ -1,4 +1,5 @@
 import { appendQueryParams, get, post, download } from '@/utils/request';
+import Cookies from 'js-cookie';
 import { Interface } from 'readline';
 import { string } from 'prop-types';
 const env = import.meta.env;
@@ -116,7 +117,7 @@ export function exportData(data: IExportData, fileName: string) {
 			body: JSON.stringify({ ...data }),
 			headers: {
 				'Content-Type': 'application/json',
-				'Blade-Auth': `${localStorage.getItem('token')}`
+				'Blade-Auth': `${Cookies.get('token')}`
 			}
 		}),
 		fileName
