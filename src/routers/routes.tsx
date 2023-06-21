@@ -24,7 +24,7 @@ export const routes: CustomRoute[] = [
 			{
 				path: 'relationShip',
 				component: lazy(() => import('@graph/pages/relationShip')),
-				meta: { title: '主体查询', icon: 'body' }
+				meta: { title: '图谱查询', icon: 'body' }
 			},
 			{
 				path: 'algorithmMining',

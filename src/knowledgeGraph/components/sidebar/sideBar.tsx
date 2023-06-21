@@ -74,6 +74,13 @@ export default (props: Props) => {
 		setFilterNAlgorithDisable(true);
 	}, [bodys]);
 	useEffect(() => {
+		if (bodys?.length > 1) {
+			form.setFieldValue('level', null);
+		} else {
+			form.setFieldValue('level', 1);
+		}
+	}, [bodys?.length]);
+	useEffect(() => {
 		getBodyTypeOptions();
 		initForm();
 	}, []);
@@ -177,7 +184,7 @@ export default (props: Props) => {
 		try {
 			const data = await getGraph({
 				algorithmName,
-				depth: level,
+				depth: level || -1, //多主体时传-1
 				nodeFilter: bodyFilter,
 				nodes,
 				paths: pathFilter
@@ -280,7 +287,7 @@ export default (props: Props) => {
 						<div className="main-filter">
 							<div className={styles['filter-item']}>
 								<SvgIcon name="filter"></SvgIcon>
-								<span>主体筛选</span>
+								<span>主体查询</span>
 							</div>
 							<Form.List name={FormItems.bodys}>
 								{(fields, { add, remove }) => (
@@ -388,17 +395,28 @@ export default (props: Props) => {
 						</div>
 
 						<div>
-							<div className={styles['filter-item']}>
+							<div
+								className={`${styles['filter-item']} ${
+									bodys?.length > 1 ? styles['filter-item-disable'] : ''
+								}`}
+							>
 								<SvgIcon name="filter"></SvgIcon>
 								<span>关系层级</span>
 							</div>
 							<Form.Item
 								name={FormItems.level}
-								label="展示层级"
+								label="查询层级"
 								initialValue={1}
-								className={styles['filter-form-item']}
+								// className={styles['filter-form-item']}
+								className={`${styles['filter-form-item']} ${
+									bodys?.length > 1 ? styles['filter-label-disable'] : ''
+								}`}
 							>
-								<InputNumber min={1} max={2} />
+								<InputNumber
+									min={1}
+									max={2}
+									disabled={bodys?.length > 1 ? true : false}
+								/>
 							</Form.Item>
 						</div>
 
