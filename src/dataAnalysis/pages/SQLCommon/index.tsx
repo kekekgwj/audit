@@ -333,6 +333,7 @@ export default () => {
 						</span>
 					</div>
 					<Pagination
+						current={current}
 						total={total}
 						showSizeChanger
 						onShowSizeChange={onShowSizeChange}

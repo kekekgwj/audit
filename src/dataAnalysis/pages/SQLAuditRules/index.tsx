@@ -38,13 +38,20 @@ export default () => {
 			render: (text, record, index) => `${(current - 1) * size + index + 1}`
 		},
 		{
+			title: '审计规则SQL编码',
+			width: 200,
+			dataIndex: 'code'
+		},
+		{
 			title: '审计规则SQL名称',
-			width: 300,
+			width: 200,
 			dataIndex: 'sqlName'
 		},
 		{
-			title: '规则用途',
-			dataIndex: 'useTo'
+			title: '规则描述',
+			dataIndex: 'useTo',
+			width: 300,
+			ellipsis: true
 		},
 		{
 			title: '操作',
@@ -89,7 +96,8 @@ export default () => {
 		const list: DataType[] = res.records.map((item) => ({
 			key: item.id,
 			sqlName: item.name,
-			useTo: item.effect
+			useTo: item.effect,
+			code: item.code
 		}));
 
 		// return {
@@ -186,6 +194,7 @@ export default () => {
 						</span>
 					</div>
 					<Pagination
+						current={current}
 						total={total}
 						showSizeChanger
 						onShowSizeChange={onShowSizeChange}

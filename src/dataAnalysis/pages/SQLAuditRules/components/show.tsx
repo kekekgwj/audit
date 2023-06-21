@@ -27,7 +27,8 @@ export default (props: Props) => {
 		form.setFieldsValue({
 			sqlName: res.name,
 			sqlContent: res.sql,
-			useTo: res.effect
+			useTo: res.effect,
+			code: res.code
 		});
 	};
 
@@ -42,13 +43,16 @@ export default (props: Props) => {
 				onCancel={cancel}
 			>
 				<Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+					<Form.Item name="code" label="SQL编码">
+						<Input placeholder="请输入" disabled />
+					</Form.Item>
 					<Form.Item name="sqlName" label="SQL名称">
 						<Input placeholder="请输入" disabled />
 					</Form.Item>
 					<Form.Item name="sqlContent" label="SQL内容">
 						<TextArea rows={4} placeholder="请输入" disabled />
 					</Form.Item>
-					<Form.Item name="useTo" label="规则用途">
+					<Form.Item name="useTo" label="规则描述">
 						<TextArea rows={4} placeholder="请输入" disabled />
 					</Form.Item>
 				</Form>
