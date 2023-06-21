@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { CustomRoute, routes } from './routes';
-import React from 'react';
 import BeforeEnter from './beforeEnter';
 
 const Loading = () => {

@@ -5,6 +5,7 @@ type Meta = {
 	icon?: string;
 	hidden?: boolean; // 是否不在菜单中显示
 	active?: string; // 在菜单中显示时，路由聚焦状态判定值， 例子： active: '/test', 当前路由为/test时，该菜单处于选中状态
+	rules?: Array<string>; // 权限
 };
 
 export type CustomRoute = {
@@ -52,7 +53,7 @@ export const routes: CustomRoute[] = [
 			{
 				path: 'whiteList',
 				component: lazy(() => import('@graph/pages/whiteList')),
-				meta: { title: '白名单', icon: 'white' }
+				meta: { title: '白名单', icon: 'white', rules: ['admin'] }
 			},
 			{
 				path: 'myAtlas',
