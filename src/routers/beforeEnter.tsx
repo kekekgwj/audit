@@ -1,8 +1,9 @@
+import Cookies from 'js-cookie';
 import { toSaveUser } from '@/redux/reducers/base';
 import { useBaseState } from '@/redux/store';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getIsAdmin } from '@/api/common';
+import { getIsAdmin, refreshToken } from '@/api/common';
 
 import { changeIsAdmin } from '@/redux/store';
 
@@ -12,11 +13,26 @@ function BeforeEnter({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		getisAdmin();
+
+		// refreshtoken();
+
+		// setInterval(() => {
+
+		// }, 30 * 60 * 1000);
 	}, []);
 
 	const getisAdmin = async () => {
 		const res = await getIsAdmin();
 		changeIsAdmin(res);
+	};
+
+	const refreshtoken = async () => {
+		const res = await refreshToken({
+			tenantId: '000000',
+			refresh_token: Cookies.get('token')
+		});
+
+		console.log(res, 'iiiiii');
 	};
 
 	if (!state.token) {
