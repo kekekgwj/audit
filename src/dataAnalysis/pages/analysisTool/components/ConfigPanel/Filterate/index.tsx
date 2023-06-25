@@ -12,6 +12,7 @@ import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { useConfigContextValue } from '../../NodeDetailPanel';
+import { useGraphPageInfo } from '../../../lib/hooks';
 
 type RowGroupItme = {
 	_key: string;
@@ -236,6 +237,7 @@ const Row = (props: RowProps) => {
 };
 
 export default () => {
+	const { pathName } = useGraphPageInfo();
 	const { id, setValue, resetValue, executeByNodeConfig, config, initValue } =
 		useConfigContextValue();
 	const reducer = (state: FormData, action: any) => {
@@ -585,6 +587,7 @@ export default () => {
 				</div>
 				<div className={styles.controlRow}>
 					<Button
+						disabled={pathName == '审计模板' ? true : false}
 						style={{ marginRight: '10px' }}
 						className={`${styles.btn} ${styles.reset}`}
 						htmlType="button"
