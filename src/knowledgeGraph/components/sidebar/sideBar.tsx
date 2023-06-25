@@ -50,13 +50,16 @@ interface IFormData {
 	bodys: IBody[];
 	level: number;
 	pathFilter: any;
+	algorithm: any;
+	paths: any;
 }
 export enum FormItems {
 	bodys = 'bodys',
 	bodyFilter = 'bodyFilter',
 	level = 'level',
 	pathFilter = 'pathFilter',
-	algorithm = 'algorithm'
+	algorithm = 'algorithm',
+	paths = 'paths'
 }
 export default (props: Props) => {
 	const { updateData, toggleLayout, canAdd, setdefaultName, curData } = props;
@@ -67,7 +70,7 @@ export default (props: Props) => {
 	const [algorithmOptions, setAlgorithmOptions] = useState(
 		Array<algorithmOption>
 	);
-	const [curPath, setCurPath] = useState([]); //保存当前链路  算法改变需要传入
+
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
 	useEffect(() => {
@@ -157,15 +160,17 @@ export default (props: Props) => {
 
 	// 提交表单 获取数据
 	const searchUpdate = async ({
-		pathFilter = null,
+		// pathFilter = null,
 		algorithmName = ''
 	}: {
-		pathFilter?: IPath[] | null;
+		// pathFilter?: IPath[] | null;
+		// path?: IPath[] | null;
 		algorithmName?: string;
 	} = {}) => {
 		const formData: IFormData = form.getFieldsValue();
+		console.log(formData, 167167167167);
 		// 调用接口 获取筛选数据
-		const { bodyFilter, bodys, level } = formData;
+		const { bodyFilter, bodys, level, algorithm, paths } = formData;
 		//设置主体为默认保存图谱名称
 		setdefaultName(bodys[0].bodyName);
 		const nodes: IFilterNode[] = [];
@@ -183,11 +188,11 @@ export default (props: Props) => {
 		}
 		try {
 			const data = await getGraph({
-				algorithmName,
+				algorithmName: algorithm,
 				depth: level || -1, //多主体时传-1
 				nodeFilter: bodyFilter,
 				nodes,
-				paths: pathFilter
+				paths
 			});
 
 			if (data.limited) {
@@ -220,7 +225,7 @@ export default (props: Props) => {
 
 	// 算法改变
 	const handleAlgorithmChange = (value: string) => {
-		searchUpdate({ algorithmName: value, pathFilter: curPath });
+		// searchUpdate({ algorithmName: value, pathFilter: curPath });
 	};
 
 	// 重置表单
@@ -264,11 +269,14 @@ export default (props: Props) => {
 	};
 
 	const handleChangeBodyType = (key: any, e: any) => {
+		console.log(key, e, 2727272);
 		if (!e) {
 			const bodys = form.getFieldValue('bodys');
 			bodys[key].bodyName = '';
 			form.setFieldValue('bodyName', bodys);
 		}
+		// 重置链路
+		form.setFieldValue('paths', null);
 	};
 
 	// 渲染表单
@@ -420,7 +428,7 @@ export default (props: Props) => {
 							</Form.Item>
 						</div>
 
-						<div className={styles['filter-form__btns']}>
+						{/* <div className={styles['filter-form__btns']}>
 							<Button
 								htmlType="button"
 								onClick={onReset}
@@ -431,70 +439,53 @@ export default (props: Props) => {
 							<Button type="primary" htmlType="submit">
 								查询
 							</Button>
-						</div>
+						</div> */}
 						<Divider dashed />
 						<div>
 							<div
 								className={`${styles['filter-item']} ${
-									bodys?.length > 1 || !curData
-										? styles['filter-item-disable']
-										: ''
+									bodys?.length > 1 ? styles['filter-item-disable'] : ''
 								}`}
 							>
 								<SvgIcon name="filter"></SvgIcon>
 								<span>链路筛选</span>
 							</div>
 							<Form.Item
-								name={FormItems.pathFilter}
+								name={FormItems.paths}
 								label="链路筛选"
+								// className={`${
+								// 	bodys?.length > 1 || !curData
+								// 		? styles['filter-label-disable']
+								// 		: ''
+								// }`}
 								className={`${
-									bodys?.length > 1 || !curData
-										? styles['filter-label-disable']
-										: ''
+									bodys?.length > 1 ? styles['filter-label-disable'] : ''
 								}`}
 							>
 								<AttrFillter
 									key={getFilterKey()}
-									canUse={
-										!filterNAlgorithDisable && bodys?.length === 1 && curData
-									}
-									// 用于保存选择的筛选项
-									setCurPath={setCurPath}
+									canUse={bodys?.length === 1}
 									getFormItemValue={getFormItemValue}
 									setFormItemValue={setFormItemValue}
-									updateGraph={(path: IPath[]) =>
-										searchUpdate({ pathFilter: path })
-									}
+									// updateGraph={(path: IPath[]) =>
+									// 	searchUpdate({ pathFilter: path })
+									// }
 								/>
 							</Form.Item>
 						</div>
 						{!canAdd ? (
 							<div>
-								<div
-									className={`${styles['filter-item']} ${
-										!curData || filterNAlgorithDisable
-											? styles['filter-item-disable']
-											: ''
-									}`}
-								>
+								<div className={styles['filter-item']}>
 									<SvgIcon name="filter"></SvgIcon>
 									<span>挖掘算法</span>
 								</div>
-								<Form.Item
-									name={FormItems.algorithm}
-									label="算法"
-									className={`${
-										!curData || filterNAlgorithDisable
-											? styles['filter-label-disable']
-											: ''
-									}`}
-								>
+								<Form.Item name={FormItems.algorithm} label="算法">
 									<Select
 										allowClear
 										style={{ width: '100%' }}
 										placeholder="请选择"
-										onChange={handleAlgorithmChange}
-										disabled={!curData || filterNAlgorithDisable}
+										// onChange={handleAlgorithmChange}
+										// disabled={!curData || filterNAlgorithDisable}
 									>
 										{algorithmOptions.map((item) => {
 											return (
@@ -528,6 +519,18 @@ export default (props: Props) => {
 						) : (
 							<></>
 						)}
+						<div className={styles['filter-form__btns']}>
+							<Button
+								htmlType="button"
+								onClick={onReset}
+								style={{ marginRight: '10px' }}
+							>
+								重置
+							</Button>
+							<Button type="primary" htmlType="submit">
+								查询
+							</Button>
+						</div>
 					</Form>
 				</div>
 			</div>

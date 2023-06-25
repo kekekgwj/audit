@@ -43,7 +43,7 @@ interface IProps {
 	getFormItemValue: (name: FormItems) => any;
 	setFormItemValue: (name: FormItems, value: any) => any;
 	updateGraph: (paths: IPath[] | null) => void;
-	setCurPath: (paths: IPath[] | null) => void;
+	// setCurPath: (paths: IPath[] | null) => void;
 	canUse: boolean; //是否禁用
 }
 export default (props: IProps) => {
@@ -51,7 +51,7 @@ export default (props: IProps) => {
 		getFormItemValue,
 		setFormItemValue,
 		updateGraph,
-		setCurPath,
+		// setCurPath
 		canUse
 	} = props;
 	const fillterAttrRef = useRef(null);
@@ -215,10 +215,10 @@ export default (props: IProps) => {
 	// 点击确定
 	const handleOk = async () => {
 		const configData = transData(treeData);
-
-		updateGraph(configData);
-		setCurPath(configData); //当前选中链路数据
+		// updateGraph(configData);
+		// setCurPath(configData); //当前选中链路数据
 		setOpen(false);
+		setFormItemValue('paths', configData);
 	};
 	const getNodeDataConverted = (id: string): IProperty[] => {
 		const rawData = nodeConfigNProperties.current.get(id)?.configInfo || {};
