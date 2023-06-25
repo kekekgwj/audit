@@ -323,6 +323,7 @@ export const Graph = forwardRef((props, ref) => {
 		dnd?.start(node, e.nativeEvent as any);
 	};
 	const syncGraph = () => {
+		if (pathName == '审计模板') return;
 		const allConfigs = getAllConfigs();
 		const graphNodesID = graph?.getNodes().map((node) => node.id);
 		const validConfig = {};

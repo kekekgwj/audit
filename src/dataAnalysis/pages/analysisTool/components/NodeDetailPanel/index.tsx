@@ -12,7 +12,12 @@ import ConfigPanel from '../ConfigPanel';
 import ASSETS from '../../assets/index';
 import { IRootState, onClickCloseConfigPanel } from '@/redux/store';
 import { CloseOutlined, DownloadOutlined } from '@ant-design/icons';
-import { useGraph, useGraphContext, useGraphID } from '../../lib/hooks';
+import {
+	useGraph,
+	useGraphContext,
+	useGraphID,
+	useGraphPageInfo
+} from '../../lib/hooks';
 import {
 	IImageTypes,
 	formatDataSource,
@@ -24,7 +29,8 @@ import SvgIcon from '@/components/svg-icon';
 import {
 	exportData,
 	getCanvasConfig,
-	getResult
+	getResult,
+	getResultByAuditProject
 } from '@/api/dataAnalysis/graph';
 import emptyPage from '@/assets/img/empty-data.png';
 import MyTable from '../myTable/';
@@ -104,6 +110,8 @@ const Panel: React.FC = () => {
 	const { getConfigValue, saveConfigValue, syncGraph, getAllConfigs } =
 		useGraphContext();
 
+	const { pathName } = useGraphPageInfo();
+
 	const [nodeConfig, setNodeConfig] = useState(null);
 	const { getNodeKey, setNodeKeyFrozen, isNodeKeyReady, setNodeKey } =
 		useNodeKey();
@@ -180,6 +188,7 @@ const Panel: React.FC = () => {
 		if (!graph) {
 			return;
 		}
+
 		const canvasData = graph?.toJSON();
 		if (!canvasData || !id || !projectID) {
 			return;
@@ -197,7 +206,21 @@ const Panel: React.FC = () => {
 			executeId: id, //当前选中元素id
 			projectId: projectID
 		};
-		const { data, head } = await getResult(params);
+
+		let data, head;
+
+		if (pathName === '审计模板') {
+			const res = await getResultByAuditProject({
+				auditProjectId: projectID,
+				executeId: id
+			});
+			data = res.data;
+			head = res.head;
+		} else {
+			const res = await getResult(params);
+			data = res.data;
+			head = res.head;
+		}
 		updateTable(data, head);
 	};
 
