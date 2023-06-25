@@ -596,7 +596,6 @@ export default () => {
 						重置
 					</Button>
 					<Button
-						disabled={pathName == '审计模板' ? true : false}
 						className={`${styles.btn} ${styles.submit}`}
 						type="primary"
 						htmlType="submit"

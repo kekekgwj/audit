@@ -18,7 +18,6 @@ import {
 	useGraphID,
 	useGraphPageInfo
 } from '../../lib/hooks';
-
 import {
 	IImageTypes,
 	formatDataSource,
@@ -30,7 +29,8 @@ import SvgIcon from '@/components/svg-icon';
 import {
 	exportData,
 	getCanvasConfig,
-	getResult
+	getResult,
+	getResultByAuditProject
 } from '@/api/dataAnalysis/graph';
 import emptyPage from '@/assets/img/empty-data.png';
 import ResizeTable from '../myTable/';
@@ -187,6 +187,7 @@ const Panel: React.FC = () => {
 		if (!graph) {
 			return;
 		}
+
 		const canvasData = graph?.toJSON();
 		if (!canvasData || !id || !projectID) {
 			return;
@@ -204,7 +205,21 @@ const Panel: React.FC = () => {
 			executeId: id, //当前选中元素id
 			projectId: projectID
 		};
-		const { data, head } = await getResult(params);
+
+		let data, head;
+
+		if (pathName === '审计模板') {
+			const res = await getResultByAuditProject({
+				auditProjectId: projectID,
+				executeId: id
+			});
+			data = res.data;
+			head = res.head;
+		} else {
+			const res = await getResult(params);
+			data = res.data;
+			head = res.head;
+		}
 		updateTable(data, head);
 	};
 

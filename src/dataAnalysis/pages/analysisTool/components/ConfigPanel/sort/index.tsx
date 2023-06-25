@@ -343,7 +343,6 @@ const Sort: FC = () => {
 					重置
 				</Button>
 				<Button
-					disabled={pathName == '审计模板' ? true : false}
 					className={`${classes.btn} ${classes.submit}`}
 					type="primary"
 					htmlType="submit"

@@ -134,3 +134,17 @@ export function getCanvasConfig(data: IGetCanvasConfig) {
 		...data
 	});
 }
+
+// 审计模板解析执行，返回查询结果
+interface IResultByAuditProject {
+	auditProjectId: string | number;
+	executeId: string | number;
+}
+export function getResultByAuditProject(data: IResultByAuditProject) {
+	return post<IExeResponse>(
+		API_PREFIX + '/blade-tool/dataAnalysis/getResultByAuditProject',
+		{
+			...data
+		}
+	);
+}
