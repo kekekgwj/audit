@@ -2,6 +2,7 @@ import { Button, Form, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
 import classes from './index.module.less';
 import { useConfigContextValue } from '../../NodeDetailPanel';
+import { useGraphPageInfo } from '../../../lib/hooks';
 interface ISelectRowProps {
 	value?: any;
 	onChange?: any;
@@ -144,6 +145,7 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 };
 
 const SelectGroup: React.FC = () => {
+	const { pathName } = useGraphPageInfo();
 	const [form] = Form.useForm();
 	const { id, setValue, resetValue, executeByNodeConfig, config, initValue } =
 		useConfigContextValue();
@@ -314,6 +316,7 @@ const SelectGroup: React.FC = () => {
 				</div>
 				<div className={classes.controlRow}>
 					<Button
+						disabled={pathName == '审计模板' ? true : false}
 						className={`${classes.btn} ${classes.reset}`}
 						htmlType="button"
 						onClick={() => handleReset()}
@@ -321,6 +324,7 @@ const SelectGroup: React.FC = () => {
 						重置
 					</Button>
 					<Button
+						disabled={pathName == '审计模板' ? true : false}
 						className={`${classes.btn} ${classes.submit}`}
 						type="primary"
 						htmlType="submit"

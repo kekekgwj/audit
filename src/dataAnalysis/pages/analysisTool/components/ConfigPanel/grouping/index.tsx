@@ -6,6 +6,7 @@ import Icon, {
 	CustomIconComponentProps
 } from '@ant-design/icons/lib/components/Icon';
 import { useConfigContextValue } from '../../NodeDetailPanel';
+import { useGraphPageInfo } from '../../../lib/hooks';
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -202,6 +203,7 @@ interface IFormValue {
 	funcType: string;
 }
 const Grouping: FC = () => {
+	const { pathName } = useGraphPageInfo();
 	const [form] = Form.useForm();
 	const {
 		id,
@@ -302,6 +304,7 @@ const Grouping: FC = () => {
 			<Form.Item {...tailLayout}>
 				<div style={{ justifyContent: 'end', display: 'flex', width: '100%' }}>
 					<Button
+						disabled={pathName == '审计模板' ? true : false}
 						className={`${classes.btn} ${classes.reset}`}
 						htmlType="button"
 						onClick={onReset}
@@ -309,6 +312,7 @@ const Grouping: FC = () => {
 						重置
 					</Button>
 					<Button
+						disabled={pathName == '审计模板' ? true : false}
 						className={`${classes.btn} ${classes.submit}`}
 						type="primary"
 						htmlType="submit"

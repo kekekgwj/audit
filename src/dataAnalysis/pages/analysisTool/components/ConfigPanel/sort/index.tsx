@@ -3,6 +3,7 @@ import classes from './index.module.less';
 import { Button, Form, Collapse } from 'antd';
 import { UpIcon, Downicon, HeartIcon, DelIcon } from './icon';
 import { useConfigContextValue } from '../../NodeDetailPanel';
+import { useGraphPageInfo } from '../../../lib/hooks';
 const { Panel } = Collapse;
 
 interface SortProps {
@@ -227,7 +228,7 @@ const SortInput: FC<SortProps> = ({ value, onChange, option, initSort }) => {
 
 const Sort: FC = () => {
 	const [form] = Form.useForm();
-
+	const { pathName } = useGraphPageInfo();
 	const {
 		id,
 		setValue,
@@ -334,6 +335,7 @@ const Sort: FC = () => {
 
 			<div style={{ justifyContent: 'end', display: 'flex', width: '100%' }}>
 				<Button
+					disabled={pathName == '审计模板' ? true : false}
 					className={`${classes.btn} ${classes.reset}`}
 					htmlType="button"
 					onClick={onReset}
@@ -341,6 +343,7 @@ const Sort: FC = () => {
 					重置
 				</Button>
 				<Button
+					disabled={pathName == '审计模板' ? true : false}
 					className={`${classes.btn} ${classes.submit}`}
 					type="primary"
 					htmlType="submit"

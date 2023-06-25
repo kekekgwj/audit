@@ -12,7 +12,13 @@ import ConfigPanel from '../ConfigPanel';
 import ASSETS from '../../assets/index';
 import { IRootState, onClickCloseConfigPanel } from '@/redux/store';
 import { CloseOutlined, DownloadOutlined } from '@ant-design/icons';
-import { useGraph, useGraphContext, useGraphID } from '../../lib/hooks';
+import {
+	useGraph,
+	useGraphContext,
+	useGraphID,
+	useGraphPageInfo
+} from '../../lib/hooks';
+
 import {
 	IImageTypes,
 	formatDataSource,
@@ -27,7 +33,7 @@ import {
 	getResult
 } from '@/api/dataAnalysis/graph';
 import emptyPage from '@/assets/img/empty-data.png';
-import MyTable from '../myTable/';
+import ResizeTable from '../myTable/';
 
 const { DOWNLOAD } = ASSETS;
 interface IConfigContext {
@@ -87,6 +93,7 @@ const useTableSource = () => {
 };
 
 const Panel: React.FC = () => {
+	const { pathName } = useGraphPageInfo();
 	const state = useSelector((state: IRootState) => state.dataAnalysis);
 
 	const graph = useGraph();
@@ -253,7 +260,25 @@ const Panel: React.FC = () => {
 	return (
 		<div className={classes.container}>
 			<div className={classes.data}>
-				<div className={classes.download}>
+				{pathName == '我的模板' ? (
+					<div className={classes.download}>
+						<div
+							onClick={downLoadData}
+							style={{
+								cursor: 'pointer',
+								display: 'flex',
+								alignItems: 'center',
+								height: '100%'
+							}}
+						>
+							<DownloadOutlined
+								style={{ color: '#24A36F', fontSize: '20px' }}
+							/>
+							<span className={classes.download_text}>下载</span>
+						</div>
+					</div>
+				) : null}
+				{/* <div className={classes.download}>
 					<div
 						onClick={downLoadData}
 						style={{
@@ -263,11 +288,10 @@ const Panel: React.FC = () => {
 							height: '100%'
 						}}
 					>
-						{/* <img src={DOWNLOAD} className={classes.download_icon}></img> */}
 						<DownloadOutlined style={{ color: '#24A36F', fontSize: '20px' }} />
 						<span className={classes.download_text}>下载</span>
 					</div>
-				</div>
+				</div> */}
 
 				<div className={classes.tableWrapper}>
 					<ConfigProvider renderEmpty={customizeRenderEmpty}>
@@ -277,6 +301,11 @@ const Panel: React.FC = () => {
 							dataSource={data}
 							pagination={{ defaultPageSize: 10 }}
 						/>
+						{/* <ResizeTable
+							columnsData={columns}
+							dataSource={data}
+							loading={tableLoading}
+						></ResizeTable> */}
 					</ConfigProvider>
 				</div>
 			</div>
