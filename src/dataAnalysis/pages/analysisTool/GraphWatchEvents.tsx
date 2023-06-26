@@ -51,32 +51,6 @@ const GraphWatchEvents = () => {
 			});
 		});
 
-		// graph.on('node:selected', ({ node }) => {
-		// 	resetGraph();
-		// 	const custom = node.store.data.attrs.custom;
-		// 	custom.isSelected = true;
-		// 	if (custom.type === IImageTypes.TABLE) {
-		// 		node.attr('body/stroke', '#24a36f');
-		// 		node.attr('label/fill', '#24a36f');
-		// 	} else {
-		// 		const activeImage = custom.activeImage;
-		// 		node.attr('img/xlink:href', activeImage);
-		// 	}
-		// });
-
-		// graph.on('node:click', ({ node }) => {
-		// 	resetGraph();
-		// 	const custom = node.store.data.attrs.custom;
-		// 	custom.isSelected = true;
-		// 	if (custom.type === IImageTypes.TABLE) {
-		// 		node.attr('body/stroke', '#24a36f');
-		// 		node.attr('label/fill', '#24a36f');
-		// 	} else {
-		// 		const activeImage = custom.activeImage;
-		// 		node.attr('img/xlink:href', activeImage);
-		// 	}
-		// });
-
 		graph.on('node:mouseenter', () => {
 			const ports = container.querySelectorAll(
 				'.x6-port-body'

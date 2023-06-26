@@ -141,6 +141,7 @@ export const Graph = forwardRef((props, ref) => {
 				.use(
 					new Selection({
 						enabled: !isPublicTemplate,
+						movable: true,
 						rubberband: true,
 						showNodeSelectionBox: true
 					})
