@@ -441,7 +441,8 @@ export const Graph = forwardRef((props, ref) => {
 								width: '440px',
 								height: '44px',
 								display: 'flex',
-								alignItems: 'center'
+								alignItems: 'center',
+								color: isPublicTemplate ? 'rgba(0, 0, 0, 0.25)' : '#18181f'
 							}}
 						>
 							<span

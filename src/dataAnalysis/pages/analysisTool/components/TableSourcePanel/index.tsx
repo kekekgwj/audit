@@ -3,13 +3,13 @@ import classes from './index.module.less';
 import { Collapse, Input, Tooltip } from 'antd';
 const { Search } = Input;
 const { Panel } = Collapse;
-import { GraphContext } from '../../lib';
+import { GraphContext, useGraphContext } from '../../lib';
 import TABLE from '@/assets/SQLEditor/table.png';
 import { IImageTypes } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
 import { SearchOutlined } from '@ant-design/icons';
 import { getTablesData } from '@/api/dataAnalysis/graph';
-const TableItem: React.FC = ({ data }) => {
+const TableItem: React.FC = ({ data, disabled }) => {
 	if (!data) {
 		return null;
 	}
@@ -53,7 +53,10 @@ const TableItem: React.FC = ({ data }) => {
 										table.tableCnName ? table.tableCnName : table.tableName
 									}
 								>
-									<span className={classes.tableName}>
+									<span
+										className={classes.tableName}
+										style={disabled ? { color: 'rgba(0, 0, 0, 0.25)' } : {}}
+									>
 										{table.tableCnName ? table.tableCnName : table.tableName}
 									</span>
 								</Tooltip>
@@ -103,7 +106,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 	const [myData, setMyData] = useState({}); //我的数据
 	const [searchData, setSearchData] = useState({}); //搜索数据
 	const [showSearch, setShowSearch] = useState(false); //展示搜索数据
-
+	const { isPublicTemplate } = useGraphContext();
 	useEffect(() => {
 		getSystemData();
 		getMyData();
@@ -183,8 +186,14 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 							<TableItem data={searchData}></TableItem>
 						) : (
 							<>
-								<TableItem data={systemData}></TableItem>
-								<TableItem data={myData}></TableItem>
+								<TableItem
+									data={systemData}
+									disabled={isPublicTemplate}
+								></TableItem>
+								<TableItem
+									data={myData}
+									disabled={isPublicTemplate}
+								></TableItem>
 							</>
 						)}
 					</div>
