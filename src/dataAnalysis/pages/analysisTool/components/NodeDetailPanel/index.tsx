@@ -292,22 +292,9 @@ const Panel: React.FC = () => {
 							<span className={classes.download_text}>下载</span>
 						</div>
 					</div>
+				) : !executeType.includes(clickNodeType) ? (
+					<div className={classes.download}></div>
 				) : null}
-				{/* <div className={classes.download}>
-					<div
-						onClick={downLoadData}
-						style={{
-							cursor: 'pointer',
-							display: 'flex',
-							alignItems: 'center',
-							height: '100%'
-						}}
-					>
-						<DownloadOutlined style={{ color: '#24A36F', fontSize: '20px' }} />
-						<span className={classes.download_text}>下载</span>
-					</div>
-				</div> */}
-
 				<div className={classes.tableWrapper}>
 					<ConfigProvider renderEmpty={customizeRenderEmpty}>
 						{/* <Table
