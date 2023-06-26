@@ -62,6 +62,12 @@ export const Graph = forwardRef((props, ref) => {
 		getLastestVersion
 	} = useNodeConfigValue();
 
+	useEffect(() => {
+		return () => {
+			graph?.off('cell:removed');
+		};
+	}, [graph]);
+
 	const cleanGoBack = () => {
 		graph?.off('cell:removed');
 		onClickCloseConfigPanel();
