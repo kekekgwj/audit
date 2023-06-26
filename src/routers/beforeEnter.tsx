@@ -22,30 +22,35 @@ function BeforeEnter({ children }: { children: React.ReactNode }) {
 	}, []);
 
 	const getisAdmin = async () => {
-		const res = await getIsAdmin();
-		changeIsAdmin(res);
+		try {
+			const res = await getIsAdmin();
+			changeIsAdmin(res);
+		} catch (e) {
+			console.error(e);
+		}
 	};
 
-	const refreshtoken = async () => {
-		const res = await refreshToken({
-			tenantId: '000000',
-			refresh_token: Cookies.get('token')
-		});
+	// const refreshtoken = async () => {
+	// 	const res = await refreshToken({
+	// 		tenantId: '000000',
+	// 		refresh_token: Cookies.get('token')
+	// 	});
 
-		console.log(res, 'iiiiii');
-	};
+	// 	console.log(res, 'iiiiii');
+	// };
 
-	if (!state.token) {
-		const location = useLocation();
-		const searchParams: Record<string, string> = {};
+	// if (!state.token) {
+	// 	const location = useLocation();
+	// 	const searchParams: Record<string, string> = {};
 
-		const search = (location.search || '').substring(1);
-		search.split('&').forEach((item) => {
-			const [key, value] = item.split('=');
-			searchParams[key] = value;
-		});
-		toSaveUser(searchParams.token);
-	}
+	// 	const search = (location.search || '').substring(1);
+	// 	search.split('&').forEach((item) => {
+	// 		const [key, value] = item.split('=');
+	// 		searchParams[key] = value;
+	// 	});
+
+	// 	toSaveUser(searchParams.token);
+	// }
 
 	return <>{children}</>;
 }
