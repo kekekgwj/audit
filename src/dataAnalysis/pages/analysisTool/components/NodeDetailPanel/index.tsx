@@ -82,7 +82,7 @@ const useNodeKey = () => {
 };
 const useTableSource = () => {
 	const [data, setData] = useState([]);
-	const [columns, setColumns] = useState([]);
+	const [columns, setColumns] = useState<any[]>([]);
 
 	const updateTable = (updateData: any, updateColumn: any) => {
 		const { data, columns } = formatDataSource(updateData, updateColumn);
@@ -292,35 +292,23 @@ const Panel: React.FC = () => {
 							<span className={classes.download_text}>下载</span>
 						</div>
 					</div>
+				) : !executeType.includes(clickNodeType) ? (
+					<div className={classes.download}></div>
 				) : null}
-				{/* <div className={classes.download}>
-					<div
-						onClick={downLoadData}
-						style={{
-							cursor: 'pointer',
-							display: 'flex',
-							alignItems: 'center',
-							height: '100%'
-						}}
-					>
-						<DownloadOutlined style={{ color: '#24A36F', fontSize: '20px' }} />
-						<span className={classes.download_text}>下载</span>
-					</div>
-				</div> */}
-
 				<div className={classes.tableWrapper}>
 					<ConfigProvider renderEmpty={customizeRenderEmpty}>
-						<Table
+						{/* <Table
 							loading={tableLoading}
 							columns={columns}
 							dataSource={data}
 							pagination={{ defaultPageSize: 10 }}
-						/>
-						{/* <ResizeTable
+						/> */}
+						<ResizeTable
 							columnsData={columns}
 							dataSource={data}
 							loading={tableLoading}
-						></ResizeTable> */}
+							key={columns}
+						></ResizeTable>
 					</ConfigProvider>
 				</div>
 			</div>

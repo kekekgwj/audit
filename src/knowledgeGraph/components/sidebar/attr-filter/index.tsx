@@ -371,8 +371,12 @@ export default (props: IProps) => {
 		return null;
 	};
 	const convertPathToHint = (): string => {
-		const item = getOnePath(treeData);
-		return item ? item.path.join('  ->  ') : '请选择筛选条件';
+		if (canUse) {
+			const item = getOnePath(treeData);
+			return item ? item.path.join('  ->  ') : '请选择筛选条件';
+		} else {
+			return '请选择筛选条件';
+		}
 	};
 
 	const ref = useRef(null);

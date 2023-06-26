@@ -31,6 +31,7 @@ import throttle from 'lodash/throttle';
 import { getGraphByRule } from '@/api/knowLedgeGraph/rule';
 // import { getFillColorByType } from './custom-node/Base';
 import formatCustomNodes from '@graph/components/graphin/customNode';
+import formatCustomEdges from '@graph/components/graphin/customEdge';
 
 // 注册自定义节点
 
@@ -312,9 +313,11 @@ const GraphCom = () => {
 
 					// 图谱数据
 					const graphData = {
-						edges: res.edges,
+						edges: formatCustomEdges({ edges: res.edges }),
 						nodes: formatCustomNodes({ nodes: formatNodes })
 					};
+
+					console.log(graphData, 319319319);
 					setDate(graphData);
 				}
 			} else {
