@@ -94,6 +94,8 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 		return null;
 	}
 
+	const { pathName } = useGraphPageInfo();
+
 	const symbolSelect = [
 		{
 			label: '=',
@@ -124,17 +126,31 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 	return (
 		<div className={classes.filterGroupWrapper}>
 			<Form.Item name={[rowName, 'leftHeaderName']} noStyle>
-				<Select options={leftOptions} style={{ width: 120 }}></Select>
+				<Select
+					disabled={pathName == '审计模板' ? true : false}
+					options={leftOptions}
+					style={{ width: 120 }}
+				></Select>
 			</Form.Item>
 			<Form.Item name={[rowName, 'operator']} noStyle>
-				<Select options={symbolSelect} style={{ width: 120 }}></Select>
+				<Select
+					disabled={pathName == '审计模板' ? true : false}
+					options={symbolSelect}
+					style={{ width: 120 }}
+				></Select>
 			</Form.Item>
 			<Form.Item name={[rowName, 'rightHeaderName']} noStyle>
-				<Select options={rightOptions} style={{ width: 120 }}></Select>
+				<Select
+					disabled={pathName == '审计模板' ? true : false}
+					options={rightOptions}
+					style={{ width: 120 }}
+				></Select>
 			</Form.Item>
 
 			<div
-				className={classes.deleteRow}
+				className={`${classes.deleteRow} ${
+					pathName == '审计模板' ? classes['edit-item-disable'] : ''
+				}`}
 				onClick={() => handleOnDelete(rowName)}
 			>
 				{DeleteIcon}
@@ -292,7 +308,10 @@ const SelectGroup: React.FC = () => {
 					)}
 				</Form.List>
 				<div
-					className={classes.addConnectBtn}
+					// className={classes.addConnectBtn}
+					className={`${classes.addConnectBtn} ${
+						pathName == '审计模板' ? classes['edit-item-disable'] : ''
+					}`}
 					onClick={() => {
 						handleOnclickAdd();
 					}}
@@ -307,7 +326,10 @@ const SelectGroup: React.FC = () => {
 						连接类型
 					</span>
 					<Form.Item name={'connectionType'}>
-						<Select style={{ width: 395, marginLeft: 0 }}>
+						<Select
+							style={{ width: 395, marginLeft: 0 }}
+							disabled={pathName == '审计模板' ? true : false}
+						>
 							<Select.Option value="INNER JOIN">内连接</Select.Option>
 							<Select.Option value="LEFT JOIN">左连接</Select.Option>
 							<Select.Option value="RIGHT JOIN">右连接</Select.Option>

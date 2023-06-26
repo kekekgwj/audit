@@ -542,7 +542,13 @@ export default () => {
 							></Group>
 						);
 					})}
-					<div className={styles['add-group']} onClick={addGroup}>
+					<div
+						// className={`${styles['add-group']}`}
+						className={`${styles['add-group']} ${
+							pathName == '审计模板' ? styles['edit-item-disable'] : ''
+						}`}
+						onClick={addGroup}
+					>
 						<SvgIcon
 							name="add-circle"
 							className={styles['add-group__icon']}
@@ -556,6 +562,7 @@ export default () => {
 						<div className={styles['label']}>列筛选</div>
 						<div>
 							<Checkbox
+								disabled={pathName == '审计模板' ? true : false}
 								indeterminate={indeterminate}
 								onChange={(e) => {
 									onCheckAllChange(e.target.checked);
@@ -573,6 +580,7 @@ export default () => {
 								<div>{label + ':'}</div>
 								<div>
 									<CheckboxGroup
+										disabled={pathName == '审计模板' ? true : false}
 										className={styles['checkbox-group']}
 										options={children}
 										defaultValue={defaultValue}
