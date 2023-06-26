@@ -66,7 +66,7 @@ const SortInput: FC<SortProps> = ({
 }) => {
 	// 设置为undefined， 避免useEffect中空值重置保存的config value
 	const [dataList, setDataList] = useState<ICondition[] | undefined>(value);
-
+	const { pathName } = useGraphPageInfo();
 	const setData = (
 		item: {
 			key: string;
@@ -104,7 +104,10 @@ const SortInput: FC<SortProps> = ({
 	return (
 		<Collapse
 			collapsible="icon"
-			className={classes.wrapBoxCollapse}
+			// className={classes.wrapBoxCollapse}
+			className={`${classes.wrapBoxCollapse} ${
+				pathName == '审计模板' ? classes['edit-label-disable'] : ''
+			}`}
 			ghost
 			expandIcon={() => <div className={classes.expandIcon}></div>}
 		>
@@ -112,7 +115,12 @@ const SortInput: FC<SortProps> = ({
 				header={
 					<div className={classes.inputWrap}>
 						<div className={classes.inputLabel}>{label}</div>
-						<div className={classes.rightInput}>
+						<div
+							// className={classes.rightInput}
+							className={`${classes.rightInput} ${
+								pathName == '审计模板' ? classes['edit-item-disable'] : ''
+							}`}
+						>
 							<div className={classes.left}>
 								{dataList && dataList.length > 0 ? (
 									dataList.map((item, index) => {
@@ -290,7 +298,11 @@ const Grouping: FC = () => {
 					name="funcType"
 					label="函数类型"
 				>
-					<Select placeholder="请选择" allowClear>
+					<Select
+						placeholder="请选择"
+						disabled={pathName == '审计模板' ? true : false}
+						allowClear
+					>
 						<Option value="SUM">求和</Option>
 						<Option value="MAX">最大</Option>
 						<Option value="MIN">最小</Option>

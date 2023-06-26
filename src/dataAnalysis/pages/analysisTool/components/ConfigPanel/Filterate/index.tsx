@@ -561,6 +561,7 @@ export default () => {
 						<div className={styles['label']}>列筛选</div>
 						<div>
 							<Checkbox
+								disabled={pathName == '审计模板' ? true : false}
 								indeterminate={indeterminate}
 								disabled={isPublicTemplate}
 								onChange={(e) => {

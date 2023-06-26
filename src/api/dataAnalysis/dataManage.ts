@@ -12,10 +12,15 @@ interface SearchData {
 	size: number;
 }
 export function getDataList(data: SearchData) {
+	// return get(
+	// 	API_PREFIX +
+	// 		`/blade-tool/dataAnalysis/listMyTables?current=${data.current}&size=${data.size}&tableName=${data.tableName}&createdBeginTime=${data.createdBeginTime}&createdEndTime=${data.createdEndTime}`,
+	// 	{}
+	// );
 	return get(
-		API_PREFIX +
-			`/blade-tool/dataAnalysis/listMyTables?current=${data.current}&size=${data.size}&tableName=${data.tableName}&createdBeginTime=${data.createdBeginTime}&createdEndTime=${data.createdEndTime}`,
-		{}
+		appendQueryParams(API_PREFIX + '/blade-tool/dataAnalysis/listMyTables', {
+			...data
+		})
 	);
 }
 

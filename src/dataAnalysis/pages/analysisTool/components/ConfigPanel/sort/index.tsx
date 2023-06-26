@@ -117,7 +117,10 @@ const SortInput: FC<SortProps> = ({
 	return (
 		<Collapse
 			collapsible="icon"
-			className={classes.wrapBoxCollapse}
+			// className={classes.wrapBoxCollapse}
+			className={`${classes.wrapBoxCollapse} ${
+				pathName == '审计模板' ? classes['edit-label-disable'] : ''
+			}`}
 			ghost
 			expandIcon={() => <div className={classes.expandIcon}></div>}
 		>
@@ -125,7 +128,12 @@ const SortInput: FC<SortProps> = ({
 				header={
 					<div className={classes.inputWrap}>
 						<div>排序</div>
-						<div className={classes.rightInput}>
+						<div
+							// className={classes.rightInput}
+							className={`${classes.rightInput} ${
+								pathName == '审计模板' ? classes['edit-item-disable'] : ''
+							}`}
+						>
 							{showOption.length === 0 ? (
 								<div className={classes.defaultTxt}>请选择</div>
 							) : (

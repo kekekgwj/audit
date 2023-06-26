@@ -57,11 +57,11 @@ const MyTemplate = () => {
 		// 当前界面每行可容纳个数
 		// md={12} lg={8} xl={6} xxl={4}
 		let rowNum;
-		if (dom?.scrollWidth < 992) {
+		if (dom?.scrollWidth < 792) {
 			rowNum = 2;
-		} else if (dom?.scrollWidth < 1200 && dom?.scrollWidth >= 992) {
+		} else if (dom?.scrollWidth < 1000 && dom?.scrollWidth >= 792) {
 			rowNum = 3;
-		} else if (dom?.scrollWidth < 1600 && dom?.scrollWidth >= 1200) {
+		} else if (dom?.scrollWidth < 1400 && dom?.scrollWidth >= 1000) {
 			rowNum = 4;
 		} else {
 			rowNum = 6;
