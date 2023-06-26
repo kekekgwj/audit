@@ -22,7 +22,12 @@ const ResizeableTitle = (props) => {
 		</Resizable>
 	);
 };
-
+// 定义头部组件
+const components = {
+	header: {
+		cell: ResizeableTitle
+	}
+};
 // 拖拽调整table
 interface Props {
 	columnsData: any;
@@ -32,43 +37,32 @@ interface Props {
 const ResizeTable: React.FC<Props> = (props: Props) => {
 	// table 数据
 	const { columnsData, dataSource, loading } = props;
-	console.log(columnsData, dataSource, 34343434);
 
 	// 表格列
-	const [cols, setCols] = useState([...columnsData]);
-	const [columns, setColumns] = useState([]);
+	// const [cols, setCols] = useState([...columnsData]);
+	const [columns, setColumns] = useState(formatCol(columnsData));
 
-	// 定义头部组件
-	const components = {
-		header: {
-			cell: ResizeableTitle
-		}
-	};
-
+	function formatCol(cols) {
+		return (cols || []).map((col, index) => ({
+			...col,
+			onHeaderCell: (column) => ({
+				width: column.width,
+				onResize: handleResize(index)
+			})
+		}));
+	}
 	// 处理拖拽
 	const handleResize =
 		(index) =>
 		(e, { size }) => {
-			const nextColumns = [...cols];
+			const nextColumns = [...columns];
 			// 拖拽是调整宽度
 			nextColumns[index] = {
 				...nextColumns[index],
 				width: size.width
 			};
-			setCols(nextColumns);
+			setColumns(formatCol(nextColumns));
 		};
-
-	useEffect(() => {
-		setColumns(
-			(cols || []).map((col, index) => ({
-				...col,
-				onHeaderCell: (column) => ({
-					width: column.width,
-					onResize: handleResize(index)
-				})
-			}))
-		);
-	}, [cols]);
 
 	return (
 		<div className="components-table-resizable-column">

@@ -82,7 +82,7 @@ const useNodeKey = () => {
 };
 const useTableSource = () => {
 	const [data, setData] = useState([]);
-	const [columns, setColumns] = useState([]);
+	const [columns, setColumns] = useState<any[]>([]);
 
 	const updateTable = (updateData: any, updateColumn: any) => {
 		const { data, columns } = formatDataSource(updateData, updateColumn);
@@ -310,17 +310,18 @@ const Panel: React.FC = () => {
 
 				<div className={classes.tableWrapper}>
 					<ConfigProvider renderEmpty={customizeRenderEmpty}>
-						<Table
+						{/* <Table
 							loading={tableLoading}
 							columns={columns}
 							dataSource={data}
 							pagination={{ defaultPageSize: 10 }}
-						/>
-						{/* <ResizeTable
+						/> */}
+						<ResizeTable
 							columnsData={columns}
 							dataSource={data}
 							loading={tableLoading}
-						></ResizeTable> */}
+							key={columns}
+						></ResizeTable>
 					</ConfigProvider>
 				</div>
 			</div>
