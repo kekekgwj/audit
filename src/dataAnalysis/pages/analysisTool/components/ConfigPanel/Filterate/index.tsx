@@ -12,7 +12,7 @@ import styles from './index.module.less';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { useConfigContextValue } from '../../NodeDetailPanel';
-import { useGraphPageInfo } from '../../../lib/hooks';
+import { useGraphContext, useGraphPageInfo } from '../../../lib/hooks';
 
 type RowGroupItme = {
 	_key: string;
@@ -240,6 +240,7 @@ export default () => {
 	const { pathName } = useGraphPageInfo();
 	const { id, setValue, resetValue, executeByNodeConfig, config, initValue } =
 		useConfigContextValue();
+	const { isPublicTemplate } = useGraphContext();
 	const reducer = (state: FormData, action: any) => {
 		switch (action.type) {
 			case 'setRowData':
@@ -542,13 +543,17 @@ export default () => {
 							></Group>
 						);
 					})}
-					<div className={styles['add-group']} onClick={addGroup}>
+					<Button
+						className={styles['add-group']}
+						onClick={addGroup}
+						disabled={isPublicTemplate}
+					>
 						<SvgIcon
 							name="add-circle"
 							className={styles['add-group__icon']}
 						></SvgIcon>
 						<span>添加行筛选</span>
-					</div>
+					</Button>
 				</div>
 
 				<div className={styles['filter-box']}>
@@ -557,6 +562,7 @@ export default () => {
 						<div>
 							<Checkbox
 								indeterminate={indeterminate}
+								disabled={isPublicTemplate}
 								onChange={(e) => {
 									onCheckAllChange(e.target.checked);
 								}}
@@ -573,6 +579,7 @@ export default () => {
 								<div>{label + ':'}</div>
 								<div>
 									<CheckboxGroup
+										disabled={isPublicTemplate}
 										className={styles['checkbox-group']}
 										options={children}
 										defaultValue={defaultValue}
@@ -587,11 +594,11 @@ export default () => {
 				</div>
 				<div className={styles.controlRow}>
 					<Button
-						disabled={pathName == '审计模板' ? true : false}
 						style={{ marginRight: '10px' }}
 						className={`${styles.btn} ${styles.reset}`}
 						htmlType="button"
 						onClick={reset}
+						disabled={isPublicTemplate}
 					>
 						重置
 					</Button>
@@ -600,6 +607,7 @@ export default () => {
 						type="primary"
 						htmlType="submit"
 						onClick={submit}
+						disabled={isPublicTemplate}
 					>
 						执行
 					</Button>

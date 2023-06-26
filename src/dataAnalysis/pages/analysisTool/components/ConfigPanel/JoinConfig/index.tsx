@@ -2,7 +2,7 @@ import { Button, Form, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
 import classes from './index.module.less';
 import { useConfigContextValue } from '../../NodeDetailPanel';
-import { useGraphPageInfo } from '../../../lib/hooks';
+import { useGraphContext, useGraphPageInfo } from '../../../lib/hooks';
 interface ISelectRowProps {
 	value?: any;
 	onChange?: any;
@@ -150,7 +150,7 @@ const SelectGroup: React.FC = () => {
 	const { id, setValue, resetValue, executeByNodeConfig, config, initValue } =
 		useConfigContextValue();
 	const [showTips, setShowTips] = useState<boolean>(false);
-
+	const { isPublicTemplate } = useGraphContext();
 	const [leftOptions, setLeftSelect] = useState([]);
 	const [rightOptions, setRightSelect] = useState([]);
 
@@ -268,6 +268,7 @@ const SelectGroup: React.FC = () => {
 					...initValue
 				}}
 				form={form}
+				disabled={isPublicTemplate}
 			>
 				<div style={{ fontSize: '14px', marginBottom: 20 }}>
 					<span style={{ fontWeight: 'bold' }}>连接语句: </span>
@@ -291,15 +292,16 @@ const SelectGroup: React.FC = () => {
 						</>
 					)}
 				</Form.List>
-				<div
+				<Button
 					className={classes.addConnectBtn}
 					onClick={() => {
 						handleOnclickAdd();
 					}}
+					disabled={isPublicTemplate}
 				>
 					{AddIcon}
 					<span>添加连接语句</span>
-				</div>
+				</Button>
 				<div className={classes.addRow}>
 					<span
 						style={{ fontSize: 14, fontWeight: 'bold', marginBottom: '24px' }}

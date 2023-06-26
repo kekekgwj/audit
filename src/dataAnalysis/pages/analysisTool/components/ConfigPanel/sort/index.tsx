@@ -3,7 +3,7 @@ import classes from './index.module.less';
 import { Button, Form, Collapse } from 'antd';
 import { UpIcon, Downicon, HeartIcon, DelIcon } from './icon';
 import { useConfigContextValue } from '../../NodeDetailPanel';
-import { useGraphPageInfo } from '../../../lib/hooks';
+import { useGraphContext, useGraphPageInfo } from '../../../lib/hooks';
 const { Panel } = Collapse;
 
 interface SortProps {
@@ -57,9 +57,14 @@ const layout = {
 	labelAlign: 'left'
 };
 
-const SortInput: FC<SortProps> = ({ value, onChange, option, initSort }) => {
+const SortInput: FC<SortProps> = ({
+	value,
+	onChange,
+	option,
+	initSort,
+	disabled
+}) => {
 	const [optionList, setOptionList] = useState<List[]>(option);
-
 	const [showOption, setShowOption] = useState<List[]>(initSort || []);
 
 	//通过传入的状态值和下标修改dataList的排序状态
@@ -135,16 +140,18 @@ const SortInput: FC<SortProps> = ({ value, onChange, option, initSort }) => {
 														{option.isUp && <UpIcon />}
 														{option.isDown && <Downicon />}
 													</div>
-													<DelIcon
-														onClick={() => {
-															setSortStatus(
-																{ isUp: false, isDown: false },
-																option.parentIndex,
-																option.childrenIndex
-															);
-														}}
-														className={classes.delIcon}
-													></DelIcon>
+													{!disabled && (
+														<DelIcon
+															onClick={() => {
+																setSortStatus(
+																	{ isUp: false, isDown: false },
+																	option.parentIndex,
+																	option.childrenIndex
+																);
+															}}
+															className={classes.delIcon}
+														></DelIcon>
+													)}
 												</div>
 											)
 										);
@@ -156,71 +163,73 @@ const SortInput: FC<SortProps> = ({ value, onChange, option, initSort }) => {
 				}
 				key="1"
 			>
-				<Collapse
-					className={classes.boxCollapse}
-					ghost
-					defaultActiveKey={
-						optionList &&
-						optionList.map((res, index) => {
-							return index + 1;
-						})
-					}
-					expandIcon={({ isActive }) => (
-						<HeartIcon
-							style={{
-								transform: isActive ? 'rotate(0deg)' : 'rotate(-90deg)',
-								transition: 'all linear .25s'
-							}}
-						/>
-					)}
-				>
-					{optionList &&
-						optionList.map((item, index) => {
-							return (
-								<Panel header={item.title} key={index + 1}>
-									{item.list.map((items, childrenIndex) => {
-										return (
-											<div key={items.title} className={classes.sortTxt}>
-												{/* <span>{items.title}</span> */}
-												<span>{items.description}</span>
-												<div className={classes.sortWrap}>
-													<div
-														style={{ marginRight: '10px' }}
-														onClick={() => {
-															setSortStatus(
-																{ isUp: !items.isUp, isDown: false },
-																index,
-																childrenIndex
-															);
-														}}
-														className={`${classes.sortBtn} ${
-															items.isUp && classes.activeBtn
-														}`}
-													>
-														升 <UpIcon />
-													</div>
-													<div
-														onClick={() => {
-															setSortStatus(
-																{ isUp: false, isDown: !items.isDown },
-																index,
-																childrenIndex
-															);
-														}}
-														className={`${classes.sortBtn} ${
-															items.isDown && classes.activeBtn
-														}`}
-													>
-														降 <Downicon />
+				{!disabled && (
+					<Collapse
+						className={classes.boxCollapse}
+						ghost
+						defaultActiveKey={
+							optionList &&
+							optionList.map((res, index) => {
+								return index + 1;
+							})
+						}
+						expandIcon={({ isActive }) => (
+							<HeartIcon
+								style={{
+									transform: isActive ? 'rotate(0deg)' : 'rotate(-90deg)',
+									transition: 'all linear .25s'
+								}}
+							/>
+						)}
+					>
+						{optionList &&
+							optionList.map((item, index) => {
+								return (
+									<Panel header={item.title} key={index + 1}>
+										{item.list.map((items, childrenIndex) => {
+											return (
+												<div key={items.title} className={classes.sortTxt}>
+													{/* <span>{items.title}</span> */}
+													<span>{items.description}</span>
+													<div className={classes.sortWrap}>
+														<div
+															style={{ marginRight: '10px' }}
+															onClick={() => {
+																setSortStatus(
+																	{ isUp: !items.isUp, isDown: false },
+																	index,
+																	childrenIndex
+																);
+															}}
+															className={`${classes.sortBtn} ${
+																items.isUp && classes.activeBtn
+															}`}
+														>
+															升 <UpIcon />
+														</div>
+														<div
+															onClick={() => {
+																setSortStatus(
+																	{ isUp: false, isDown: !items.isDown },
+																	index,
+																	childrenIndex
+																);
+															}}
+															className={`${classes.sortBtn} ${
+																items.isDown && classes.activeBtn
+															}`}
+														>
+															降 <Downicon />
+														</div>
 													</div>
 												</div>
-											</div>
-										);
-									})}
-								</Panel>
-							);
-						})}
-				</Collapse>
+											);
+										})}
+									</Panel>
+								);
+							})}
+					</Collapse>
+				)}
 			</Panel>
 		</Collapse>
 	);
@@ -238,6 +247,8 @@ const Sort: FC = () => {
 		config,
 		initValue
 	} = useConfigContextValue();
+
+	const { isPublicTemplate } = useGraphContext();
 	const [option, setOption] = useState<List[]>();
 	useEffect(() => {
 		const initSortingValue: ISortInitValue[] = initValue.sorting;
@@ -318,6 +329,7 @@ const Sort: FC = () => {
 			form={form}
 			name="control"
 			onFinish={onFinish}
+			disabled={isPublicTemplate}
 			className={classes.fromWrap}
 			onValuesChange={(_, value) => {
 				handleSortChange(value);
@@ -326,6 +338,7 @@ const Sort: FC = () => {
 			<div className={classes.formList}>
 				<Form.Item name="sorting">
 					<SortInput
+						disabled={isPublicTemplate}
 						option={option}
 						initSort={initValue.sorting}
 						key={option}

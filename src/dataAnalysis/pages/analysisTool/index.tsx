@@ -1,6 +1,6 @@
 import { message } from 'antd';
-import AddNodeBehavior from './AddNodeBehavior';
-import GraphExport from './ExportData';
+// import AddNodeBehavior from './AddNodeBehavior';
+// import GraphExport from './ExportData';
 import FromJSONBehavior from './FromJSONBehavior';
 import NodeDetailPanel from './components/NodeDetailPanel';
 import { Graph } from './lib/index';

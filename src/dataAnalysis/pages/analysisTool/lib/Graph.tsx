@@ -421,8 +421,12 @@ export const Graph = forwardRef((props, ref) => {
 				>
 					<div className={classes['control-wrapper']}>
 						<Button
-							disabled={pathName == '审计模板'}
-							className={classes['save-btn']}
+							disabled={isPublicTemplate}
+							className={
+								isPublicTemplate
+									? classes['save-btn-disabled']
+									: classes['save-btn']
+							}
 							onClick={() => {
 								saveAsAuditTem();
 							}}
