@@ -214,10 +214,12 @@ export default (props: IProps) => {
 
 	// 点击确定
 	const handleOk = async () => {
+		console.log(treeData, 217217);
 		const configData = transData(treeData);
 		// updateGraph(configData);
 		// setCurPath(configData); //当前选中链路数据
 		setOpen(false);
+		console.log(configData, 221221221);
 		setFormItemValue('paths', configData);
 	};
 	const getNodeDataConverted = (id: string): IProperty[] => {
@@ -233,7 +235,7 @@ export default (props: IProps) => {
 				operationLinks: [],
 				operations: []
 			};
-			if (type === ComponentsType.PERSON) {
+			if (ComponentsType.PERSON.includes(type)) {
 				value.forEach((person: string, index: number) => {
 					if (index > 0) {
 						formatValue.operationLinks.push(2);
@@ -245,7 +247,7 @@ export default (props: IProps) => {
 				});
 			}
 
-			if (type === ComponentsType.DATE) {
+			if (ComponentsType.DATE.includes(type)) {
 				const [start, end] = value;
 				formatValue.operations.push({
 					// >=
@@ -259,14 +261,14 @@ export default (props: IProps) => {
 				});
 			}
 
-			if (type === ComponentsType.GENDER) {
+			if (ComponentsType.GENDER.includes(type)) {
 				formatValue.operations.push({
 					operatorType: 1,
 					value: value
 				});
 			}
 
-			if (type === ComponentsType.RANGE) {
+			if (ComponentsType.RANGE.includes(type)) {
 				formatValue.operationLinks = value?.operationLinks || [];
 				formatValue.operations = value?.operations || [];
 			}
