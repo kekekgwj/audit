@@ -51,7 +51,7 @@ const SpecialCom = (props: Props) => {
 	// 传值
 	useEffect(() => {
 		setOperator({
-			[name]: { operationLinks, operations, type: '2', key: name }
+			[name]: { operationLinks, operations, type: 2, key: name }
 		});
 	}, [operations, operationLinks]);
 

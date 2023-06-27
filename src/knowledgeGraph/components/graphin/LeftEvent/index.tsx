@@ -43,7 +43,7 @@ const DetailInfo = React.memo((props: DetailProps) => {
 					return (
 						<div className={styles['node-detail-item']} key={index}>
 							<span className={styles['detail-item-title']}>{item.label}:</span>
-							{item.value}
+							<span>{item.value}</span>
 						</div>
 					);
 				})}
