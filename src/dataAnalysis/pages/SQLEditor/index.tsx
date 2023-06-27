@@ -242,7 +242,6 @@ const SQLEditor: React.FC = () => {
 							<div className={classes.aceResultTable}>
 								<Table
 									columns={columns}
-									showHeader={false}
 									dataSource={result}
 									scroll={{ y: 300 }}
 									pagination={false}
