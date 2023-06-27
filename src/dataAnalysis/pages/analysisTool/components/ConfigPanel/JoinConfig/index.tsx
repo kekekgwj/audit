@@ -94,8 +94,6 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 		return null;
 	}
 
-	const { pathName } = useGraphPageInfo();
-
 	const symbolSelect = [
 		{
 			label: '=',
@@ -126,42 +124,36 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 	return (
 		<div className={classes.filterGroupWrapper}>
 			<Form.Item name={[rowName, 'leftHeaderName']} noStyle>
-				<Select
-					disabled={pathName == '审计模板' ? true : false}
-					options={leftOptions}
-					style={{ width: 120 }}
-				></Select>
+				<Select options={leftOptions} style={{ width: 120 }}></Select>
 			</Form.Item>
 			<Form.Item name={[rowName, 'operator']} noStyle>
-				<Select
-					disabled={pathName == '审计模板' ? true : false}
-					options={symbolSelect}
-					style={{ width: 120 }}
-				></Select>
+				<Select options={symbolSelect} style={{ width: 120 }}></Select>
 			</Form.Item>
 			<Form.Item name={[rowName, 'rightHeaderName']} noStyle>
-				<Select
-					disabled={pathName == '审计模板' ? true : false}
-					options={rightOptions}
-					style={{ width: 120 }}
-				></Select>
+				<Select options={rightOptions} style={{ width: 120 }}></Select>
 			</Form.Item>
 
-			<div
-				className={`${classes.deleteRow} ${
-					pathName == '审计模板' ? classes['edit-item-disable'] : ''
-				}`}
+			{/* <div
+				className={classes.deleteRow}
 				onClick={() => handleOnDelete(rowName)}
 			>
 				{DeleteIcon}
 				<span>删除</span>
-			</div>
+			</div> */}
+			<Button
+				onClick={() => handleOnDelete(rowName)}
+				type="text"
+				shape="round"
+				icon={DeleteIcon}
+				className={classes.deleteRow}
+			>
+				删除
+			</Button>
 		</div>
 	);
 };
 
 const SelectGroup: React.FC = () => {
-	const { pathName } = useGraphPageInfo();
 	const [form] = Form.useForm();
 	const { id, setValue, resetValue, executeByNodeConfig, config, initValue } =
 		useConfigContextValue();
@@ -325,10 +317,7 @@ const SelectGroup: React.FC = () => {
 						连接类型
 					</span>
 					<Form.Item name={'connectionType'}>
-						<Select
-							style={{ width: 395, marginLeft: 0 }}
-							disabled={pathName == '审计模板' ? true : false}
-						>
+						<Select style={{ width: 395, marginLeft: 0 }}>
 							<Select.Option value="INNER JOIN">内连接</Select.Option>
 							<Select.Option value="LEFT JOIN">左连接</Select.Option>
 							<Select.Option value="RIGHT JOIN">右连接</Select.Option>
@@ -337,7 +326,6 @@ const SelectGroup: React.FC = () => {
 				</div>
 				<div className={classes.controlRow}>
 					<Button
-						disabled={pathName == '审计模板' ? true : false}
 						className={`${classes.btn} ${classes.reset}`}
 						htmlType="button"
 						onClick={() => handleReset()}

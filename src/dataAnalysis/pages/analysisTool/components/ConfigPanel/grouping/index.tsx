@@ -6,7 +6,7 @@ import Icon, {
 	CustomIconComponentProps
 } from '@ant-design/icons/lib/components/Icon';
 import { useConfigContextValue } from '../../NodeDetailPanel';
-import { useGraphPageInfo } from '../../../lib/hooks';
+import { useGraphPageInfo, useGraphContext } from '../../../lib/hooks';
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -62,11 +62,11 @@ const SortInput: FC<SortProps> = ({
 	value,
 	onChange,
 	label,
-	isMulti = false
+	isMulti = false,
+	disabled
 }) => {
 	// 设置为undefined， 避免useEffect中空值重置保存的config value
 	const [dataList, setDataList] = useState<ICondition[] | undefined>(value);
-	const { pathName } = useGraphPageInfo();
 	const setData = (
 		item: {
 			key: string;
@@ -104,10 +104,7 @@ const SortInput: FC<SortProps> = ({
 	return (
 		<Collapse
 			collapsible="icon"
-			// className={classes.wrapBoxCollapse}
-			className={`${classes.wrapBoxCollapse} ${
-				pathName == '审计模板' ? classes['edit-label-disable'] : ''
-			}`}
+			className={classes.wrapBoxCollapse}
 			ghost
 			expandIcon={() => <div className={classes.expandIcon}></div>}
 		>
@@ -115,28 +112,25 @@ const SortInput: FC<SortProps> = ({
 				header={
 					<div className={classes.inputWrap}>
 						<div className={classes.inputLabel}>{label}</div>
-						<div
-							// className={classes.rightInput}
-							className={`${classes.rightInput} ${
-								pathName == '审计模板' ? classes['edit-item-disable'] : ''
-							}`}
-						>
+						<div className={classes.rightInput}>
 							<div className={classes.left}>
 								{dataList && dataList.length > 0 ? (
 									dataList.map((item, index) => {
 										return (
 											<div className={classes.label} key={item.key}>
 												{item.description}
-												<DelIcon
-													onClick={() => {
-														const newData = JSON.parse(
-															JSON.stringify(dataList)
-														);
-														newData.splice(index, 1);
-														setDataList(newData);
-													}}
-													className={classes.delIcon}
-												></DelIcon>
+												{!disabled && (
+													<DelIcon
+														onClick={() => {
+															const newData = JSON.parse(
+																JSON.stringify(dataList)
+															);
+															newData.splice(index, 1);
+															setDataList(newData);
+														}}
+														className={classes.delIcon}
+													></DelIcon>
+												)}
 											</div>
 										);
 									})
@@ -149,52 +143,54 @@ const SortInput: FC<SortProps> = ({
 				}
 				key="1"
 			>
-				<Collapse
-					className={classes.boxCollapse}
-					ghost
-					defaultActiveKey={
-						option &&
-						option.map((res, index) => {
-							return index + 1;
-						})
-					}
-					expandIcon={({ isActive }) => (
-						<HeartIcon
-							style={{
-								transform: isActive ? 'rotate(0deg)' : 'rotate(-90deg)',
-								transition: 'all linear .25s'
-							}}
-						/>
-					)}
-				>
-					{option.map((item, index) => {
-						const { tableRealName, tableName } = item;
+				{!disabled && (
+					<Collapse
+						className={classes.boxCollapse}
+						ghost
+						defaultActiveKey={
+							option &&
+							option.map((res, index) => {
+								return index + 1;
+							})
+						}
+						expandIcon={({ isActive }) => (
+							<HeartIcon
+								style={{
+									transform: isActive ? 'rotate(0deg)' : 'rotate(-90deg)',
+									transition: 'all linear .25s'
+								}}
+							/>
+						)}
+					>
+						{option.map((item, index) => {
+							const { tableRealName, tableName } = item;
 
-						return (
-							<Panel header={tableName} key={index + 1}>
-								{item.list.map((items, _) => {
-									return (
-										<div
-											key={items.title}
-											className={classes.sortTxt}
-											onClick={() => {
-												if (isMulti) {
-													setData(items, tableRealName, tableName);
-												} else {
-													if (!dataList) {
+							return (
+								<Panel header={tableName} key={index + 1}>
+									{item.list.map((items, _) => {
+										return (
+											<div
+												key={items.title}
+												className={classes.sortTxt}
+												onClick={() => {
+													if (isMulti) {
 														setData(items, tableRealName, tableName);
+													} else {
+														if (!dataList) {
+															setData(items, tableRealName, tableName);
+														}
 													}
-												}
-											}}
-										>
-											<span>{items.description}</span>
-										</div>
-									);
-								})}
-							</Panel>
-						);
-					})}
-				</Collapse>
+												}}
+											>
+												<span>{items.description}</span>
+											</div>
+										);
+									})}
+								</Panel>
+							);
+						})}
+					</Collapse>
+				)}
 			</Panel>
 		</Collapse>
 	);
@@ -211,7 +207,7 @@ interface IFormValue {
 	funcType: string;
 }
 const Grouping: FC = () => {
-	const { pathName } = useGraphPageInfo();
+	const { isPublicTemplate } = useGraphContext();
 	const [form] = Form.useForm();
 	const {
 		id,
@@ -270,6 +266,7 @@ const Grouping: FC = () => {
 	};
 	return (
 		<Form
+			disabled={isPublicTemplate}
 			{...layout}
 			form={form}
 			name="control"
@@ -290,7 +287,12 @@ const Grouping: FC = () => {
 					name="conditions"
 					label=""
 				>
-					<SortInput isMulti label="分组依据" option={groupData}></SortInput>
+					<SortInput
+						disabled={isPublicTemplate}
+						isMulti
+						label="分组依据"
+						option={groupData}
+					></SortInput>
 				</Form.Item>
 				<Form.Item
 					className={classes.funcType}
@@ -298,25 +300,24 @@ const Grouping: FC = () => {
 					name="funcType"
 					label="函数类型"
 				>
-					<Select
-						placeholder="请选择"
-						disabled={pathName == '审计模板' ? true : false}
-						allowClear
-					>
+					<Select placeholder="请选择" allowClear>
 						<Option value="SUM">求和</Option>
 						<Option value="MAX">最大</Option>
 						<Option value="MIN">最小</Option>
 					</Select>
 				</Form.Item>
 				<Form.Item wrapperCol={{ offset: 0, span: 24 }} name="column" label="">
-					<SortInput label="列" option={accordData}></SortInput>
+					<SortInput
+						label="列"
+						option={accordData}
+						disabled={isPublicTemplate}
+					></SortInput>
 				</Form.Item>
 			</div>
 
 			<Form.Item {...tailLayout}>
 				<div style={{ justifyContent: 'end', display: 'flex', width: '100%' }}>
 					<Button
-						disabled={pathName == '审计模板' ? true : false}
 						className={`${classes.btn} ${classes.reset}`}
 						htmlType="button"
 						onClick={onReset}
