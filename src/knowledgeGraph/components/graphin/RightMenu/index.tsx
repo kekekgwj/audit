@@ -61,7 +61,6 @@ const MyMenu = React.memo((props: MenuProps) => {
 			edges: curData.edges
 		};
 		// for 移动到中心节点
-
 		onSetSelectID({ selectID: orginId + '-node' });
 		getNextGraph({ nodeId: orginId, relationships: checkedRel }).then(
 			(res: any) => {

@@ -128,7 +128,7 @@ const GraphinCom = React.memo((props: Props) => {
 				<GraphContext.Provider value={{ updateData, curData }}>
 					<RightMenu />
 				</GraphContext.Provider>
-				{/* <FocusCenter /> */}
+				<FocusCenter />
 				<Hoverable bindType="node" />
 			</Graphin>
 		</div>
