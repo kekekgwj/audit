@@ -39,6 +39,7 @@ const FocusCenter = () => {
 		});
 		return () => {
 			graph.off('afterrender');
+			graph.off('afterlayout');
 		};
 	}, [selectID, centerID]);
 

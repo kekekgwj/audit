@@ -131,7 +131,7 @@ const GraphinCom = React.memo((props: Props) => {
 				<FocusCenter />
 				{/* <Hoverable bindType="node" /> */}
 				<ZoomCanvas enableOptimize />
-				<DragNode disabled />
+				<DragNode />
 				<DragCanvas />
 				<ActivateRelations />
 			</Graphin>
