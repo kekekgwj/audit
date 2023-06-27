@@ -117,10 +117,7 @@ const SortInput: FC<SortProps> = ({
 	return (
 		<Collapse
 			collapsible="icon"
-			// className={classes.wrapBoxCollapse}
-			className={`${classes.wrapBoxCollapse} ${
-				pathName == '审计模板' ? classes['edit-label-disable'] : ''
-			}`}
+			className={classes.wrapBoxCollapse}
 			ghost
 			expandIcon={() => <div className={classes.expandIcon}></div>}
 		>
@@ -128,12 +125,7 @@ const SortInput: FC<SortProps> = ({
 				header={
 					<div className={classes.inputWrap}>
 						<div>排序</div>
-						<div
-							// className={classes.rightInput}
-							className={`${classes.rightInput} ${
-								pathName == '审计模板' ? classes['edit-item-disable'] : ''
-							}`}
-						>
+						<div className={classes.rightInput}>
 							{showOption.length === 0 ? (
 								<div className={classes.defaultTxt}>请选择</div>
 							) : (
@@ -245,7 +237,6 @@ const SortInput: FC<SortProps> = ({
 
 const Sort: FC = () => {
 	const [form] = Form.useForm();
-	const { pathName } = useGraphPageInfo();
 	const {
 		id,
 		setValue,
@@ -356,7 +347,6 @@ const Sort: FC = () => {
 
 			<div style={{ justifyContent: 'end', display: 'flex', width: '100%' }}>
 				<Button
-					disabled={pathName == '审计模板' ? true : false}
 					className={`${classes.btn} ${classes.reset}`}
 					htmlType="button"
 					onClick={onReset}

@@ -50,7 +50,7 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 			type: 'graphin-circle',
 			style: {
 				label: {
-					value: label,
+					value: label + '----' + id,
 					fontSize: 12,
 					x: 0,
 					y: 0,

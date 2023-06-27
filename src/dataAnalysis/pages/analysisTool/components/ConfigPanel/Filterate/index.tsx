@@ -237,7 +237,6 @@ const Row = (props: RowProps) => {
 };
 
 export default () => {
-	const { pathName } = useGraphPageInfo();
 	const { id, setValue, resetValue, executeByNodeConfig, config, initValue } =
 		useConfigContextValue();
 	const { isPublicTemplate } = useGraphContext();
@@ -561,7 +560,6 @@ export default () => {
 						<div className={styles['label']}>列筛选</div>
 						<div>
 							<Checkbox
-								disabled={pathName == '审计模板' ? true : false}
 								indeterminate={indeterminate}
 								disabled={isPublicTemplate}
 								onChange={(e) => {

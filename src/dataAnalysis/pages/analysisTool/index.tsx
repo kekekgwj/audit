@@ -5,6 +5,8 @@ import FromJSONBehavior from './FromJSONBehavior';
 import NodeDetailPanel from './components/NodeDetailPanel';
 import { Graph } from './lib/index';
 import GraphWatchEvents from './GraphWatchEvents';
+import { useEffect } from 'react';
+import { onClickCloseConfigPanel } from '@/redux/store';
 
 const X6Graph = () => {
 	const [messageApi, contextHolder] = message.useMessage();
@@ -18,6 +20,11 @@ const X6Graph = () => {
 			duration: 2
 		});
 	};
+	useEffect(() => {
+		return () => {
+			onClickCloseConfigPanel();
+		};
+	}, []);
 
 	return (
 		<>
