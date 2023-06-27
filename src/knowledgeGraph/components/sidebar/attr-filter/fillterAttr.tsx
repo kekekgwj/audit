@@ -21,10 +21,10 @@ interface IProps {
 }
 
 export enum ComponentsType {
-	PERSON = '1',
-	RANGE = '2',
-	DATE = '3',
-	GENDER = '4'
+	PERSON = [1],
+	RANGE = [2],
+	DATE = [3, 4],
+	GENDER = [8, 9]
 }
 
 const CustomizedComponent = (option: Option) => {
@@ -37,7 +37,10 @@ const CustomizedComponent = (option: Option) => {
 		updateFormChange
 	} = option;
 
-	if (type == ComponentsType.PERSON) {
+	console.log(type, ComponentsType.PERSON, 404040);
+
+	// if (type == ComponentsType.PERSON) {
+	if (ComponentsType.PERSON.includes(type)) {
 		return (
 			<Form.Item label={label}>
 				<MyTag
@@ -50,7 +53,7 @@ const CustomizedComponent = (option: Option) => {
 		);
 	}
 
-	if (type == ComponentsType.RANGE) {
+	if (ComponentsType.RANGE.includes(type)) {
 		return (
 			<SpecialCom
 				label={label}
@@ -60,7 +63,7 @@ const CustomizedComponent = (option: Option) => {
 			></SpecialCom>
 		);
 	}
-	if (type == ComponentsType.DATE) {
+	if (ComponentsType.DATE.includes(type)) {
 		return (
 			<Form.Item label={label}>
 				<RangePicker
@@ -69,7 +72,8 @@ const CustomizedComponent = (option: Option) => {
 						updateFormChange({
 							[name]: {
 								value: dateString,
-								type: ComponentsType.DATE,
+								// type: ComponentsType.DATE,
+								type: type,
 								key: name
 							}
 						})
@@ -78,7 +82,7 @@ const CustomizedComponent = (option: Option) => {
 			</Form.Item>
 		);
 	}
-	if (type == ComponentsType.GENDER) {
+	if (ComponentsType.GENDER.includes(type)) {
 		return (
 			<Form.Item label={label}>
 				<Radio.Group
@@ -87,7 +91,8 @@ const CustomizedComponent = (option: Option) => {
 						updateFormChange({
 							[name]: {
 								value: e.target.value,
-								type: ComponentsType.GENDER,
+								// type: ComponentsType.GENDER,
+								type: type,
 								key: name
 							}
 						})

@@ -1,4 +1,5 @@
 import { IGraphData } from '@/api/knowLedgeGraph/graphin';
+import { getCanvasText } from '@/utils/graphin';
 
 const Colors: {
 	[key: string]: Array<string>;
@@ -44,16 +45,19 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 		const size = score
 			? Math.min(Math.max((score / averageScore) * 200, 100), 200)
 			: 100;
+
+		const [str] = getCanvasText(label, 12, size);
 		return {
 			...node,
 			id: id + '-node',
 			type: 'graphin-circle',
 			style: {
 				label: {
-					value: label,
+					// value: label,
+					value: str,
 					fontSize: 12,
 					x: 0,
-					y: 0,
+					y: 6,
 					textAlign: 'center',
 					textBaseline: 'middle',
 					fill: labelColor,
