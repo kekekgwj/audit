@@ -262,7 +262,7 @@ const SelectGroup: React.FC = () => {
 	};
 
 	return (
-		<div style={{ overflowY: 'auto', height: '300px' }}>
+		<div style={{ overflowY: 'auto', paddingRight: '20px', height: '300px' }}>
 			<Form
 				name="customized_form_controls"
 				layout="vertical"
@@ -308,7 +308,7 @@ const SelectGroup: React.FC = () => {
 					disabled={isPublicTemplate}
 				>
 					{AddIcon}
-					<span>添加连接语句</span>
+					<span style={{ marginLeft: '-10px' }}>添加连接语句</span>
 				</Button>
 				<div className={classes.addRow}>
 					<span
