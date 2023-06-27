@@ -10,7 +10,7 @@ import Graphin, {
 	type GraphinData,
 	type LegendChildrenProps
 } from '@antv/graphin';
-
+const { DragCanvas, ZoomCanvas, DragNode, ActivateRelations } = Behaviors;
 import { IGraphData } from '@/api/knowLedgeGraph/graphin';
 import Legend from './legend';
 import LeftEvent from './LeftEvent';
@@ -92,14 +92,14 @@ const GraphinCom = React.memo((props: Props) => {
 				key={key}
 				data={formatData}
 				width={width}
-				modes={{
-					default: [
-						'drag-node',
-						'drag-canvas',
-						'zoom-canvas',
-						'activate-relations'
-					]
-				}}
+				// modes={{
+				// 	default: [
+				// 		'drag-node',
+				// 		'drag-canvas',
+				// 		'zoom-canvas',
+				// 		'activate-relations'
+				// 	]
+				// }}
 				layout={{
 					type: 'force',
 					preventOverlap: true,
@@ -129,7 +129,11 @@ const GraphinCom = React.memo((props: Props) => {
 					<RightMenu />
 				</GraphContext.Provider>
 				<FocusCenter />
-				<Hoverable bindType="node" />
+				{/* <Hoverable bindType="node" /> */}
+				<ZoomCanvas enableOptimize />
+				<DragNode disabled />
+				<DragCanvas />
+				<ActivateRelations />
 			</Graphin>
 		</div>
 	);
