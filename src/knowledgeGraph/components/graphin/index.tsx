@@ -92,46 +92,20 @@ const GraphinCom = React.memo((props: Props) => {
 				key={key}
 				data={formatData}
 				width={width}
-				// modes={{
-				// 	default: [
-				// 		'drag-canvas',
-				// 		{
-				// 			type: 'tooltip',
-				// 			formatText: function formatText(model) {
-				// 				return model.name;
-				// 			}
-				// 		},
-				// 		{
-				// 			type: 'edge-tooltip',
-				// 			formatText: function formatText(model, e) {
-				// 				const edge = e.item;
-				// 				return (
-				// 					'来源：' +
-				// 					edge.getSource().getModel().name +
-				// 					'<br/>去向：' +
-				// 					edge.getTarget().getModel().name
-				// 				);
-				// 			}
-				// 		},
-				// 		'activate-relations'
-				// 	]
-				// }}
+				modes={{
+					default: [
+						'drag-node',
+						'drag-canvas',
+						'zoom-canvas',
+						'activate-relations'
+					]
+				}}
 				layout={{
 					type: 'force',
 					preventOverlap: true,
 					nodeSize: 200,
 					nodeSpacing: 50
 				}}
-				// nodeStateStyles={{
-				// 	status: {
-				// 		active: {
-				// 			opacity: 0.1
-				// 		},
-				// 		inactive: {
-				// 			opacity: 0.2
-				// 		}
-				// 	}
-				// }}
 			>
 				<Legend bindType="node" sortKey="config.type">
 					{(renderProps: LegendChildrenProps) => {
