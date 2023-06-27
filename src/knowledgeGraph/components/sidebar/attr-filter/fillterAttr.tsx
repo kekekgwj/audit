@@ -1,5 +1,5 @@
 import React, { FC, forwardRef, useImperativeHandle, useRef } from 'react';
-import { Radio, DatePicker, Form } from 'antd';
+import { Radio, DatePicker, Form, Checkbox } from 'antd';
 import styles from './index.module.less';
 const { RangePicker } = DatePicker;
 import SpecialCom from '../../luoji/index';
@@ -20,12 +20,12 @@ interface IProps {
 	id: string;
 }
 
-export enum ComponentsType {
-	PERSON = [1],
-	RANGE = [2],
-	DATE = [3, 4],
-	GENDER = [8, 9]
-}
+export const ComponentsType = {
+	PERSON: ['1'],
+	RANGE: ['2'],
+	DATE: ['3', '4'],
+	GENDER: ['8', '9']
+};
 
 const CustomizedComponent = (option: Option) => {
 	const {
@@ -37,10 +37,7 @@ const CustomizedComponent = (option: Option) => {
 		updateFormChange
 	} = option;
 
-	console.log(type, ComponentsType.PERSON, 404040);
-
-	// if (type == ComponentsType.PERSON) {
-	if (ComponentsType.PERSON.includes(type)) {
+	if (ComponentsType.PERSON.includes(String(type))) {
 		return (
 			<Form.Item label={label}>
 				<MyTag
@@ -53,7 +50,7 @@ const CustomizedComponent = (option: Option) => {
 		);
 	}
 
-	if (ComponentsType.RANGE.includes(type)) {
+	if (ComponentsType.RANGE.includes(String(type))) {
 		return (
 			<SpecialCom
 				label={label}
@@ -63,7 +60,7 @@ const CustomizedComponent = (option: Option) => {
 			></SpecialCom>
 		);
 	}
-	if (ComponentsType.DATE.includes(type)) {
+	if (ComponentsType.DATE.includes(String(type))) {
 		return (
 			<Form.Item label={label}>
 				<RangePicker
@@ -82,21 +79,28 @@ const CustomizedComponent = (option: Option) => {
 			</Form.Item>
 		);
 	}
-	if (ComponentsType.GENDER.includes(type)) {
+	if (ComponentsType.GENDER.includes(String(type))) {
+		const options = dict?.map((item) => {
+			return {
+				label: item.label,
+				value: item.label
+			};
+		});
 		return (
 			<Form.Item label={label}>
-				<Radio.Group
-					options={dict}
-					onChange={(e) =>
-						updateFormChange({
-							[name]: {
-								value: e.target.value,
-								// type: ComponentsType.GENDER,
-								type: type,
-								key: name
-							}
-						})
-					}
+				<Checkbox.Group
+					key={label}
+					options={options}
+					// onChange={(e) =>
+					// 	updateFormChange({
+					// 		[name]: {
+					// 			value: e.target.value,
+					// 			// type: ComponentsType.GENDER,
+					// 			type: type,
+					// 			key: name
+					// 		}
+					// 	})
+					// }
 				/>
 			</Form.Item>
 		);
