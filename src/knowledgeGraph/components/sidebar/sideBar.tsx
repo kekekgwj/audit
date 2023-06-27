@@ -169,7 +169,6 @@ export default (props: Props) => {
 		algorithmName?: string;
 	} = {}) => {
 		const formData: IFormData = form.getFieldsValue();
-		console.log(formData, 167167167167);
 		// 调用接口 获取筛选数据
 		const { bodyFilter, bodys, level, algorithm, paths } = formData;
 		//设置主体为默认保存图谱名称
@@ -270,7 +269,6 @@ export default (props: Props) => {
 	};
 
 	const handleChangeBodyType = (key: any, e: any) => {
-		console.log(key, e, 2727272);
 		if (!e) {
 			const bodys = form.getFieldValue('bodys');
 			bodys[key].bodyName = '';

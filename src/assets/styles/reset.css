@@ -336,5 +336,5 @@ button:focus-visible {
 }
 
 .x6-widget-selection-selected {
-	display: none;
+	opacity: 0;
 }

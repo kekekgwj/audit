@@ -92,6 +92,14 @@ const GraphinCom = React.memo((props: Props) => {
 				key={key}
 				data={formatData}
 				width={width}
+				modes={{
+					default: [
+						'drag-node',
+						'drag-canvas',
+						'zoom-canvas',
+						'activate-relations'
+					]
+				}}
 				layout={{
 					type: 'force',
 					preventOverlap: true,
@@ -120,7 +128,7 @@ const GraphinCom = React.memo((props: Props) => {
 				<GraphContext.Provider value={{ updateData, curData }}>
 					<RightMenu />
 				</GraphContext.Provider>
-				{/* <FocusCenter /> */}
+				<FocusCenter />
 				<Hoverable bindType="node" />
 			</Graphin>
 		</div>
