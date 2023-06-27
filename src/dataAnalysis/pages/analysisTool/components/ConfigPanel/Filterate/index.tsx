@@ -517,7 +517,7 @@ export default () => {
 	};
 
 	return (
-		<div style={{ overflowY: 'auto', height: '300px' }}>
+		<div style={{ overflowY: 'auto', paddingRight: '20px', height: '300px' }}>
 			<FilterateContext.Provider
 				value={{
 					setRowData,
