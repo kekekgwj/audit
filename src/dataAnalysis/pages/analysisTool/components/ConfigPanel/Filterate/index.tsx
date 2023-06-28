@@ -147,11 +147,11 @@ const Row = (props: RowProps) => {
 		},
 		{
 			label: '>',
-			value: '4'
+			value: '2'
 		},
 		{
 			label: '<',
-			value: '<'
+			value: '4'
 		},
 		{
 			label: '>=',
