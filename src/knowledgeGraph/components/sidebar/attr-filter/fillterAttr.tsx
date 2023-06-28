@@ -91,16 +91,15 @@ const CustomizedComponent = (option: Option) => {
 				<Checkbox.Group
 					key={label}
 					options={options}
-					// onChange={(e) =>
-					// 	updateFormChange({
-					// 		[name]: {
-					// 			value: e.target.value,
-					// 			// type: ComponentsType.GENDER,
-					// 			type: type,
-					// 			key: name
-					// 		}
-					// 	})
-					// }
+					onChange={(val) =>
+						updateFormChange({
+							[name]: {
+								value: val,
+								type: type,
+								key: name
+							}
+						})
+					}
 				/>
 			</Form.Item>
 		);

@@ -216,11 +216,9 @@ export default (props: IProps) => {
 	const handleOk = async () => {
 		console.log(treeData, 217217);
 		const configData = transData(treeData);
-		// updateGraph(configData);
-		// setCurPath(configData); //当前选中链路数据
-		setOpen(false);
 		console.log(configData, 221221221);
 		setFormItemValue('paths', configData);
+		setOpen(false);
 	};
 	const getNodeDataConverted = (id: string): IProperty[] => {
 		const rawData = nodeConfigNProperties.current.get(id)?.configInfo || {};
@@ -235,7 +233,7 @@ export default (props: IProps) => {
 				operationLinks: [],
 				operations: []
 			};
-			if (ComponentsType.PERSON.includes(type)) {
+			if (ComponentsType.PERSON.includes(String(type))) {
 				value.forEach((person: string, index: number) => {
 					if (index > 0) {
 						formatValue.operationLinks.push(2);
@@ -247,7 +245,7 @@ export default (props: IProps) => {
 				});
 			}
 
-			if (ComponentsType.DATE.includes(type)) {
+			if (ComponentsType.DATE.includes(String(type))) {
 				const [start, end] = value;
 				formatValue.operations.push({
 					// >=
@@ -261,14 +259,20 @@ export default (props: IProps) => {
 				});
 			}
 
-			if (ComponentsType.GENDER.includes(type)) {
-				formatValue.operations.push({
-					operatorType: 1,
-					value: value
+			if (ComponentsType.GENDER.includes(String(type))) {
+				// formatValue.operations.push({
+				// 	operatorType: 1,
+				// 	value: value
+				// });
+				value.forEach((item: string, index: number) => {
+					formatValue.operations.push({
+						operatorType: 1,
+						value: item
+					});
 				});
 			}
 
-			if (ComponentsType.RANGE.includes(type)) {
+			if (ComponentsType.RANGE.includes(String(type))) {
 				formatValue.operationLinks = value?.operationLinks || [];
 				formatValue.operations = value?.operations || [];
 			}
@@ -289,10 +293,13 @@ export default (props: IProps) => {
 
 	//转成后台需要的数据形式
 	const transData = (list: ITreeData[]): IPath[] | null => {
+		console.log(list, 292292292);
 		const listTrans = list.map((item: ITreeData) => {
 			const { children, title, key } = item;
 			const nextPaths = transData(children);
 			const properties = getNodeDataConverted(key);
+
+			console.log(properties, 297297297);
 
 			if (!saveNodes.includes(key)) {
 				if (nextPaths && nextPaths.filter((v) => v !== null).length === 0) {

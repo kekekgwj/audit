@@ -24,7 +24,7 @@ const MyTag = (props: Props) => {
 	// const defaultValue = value?
 
 	useEffect(() => {
-		setData({ [name]: { value: tags, type: 1, key: name } });
+		setData({ [name]: { value: tags, type: '1', key: name } });
 	}, [tags]);
 
 	useEffect(() => {
