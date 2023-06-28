@@ -89,6 +89,8 @@ const SQLEditor: React.FC = () => {
 	const [pos, setPos] = useState<IPos>({ top: 0, left: 0 });
 	const [showSearchBox, setShowSearchBox] = useState<BoxType>(BoxType.NONE);
 	const [sql, setSql] = useState('');
+	const [current, setCurrent] = useState(1);
+	const [total, setTotal] = useState(0);
 
 	const [messageApi, contextHolder] = message.useMessage();
 
@@ -123,11 +125,17 @@ const SQLEditor: React.FC = () => {
 	};
 
 	const handleExecute = async () => {
-		const res = await getResultBySql(sql);
-
+		const params = {
+			current,
+			size: 10,
+			sql
+		};
+		const res = await getResultBySql(params);
+		setTotal(res.total);
 		const columns = res.head.map((item: string, index: number) => ({
 			title: item,
-			dataIndex: index
+			dataIndex: index,
+			width: 120
 		}));
 
 		// 设置结果的列配置
@@ -138,6 +146,17 @@ const SQLEditor: React.FC = () => {
 		// 展示结果
 		setHasResult(true);
 	};
+
+	const searchChange = (page) => {
+		console.log(page, 151515151);
+		setCurrent(page);
+	};
+
+	useEffect(() => {
+		if (sql) {
+			handleExecute();
+		}
+	}, [current]);
 
 	// 下载
 	const handleDownLoad = async () => {
@@ -244,7 +263,14 @@ const SQLEditor: React.FC = () => {
 									columns={columns}
 									dataSource={result}
 									scroll={{ y: 300 }}
-									pagination={false}
+									pagination={{
+										current,
+										total,
+										pageSize: 10,
+										onChange: (page) => {
+											searchChange(page);
+										}
+									}}
 								/>
 							</div>
 						</>

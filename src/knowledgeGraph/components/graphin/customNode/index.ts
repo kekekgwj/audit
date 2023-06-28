@@ -37,7 +37,7 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 
 	const formatNodes = nodes.map((node) => {
-		const { type, score, communityId, id, isCenter = false, label } = node;
+		const { type, score, communityId, id, isCenter = false, labels } = node;
 		const [strokeColor, fillColor, labelColor] = getColorByType(
 			isCenter ? '中心节点' : type
 		);
@@ -45,8 +45,8 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 		const size = score
 			? Math.min(Math.max((score / averageScore) * 200, 100), 200)
 			: 100;
-
-		const [str] = getCanvasText(label, 12, size);
+		const labelStr = labels.join('/');
+		const [str] = getCanvasText(labelStr, 12, size);
 		return {
 			...node,
 			id: id + '-node',

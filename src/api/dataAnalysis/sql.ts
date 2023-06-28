@@ -112,10 +112,13 @@ export function deleteSql(id: string | number) {
 }
 
 // 执行传入的sql语句，返回查询结果
-export function getResultBySql(sql: string) {
-	return post(API_PREFIX + '/blade-tool/dataAnalysis/getResultBySql', {
-		sql
-	});
+interface IGetResultBySql {
+	current: number;
+	size: number;
+	sql: string;
+}
+export function getResultBySql(data: IGetResultBySql) {
+	return post(API_PREFIX + '/blade-tool/dataAnalysis/getResultBySql', data);
 }
 
 // 查询我的常用sql列表
