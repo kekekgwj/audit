@@ -83,7 +83,7 @@ const CustomizedComponent = (option: Option) => {
 		const options = dict?.map((item) => {
 			return {
 				label: item.label,
-				value: item.label
+				value: item.key
 			};
 		});
 		return (

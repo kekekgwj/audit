@@ -110,7 +110,6 @@ export default (props: Props) => {
 	};
 
 	//获取算法下拉选型
-	// 待完善
 	const getAlgorithmOptions = async () => {
 		const res = await getAlgs();
 		setAlgorithmOptions(res);
@@ -308,6 +307,7 @@ export default (props: Props) => {
 													className={styles['filter-form-item']}
 												>
 													<Select
+														listHeight={300}
 														placeholder="请选择"
 														allowClear
 														options={bodyTypeOptions}
@@ -392,6 +392,7 @@ export default (props: Props) => {
 							</div>
 							<Form.Item name={FormItems.bodyFilter} label="主体类型">
 								<Select
+									listHeight={300}
 									mode="multiple"
 									allowClear
 									style={{ width: '100%' }}

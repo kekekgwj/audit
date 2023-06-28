@@ -2,7 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Button, Tree, message } from 'antd';
 import CustomDialog from '@/components/custom-dialog';
-import { CaretDownOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+	CaretDownOutlined,
+	CloseOutlined,
+	ArrowRightOutlined
+} from '@ant-design/icons';
 import FillterAttr, { ComponentsType } from './fillterAttr';
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
@@ -382,9 +386,9 @@ export default (props: IProps) => {
 	const convertPathToHint = (): string => {
 		if (canUse) {
 			const item = getOnePath(treeData);
-			return item ? item.path.join('  ->  ') : '请选择筛选条件';
+			return item ? item.path.join('  ->  ') : '请选择';
 		} else {
-			return '请选择筛选条件';
+			return '请选择';
 		}
 	};
 
@@ -414,14 +418,11 @@ export default (props: IProps) => {
 					overflow: 'hidden'
 				}}
 			>
-				<div
-					style={{
-						width: '100%',
-						textOverflow: 'ellipsis',
-						overflow: 'hidden'
-					}}
-				>
-					{convertPathToHint()}
+				<div className={styles['fillter-into-button']}>
+					<span>{convertPathToHint()}</span>
+					<span>
+						<ArrowRightOutlined />
+					</span>
 				</div>
 			</Button>
 			{/* <CloseOutlined
