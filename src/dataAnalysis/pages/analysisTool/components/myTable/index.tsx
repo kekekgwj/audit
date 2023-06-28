@@ -33,10 +33,14 @@ interface Props {
 	columnsData: any;
 	dataSource: any;
 	loading: boolean;
+	searchChange: (page: number) => void;
+	current: number;
+	total: number;
 }
 const ResizeTable: React.FC<Props> = (props: Props) => {
 	// table 数据
-	const { columnsData, dataSource, loading } = props;
+	const { columnsData, dataSource, loading, searchChange, current, total } =
+		props;
 
 	// 表格列
 	// const [cols, setCols] = useState([...columnsData]);
@@ -74,7 +78,14 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 				columns={columns}
 				dataSource={dataSource}
 				scroll={{ y: 240 }}
-				pagination={{ defaultPageSize: 10 }}
+				pagination={{
+					current,
+					total,
+					pageSize: 10,
+					onChange: (page) => {
+						searchChange(page);
+					}
+				}}
 			/>
 		</div>
 	);

@@ -118,6 +118,14 @@ const Panel: React.FC = () => {
 
 	const [tableLoading, setTableLoading] = useState<boolean>(false);
 
+	// 分页
+	const [current, setCurrent] = useState(1);
+	const [total, setTotal] = useState(0);
+	const currentRef = useRef();
+	useEffect(() => {
+		currentRef.current = current;
+	}, [current]);
+
 	useEffect(() => {
 		!isInit && syncGraph();
 	}, [showPanel]);
@@ -203,24 +211,31 @@ const Panel: React.FC = () => {
 				configs: getAllConfigs()
 			}),
 			executeId: id, //当前选中元素id
-			projectId: projectID
+			projectId: projectID,
+			current: currentRef.current,
+			size: 10
 		};
 
-		let data, head;
+		let data, head, totalNum;
 
 		if (pathName === '审计模板') {
 			const res = await getResultByAuditProject({
 				auditProjectId: projectID,
-				executeId: id
+				executeId: id,
+				current: currentRef.current,
+				size: 10
 			});
 			data = res.data;
 			head = res.head;
+			totalNum = res.total;
 		} else {
 			const res = await getResult(params);
 			data = res.data;
 			head = res.head;
+			totalNum = res.total;
 		}
 		updateTable(data, head);
+		setTotal(totalNum);
 	};
 
 	// 点击画布元素触发事件，获取对应表的数据
@@ -229,6 +244,7 @@ const Panel: React.FC = () => {
 		if (!id || !projectID || !graph) {
 			return;
 		}
+		setCurrent(1); //id改变 重置页码
 		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
 		if (executeType.includes(curType)) {
 			executeByNodeConfig();
@@ -245,6 +261,19 @@ const Panel: React.FC = () => {
 	const toggleConfig = () => {
 		setShowConfig(!showConfig);
 	};
+
+	// 分页改变
+	const searchChange = (page) => {
+		console.log(page, 267267);
+		setCurrent(page);
+		setTimeout(() => {
+			executeByNodeConfig();
+		}, 200);
+	};
+
+	// useEffect(() => {
+	// 	executeByNodeConfig();
+	// }, [current]);
 
 	const downLoadData = async () => {
 		const canvasData = graph.toJSON();
@@ -308,6 +337,9 @@ const Panel: React.FC = () => {
 							dataSource={data}
 							loading={tableLoading}
 							key={columns}
+							searchChange={searchChange}
+							current={currentRef.current}
+							total={total}
 						></ResizeTable>
 					</ConfigProvider>
 				</div>
