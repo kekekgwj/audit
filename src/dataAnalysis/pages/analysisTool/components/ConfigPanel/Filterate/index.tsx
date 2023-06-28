@@ -143,11 +143,11 @@ const Row = (props: RowProps) => {
 	const symbolSelect = [
 		{
 			label: '=',
-			value: '='
+			value: '1'
 		},
 		{
 			label: '>',
-			value: '>'
+			value: '4'
 		},
 		{
 			label: '<',
@@ -155,11 +155,11 @@ const Row = (props: RowProps) => {
 		},
 		{
 			label: '>=',
-			value: '>='
+			value: '3'
 		},
 		{
 			label: '<=',
-			value: '<='
+			value: '5'
 		}
 	];
 
