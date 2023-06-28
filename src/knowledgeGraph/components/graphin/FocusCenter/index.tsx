@@ -35,6 +35,11 @@ const FocusCenter = () => {
 			if (selectID) {
 				const node = graph.findById(selectID);
 				node && apis.focusNodeById(selectID);
+			} else {
+				if (centerID) {
+					const node = graph.findById(centerID);
+					node && apis.focusNodeById(centerID);
+				}
 			}
 		});
 		return () => {

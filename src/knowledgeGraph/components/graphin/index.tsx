@@ -92,6 +92,7 @@ const GraphinCom = React.memo((props: Props) => {
 				key={key}
 				data={formatData}
 				width={width}
+				animate={false}
 				// modes={{
 				// 	default: [
 				// 		'drag-node',

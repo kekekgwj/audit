@@ -22,6 +22,7 @@ import {
 	IPath,
 	getAlgs
 } from '@/api/knowLedgeGraph/graphin';
+import { onSetSelectID } from '@/redux/store';
 interface Props {
 	curData: any; //当前图谱数据 用来判断链路和算法是否可用 为空时禁用
 	updateData: (layout: GraphinData) => void;
@@ -167,6 +168,8 @@ export default (props: Props) => {
 		// path?: IPath[] | null;
 		algorithmName?: string;
 	} = {}) => {
+		// 重置select id
+		onSetSelectID({ selectID: null });
 		const formData: IFormData = form.getFieldsValue();
 		// 调用接口 获取筛选数据
 		const { bodyFilter, bodys, level, algorithm, paths } = formData;

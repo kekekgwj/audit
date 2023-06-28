@@ -266,6 +266,7 @@ const Sort: FC = () => {
 		const formatData = transData(config, initConfig);
 
 		setOption(formatData);
+		executeByNodeConfig();
 	}, []);
 
 	//转数据形式
