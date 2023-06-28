@@ -225,6 +225,7 @@ const Grouping: FC = () => {
 	//获取配置项数据
 	useEffect(() => {
 		getConfig();
+		executeByNodeConfig();
 	}, []);
 
 	const transData = (data: any) => {

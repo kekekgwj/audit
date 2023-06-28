@@ -135,7 +135,6 @@ export const useNodeConfigValue: () => IGraphConfig = () => {
 	const ref = useRef<Record<string, object>>({});
 
 	const getConfigValue = useCallback((id: string) => {
-		// console.log('get:', ref.current[id]);
 		if (ref.current) {
 			return ref.current[id];
 		} else {
@@ -143,7 +142,6 @@ export const useNodeConfigValue: () => IGraphConfig = () => {
 		}
 	}, []);
 	const saveConfigValue = useCallback((id: string, value: any) => {
-		// console.log('save', value);
 		ref.current[id] = value;
 	}, []);
 

@@ -184,6 +184,7 @@ const SelectGroup: React.FC = () => {
 
 	useEffect(() => {
 		handleGetNodeConfig();
+		executeByNodeConfig();
 	}, []);
 
 	const handleOnclickAdd = () => {
@@ -203,7 +204,7 @@ const SelectGroup: React.FC = () => {
 			connectionSentences: nextList
 		});
 	};
-	const formatSubmitValue = (value: IForm): IExecuteConfig | null => {
+	const formatSubmitValue = (value: IForm): IExecuteConfig | [] => {
 		const [leftTableName, rightTableName] = config
 			? config?.map((item) => item.tableName)
 			: [null, null];
@@ -225,7 +226,7 @@ const SelectGroup: React.FC = () => {
 				connectionType
 			};
 		}
-		return null;
+		return [];
 	};
 	const onFinish = () => {
 		executeByNodeConfig();

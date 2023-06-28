@@ -317,6 +317,7 @@ export default () => {
 	useEffect(() => {
 		setCascaderOptions(formatCascaderData(config));
 		setColOptions(formatColData(config));
+		executeByNodeConfig();
 	}, []);
 
 	// useEffect(() => {
