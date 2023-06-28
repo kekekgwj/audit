@@ -189,6 +189,7 @@ const MyTableCom = React.memo((props: TanbleProps) => {
 			{contextHolder}
 			<div className={styles['handle-table-box']}>
 				<Button
+					type="primary"
 					htmlType="button"
 					onClick={() => {
 						add();
