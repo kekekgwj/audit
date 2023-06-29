@@ -271,11 +271,15 @@ export default (props: Props) => {
 	};
 
 	const handleChangeBodyType = (key: any, e: any) => {
-		if (!e) {
-			const bodys = form.getFieldValue('bodys');
-			bodys[key].bodyName = '';
-			form.setFieldValue('bodyName', bodys);
-		}
+		console.log(key, e, 2742742374);
+		// if (!e) {
+		// 	const bodys = form.getFieldValue('bodys');
+		// 	bodys[key].bodyName = '';
+		// 	form.setFieldValue('bodyName', bodys);
+		// }
+		const bodys = form.getFieldValue('bodys');
+		bodys[key].bodyName = '';
+		form.setFieldValue('bodyName', bodys);
 		// 重置链路
 		form.setFieldValue('paths', null);
 	};
@@ -283,7 +287,12 @@ export default (props: Props) => {
 	// 渲染表单
 	const renderForm = () => {
 		return (
-			<div className={styles['filter-form-box']}>
+			// <div className={styles['filter-form-box']}>
+			<div
+				className={`${styles['filter-form-box']} ${
+					!configVisibile ? styles['filter-form-hide'] : ''
+				}`}
+			>
 				<div className={styles['filter-form']}>
 					<Form
 						form={form}
@@ -543,7 +552,8 @@ export default (props: Props) => {
 	return (
 		<>
 			{renderTpggleTab()}
-			{configVisibile && renderForm()}
+			{/* {configVisibile && renderForm()} */}
+			{renderForm()}
 		</>
 	);
 };

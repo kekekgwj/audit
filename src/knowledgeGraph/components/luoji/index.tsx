@@ -50,8 +50,9 @@ const SpecialCom = (props: Props) => {
 
 	// 传值
 	useEffect(() => {
+		console.log('逻辑组件船只啦！！！');
 		setOperator({
-			[name]: { operationLinks, operations, type: '2', key: name }
+			[name]: { value: { operationLinks, operations }, type: '2', key: name }
 		});
 	}, [operations, operationLinks]);
 
