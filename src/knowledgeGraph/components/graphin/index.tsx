@@ -21,6 +21,7 @@ import formatCustomEdges from './customEdge';
 import formatCustomNodes from './customNode';
 import FocusCenter from './FocusCenter';
 import { onSetCenterID, useFocuseState } from '@/redux/store';
+import { getNextGraph } from '../../../api/knowledgeGraph/graphin';
 const { Hoverable } = Behaviors;
 interface Props {
 	data: IGraphData;
@@ -56,13 +57,85 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 interface IGraphContext {
 	updateData: ((data: GraphinData) => void) | null;
 	curData: Record<string, any> | null;
+	setNextGraphInfo: ISetNextGraphInfo;
+	getNextGraphInfo: IGetNextGraphInfo;
 }
 const GraphContext = createContext<IGraphContext>({
 	updateData: null,
-	curData: null
+	curData: null,
+	setNextGraphInfo: function ({
+		nodeID,
+		nodes,
+		edges,
+		path
+	}: {
+		nodeID: string;
+		nodes: string[];
+		edges: string[];
+		path: string;
+	}): void {
+		throw new Error('Function not implemented.');
+	},
+	getNextGraphInfo: function (
+		nodeID: string,
+		path: string
+	): INextGraphNode | null {
+		throw new Error('Function not implemented.');
+	}
 });
 export const useGraphContext = () => {
 	return useContext(GraphContext);
+};
+interface INextGraphNode {
+	nodes: Set<string>;
+	edges: Set<string>;
+}
+type ISetNextGraphInfo = ({
+	nodeID,
+	// nodes,
+	// edges,
+	relations
+}: {
+	nodeID: string;
+	// nodes: string[];
+	// edges: string[];
+	relations: string[];
+}) => void;
+type IGetNextGraphInfo = (
+	nodeID: string,
+	path: string
+) => INextGraphNode | null;
+// 用于记录穿透下一层节点的勾选 id - path - nodes/edges
+const useNextGraphRef = () => {
+	// const ref = useRef<Record<string, Record<string, INextGraphNode>>>({});
+	const ref = useRef < Record<string, string[]>({});
+	const setNextGraphInfo: ISetNextGraphInfo = ({
+		nodeID,
+		// nodes,
+		// edges,
+		relations
+	}) => {
+		if (!ref.current[nodeID]) {
+			ref.current[nodeID] = [];
+		}
+		ref.current[nodeID][path] = {
+			nodes: new Set(nodes),
+			edges: new Set(edges)
+		};
+		// ref.current[nodeID][path] = {
+		// 	nodes: new Set(nodes),
+		// 	edges: new Set(edges)
+		// };
+	};
+	const getNextGraphInfo = (
+		nodeID: string,
+		path: string
+	): INextGraphNode | null => {
+		const nodeInfo = ref.current[nodeID];
+
+		return nodeInfo ? nodeInfo[path] || null : null;
+	};
+	return { setNextGraphInfo, getNextGraphInfo };
 };
 const GraphinCom = React.memo((props: Props) => {
 	const { data, updateData, refersh } = props;
@@ -85,7 +158,7 @@ const GraphinCom = React.memo((props: Props) => {
 		setKey(`${rect?.width}`);
 		setWidth(rect?.width as number);
 	}, [refersh]);
-
+	const { setNextGraphInfo, getNextGraphInfo } = useNextGraphRef();
 	return (
 		<div ref={graphinContainerRef} className={styles['graphin-box']}>
 			<Graphin
@@ -93,14 +166,6 @@ const GraphinCom = React.memo((props: Props) => {
 				data={formatData}
 				width={width}
 				animate={false}
-				// modes={{
-				// 	default: [
-				// 		'drag-node',
-				// 		'drag-canvas',
-				// 		'zoom-canvas',
-				// 		'activate-relations'
-				// 	]
-				// }}
 				layout={{
 					type: 'force',
 					preventOverlap: true,
@@ -126,7 +191,9 @@ const GraphinCom = React.memo((props: Props) => {
 					}}
 				</Legend>
 				<LeftEvent />
-				<GraphContext.Provider value={{ updateData, curData }}>
+				<GraphContext.Provider
+					value={{ updateData, curData, setNextGraphInfo, getNextGraphInfo }}
+				>
 					<RightMenu />
 				</GraphContext.Provider>
 				<FocusCenter />

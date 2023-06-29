@@ -130,7 +130,7 @@ interface NextGraph {
 	nodeId: string;
 	relationships: string[];
 }
-export const getNextGraph = (data: NextGraph) => {
+export const getNextGraph = (data: NextGraph): Promise<IGraphData> => {
 	return post(API_PREFIX + '/blade-tool/graphAnalysis/getNextGraph', data);
 };
 
