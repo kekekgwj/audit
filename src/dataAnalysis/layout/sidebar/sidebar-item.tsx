@@ -20,8 +20,13 @@ type Props = {
 
 const SidebarItem = (props: Props) => {
 	const { menu, activeMenu, parentMenu } = props;
-	const [toggle, setToggle] = useState(false);
+	const [toggle, setToggle] = useState(parentMenu?.active === menu.active);
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		setToggle(parentMenu?.active === menu.active);
+	}, [parentMenu]);
+
 	const handleNavigate = (path: string | undefined) => {
 		if (path) {
 			navigate(path);
