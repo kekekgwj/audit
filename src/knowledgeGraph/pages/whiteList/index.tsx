@@ -13,7 +13,9 @@ import {
 	DatePicker,
 	Empty,
 	message,
-	Divider
+	Divider,
+	Row,
+	Col
 } from 'antd';
 import type { PaginationProps } from 'antd';
 import SvgIcon from '@/components/svg-icon';
@@ -334,33 +336,44 @@ const WhiteListCom = () => {
 		<div style={{ padding: '20px' }}>
 			<div className={styles.searchForm}>
 				<Form
+					style={{ width: 'calc(100% - 138px)' }}
 					form={form}
 					labelCol={{ span: 6 }}
 					wrapperCol={{ span: 18 }}
 					layout="inline"
 				>
-					<Form.Item
-						name="name"
-						label="名称"
-						labelCol={{ span: 4 }}
-						wrapperCol={{ span: 20 }}
-						colon={false}
-					>
-						<Input placeholder="请输入" />
-					</Form.Item>
-
-					<Form.Item name="type" label="类型" colon={false}>
-						<Select
-							options={listType}
-							style={{ width: 170 }}
-							allowClear
-							placeholder="请选择"
-						/>
-					</Form.Item>
-
-					<Form.Item name="gmtCreated" label="创建时间" colon={false}>
-						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
-					</Form.Item>
+					<Row style={{ width: '100%' }}>
+						<Col span={8}>
+							<Form.Item
+								name="name"
+								label="名称"
+								labelCol={{ span: 4 }}
+								wrapperCol={{ span: 20 }}
+								colon={false}
+							>
+								<Input style={{ maxWidth: '270px' }} placeholder="请输入" />
+							</Form.Item>
+						</Col>
+						<Col span={8}>
+							<Form.Item name="type" label="类型" colon={false}>
+								<Select
+									options={listType}
+									style={{ maxWidth: 270 }}
+									allowClear
+									placeholder="请选择"
+								/>
+							</Form.Item>
+						</Col>
+						<Col span={8}>
+							<Form.Item name="gmtCreated" label="创建时间" colon={false}>
+								<RangePicker
+									style={{ maxWidth: 270 }}
+									format="YYYY-MM-DD"
+									separator={<div>至</div>}
+								/>
+							</Form.Item>
+						</Col>
+					</Row>
 				</Form>
 				<div className={styles['search-handle-box']}>
 					<Button htmlType="button" onClick={onReset}>

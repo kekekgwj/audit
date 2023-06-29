@@ -7,7 +7,9 @@ import {
 	Input,
 	Button,
 	Select,
-	Empty
+	Empty,
+	Row,
+	Col
 } from 'antd';
 import {
 	PlayCircleOutlined,
@@ -224,14 +226,23 @@ const RuleCom = () => {
 		<div style={{ padding: '20px' }}>
 			<div className={styles.searchForm}>
 				<Form
+					style={{ width: 'calc(100% - 138px)' }}
 					form={form}
 					labelCol={{ span: 6 }}
 					wrapperCol={{ span: 18 }}
 					layout="inline"
 				>
-					<Form.Item name="name" label="规则名称" colon={false}>
-						<Input placeholder="请输入" className={styles.searchItem} />
-					</Form.Item>
+					<Row style={{ width: '100%' }}>
+						<Col span={8}>
+							<Form.Item name="name" label="规则名称" colon={false}>
+								<Input
+									style={{ maxWidth: '270px' }}
+									placeholder="请输入"
+									className={styles.searchItem}
+								/>
+							</Form.Item>
+						</Col>
+					</Row>
 				</Form>
 				<div className={styles['search-handle-box']}>
 					<Button htmlType="button" onClick={onReset}>
