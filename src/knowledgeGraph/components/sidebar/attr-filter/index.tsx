@@ -5,7 +5,8 @@ import CustomDialog from '@/components/custom-dialog';
 import {
 	CaretDownOutlined,
 	CloseOutlined,
-	ArrowRightOutlined
+	ArrowRightOutlined,
+	RightOutlined
 } from '@ant-design/icons';
 import FillterAttr, { ComponentsType } from './fillterAttr';
 import SvgIcon from '@/components/svg-icon';
@@ -13,6 +14,7 @@ import styles from './index.module.less';
 
 import { IPath, IProperty, getNextPaths } from '@/api/knowLedgeGraph/graphin';
 import { FormItems } from '../sideBar';
+import { spawn } from 'child_process';
 
 interface IResProperty {
 	key: string;
@@ -386,9 +388,9 @@ export default (props: IProps) => {
 	const convertPathToHint = (): string => {
 		if (canUse) {
 			const item = getOnePath(treeData);
-			return item ? item.path.join('  ->  ') : '请选择';
+			return item ? item.path.join('  ->  ') : '';
 		} else {
-			return '请选择';
+			return '';
 		}
 	};
 
@@ -419,9 +421,13 @@ export default (props: IProps) => {
 				}}
 			>
 				<div className={styles['fillter-into-button']}>
-					<span>{convertPathToHint()}</span>
-					<span>
-						<ArrowRightOutlined />
+					{convertPathToHint() ? (
+						<span>{convertPathToHint()}</span>
+					) : (
+						<span style={{ color: 'rgba(0, 0, 0, 0.25)' }}>请选择</span>
+					)}
+					<span style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
+						<RightOutlined />
 					</span>
 				</div>
 			</Button>
