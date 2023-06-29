@@ -4,7 +4,10 @@ import styles from './index.module.less';
 const { RangePicker } = DatePicker;
 import SpecialCom from '../../luoji/index';
 import MyTag from '../../myTag/index';
+import DateCom from '../../dateCom/index';
+import CheckCom from '../../checkCom/index';
 import { INodeConfigNProps } from './index';
+import dayjs from 'dayjs';
 
 interface Option {
 	name: string;
@@ -61,20 +64,16 @@ const CustomizedComponent = (option: Option) => {
 		);
 	}
 	if (ComponentsType.DATE.includes(String(type))) {
+		const data1 = defaultValue && defaultValue.length ? defaultValue[0] : null;
+		const data2 = defaultValue && defaultValue.length ? defaultValue[1] : null;
 		return (
 			<Form.Item label={label}>
-				<RangePicker
-					format={'YYYY-MM-DD'}
-					onChange={(date, dateString) =>
-						updateFormChange({
-							[name]: {
-								value: dateString,
-								// type: ComponentsType.DATE,
-								type: type,
-								key: name
-							}
-						})
-					}
+				<DateCom
+					label={label}
+					name={name}
+					setData={updateFormChange}
+					value={defaultValue}
+					type={type}
 				/>
 			</Form.Item>
 		);
@@ -88,18 +87,13 @@ const CustomizedComponent = (option: Option) => {
 		});
 		return (
 			<Form.Item label={label}>
-				<Checkbox.Group
-					key={label}
+				<CheckCom
+					label={label}
+					name={name}
+					setData={updateFormChange}
+					value={defaultValue}
 					options={options}
-					onChange={(val) =>
-						updateFormChange({
-							[name]: {
-								value: val,
-								type: type,
-								key: name
-							}
-						})
-					}
+					type={type}
 				/>
 			</Form.Item>
 		);
@@ -110,6 +104,23 @@ const CustomizedComponent = (option: Option) => {
 const FillterAttr: FC<IProps> = forwardRef(
 	({ formChange, initValues, id }, ref: any) => {
 		const { configInfo, properties } = initValues;
+		console.log(configInfo, 123123);
+		properties.forEach((item, index) => {
+			for (let key in configInfo) {
+				if (item.key == key) {
+					// if (item.type != 2) {
+					// 	item.value = configInfo[key].value || null;
+					// } else {
+					// 	item.value = {
+					// 		operationLinks: configInfo[key].value.operationLinks || null,
+					// 		operations: configInfo[key].value.operations || null
+					// 	};
+					// }
+					item.value = configInfo[key].value || null;
+				}
+			}
+		});
+		console.log(properties, 128128128);
 		const [form] = Form.useForm();
 		// const [curProperties,setCurProp] = useState()
 		useImperativeHandle(ref, () => ({
@@ -143,6 +154,7 @@ const FillterAttr: FC<IProps> = forwardRef(
 				...changeData
 			};
 			latestFormData.current = formData;
+			console.log(formData, 170170170);
 			formChange(id, formData);
 		};
 
@@ -162,7 +174,7 @@ const FillterAttr: FC<IProps> = forwardRef(
 					}}
 				>
 					{properties.map((item, index) => {
-						const { label, key, type, dict } = item;
+						const { label, key, type, dict, value } = item;
 						return (
 							<div key={index}>
 								<CustomizedComponent
@@ -170,6 +182,7 @@ const FillterAttr: FC<IProps> = forwardRef(
 									type={type}
 									label={label}
 									dict={dict}
+									defaultValue={value}
 									updateFormChange={updateFormChange}
 								/>
 							</div>
