@@ -64,8 +64,6 @@ const CustomizedComponent = (option: Option) => {
 		);
 	}
 	if (ComponentsType.DATE.includes(String(type))) {
-		const data1 = defaultValue && defaultValue.length ? defaultValue[0] : null;
-		const data2 = defaultValue && defaultValue.length ? defaultValue[1] : null;
 		return (
 			<Form.Item label={label}>
 				<DateCom
