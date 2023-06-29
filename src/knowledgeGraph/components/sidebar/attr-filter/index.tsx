@@ -229,6 +229,8 @@ export default (props: IProps) => {
 	const getNodeDataConverted = (id: string): IProperty[] => {
 		const rawData = nodeConfigNProperties.current.get(id)?.configInfo || {};
 
+		console.log(rawData, 232323232);
+
 		const convertProperties = Object.entries(rawData).map(([label, v]) => {
 			if (!saveNodes.includes(id)) {
 				return null;
@@ -294,6 +296,8 @@ export default (props: IProps) => {
 				...formatValue
 			};
 		});
+
+		console.log(convertProperties, 30003000000);
 		return convertProperties.filter((p) => p !== null) as IProperty[];
 	};
 
@@ -345,6 +349,7 @@ export default (props: IProps) => {
 		checkedKeys: any,
 		{ selected, node }: { selected: boolean; node: ITreeData }
 	) => {
+		console.log(node.key, 348348);
 		// todo: selected反选
 		setSelectedNodeID(node.key);
 		// setOptions(node.properties);
@@ -365,6 +370,8 @@ export default (props: IProps) => {
 			...curValues,
 			configInfo: formAllValues
 		});
+
+		console.log(nodeConfigNProperties.current, 370370);
 	};
 
 	const getOnePath = (treeData: ITreeData[]): ITreeData | null => {

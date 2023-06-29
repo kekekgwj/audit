@@ -38,6 +38,7 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 
 	const formatNodes = nodes.map((node) => {
 		const { type, score, communityId, id, isCenter = false, labels } = node;
+
 		const [strokeColor, fillColor, labelColor] = getColorByType(
 			isCenter ? '中心节点' : type
 		);

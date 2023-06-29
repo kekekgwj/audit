@@ -11,7 +11,7 @@ export function getCanvasText(text: string, fontSize = 14, maxWidth = 90) {
 	let str = '';
 	let currentIndex = 0;
 	let line = 0;
-	while (currentIndex < text.length - 1) {
+	while (currentIndex <= text.length - 1) {
 		str += text.substring(currentIndex, currentIndex + lineMax) + '\n';
 		currentIndex += lineMax;
 		line++;
