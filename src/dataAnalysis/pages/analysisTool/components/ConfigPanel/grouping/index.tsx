@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import { isEmpty } from 'lodash';
 import classes from './index.module.less';
 import { Button, Form, Select, Collapse } from 'antd';
 import { DelIcon } from '../sort/icon';
@@ -176,7 +177,7 @@ const SortInput: FC<SortProps> = ({
 													if (isMulti) {
 														setData(items, tableRealName, tableName);
 													} else {
-														if (dataList && dataList.length === 0) {
+														if (isEmpty(dataList)) {
 															setData(items, tableRealName, tableName);
 														}
 													}
