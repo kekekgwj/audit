@@ -266,6 +266,7 @@ const Grouping: FC = () => {
 		form.resetFields();
 		id && resetValue();
 	};
+
 	return (
 		<Form
 			disabled={isPublicTemplate}
