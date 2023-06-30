@@ -73,6 +73,7 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 			<Table
 				size="small"
 				bordered
+				showHeader={!!total}
 				loading={loading}
 				components={components}
 				columns={columns}

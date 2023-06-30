@@ -131,8 +131,17 @@
 .emptyTableBox {
 	height: 260px;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	justify-content: space-around;
+	justify-content: center;
+
+	.emptyTableText {
+		margin-top: 10px;
+		text-align: center;
+		font-size: 14px;
+		font-weight: bold;
+		color: #333;
+	}
 }
 :global(.notificationWrap) {
 	width: 290px !important;

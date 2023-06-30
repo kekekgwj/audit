@@ -311,6 +311,7 @@ const Panel: React.FC = () => {
 		//这里面就是我们自己定义的空状态
 		<div className={classes.emptyTableBox}>
 			<img src={emptyPage} alt="" />
+			<div className={classes.emptyTableText}>暂无数据</div>
 		</div>
 	);
 
