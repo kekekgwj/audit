@@ -140,16 +140,7 @@ const MyTableCom = React.memo((props: TableProps) => {
 					pagination={false}
 				></Table>
 			</div>
-			<div
-				style={{
-					textAlign: 'center',
-					marginTop: '20px',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between',
-					fontSize: '14px'
-				}}
-			>
+			<div className={styles['pagination-box']}>
 				<div>
 					<span style={{ marginRight: '10px' }}>共{total}条记录</span>
 					<span>
