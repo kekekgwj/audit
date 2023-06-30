@@ -184,7 +184,6 @@ const SelectGroup: React.FC = () => {
 
 	useEffect(() => {
 		handleGetNodeConfig();
-		executeByNodeConfig();
 	}, []);
 
 	const handleOnclickAdd = () => {

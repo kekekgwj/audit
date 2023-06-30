@@ -206,8 +206,10 @@ const Panel: React.FC = () => {
 			: null;
 		type paramsType = getParameterFirst<Parameters<typeof getResult>>;
 		const curConfis = getAllConfigs();
-		// 不存在config不自动执行
-		if (!curConfis[id]) {
+		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
+		// 除了table和end的类型 不存在config 不自动执行
+		if (!executeType.includes(curType) && !curConfis[id]) {
+			updateTable([], []);
 			return;
 		}
 
@@ -223,22 +225,26 @@ const Panel: React.FC = () => {
 		};
 
 		let data, head, totalNum;
-
-		if (pathName === '审计模板') {
-			const res = await getResultByAuditProject({
-				auditProjectId: projectID,
-				executeId: id,
-				current: currentRef.current,
-				size: 10
-			});
-			data = res.data;
-			head = res.head;
-			totalNum = res.total;
-		} else {
-			const res = await getResult(params);
-			data = res.data;
-			head = res.head;
-			totalNum = res.total;
+		try {
+			if (pathName === '审计模板') {
+				const res = await getResultByAuditProject({
+					auditProjectId: projectID,
+					executeId: id,
+					current: currentRef.current,
+					size: 10
+				});
+				data = res.data;
+				head = res.head;
+				totalNum = res.total;
+			} else {
+				const res = await getResult(params);
+				data = res.data;
+				head = res.head;
+				totalNum = res.total;
+			}
+		} catch (e) {
+			updateTable([], []);
+			return;
 		}
 		updateTable(data, head);
 		setTotal(totalNum);
@@ -251,13 +257,14 @@ const Panel: React.FC = () => {
 			return;
 		}
 		setCurrent(1); //id改变 重置页码
-		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
-		if (executeType.includes(curType)) {
-			executeByNodeConfig();
-		} else {
-			//需要将表数据清空
-			updateTable([], []);
-		}
+
+		executeByNodeConfig();
+		// if (executeType.includes(curType)) {
+		// 	executeByNodeConfig();
+		// } else {
+		// 	//需要将表数据清空
+		// 	updateTable([], []);
+		// }
 	}, [id]);
 
 	if (!showPanel || !graph) {
