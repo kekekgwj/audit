@@ -192,7 +192,7 @@ const SelectGroup: React.FC = () => {
 		const nextList = list.concat({
 			key: list.length,
 			fieldKey: list.length,
-			operator: '='
+			operator: '1'
 		});
 		if (nextList.length > 0) {
 			setShowTips(true);
