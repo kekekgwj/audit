@@ -198,7 +198,7 @@ export default (props: Props) => {
 			});
 
 			if (data.limited) {
-				if (algorithmName) {
+				if (algorithm) {
 					message.warning(
 						'您查询的数据量过多，因前端展示效果限制仅针对展示数据做算法应用'
 					);
