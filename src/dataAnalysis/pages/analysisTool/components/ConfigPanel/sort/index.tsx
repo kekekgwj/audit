@@ -266,7 +266,6 @@ const Sort: FC = () => {
 		const formatData = transData(config, initConfig);
 
 		setOption(formatData);
-		executeByNodeConfig();
 	}, []);
 
 	//转数据形式
@@ -346,7 +345,14 @@ const Sort: FC = () => {
 				</Form.Item>
 			</div>
 
-			<div style={{ justifyContent: 'end', display: 'flex', width: '100%' }}>
+			<div
+				style={{
+					justifyContent: 'end',
+					display: 'flex',
+					width: '100%',
+					paddingRight: '20px'
+				}}
+			>
 				<Button
 					className={`${classes.btn} ${classes.reset}`}
 					htmlType="button"
