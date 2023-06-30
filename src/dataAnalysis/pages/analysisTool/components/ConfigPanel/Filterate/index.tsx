@@ -594,7 +594,7 @@ export default () => {
 				</div>
 				<div className={styles.controlRow}>
 					<Button
-						style={{ marginRight: '10px' }}
+						style={{ marginRight: '20px' }}
 						className={`${styles.btn} ${styles.reset}`}
 						htmlType="button"
 						onClick={reset}
