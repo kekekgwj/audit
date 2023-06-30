@@ -115,13 +115,13 @@ const useNextGraphRef = () => {
 		// edges,
 		relations
 	}) => {
-		if (!ref.current[nodeID]) {
-			ref.current[nodeID] = [];
-		}
-		ref.current[nodeID][path] = {
-			nodes: new Set(nodes),
-			edges: new Set(edges)
-		};
+		// if (!ref.current[nodeID]) {
+		// 	ref.current[nodeID] = [];
+		// }
+		// ref.current[nodeID][path] = {
+		// 	nodes: new Set(nodes),
+		// 	edges: new Set(edges)
+		// };
 		// ref.current[nodeID][path] = {
 		// 	nodes: new Set(nodes),
 		// 	edges: new Set(edges)
