@@ -97,27 +97,27 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 	const symbolSelect = [
 		{
 			label: '=',
-			value: '='
-		},
-		{
-			label: '!=',
-			value: '!='
+			value: '1'
 		},
 		{
 			label: '>',
-			value: '>'
+			value: '2'
 		},
 		{
 			label: '<',
-			value: '<'
+			value: '4'
 		},
 		{
-			lable: '>=',
-			value: '>='
+			label: '>=',
+			value: '3'
 		},
 		{
-			lable: '<=',
-			value: '<='
+			label: '<=',
+			value: '5'
+		},
+		{
+			label: '!=',
+			value: '6'
 		}
 	];
 

@@ -108,7 +108,7 @@ type IGetNextGraphInfo = (
 // 用于记录穿透下一层节点的勾选 id - path - nodes/edges
 const useNextGraphRef = () => {
 	// const ref = useRef<Record<string, Record<string, INextGraphNode>>>({});
-	const ref = useRef < Record<string, string[]>({});
+	const ref = useRef<Record<string, string[]>>({});
 	const setNextGraphInfo: ISetNextGraphInfo = ({
 		nodeID,
 		// nodes,
