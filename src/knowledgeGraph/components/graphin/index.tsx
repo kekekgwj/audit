@@ -11,7 +11,7 @@ import Graphin, {
 	type LegendChildrenProps
 } from '@antv/graphin';
 const { DragCanvas, ZoomCanvas, DragNode, ActivateRelations } = Behaviors;
-import { IGraphData } from '@/api/knowLedgeGraph/graphin';
+import { IGraphData, IResNode } from '@/api/knowLedgeGraph/graphin';
 import Legend from './legend';
 import LeftEvent from './LeftEvent';
 import RightMenu from './RightMenu';
@@ -43,15 +43,30 @@ const getCenterNode = ({ nodes }: Pick<IGraphData, 'nodes'>): string | null => {
 	return centerNode;
 };
 
+const formatCombo = (nodes: IResNode[]) => {
+	const comboID = new Set<string>();
+	nodes.forEach((node) => {
+		const { communityId } = node;
+		communityId && comboID.add(communityId);
+	});
+	return [...comboID].map((id) => {
+		return {
+			id,
+			label: 'communityID: ' + id
+		};
+	});
+};
 const formatGraphData = (data: IGraphData): GraphinData => {
 	const { edges, nodes } = Object.assign({}, data);
 
 	const customEdges = formatCustomEdges({ edges });
 	const customNodes = formatCustomNodes({ nodes });
+	const combos = formatCombo(nodes);
 
 	return {
 		edges: customEdges,
-		nodes: customNodes
+		nodes: customNodes,
+		combos: combos
 	};
 };
 interface IGraphContext {

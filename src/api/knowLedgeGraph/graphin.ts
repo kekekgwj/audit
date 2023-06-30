@@ -64,7 +64,7 @@ export interface IResNode {
 	};
 	communityId: string | null;
 	id: string;
-	label: string;
+	labels: string[];
 	score: number | null;
 	type: string;
 	isCenter?: boolean;
