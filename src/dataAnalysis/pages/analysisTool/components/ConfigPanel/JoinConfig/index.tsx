@@ -1,5 +1,6 @@
 import { Button, Form, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { isEmpty } from 'lodash';
 import classes from './index.module.less';
 import { useConfigContextValue } from '../../NodeDetailPanel';
 import { useGraphContext, useGraphPageInfo } from '../../../lib/hooks';
@@ -261,6 +262,32 @@ const SelectGroup: React.FC = () => {
 		id && resetValue();
 	};
 
+	useEffect(() => {
+		const connectionSentences = [];
+
+		if (isEmpty(initValue.connectionSentences)) {
+			if (!isEmpty(config[0].recommendFieldNames)) {
+				config[0].recommendFieldNames.forEach((item, index) => {
+					connectionSentences.push({
+						key: index,
+						fieldKey: index,
+						leftHeaderName: item,
+						leftTableName: config[0].tableName,
+						operator: '=',
+						rightHeaderName: config[1].recommendFieldNames[index],
+						rightTableName: config[1].tableName
+					});
+				});
+			}
+		}
+
+		form.setFieldsValue({
+			connectionSentences,
+			connectionType: 'INNER JOIN',
+			...initValue
+		});
+	}, []);
+
 	return (
 		<div style={{ overflowY: 'auto', paddingRight: '20px', height: '300px' }}>
 			<Form
@@ -270,11 +297,11 @@ const SelectGroup: React.FC = () => {
 				onValuesChange={(_, value) => {
 					handleOnChange(value);
 				}}
-				initialValues={{
-					connectionSentences: [],
-					connectionType: 'INNER JOIN',
-					...initValue
-				}}
+				// initialValues={{
+				// 	connectionSentences: [],
+				// 	connectionType: 'INNER JOIN',
+				// 	...initValue
+				// }}
 				form={form}
 				disabled={isPublicTemplate}
 			>
