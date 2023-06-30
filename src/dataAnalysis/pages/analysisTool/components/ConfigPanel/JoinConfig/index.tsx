@@ -289,7 +289,7 @@ const SelectGroup: React.FC = () => {
 	}, []);
 
 	return (
-		<div style={{ overflowY: 'auto', paddingRight: '20px', height: '300px' }}>
+		<div className={classes.boxx}>
 			<Form
 				name="customized_form_controls"
 				layout="vertical"
@@ -304,53 +304,57 @@ const SelectGroup: React.FC = () => {
 				// }}
 				form={form}
 				disabled={isPublicTemplate}
+				style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
 			>
-				<div style={{ fontSize: '14px', marginBottom: 20 }}>
-					<span style={{ fontWeight: 'bold' }}>连接语句: </span>
-					<span>多行之间是"且"的关系</span>
+				<div className={classes.boxxScroll}>
+					<div style={{ fontSize: '14px', marginBottom: 20 }}>
+						<span style={{ fontWeight: 'bold' }}>连接语句: </span>
+						<span>多行之间是"且"的关系</span>
+					</div>
+
+					<Form.List name="connectionSentences">
+						{(fields, { add, remove }) => (
+							<>
+								{fields.map(({ key, name }) => (
+									<Form.Item name={name} key={key}>
+										<SelectRow
+											key={key}
+											rowName={name}
+											handleOnDelete={handleOnDelete}
+											leftOptions={leftOptions}
+											rightOptions={rightOptions}
+										></SelectRow>
+									</Form.Item>
+								))}
+							</>
+						)}
+					</Form.List>
+					<Button
+						className={classes.addConnectBtn}
+						onClick={() => {
+							handleOnclickAdd();
+						}}
+						disabled={isPublicTemplate}
+					>
+						{AddIcon}
+						<span style={{ marginLeft: '-10px' }}>添加连接语句</span>
+					</Button>
+					<div className={classes.addRow}>
+						<span
+							style={{ fontSize: 14, fontWeight: 'bold', marginBottom: '24px' }}
+						>
+							连接类型
+						</span>
+						<Form.Item name={'connectionType'}>
+							<Select style={{ width: 395, marginLeft: 0 }}>
+								<Select.Option value="INNER JOIN">内连接</Select.Option>
+								<Select.Option value="LEFT JOIN">左连接</Select.Option>
+								<Select.Option value="RIGHT JOIN">右连接</Select.Option>
+							</Select>
+						</Form.Item>
+					</div>
 				</div>
 
-				<Form.List name="connectionSentences">
-					{(fields, { add, remove }) => (
-						<>
-							{fields.map(({ key, name }) => (
-								<Form.Item name={name} key={key}>
-									<SelectRow
-										key={key}
-										rowName={name}
-										handleOnDelete={handleOnDelete}
-										leftOptions={leftOptions}
-										rightOptions={rightOptions}
-									></SelectRow>
-								</Form.Item>
-							))}
-						</>
-					)}
-				</Form.List>
-				<Button
-					className={classes.addConnectBtn}
-					onClick={() => {
-						handleOnclickAdd();
-					}}
-					disabled={isPublicTemplate}
-				>
-					{AddIcon}
-					<span style={{ marginLeft: '-10px' }}>添加连接语句</span>
-				</Button>
-				<div className={classes.addRow}>
-					<span
-						style={{ fontSize: 14, fontWeight: 'bold', marginBottom: '24px' }}
-					>
-						连接类型
-					</span>
-					<Form.Item name={'connectionType'}>
-						<Select style={{ width: 395, marginLeft: 0 }}>
-							<Select.Option value="INNER JOIN">内连接</Select.Option>
-							<Select.Option value="LEFT JOIN">左连接</Select.Option>
-							<Select.Option value="RIGHT JOIN">右连接</Select.Option>
-						</Select>
-					</Form.Item>
-				</div>
 				<div className={classes.controlRow}>
 					<Button
 						className={`${classes.btn} ${classes.reset}`}
