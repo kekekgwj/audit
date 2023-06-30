@@ -16,7 +16,9 @@ import {
 	message,
 	Table,
 	Pagination,
-	Empty
+	Empty,
+	Row,
+	Col
 } from 'antd';
 import type { PaginationProps } from 'antd';
 import SvgIcon from '@/components/svg-icon';
@@ -276,19 +278,26 @@ export default () => {
 					labelCol={{ span: 6 }}
 					wrapperCol={{ span: 18 }}
 					layout="inline"
+					style={{ width: 'calc(100% - 138px)' }}
 				>
-					<Form.Item
-						name="sqlName"
-						label="SQL名称"
-						labelCol={{ span: 6 }}
-						wrapperCol={{ span: 18 }}
-						colon={false}
-					>
-						<Input placeholder="请输入" />
-					</Form.Item>
-					<Form.Item name="createdDate" label="创建时间" colon={false}>
-						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
-					</Form.Item>
+					<Row style={{ width: '100%' }}>
+						<Col span={8}>
+							<Form.Item
+								name="sqlName"
+								label="SQL名称"
+								labelCol={{ span: 6 }}
+								wrapperCol={{ span: 18 }}
+								colon={false}
+							>
+								<Input placeholder="请输入" />
+							</Form.Item>
+						</Col>
+						<Col span={8}>
+							<Form.Item name="createdDate" label="创建时间" colon={false}>
+								<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
+							</Form.Item>
+						</Col>
+					</Row>
 				</Form>
 				<div className={styles['search-handle-box']}>
 					<Button htmlType="button" onClick={onReset}>
@@ -364,11 +373,7 @@ export default () => {
 					</div>
 				</div>
 			) : (
-				<Empty
-					image={emptyPage}
-					description={false}
-					imageStyle={{ height: '193px' }}
-				/>
+				<Empty image={emptyPage} description={false} />
 			)}
 			{contextHolder}
 

@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Button, Form, Input, Table, Pagination, Empty } from 'antd';
+import { Button, Form, Input, Table, Pagination, Empty, Row, Col } from 'antd';
 import type { PaginationProps } from 'antd';
 import SvgIcon from '@/components/svg-icon';
 import emptyPage from '@/assets/img/empty-data.png';
@@ -145,20 +145,25 @@ export default () => {
 		<div style={{ padding: '20px' }} className={styles.sqlAuditBox}>
 			<div className={styles.searchForm}>
 				<Form
+					style={{ width: 'calc(100% - 138px)' }}
 					form={searchForm}
 					labelCol={{ span: 6 }}
 					wrapperCol={{ span: 18 }}
 					layout="inline"
 				>
-					<Form.Item
-						name="sqlName"
-						label="审计规则SQL名称"
-						labelCol={{ span: 10 }}
-						wrapperCol={{ span: 14 }}
-						colon={false}
-					>
-						<Input placeholder="请输入" />
-					</Form.Item>
+					<Row style={{ width: '100%' }}>
+						<Col span={8}>
+							<Form.Item
+								name="sqlName"
+								label="审计规则SQL名称"
+								labelCol={{ span: 10 }}
+								wrapperCol={{ span: 14 }}
+								colon={false}
+							>
+								<Input placeholder="请输入" className={styles.searchItem} />
+							</Form.Item>
+						</Col>
+					</Row>
 				</Form>
 				<div className={styles['search-handle-box']}>
 					<Button htmlType="button" onClick={onReset}>
@@ -205,7 +210,7 @@ export default () => {
 				</div>
 			</div> */}
 
-			{tableData && tableData.length ? (
+			{tableData && tableData.length > 6 ? (
 				<div className={styles['my-table-box']}>
 					<Table
 						className={styles['my-table']}
@@ -231,11 +236,7 @@ export default () => {
 					</div>
 				</div>
 			) : (
-				<Empty
-					image={emptyPage}
-					description={false}
-					imageStyle={{ height: '193px' }}
-				/>
+				<Empty image={emptyPage} description={false} />
 			)}
 
 			<Show

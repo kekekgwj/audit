@@ -12,7 +12,9 @@ import {
 	DatePicker,
 	Empty,
 	message,
-	Divider
+	Divider,
+	Row,
+	Col
 } from 'antd';
 import type { PaginationProps } from 'antd';
 import emptyPage from '@/assets/img/no-data.png';
@@ -224,22 +226,26 @@ const DataManageCom = () => {
 			<div className={styles.searchForm}>
 				<Form
 					form={form}
+					labelCol={{ span: 6 }}
+					wrapperCol={{ span: 18 }}
 					layout="inline"
 					onFinish={(res: any) => {
 						search();
 					}}
+					style={{ width: 'calc(100% - 138px)' }}
 				>
-					<Form.Item name="tableName" label="表名称">
-						<Input placeholder="请输入" />
-					</Form.Item>
-
-					<Form.Item name="gmtCreated" label="创建时间">
-						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
-					</Form.Item>
-
-					{/* <Form.Item name="updateTime" label="更新时间">
-						<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
-					</Form.Item> */}
+					<Row style={{ width: '100%' }}>
+						<Col span={8}>
+							<Form.Item name="tableName" label="表名称">
+								<Input placeholder="请输入" />
+							</Form.Item>
+						</Col>
+						<Col span={8}>
+							<Form.Item name="gmtCreated" label="创建时间">
+								<RangePicker format="YYYY-MM-DD" separator={<div>至</div>} />
+							</Form.Item>
+						</Col>
+					</Row>
 				</Form>
 				<div className={styles['search-handle-box']}>
 					<Button htmlType="button" onClick={onReset}>
@@ -281,11 +287,7 @@ const DataManageCom = () => {
 					refresh={getList}
 				/>
 			) : (
-				<Empty
-					image={emptyPage}
-					description={false}
-					imageStyle={{ height: '193px' }}
-				/>
+				<Empty image={emptyPage} description={false} />
 			)}
 			<ImportDialog
 				open={openImport}
