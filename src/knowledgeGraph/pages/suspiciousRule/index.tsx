@@ -227,7 +227,7 @@ const RuleCom = () => {
 						<Col span={8}>
 							<Form.Item name="name" label="规则名称" colon={false}>
 								<Input
-									style={{ maxWidth: '270px' }}
+									// style={{ maxWidth: '270px' }}
 									placeholder="请输入"
 									className={styles.searchItem}
 								/>
@@ -264,11 +264,7 @@ const RuleCom = () => {
 					current={current}
 				/>
 			) : (
-				<Empty
-					image={emptyPage}
-					description={false}
-					imageStyle={{ height: '193px' }}
-				/>
+				<Empty image={emptyPage} description={false} />
 			)}
 		</div>
 	);

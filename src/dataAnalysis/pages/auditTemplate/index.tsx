@@ -213,11 +213,7 @@ const AuditTemplate = () => {
 						</div>
 					</div>
 				) : (
-					<Empty
-						image={emptyPage}
-						description={false}
-						imageStyle={{ height: '193px' }}
-					/>
+					<Empty image={emptyPage} description={false} />
 				)}
 			</div>
 			<CustomDialog
