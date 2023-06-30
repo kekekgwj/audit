@@ -1,3 +1,16 @@
+.boxx {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	// padding-right: 20px;
+}
+
+.boxxScroll {
+	flex: 1 1 auto;
+	padding-right: 20px;
+	overflow-y: auto;
+}
+
 .filter-box {
 	margin-bottom: 20px;
 	&__title {
@@ -69,11 +82,11 @@
 	}
 }
 .checkbox-group-item {
-	margin-bottom: 10px;
+	margin-bottom: 14px;
 	.checkbox-group {
 		display: flex;
 		flex-wrap: wrap;
-		margin-top: 10px;
+		margin-top: 14px;
 	}
 }
 
@@ -85,5 +98,8 @@
 }
 
 .controlRow {
+	flex: 0 0 auto;
+	margin-top: 14px;
+	padding-right: 20px;
 	text-align: right;
 }

@@ -521,7 +521,7 @@ export default () => {
 	};
 
 	return (
-		<div style={{ overflowY: 'auto', paddingRight: '20px', height: '300px' }}>
+		<div className={styles['boxx']}>
 			<FilterateContext.Provider
 				value={{
 					setRowData,
@@ -531,70 +531,75 @@ export default () => {
 					cascaderOptions
 				}}
 			>
-				<div className={styles['filter-box']}>
-					<div className={styles['filter-box__title']}>
-						<div className={styles['label']}>行筛选</div>
-						<div>同一组内为且，不同组间为或</div>
-					</div>
-
-					{formData.row.map((rowGroup, rowGroupIndex) => {
-						return (
-							<Group
-								key={rowGroupIndex}
-								index={rowGroupIndex}
-								rowGroup={rowGroup}
-							></Group>
-						);
-					})}
-					<Button
-						className={styles['add-group']}
-						onClick={addGroup}
-						disabled={isPublicTemplate}
-					>
-						<SvgIcon
-							name="add-circle"
-							className={styles['add-group__icon']}
-						></SvgIcon>
-						<span>添加行筛选</span>
-					</Button>
-				</div>
-
-				<div className={styles['filter-box']}>
-					<div className={styles['filter-box__title']}>
-						<div className={styles['label']}>列筛选</div>
-						<div>
-							<Checkbox
-								indeterminate={indeterminate}
-								disabled={isPublicTemplate}
-								onChange={(e) => {
-									onCheckAllChange(e.target.checked);
-								}}
-								checked={checkAll}
-							>
-								全选
-							</Checkbox>
+				<div className={styles.boxxScroll}>
+					<div className={styles['filter-box']}>
+						<div className={styles['filter-box__title']}>
+							<div className={styles['label']}>行筛选</div>
+							<div>同一组内为且，不同组间为或</div>
 						</div>
+
+						{formData.row.map((rowGroup, rowGroupIndex) => {
+							return (
+								<Group
+									key={rowGroupIndex}
+									index={rowGroupIndex}
+									rowGroup={rowGroup}
+								></Group>
+							);
+						})}
+						<Button
+							className={styles['add-group']}
+							onClick={addGroup}
+							disabled={isPublicTemplate}
+						>
+							<SvgIcon
+								name="add-circle"
+								className={styles['add-group__icon']}
+							></SvgIcon>
+							<span>添加行筛选</span>
+						</Button>
 					</div>
 
-					{colOptions.map(({ _key, label, value, children, defaultValue }) => {
-						return (
-							<div key={_key} className={styles['checkbox-group-item']}>
-								<div>{label + ':'}</div>
-								<div>
-									<CheckboxGroup
-										disabled={isPublicTemplate}
-										className={styles['checkbox-group']}
-										options={children}
-										defaultValue={defaultValue}
-										onChange={(val) => {
-											onChange(value, val);
-										}}
-									/>
-								</div>
+					<div className={styles['filter-box']}>
+						<div className={styles['filter-box__title']}>
+							<div className={styles['label']}>列筛选</div>
+							<div>
+								<Checkbox
+									indeterminate={indeterminate}
+									disabled={isPublicTemplate}
+									onChange={(e) => {
+										onCheckAllChange(e.target.checked);
+									}}
+									checked={checkAll}
+								>
+									全选
+								</Checkbox>
 							</div>
-						);
-					})}
+						</div>
+
+						{colOptions.map(
+							({ _key, label, value, children, defaultValue }) => {
+								return (
+									<div key={_key} className={styles['checkbox-group-item']}>
+										<div>{label + ':'}</div>
+										<div>
+											<CheckboxGroup
+												disabled={isPublicTemplate}
+												className={styles['checkbox-group']}
+												options={children}
+												defaultValue={defaultValue}
+												onChange={(val) => {
+													onChange(value, val);
+												}}
+											/>
+										</div>
+									</div>
+								);
+							}
+						)}
+					</div>
 				</div>
+
 				<div className={styles.controlRow}>
 					<Button
 						style={{ marginRight: '20px' }}

@@ -73,19 +73,24 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 			<Table
 				size="small"
 				bordered
+				showHeader={!!total}
 				loading={loading}
 				components={components}
 				columns={columns}
 				dataSource={dataSource}
-				scroll={{ y: 240 }}
-				pagination={{
-					current,
-					total,
-					pageSize: 10,
-					onChange: (page) => {
-						searchChange(page);
-					}
-				}}
+				scroll={{ y: total ? 240 : 300 }}
+				pagination={
+					total
+						? {
+								current,
+								total,
+								pageSize: 10,
+								onChange: (page) => {
+									searchChange(page);
+								}
+						  }
+						: false
+				}
 			/>
 		</div>
 	);
