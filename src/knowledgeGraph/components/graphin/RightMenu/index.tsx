@@ -1,11 +1,12 @@
 import {
+	IGraphData,
 	getNextGraph,
 	getNextRelationships
 } from '@/api/knowLedgeGraph/graphin';
 
 import { Checkbox, Col, Row } from 'antd';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Components } from '@antv/graphin';
 import styles from './index.module.less';
 import { useGraphContext } from '..';
@@ -17,6 +18,7 @@ interface MenuProps {
 	id?: string;
 }
 const { ContextMenu } = Components;
+
 const RightMenu = () => {
 	return (
 		<ContextMenu style={{ width: 'auto', background: '#fff' }} bindType="node">
@@ -29,8 +31,8 @@ const RightMenu = () => {
 };
 
 const MyMenu = React.memo((props: MenuProps) => {
-	const { curData, updateData } = useGraphContext();
-
+	const { curData, updateData, setNextGraphInfo, getNextGraphInfo } =
+		useGraphContext();
 	if (!curData || !updateData) {
 		return <></>;
 	}
@@ -54,31 +56,37 @@ const MyMenu = React.memo((props: MenuProps) => {
 	const onChange = (checkedValues: CheckboxValueType[]) => {
 		setCheckedRel(checkedValues);
 	};
+
 	// 穿透到下一层
 	const showNextLeval = () => {
-		const oldData = {
-			nodes: curData.nodes,
-			edges: curData.edges
-		};
+		const { nodes: curNodes, edges: curEdges } = curData as IGraphData;
+
 		// for 移动到中心节点
 		onSetSelectID({ selectID: orginId + '-node' });
-		getNextGraph({ nodeId: orginId, relationships: checkedRel }).then(
-			(res: any) => {
-				const map = new Map();
-				const newData = {
-					//拼接原有数据并去重
-					nodes: [...oldData.nodes, ...res.nodes].filter(
-						(v) => !map.has(v.id) && map.set(v.id, 1)
-					),
-					edges: [...oldData.edges, ...res.edges].filter(
-						(v) => !map.has(v.id) && map.set(v.id, 1)
-					)
-				};
+		getNextGraph({ nodeId: orginId, relationships: checkedRel }).then((res) => {
+			const { nodes, edges } = res || {};
+			console.log('nodes', nodes, edges, checkedRel);
+			const prevNodesID = curNodes.map((node) => node.id);
+			const prevEdgesID = curEdges.map((edge) => edge.id);
+			const addNodes = nodes.filter((node) => !prevNodesID.includes(node.id));
+			const addEdges = edges.filter((edge) => !prevEdgesID.includes(edge.id));
 
-				updateData(newData);
-				onClose();
-			}
-		);
+			const addNodesID = addNodes.map((node) => node.id);
+			const addEdgesID = addEdges.map((edge) => edge.id);
+			setNextGraphInfo({
+				nodeID: orginId,
+				// nodes: addNodesID,
+				// edges: addEdgesID,
+				relations: checkedRel
+			});
+			const newData = {
+				//拼接原有数据并去重
+				nodes: [...curNodes, ...addNodes],
+				edges: [...curEdges, ...addEdges]
+			};
+			updateData(newData);
+			onClose();
+		});
 	};
 	return (
 		<div className={styles['check-group-box']}>

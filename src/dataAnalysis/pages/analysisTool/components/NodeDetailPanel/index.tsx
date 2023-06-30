@@ -205,10 +205,16 @@ const Panel: React.FC = () => {
 			? first
 			: null;
 		type paramsType = getParameterFirst<Parameters<typeof getResult>>;
+		const curConfis = getAllConfigs();
+		// 不存在config不自动执行
+		if (!curConfis[id]) {
+			return;
+		}
+
 		const params: paramsType = {
 			canvasJson: JSON.stringify({
 				content: canvasData,
-				configs: getAllConfigs()
+				configs: curConfis
 			}),
 			executeId: id, //当前选中元素id
 			projectId: projectID,

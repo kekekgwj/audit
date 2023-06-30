@@ -261,11 +261,11 @@ const DataManageCom = () => {
 			</div>
 			<div className={styles['handle-table-box']}>
 				<Button
+					type="primary"
 					htmlType="button"
 					onClick={() => {
 						importData();
 					}}
-					className={styles['add-button']}
 				>
 					数据导入
 				</Button>

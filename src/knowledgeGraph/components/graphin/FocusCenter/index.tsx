@@ -25,13 +25,14 @@ const FocusCenter = () => {
 		// 	console.log('afterupdateitem');
 		// });
 
-		graph.on('afterrender', () => {
-			if (centerID) {
-				const node = graph.findById(centerID);
-				node && apis.focusNodeById(centerID);
-			}
-		});
+		// graph.on('afterrender', () => {
+		// 	if (centerID) {
+		// 		const node = graph.findById(centerID);
+		// 		node && apis.focusNodeById(centerID);
+		// 	}
+		// });
 		graph.on('afterlayout', () => {
+			// console.log('afterlayout');
 			if (selectID) {
 				const node = graph.findById(selectID);
 				node && apis.focusNodeById(selectID);
@@ -43,7 +44,7 @@ const FocusCenter = () => {
 			}
 		});
 		return () => {
-			graph.off('afterrender');
+			// graph.off('afterrender');
 			graph.off('afterlayout');
 		};
 	}, [selectID, centerID]);

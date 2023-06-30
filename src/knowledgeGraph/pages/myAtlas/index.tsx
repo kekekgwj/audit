@@ -16,7 +16,9 @@ import {
 	DatePicker,
 	Empty,
 	message,
-	Divider
+	Divider,
+	Row,
+	Col
 } from 'antd';
 import type { PaginationProps } from 'antd';
 const { RangePicker } = DatePicker;
@@ -214,22 +216,29 @@ const MyAtlasCom = () => {
 		<div className={styles.altasContent}>
 			<div className={styles.searchForm}>
 				<Form
+					style={{ width: 'calc(100% - 138px)' }}
 					form={form}
 					labelCol={{ span: 6 }}
 					wrapperCol={{ span: 18 }}
 					layout="inline"
 				>
-					<Form.Item name="name" label="图谱名称" colon={false}>
-						<Input placeholder="请输入" />
-					</Form.Item>
-
-					<Form.Item name="gmtCreated" label="创建时间" colon={false}>
-						<RangePicker
-							format="YYYY-MM-DD"
-							separator={<div>至</div>}
-							className={styles.searchItem}
-						/>
-					</Form.Item>
+					<Row style={{ width: '100%' }}>
+						<Col span={8}>
+							<Form.Item name="name" label="图谱名称" colon={false}>
+								<Input style={{ maxWidth: '270px' }} placeholder="请输入" />
+							</Form.Item>
+						</Col>
+						<Col span={8}>
+							<Form.Item name="gmtCreated" label="创建时间" colon={false}>
+								<RangePicker
+									style={{ maxWidth: '270px' }}
+									format="YYYY-MM-DD"
+									separator={<div>至</div>}
+									className={styles.searchItem}
+								/>
+							</Form.Item>
+						</Col>
+					</Row>
 				</Form>
 				<div className={styles['search-handle-box']}>
 					<Button htmlType="button" onClick={onReset}>
