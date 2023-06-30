@@ -4,6 +4,7 @@ import Delete from '@/components/delete-dialog';
 import Edit from './components/edit';
 import Show from './components/show';
 import Add from './components/add';
+import emptyPage from '@/assets/img/empty-data.png';
 
 import styles from './index.module.less';
 import {
@@ -14,7 +15,8 @@ import {
 	Input,
 	message,
 	Table,
-	Pagination
+	Pagination,
+	Empty
 } from 'antd';
 import type { PaginationProps } from 'antd';
 import SvgIcon from '@/components/svg-icon';
@@ -312,13 +314,7 @@ export default () => {
 				新增SQL
 			</Button>
 
-			{/* <DataTable
-				ref={tableRef}
-				columns={columns}
-				getData={getData}
-				className={styles.table}
-			></DataTable> */}
-			<div className={styles['my-table-box']}>
+			{/* <div className={styles['my-table-box']}>
 				<Table
 					className={styles['my-table']}
 					columns={columns}
@@ -341,7 +337,39 @@ export default () => {
 						showQuickJumper
 					/>
 				</div>
-			</div>
+			</div> */}
+			{tableData && tableData.length ? (
+				<div className={styles['my-table-box']}>
+					<Table
+						className={styles['my-table']}
+						columns={columns}
+						dataSource={tableData}
+						pagination={false}
+					></Table>
+					<div className={styles['pagination-box']}>
+						<div>
+							<span style={{ marginRight: '10px' }}>共{total}条记录</span>
+							<span>
+								第{current}/{Math.ceil(total / size)}页
+							</span>
+						</div>
+						<Pagination
+							current={current}
+							total={total}
+							showSizeChanger
+							onShowSizeChange={onShowSizeChange}
+							onChange={onChange}
+							showQuickJumper
+						/>
+					</div>
+				</div>
+			) : (
+				<Empty
+					image={emptyPage}
+					description={false}
+					imageStyle={{ height: '193px' }}
+				/>
+			)}
 			{contextHolder}
 
 			<Delete

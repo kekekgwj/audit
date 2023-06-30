@@ -39,7 +39,7 @@ const GraphWatchEvents = () => {
 		graph.on('selection:changed', ({ selected }) => {
 			resetGraph();
 			selected.forEach((node) => {
-				const custom = node.store.data.attrs.custom;
+				const custom = node?.store?.data?.attrs?.custom || {};
 				custom.isSelected = true;
 				if (custom.type === IImageTypes.TABLE) {
 					node.attr('body/stroke', '#24a36f');

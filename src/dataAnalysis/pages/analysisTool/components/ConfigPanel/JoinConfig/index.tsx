@@ -98,27 +98,27 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 	const symbolSelect = [
 		{
 			label: '=',
-			value: '='
-		},
-		{
-			label: '!=',
-			value: '!='
+			value: '1'
 		},
 		{
 			label: '>',
-			value: '>'
+			value: '2'
 		},
 		{
 			label: '<',
-			value: '<'
+			value: '4'
 		},
 		{
-			lable: '>=',
-			value: '>='
+			label: '>=',
+			value: '3'
 		},
 		{
-			lable: '<=',
-			value: '<='
+			label: '<=',
+			value: '5'
+		},
+		{
+			label: '!=',
+			value: '6'
 		}
 	];
 
@@ -185,7 +185,6 @@ const SelectGroup: React.FC = () => {
 
 	useEffect(() => {
 		handleGetNodeConfig();
-		executeByNodeConfig();
 	}, []);
 
 	const handleOnclickAdd = () => {
@@ -193,7 +192,7 @@ const SelectGroup: React.FC = () => {
 		const nextList = list.concat({
 			key: list.length,
 			fieldKey: list.length,
-			operator: '='
+			operator: '1'
 		});
 		if (nextList.length > 0) {
 			setShowTips(true);

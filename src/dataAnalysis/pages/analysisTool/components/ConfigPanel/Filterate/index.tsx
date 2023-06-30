@@ -160,6 +160,10 @@ const Row = (props: RowProps) => {
 		{
 			label: '<=',
 			value: '5'
+		},
+		{
+			label: '!=',
+			value: '6'
 		}
 	];
 
@@ -256,7 +260,7 @@ export default () => {
 						_key: getHash(),
 						tableName: '', // 表名
 						tableHeader: '', // 表头
-						operator: '=', // 符号
+						operator: '1', // 符号
 						value: '', // 值
 						dataType: ''
 					}
@@ -268,7 +272,7 @@ export default () => {
 					_key: getHash(),
 					tableName: '', // 表名
 					tableHeader: '', // 表头
-					operator: '=', // 符号
+					operator: '1', // 符号
 					value: '', // 值
 					dataType: ''
 				});
@@ -317,7 +321,6 @@ export default () => {
 	useEffect(() => {
 		setCascaderOptions(formatCascaderData(config));
 		setColOptions(formatColData(config));
-		executeByNodeConfig();
 	}, []);
 
 	// useEffect(() => {

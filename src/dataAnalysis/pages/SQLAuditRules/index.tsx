@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
-import { Button, Form, Input, Table, Pagination } from 'antd';
+import { Button, Form, Input, Table, Pagination, Empty } from 'antd';
 import type { PaginationProps } from 'antd';
 import SvgIcon from '@/components/svg-icon';
+import emptyPage from '@/assets/img/empty-data.png';
 // import DataTable from '@/components/data-table';
 import Show from './components/show';
 
@@ -141,7 +142,7 @@ export default () => {
 	// };
 
 	return (
-		<div style={{ padding: '20px' }}>
+		<div style={{ padding: '20px' }} className={styles.sqlAuditBox}>
 			<div className={styles.searchForm}>
 				<Form
 					form={searchForm}
@@ -179,7 +180,7 @@ export default () => {
 			</div>
 
 			{/* <DataTable ref={tableRef} columns={columns} getData={getData}></DataTable> */}
-			<div className={styles['my-table-box']}>
+			{/* <div className={styles['my-table-box']}>
 				<Table
 					className={styles['my-table']}
 					columns={columns}
@@ -202,7 +203,40 @@ export default () => {
 						showQuickJumper
 					/>
 				</div>
-			</div>
+			</div> */}
+
+			{tableData && tableData.length ? (
+				<div className={styles['my-table-box']}>
+					<Table
+						className={styles['my-table']}
+						columns={columns}
+						dataSource={tableData}
+						pagination={false}
+					></Table>
+					<div className={styles['pagination-box']}>
+						<div>
+							<span style={{ marginRight: '10px' }}>共{total}条记录</span>
+							<span>
+								第{current}/{Math.ceil(total / size)}页
+							</span>
+						</div>
+						<Pagination
+							current={current}
+							total={total}
+							showSizeChanger
+							onShowSizeChange={onShowSizeChange}
+							onChange={onChange}
+							showQuickJumper
+						/>
+					</div>
+				</div>
+			) : (
+				<Empty
+					image={emptyPage}
+					description={false}
+					imageStyle={{ height: '193px' }}
+				/>
+			)}
 
 			<Show
 				open={openShow}
