@@ -392,16 +392,16 @@ export const formatDataSource = (data: any[], head: string[]) => {
 
 	interface IColumn {
 		title: string;
-		dataIndex: string;
-		key: string;
+		dataIndex: string | number;
+		key: string | number;
 		ellipsis: boolean;
 		width: number;
 	}
 	const columns: IColumn[] = head.map((item, index) => {
 		return {
 			title: item,
-			dataIndex: item,
-			key: item,
+			dataIndex: index,
+			key: index,
 			ellipsis: true,
 			width: 100
 		};
