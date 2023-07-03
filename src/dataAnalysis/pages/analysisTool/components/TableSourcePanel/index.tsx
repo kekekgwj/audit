@@ -17,7 +17,7 @@ const TableItem: React.FC = ({ data, disabled }) => {
 	return (
 		<Collapse
 			className={classes.tableItemWrapper}
-			expandIconPosition={'start'}
+			expandIconPosition="end"
 			ghost={true}
 			defaultActiveKey={['panel']}
 		>
@@ -171,7 +171,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 		<div className={classes.drawerWrapper}>
 			{open && (
 				<div className={classes.container}>
-					<div style={{ paddingRight: '15px' }}>
+					<div style={{ paddingRight: '15px', marginBottom: '20px' }}>
 						<Search
 							placeholder="请输入关键字"
 							enterButton="查询"
