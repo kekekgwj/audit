@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import isEqual from 'lodash/isEqual';
-import emptyPage from '@/assets/img/noGraph.png';
+import emptyPage from '@/assets/img/newEmpty.png';
 import SvgIcon from '@/components/svg-icon';
 import {
 	Table,
@@ -269,7 +269,16 @@ const MyAtlasCom = () => {
 					refresh={getList}
 				/>
 			) : (
-				<Empty image={emptyPage} description={false} />
+				// <Empty image={emptyPage} description={false} />
+				<Empty
+					image={emptyPage}
+					description={
+						<div className={styles['empty-tip-box']}>
+							<div className={styles['empty-tip1']}>暂无数据</div>
+							<div className={styles['empty-tip2']}>图谱空空如也~</div>
+						</div>
+					}
+				/>
 			)}
 		</div>
 	);

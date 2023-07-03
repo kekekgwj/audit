@@ -16,7 +16,7 @@ import {
 	MinusCircleOutlined,
 	PlusCircleOutlined
 } from '@ant-design/icons';
-import emptyPage from '@/assets/img/empty.png';
+import emptyPage from '@/assets/img/newEmpty.png';
 import styles from './index.module.less';
 import CustomDialog from '@/components/custom-dialog';
 import { getSuspiciousRule, checkNodeByRule } from '@/api/knowLedgeGraph/rule';
@@ -264,7 +264,15 @@ const RuleCom = () => {
 					current={current}
 				/>
 			) : (
-				<Empty image={emptyPage} description={false} />
+				<Empty
+					image={emptyPage}
+					description={
+						<div className={styles['empty-tip-box']}>
+							<div className={styles['empty-tip1']}>暂无数据</div>
+							<div className={styles['empty-tip2']}>数据空空如也~</div>
+						</div>
+					}
+				/>
 			)}
 		</div>
 	);
