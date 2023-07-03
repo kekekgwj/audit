@@ -4,7 +4,7 @@ import Delete from '@/components/delete-dialog';
 import Edit from './components/edit';
 import Show from './components/show';
 import Add from './components/add';
-import emptyPage from '@/assets/img/empty-data.png';
+import emptyPage from '@/assets/img/newEmpty.png';
 
 import styles from './index.module.less';
 import {
@@ -373,7 +373,15 @@ export default () => {
 					</div>
 				</div>
 			) : (
-				<Empty image={emptyPage} description={false} />
+				<Empty
+					image={emptyPage}
+					description={
+						<div className={styles['empty-tip-box']}>
+							<div className={styles['empty-tip1']}>暂无数据</div>
+							<div className={styles['empty-tip2']}>数据空空如也~</div>
+						</div>
+					}
+				/>
 			)}
 			{contextHolder}
 
