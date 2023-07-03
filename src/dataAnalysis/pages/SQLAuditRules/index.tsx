@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Button, Form, Input, Table, Pagination, Empty, Row, Col } from 'antd';
 import type { PaginationProps } from 'antd';
 import SvgIcon from '@/components/svg-icon';
-import emptyPage from '@/assets/img/empty-data.png';
+import emptyPage from '@/assets/img/newEmpty.png';
 // import DataTable from '@/components/data-table';
 import Show from './components/show';
 
@@ -236,7 +236,15 @@ export default () => {
 					</div>
 				</div>
 			) : (
-				<Empty image={emptyPage} description={false} />
+				<Empty
+					image={emptyPage}
+					description={
+						<div className={styles['empty-tip-box']}>
+							<div className={styles['empty-tip1']}>暂无数据</div>
+							<div className={styles['empty-tip2']}>数据空空如也~</div>
+						</div>
+					}
+				/>
 			)}
 
 			<Show

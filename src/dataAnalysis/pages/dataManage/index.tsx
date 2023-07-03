@@ -17,7 +17,7 @@ import {
 	Col
 } from 'antd';
 import type { PaginationProps } from 'antd';
-import emptyPage from '@/assets/img/no-data.png';
+import emptyPage from '@/assets/img/newEmpty.png';
 const { RangePicker } = DatePicker;
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import SvgIcon from '@/components/svg-icon';
@@ -287,7 +287,16 @@ const DataManageCom = () => {
 					refresh={getList}
 				/>
 			) : (
-				<Empty image={emptyPage} description={false} />
+				// <Empty image={emptyPage} description={false} />
+				<Empty
+					image={emptyPage}
+					description={
+						<div className={styles['empty-tip-box']}>
+							<div className={styles['empty-tip1']}>暂无数据</div>
+							<div className={styles['empty-tip2']}>我的数据空空如也~</div>
+						</div>
+					}
+				/>
 			)}
 			<ImportDialog
 				open={openImport}

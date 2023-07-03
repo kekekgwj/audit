@@ -69,7 +69,13 @@ const SidebarItem = (props: Props) => {
 						></SvgIcon>
 					</div>
 					<div
-						style={{ height: toggle ? menu.children.length * 50 + 'px' : '0' }}
+						style={{
+							height: toggle
+								? menu.children.length * 50 +
+								  (menu.children.length - 1) * 10 +
+								  'px'
+								: '0'
+						}}
 						className={styles['sub-menu']}
 					>
 						{menu.children.map((m) => (

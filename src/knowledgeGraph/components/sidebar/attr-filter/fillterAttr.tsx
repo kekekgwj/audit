@@ -164,7 +164,7 @@ const FillterAttr: FC<IProps> = forwardRef(
 					// labelCol={{ span: 6 }}
 					// wrapperCol={{ span: 18 }}
 					layout="vertical"
-					style={{ maxWidth: 600, maxHeight: 350, overflowY: 'auto' }}
+					style={{ maxWidth: 600, maxHeight: 380, overflowY: 'auto' }}
 					autoComplete="off"
 					form={form}
 					onValuesChange={(allValues) => {
@@ -174,7 +174,7 @@ const FillterAttr: FC<IProps> = forwardRef(
 					{properties.map((item, index) => {
 						const { label, key, type, dict, value } = item;
 						return (
-							<div key={index}>
+							<div key={index} style={{ maxWidth: '370px' }}>
 								<CustomizedComponent
 									name={key}
 									type={type}
