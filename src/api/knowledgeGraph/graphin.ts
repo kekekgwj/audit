@@ -50,10 +50,12 @@ interface IFilters {
 	nodeFilter?: string[];
 	nodes: IFilterNode[];
 	paths?: IPath | null;
+	nextGraphs?: INextGraphParam[] | null;
 }
 export interface IGraphData {
 	edges: IResEdge[];
 	nodes: IResNode[];
+	limited: boolean;
 }
 
 export interface IResNode {
@@ -64,7 +66,7 @@ export interface IResNode {
 	};
 	communityId: string | null;
 	id: string;
-	label: string;
+	labels: string[];
 	score: number | null;
 	type: string;
 	isCenter?: boolean;
@@ -82,20 +84,25 @@ export interface IResEdge {
 	target: string;
 	type: string;
 }
-
+export interface INextGraphParam {
+	nodeId: number;
+	relationships: string[];
+}
 export const getGraph: (filters: IFilters) => Promise<IGraphData> = ({
 	algorithmName = null,
 	depth = 4,
 	nodeFilter = [],
 	nodes,
-	paths = null
+	paths = null,
+	nextGraphs = null
 }) => {
 	return post<IGraphData>(API_PREFIX + '/blade-tool/graphAnalysis/getGraph', {
 		algorithmName,
 		depth,
 		nodeFilter,
 		nodes,
-		paths
+		paths,
+		nextGraphs
 	});
 };
 interface IGetNextPaths {

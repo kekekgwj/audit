@@ -1,5 +1,6 @@
 import {
 	IGraphData,
+	INextGraphParam,
 	getNextGraph,
 	getNextRelationships
 } from '@/api/knowLedgeGraph/graphin';
@@ -31,9 +32,14 @@ const RightMenu = () => {
 };
 
 const MyMenu = React.memo((props: MenuProps) => {
-	const { curData, updateData, setNextGraphInfo, getNextGraphInfo } =
-		useGraphContext();
-	if (!curData || !updateData) {
+	const {
+		curData,
+		updateData,
+		setNextGraphInfo,
+		getNextGraphInfo,
+		searchNewGraph
+	} = useGraphContext();
+	if (!curData) {
 		return <></>;
 	}
 	const { id, onClose } = props;
@@ -50,43 +56,28 @@ const MyMenu = React.memo((props: MenuProps) => {
 			setRelARR(res);
 		});
 	};
-
+	const savedRelations = getNextGraphInfo(parseInt(orginId));
 	// 选中数据
-	const [checkedRel, setCheckedRel] = React.useState([]);
+
 	const onChange = (checkedValues: CheckboxValueType[]) => {
-		setCheckedRel(checkedValues);
+		setNextGraphInfo({
+			nodeID: Number(orginId),
+			relations: checkedValues as string[]
+		});
 	};
-
-	// 穿透到下一层
+	// 点击查询：穿透到下一层
 	const showNextLeval = () => {
-		const { nodes: curNodes, edges: curEdges } = curData as IGraphData;
-
 		// for 移动到中心节点
 		onSetSelectID({ selectID: orginId + '-node' });
-		getNextGraph({ nodeId: orginId, relationships: checkedRel }).then((res) => {
-			const { nodes, edges } = res || {};
-			console.log('nodes', nodes, edges, checkedRel);
-			const prevNodesID = curNodes.map((node) => node.id);
-			const prevEdgesID = curEdges.map((edge) => edge.id);
-			const addNodes = nodes.filter((node) => !prevNodesID.includes(node.id));
-			const addEdges = edges.filter((edge) => !prevEdgesID.includes(edge.id));
+		const nextGraph = getNextGraphInfo(Number(orginId));
+		const searchParam: INextGraphParam = {
+			nodeId: Number(orginId),
+			relationships: nextGraph
+		};
 
-			const addNodesID = addNodes.map((node) => node.id);
-			const addEdgesID = addEdges.map((edge) => edge.id);
-			setNextGraphInfo({
-				nodeID: orginId,
-				// nodes: addNodesID,
-				// edges: addEdgesID,
-				relations: checkedRel
-			});
-			const newData = {
-				//拼接原有数据并去重
-				nodes: [...curNodes, ...addNodes],
-				edges: [...curEdges, ...addEdges]
-			};
-			updateData(newData);
-			onClose();
-		});
+		searchNewGraph(searchParam);
+		// 关闭弹窗
+		onClose();
 	};
 	return (
 		<div className={styles['check-group-box']}>
@@ -96,6 +87,7 @@ const MyMenu = React.memo((props: MenuProps) => {
 					style={{ width: '100%' }}
 					onChange={onChange}
 					className={styles['relationGroup']}
+					defaultValue={savedRelations || []}
 				>
 					<Row>
 						{relArr.map((item, index) => (

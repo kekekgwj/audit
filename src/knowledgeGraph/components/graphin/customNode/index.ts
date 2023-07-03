@@ -51,6 +51,7 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 		return {
 			...node,
 			id: id + '-node',
+			comboId: communityId,
 			type: 'graphin-circle',
 			style: {
 				label: {
