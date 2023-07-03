@@ -10,6 +10,12 @@
 		padding: 17px 0 0 14px;
 
 		.tableItemWrapper {
+			:global {
+				.ant-collapse-header {
+					padding-left: 0 !important;
+				}
+			}
+
 			.itemTitle {
 				.itemTitleBox {
 					display: flex;
@@ -62,8 +68,8 @@
 			}
 		}
 		.tableItemWrapper:not(:first-child) {
-			width: 200px;
-			margin-top: 20px;
+			// width: 200px;
+			// margin-top: 20px;
 		}
 	}
 	.switch {
