@@ -273,7 +273,7 @@ const SelectGroup: React.FC = () => {
 						fieldKey: index,
 						leftHeaderName: item,
 						leftTableName: config[0].tableName,
-						operator: '=',
+						operator: '1',
 						rightHeaderName: config[1].recommendFieldNames[index],
 						rightTableName: config[1].tableName
 					});
@@ -286,6 +286,14 @@ const SelectGroup: React.FC = () => {
 			connectionType: 'INNER JOIN',
 			...initValue
 		});
+
+		setValue(
+			formatSubmitValue({
+				connectionSentences,
+				connectionType: 'INNER JOIN',
+				...initValue
+			})
+		);
 	}, []);
 
 	return (
