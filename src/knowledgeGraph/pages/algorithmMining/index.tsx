@@ -12,6 +12,10 @@ import {
 	uploadGraphPic
 } from '@/api/knowLedgeGraph/graphin';
 import CustomDialog from '@/components/custom-dialog';
+import {
+	GraphContext,
+	useNextGraphRef
+} from '@/knowledgeGraph/components/hooks';
 
 interface SaveProps {
 	open: boolean;
@@ -26,7 +30,6 @@ const SaveCom = React.memo((props: SaveProps) => {
 
 	useEffect(() => {
 		if (open) {
-			console.log(defaultName, 187187);
 			initForm();
 		}
 	}, [open]);
@@ -89,11 +92,20 @@ const Algorithm = () => {
 	const [defaultName, setdefaultName] = React.useState();
 	const sideBarRef = useRef<any>(null);
 
-	const searchNewGraph = (nextGraphParam: INextGraphParam) => {
+	const searchNewGraph = () => {
+		const relations: INextGraphParam[] = getAllNextGraphInfo();
+
 		if (sideBarRef.current) {
-			sideBarRef.current.getGraph([nextGraphParam]);
+			sideBarRef.current.getGraph(relations);
 		}
 	};
+	const {
+		setNextGraphInfo,
+		getNextGraphInfo,
+		resetAllNextGraph,
+		getAllNextGraphInfo
+	} = useNextGraphRef();
+
 	useEffect(() => {
 		getGraphinData();
 	}, []);
@@ -150,20 +162,27 @@ const Algorithm = () => {
 					canAdd={false}
 					onRef={sideBarRef}
 					setdefaultName={setdefaultName}
+					resetAllNextGraph={resetAllNextGraph}
+					getAllNextGraphInfo={getAllNextGraphInfo}
 				></SideBar>
 			</div>
 			<div className={styles['graphin-box']}>
 				{data && (
 					<>
 						<div className={styles['graphin-box__com']}>
-							<GraphinCom
-								// ref={graphinRef}
-								data={data}
-								refersh={barOpen}
-								updateData={updateData}
-								onClose={() => {}}
-								searchNewGraph={searchNewGraph}
-							></GraphinCom>
+							<GraphContext.Provider
+								value={{
+									updateData,
+									data,
+									setNextGraphInfo,
+									getNextGraphInfo,
+									resetAllNextGraph,
+									searchNewGraph,
+									refresh: barOpen
+								}}
+							>
+								<GraphinCom />
+							</GraphContext.Provider>
 						</div>
 						<div className={styles['graphin-box__btn']}>
 							<Button
