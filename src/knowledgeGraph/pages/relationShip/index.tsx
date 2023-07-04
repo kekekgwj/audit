@@ -6,7 +6,11 @@ import GraphinCom from '@graph/components/graphin';
 import SideBar from '@graph/components/sidebar/sideBar';
 import { toImgStyle } from '@/utils/other';
 import styles from './index.module.less';
-import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
+import {
+	INextGraphParam,
+	saveGraph,
+	uploadGraphPic
+} from '@/api/knowLedgeGraph/graphin';
 import CustomDialog from '@/components/custom-dialog';
 
 interface SaveProps {
@@ -87,7 +91,13 @@ const RelationShipCom = () => {
 	const [open, setSaveOpen] = React.useState(false);
 	const [fileUrl, setFile] = React.useState();
 	const [defaultName, setdefaultName] = React.useState();
+	const sideBarRef = useRef<any>(null);
 
+	const searchNewGraph = (nextGraphParam: INextGraphParam) => {
+		if (sideBarRef.current) {
+			sideBarRef.current.getGraph([nextGraphParam]);
+		}
+	};
 	useEffect(() => {
 		getGraphinData();
 	}, []);
@@ -146,6 +156,7 @@ const RelationShipCom = () => {
 					toggleLayout={toggleBarLayout}
 					canAdd={true}
 					setdefaultName={setdefaultName}
+					onRef={sideBarRef}
 				></SideBar>
 			</div>
 			<div className={styles['graphin-box']}>
@@ -157,6 +168,7 @@ const RelationShipCom = () => {
 								data={data}
 								refersh={barOpen}
 								updateData={updateData}
+								searchNewGraph={searchNewGraph}
 								onClose={() => {}}
 							></GraphinCom>
 						</div>

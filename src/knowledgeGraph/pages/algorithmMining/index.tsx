@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { type GraphinData } from '@antv/graphin';
 import GraphinCom from '../../components/graphin';
 import SideBar from '../../components/sidebar/sideBar';
@@ -6,170 +6,12 @@ import { Button, message, Input, Form, Row, Col } from 'antd';
 import html2canvas from 'html2canvas';
 import styles from './index.module.less';
 import { toImgStyle } from '@/utils/other';
-import { saveGraph, uploadGraphPic } from '@/api/knowLedgeGraph/graphin';
+import {
+	INextGraphParam,
+	saveGraph,
+	uploadGraphPic
+} from '@/api/knowLedgeGraph/graphin';
 import CustomDialog from '@/components/custom-dialog';
-
-const mockData: GraphinData = {
-	nodes: [
-		{
-			id: 'node-0',
-			x: 100,
-			y: 100,
-			data: {
-				type: 'centerPointer'
-			},
-			style: {
-				label: {
-					value: '我是\nnode0',
-					position: 'center',
-					offset: [0, 0],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 80,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-1',
-			x: 200,
-			y: 200,
-			data: {
-				type: 'project'
-			},
-			style: {
-				label: {
-					value: '我是node1',
-					position: 'center',
-					offset: [0, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 60,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-2',
-			x: 100,
-			y: 300,
-			data: {
-				type: 'project'
-			},
-			style: {
-				label: {
-					value: '我是node2',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 40,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-3',
-			data: {
-				type: 'person'
-			},
-			style: {
-				label: {
-					value: '我是node3',
-					position: 'center',
-					offset: [20, 5],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 40,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		},
-		{
-			id: 'node-4',
-			data: {
-				type: 'person'
-			},
-			style: {
-				label: {
-					value: '我是node4',
-					position: 'center',
-					offset: [20, 0],
-					fill: 'green'
-				},
-				keyshape: {
-					size: 40,
-					stroke: '#ff9f0f',
-					fill: '#ff9f0ea6'
-				}
-			}
-		}
-	],
-	edges: [
-		{
-			id: 'edge-0-1',
-			source: 'node-0',
-			target: 'node-1',
-			style: {
-				label: {
-					value: '我是边1'
-				}
-			}
-		},
-		{
-			id: 'edge-0-3',
-			source: 'node-0',
-			target: 'node-3',
-			style: {
-				label: {
-					value: '我是边4'
-				}
-			}
-		},
-		{
-			id: 'edge-3-4',
-			source: 'node-3',
-			target: 'node-4',
-			style: {
-				label: {
-					value: '我是边5'
-				}
-			}
-		},
-		{
-			id: 'edge-1-2',
-			source: 'node-1',
-			target: 'node-2',
-			style: {
-				label: {
-					value: '我是边2'
-				},
-				keyshape: {
-					lineWidth: 5,
-					stroke: '#00f'
-				}
-			}
-		},
-		{
-			id: 'edge-0-2',
-			source: 'node-0',
-			target: 'node-2',
-			style: {
-				label: {
-					value: '我是边3'
-				}
-			}
-		}
-	]
-};
 
 interface SaveProps {
 	open: boolean;
@@ -245,7 +87,13 @@ const Algorithm = () => {
 	const [open, setSaveOpen] = React.useState(false);
 	const [fileUrl, setFile] = React.useState();
 	const [defaultName, setdefaultName] = React.useState();
+	const sideBarRef = useRef<any>(null);
 
+	const searchNewGraph = (nextGraphParam: INextGraphParam) => {
+		if (sideBarRef.current) {
+			sideBarRef.current.getGraph([nextGraphParam]);
+		}
+	};
 	useEffect(() => {
 		getGraphinData();
 	}, []);
@@ -300,6 +148,7 @@ const Algorithm = () => {
 					updateData={updateData}
 					toggleLayout={toggleBarLayout}
 					canAdd={false}
+					onRef={sideBarRef}
 					setdefaultName={setdefaultName}
 				></SideBar>
 			</div>
@@ -313,6 +162,7 @@ const Algorithm = () => {
 								refersh={barOpen}
 								updateData={updateData}
 								onClose={() => {}}
+								searchNewGraph={searchNewGraph}
 							></GraphinCom>
 						</div>
 						<div className={styles['graphin-box__btn']}>

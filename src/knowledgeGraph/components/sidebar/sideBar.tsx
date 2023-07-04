@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useState } from 'react';
 import {
 	Form,
 	Input,
@@ -29,6 +29,7 @@ interface Props {
 	toggleLayout: (isOpen: boolean) => void;
 	canAdd: boolean; //是否可添加多个主体
 	setdefaultName: (name: string) => void;
+	onRef: React.MutableRefObject<unknown>;
 }
 
 interface bodyTypeOption {
@@ -63,7 +64,8 @@ export enum FormItems {
 	paths = 'paths'
 }
 export default (props: Props) => {
-	const { updateData, toggleLayout, canAdd, setdefaultName, curData } = props;
+	const { updateData, toggleLayout, canAdd, setdefaultName, curData, onRef } =
+		props;
 	const [filterNAlgorithDisable, setFilterNAlgorithDisable] =
 		useState<boolean>(false);
 	const [configVisibile, setconfigVisibile] = useState(true);
@@ -96,6 +98,11 @@ export default (props: Props) => {
 			getAlgorithmOptions();
 		}
 	}, []);
+	useImperativeHandle(onRef, () => {
+		return {
+			getGraph: searchUpdate
+		};
+	});
 
 	// 获取主体类型下拉选项
 	const getBodyTypeOptions = async () => {
@@ -160,16 +167,12 @@ export default (props: Props) => {
 	};
 
 	// 提交表单 获取数据
-	const searchUpdate = async ({
-		// pathFilter = null,
-		algorithmName = ''
-	}: {
-		// pathFilter?: IPath[] | null;
-		// path?: IPath[] | null;
-		algorithmName?: string;
-	} = {}) => {
+	const searchUpdate = async (nextGraphs = null) => {
 		// 重置select id
-		onSetSelectID({ selectID: null });
+		if (!nextGraphs) {
+			onSetSelectID({ selectID: null });
+		}
+
 		const formData: IFormData = form.getFieldsValue();
 		// 调用接口 获取筛选数据
 		const { bodyFilter, bodys, level, algorithm, paths } = formData;
@@ -194,7 +197,8 @@ export default (props: Props) => {
 				depth: level || -1, //多主体时传-1
 				nodeFilter: bodyFilter,
 				nodes,
-				paths
+				paths,
+				nextGraphs
 			});
 
 			if (data.limited) {
@@ -434,7 +438,7 @@ export default (props: Props) => {
 							>
 								<InputNumber
 									min={1}
-									max={2}
+									max={6}
 									disabled={bodys?.length > 1 ? true : false}
 								/>
 							</Form.Item>
