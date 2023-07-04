@@ -94,8 +94,13 @@ const SortInput: FC<SortProps> = ({
 		}
 	};
 
+	useEffect(() => {
+		setDataList(value);
+	}, [value]);
+
 	//监听dataList改变触发onChange
 	useEffect(() => {
+		console.log('ppppp', dataList);
 		// !避免回显错误
 		if (!dataList) return;
 		// !
@@ -262,7 +267,11 @@ const Grouping: FC = () => {
 		setValue(value);
 	};
 	const onReset = () => {
-		form.resetFields();
+		form.setFieldsValue({
+			conditions: undefined,
+			funcType: undefined,
+			column: undefined
+		});
 		id && resetValue();
 	};
 

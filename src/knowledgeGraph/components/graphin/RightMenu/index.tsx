@@ -1,18 +1,16 @@
 import {
-	IGraphData,
 	INextGraphParam,
-	getNextGraph,
 	getNextRelationships
 } from '@/api/knowLedgeGraph/graphin';
 
 import { Checkbox, Col, Row } from 'antd';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Components } from '@antv/graphin';
 import styles from './index.module.less';
-import { useGraphContext } from '..';
-import { GraphinContext } from '@antv/graphin/lib';
+
 import { onSetSelectID } from '@/redux/store';
+import { useGraphContext } from '../../hooks';
 interface MenuProps {
 	onClose: () => void;
 
@@ -32,14 +30,9 @@ const RightMenu = () => {
 };
 
 const MyMenu = React.memo((props: MenuProps) => {
-	const {
-		curData,
-		updateData,
-		setNextGraphInfo,
-		getNextGraphInfo,
-		searchNewGraph
-	} = useGraphContext();
-	if (!curData) {
+	const { data, setNextGraphInfo, getNextGraphInfo, searchNewGraph } =
+		useGraphContext();
+	if (!data) {
 		return <></>;
 	}
 	const { id, onClose } = props;
@@ -69,13 +62,13 @@ const MyMenu = React.memo((props: MenuProps) => {
 	const showNextLeval = () => {
 		// for 移动到中心节点
 		onSetSelectID({ selectID: orginId + '-node' });
-		const nextGraph = getNextGraphInfo(Number(orginId));
-		const searchParam: INextGraphParam = {
-			nodeId: Number(orginId),
-			relationships: nextGraph
-		};
+		// const nextGraph = getNextGraphInfo(Number(orginId));
+		// const searchParam: INextGraphParam = {
+		// 	nodeId: Number(orginId),
+		// 	relationships: nextGraph
+		// };
 
-		searchNewGraph(searchParam);
+		searchNewGraph();
 		// 关闭弹窗
 		onClose();
 	};
