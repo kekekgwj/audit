@@ -78,7 +78,8 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 				}
 			},
 			config: {
-				type
+				// type
+				type: isCenter ? '中心节点' : type
 			}
 		};
 	});
