@@ -60,7 +60,6 @@ const DataTable = forwardRef((props: Props, ref) => {
 	const getScrollHeight = () => {
 		if (!tabRef.current || !scroll) return;
 		const bound = tabRef.current.getBoundingClientRect();
-		console.log(bound);
 		const height = bound.height - 105;
 		setScrollHeight(height);
 	};
