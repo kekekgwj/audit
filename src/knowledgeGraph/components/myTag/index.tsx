@@ -84,7 +84,8 @@ const MyTag = (props: Props) => {
 			style={{
 				border: '1px solid #ccc',
 				boxSizing: 'border-box',
-				padding: '2px'
+				padding: '2px',
+				width: '348px'
 			}}
 		>
 			<Space size={[0, 8]} wrap>
