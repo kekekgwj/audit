@@ -1,7 +1,17 @@
+.page {
+	display: flex;
+	align-items: flex-start;
+	flex-direction: column;
+	height: 100vh;
+	overflow-y: hidden;
+}
+
 .searchForm {
+	flex: 0 0 auto;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	width: 100%;
 	height: 64px;
 	background: #f8f9fa;
 	// margin-bottom: 10px;
@@ -16,6 +26,10 @@
 	}
 }
 
+.table {
+	flex: 1 1 auto;
+}
+
 .operate-box {
 	display: flex;
 	.operate-item {
@@ -25,65 +39,5 @@
 		svg {
 			font-size: 18px;
 		}
-	}
-}
-.my-table-box {
-	.my-table {
-		max-height: calc(100vh - 180px);
-		overflow-y: auto;
-	}
-	:global {
-		.ant-pagination .ant-pagination-item {
-			border: 1px solid #d9d9d9;
-		}
-		.ant-pagination .ant-pagination-item-active {
-			background: #24a36f;
-			border: none;
-			a {
-				color: #fff;
-			}
-		}
-	}
-	.pagination-box {
-		position: absolute;
-		bottom: 24px;
-		width: 100%;
-		text-align: center;
-		margin-top: 20px;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-right: 45px;
-		font-size: 14px;
-	}
-}
-
-.sqlAuditBox {
-	:global {
-		.ant-empty-image {
-			margin-top: 200px;
-			height: auto !important;
-		}
-	}
-}
-
-.empty-tip-box {
-	.empty-tip1 {
-		height: 21px;
-		font-size: 14px;
-		font-family: Noto Sans-Regular, Noto Sans;
-		font-weight: 400;
-		color: #18181f;
-		line-height: 21px;
-		margin-top: -15px;
-		margin-bottom: 8px;
-	}
-	.empty-tip2 {
-		height: 20px;
-		font-size: 12px;
-		font-family: Noto Sans-Regular, Noto Sans;
-		font-weight: 400;
-		color: #999999;
-		line-height: 20px;
 	}
 }

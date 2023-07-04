@@ -11,6 +11,7 @@ import emptyPage from '@/assets/img/newEmpty.png';
 import styles from './index.module.less';
 
 interface Props {
+	className?: string;
 	columns: Array<any>;
 	scroll: boolean;
 	getData: (
@@ -20,7 +21,7 @@ interface Props {
 }
 
 const DataTable = forwardRef((props: Props, ref) => {
-	const { columns, scroll = false, getData } = props;
+	const { className, columns, scroll = false, getData } = props;
 
 	columns.forEach((col) => {
 		if (col.type === 'globalIndex') {
@@ -87,7 +88,7 @@ const DataTable = forwardRef((props: Props, ref) => {
 	};
 
 	return (
-		<div ref={tabRef} className={styles['data-table']}>
+		<div ref={tabRef} className={`${styles['data-table']} ${className}`}>
 			{dataSource.length ? (
 				<>
 					<Table
@@ -118,6 +119,7 @@ const DataTable = forwardRef((props: Props, ref) => {
 				</>
 			) : (
 				<Empty
+					className={styles['empty']}
 					image={emptyPage}
 					description={
 						<div className={styles['empty-tip-box']}>

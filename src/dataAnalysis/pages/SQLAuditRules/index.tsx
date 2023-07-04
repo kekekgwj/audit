@@ -1,9 +1,7 @@
-import { useRef, useState, useEffect } from 'react';
-import { Button, Form, Input, Table, Pagination, Empty, Row, Col } from 'antd';
-import type { PaginationProps } from 'antd';
+import { useRef, useState } from 'react';
+import { Button, Col, Form, Input, Row } from 'antd';
 import SvgIcon from '@/components/svg-icon';
-import emptyPage from '@/assets/img/newEmpty.png';
-// import DataTable from '@/components/data-table';
+import DataTable from '@/components/data-table';
 import Show from './components/show';
 
 import { getAuditSqlPage } from '@/api/dataAnalysis/sql';
@@ -22,37 +20,21 @@ export default () => {
 	const [searchForm] = Form.useForm();
 	const [currentRow, setCurrentRow] = useState<DataType>();
 	const [openShow, setOpenShow] = useState(false);
-	// 表数据
-	const [tableData, setTableData] = useState([]);
-	const [current, setCurrent] = useState(1);
-	const [size, setSize] = useState(10);
-	const [total, setTotal] = useState(0);
-
-	useEffect(() => {
-		getData();
-	}, [current, size]);
 
 	const columns = [
 		{
 			title: '序号',
 			width: 100,
-			render: (text, record, index) => `${(current - 1) * size + index + 1}`
-		},
-		{
-			title: '审计规则SQL编码',
-			width: 200,
-			dataIndex: 'code'
+			render: (text, record, index) => index + 1
 		},
 		{
 			title: '审计规则SQL名称',
-			width: 200,
+			width: 300,
 			dataIndex: 'sqlName'
 		},
 		{
-			title: '规则描述',
-			dataIndex: 'useTo',
-			width: 300,
-			ellipsis: true
+			title: '规则用途',
+			dataIndex: 'useTo'
 		},
 		{
 			title: '操作',
@@ -87,62 +69,39 @@ export default () => {
 		setOpenShow(false);
 	};
 
-	const getData = async () => {
+	const getData = async (pageIndex: number, pageSize: number) => {
 		const res = await getAuditSqlPage({
-			current: current,
-			size: size,
+			current: pageIndex,
+			size: pageSize,
 			name: searchForm.getFieldsValue().sqlName || ''
 		});
 
 		const list: DataType[] = res.records.map((item) => ({
 			key: item.id,
 			sqlName: item.name,
-			useTo: item.effect,
-			code: item.code
+			useTo: item.effect
 		}));
 
-		// return {
-		// 	list,
-		// 	total: res.total
-		// };
-		setTableData(list);
-		setTotal(res.total);
+		return {
+			list,
+			total: res.total
+		};
 	};
 
-	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
-		current: number,
-		pageSize: number
-	) => {
-		setSize(pageSize);
-	};
-
-	const onChange: PaginationProps['onChange'] = (pageNumber: number) => {
-		console.log('Page: ', pageNumber);
-		setCurrent(pageNumber);
+	const tableRefresh = () => {
+		tableRef.current.refresh();
 	};
 
 	const onReset = () => {
 		searchForm.resetFields();
-		getData();
+		tableRefresh();
 	};
-
 	const search = () => {
-		setCurrent(1);
-		getData();
+		tableRefresh();
 	};
-	// const tableRefresh = () => {
-	// 	tableRef.current.refresh();
-	// };
-	// const onReset = () => {
-	// 	searchForm.resetFields();
-	// 	tableRefresh();
-	// };
-	// const search = () => {
-	// 	tableRefresh();
-	// };
 
 	return (
-		<div style={{ padding: '20px' }} className={styles.sqlAuditBox}>
+		<div className={styles.page} style={{ padding: '20px' }}>
 			<div className={styles.searchForm}>
 				<Form
 					style={{ width: 'calc(100% - 138px)' }}
@@ -184,68 +143,12 @@ export default () => {
 				</div>
 			</div>
 
-			{/* <DataTable ref={tableRef} columns={columns} getData={getData}></DataTable> */}
-			{/* <div className={styles['my-table-box']}>
-				<Table
-					className={styles['my-table']}
-					columns={columns}
-					dataSource={tableData}
-					pagination={false}
-				></Table>
-				<div className={styles['pagination-box']}>
-					<div>
-						<span style={{ marginRight: '10px' }}>共{total}条记录</span>
-						<span>
-							第{current}/{Math.ceil(total / size)}页
-						</span>
-					</div>
-					<Pagination
-						current={current}
-						total={total}
-						showSizeChanger
-						onShowSizeChange={onShowSizeChange}
-						onChange={onChange}
-						showQuickJumper
-					/>
-				</div>
-			</div> */}
-
-			{tableData && tableData.length > 6 ? (
-				<div className={styles['my-table-box']}>
-					<Table
-						className={styles['my-table']}
-						columns={columns}
-						dataSource={tableData}
-						pagination={false}
-					></Table>
-					<div className={styles['pagination-box']}>
-						<div>
-							<span style={{ marginRight: '10px' }}>共{total}条记录</span>
-							<span>
-								第{current}/{Math.ceil(total / size)}页
-							</span>
-						</div>
-						<Pagination
-							current={current}
-							total={total}
-							showSizeChanger
-							onShowSizeChange={onShowSizeChange}
-							onChange={onChange}
-							showQuickJumper
-						/>
-					</div>
-				</div>
-			) : (
-				<Empty
-					image={emptyPage}
-					description={
-						<div className={styles['empty-tip-box']}>
-							<div className={styles['empty-tip1']}>暂无数据</div>
-							<div className={styles['empty-tip2']}>数据空空如也~</div>
-						</div>
-					}
-				/>
-			)}
+			<DataTable
+				ref={tableRef}
+				columns={columns}
+				getData={getData}
+				className={styles.table}
+			></DataTable>
 
 			<Show
 				open={openShow}
