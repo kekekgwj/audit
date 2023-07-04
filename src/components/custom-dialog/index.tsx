@@ -63,7 +63,9 @@ export default (props: DialogProps) => {
 				></SvgIcon>
 			}
 			onCancel={onCancel}
-			className={styles['custom-dialog']}
+			className={`${styles['custom-dialog']} ${
+				showOkButton ? '' : styles['no-handle-box']
+			}`}
 		>
 			<div className={styles['ant-modal__header']}>
 				<div className={styles['ant-modal__header_title']}>{title}</div>

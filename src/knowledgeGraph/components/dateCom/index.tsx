@@ -18,6 +18,7 @@ const DataCom = (props: Props) => {
 	}, [curVal]);
 	return (
 		<RangePicker
+			style={{ width: '348px' }}
 			defaultValue={
 				curVal && curVal.length
 					? [dayjs(curVal[0], 'YYYY-MM-DD'), dayjs(curVal[1], 'YYYY-MM-DD')]

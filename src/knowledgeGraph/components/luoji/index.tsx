@@ -116,7 +116,7 @@ const SpecialCom = (props: Props) => {
 												]}
 											>
 												<Select
-													style={{ width: 120 }}
+													style={{ width: 140 }}
 													options={[
 														{ value: '1', label: '等于' },
 														{ value: '2', label: '大于' },
@@ -131,7 +131,7 @@ const SpecialCom = (props: Props) => {
 												name={[name, 'value']}
 												rules={[{ required: true, message: '' }]}
 											>
-												<Input placeholder="" style={{ width: 120 }} />
+												<Input placeholder="" style={{ width: 140 }} />
 											</Form.Item>
 											{index == operations.length - 1 ? (
 												<PlusCircleOutlined

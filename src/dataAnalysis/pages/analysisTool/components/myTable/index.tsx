@@ -42,31 +42,58 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 	const { columnsData, dataSource, loading, searchChange, current, total } =
 		props;
 
-	// 表格列
-	// const [cols, setCols] = useState([...columnsData]);
-	const [columns, setColumns] = useState(formatCol(columnsData));
+	// const [columns, setColumns] = useState(formatCol(columnsData));
 
-	function formatCol(cols) {
-		return (cols || []).map((col, index) => ({
-			...col,
-			onHeaderCell: (column) => ({
-				width: column.width,
-				onResize: handleResize(index)
-			})
-		}));
-	}
+	// function formatCol(cols) {
+	// 	return (cols || []).map((col, index) => ({
+	// 		...col,
+	// 		onHeaderCell: (column) => ({
+	// 			width: column.width,
+	// 			onResize: handleResize(index)
+	// 		})
+	// 	}));
+	// }
+	// // 处理拖拽
+	// const handleResize =
+	// 	(index) =>
+	// 	(e, { size }) => {
+	// 		const nextColumns = [...columns];
+	// 		// 拖拽时调整宽度
+	// 		nextColumns[index] = {
+	// 			...nextColumns[index],
+	// 			width: size.width
+	// 		};
+	// 		setColumns(formatCol(nextColumns));
+	// 	};
+
+	// 测试
+	const [cols, setCols] = useState(columnsData);
+	const [columns, setColumns] = useState([]);
 	// 处理拖拽
 	const handleResize =
 		(index) =>
 		(e, { size }) => {
-			const nextColumns = [...columns];
-			// 拖拽是调整宽度
+			const nextColumns = [...cols];
+			// 拖拽时调整宽度
 			nextColumns[index] = {
 				...nextColumns[index],
 				width: size.width
 			};
-			setColumns(formatCol(nextColumns));
+
+			setCols(nextColumns);
 		};
+
+	useEffect(() => {
+		setColumns(
+			(cols || []).map((col, index) => ({
+				...col,
+				onHeaderCell: (column) => ({
+					width: column.width,
+					onResize: handleResize(index)
+				})
+			}))
+		);
+	}, [cols]);
 
 	return (
 		<div className="components-table-resizable-column">
