@@ -25,7 +25,7 @@ export default () => {
 		{
 			title: '序号',
 			width: 100,
-			render: (text, record, index) => index + 1
+			type: 'globalIndex'
 		},
 		{
 			title: '审计规则SQL名称',
