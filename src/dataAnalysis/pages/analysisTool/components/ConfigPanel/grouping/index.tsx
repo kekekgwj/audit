@@ -100,7 +100,6 @@ const SortInput: FC<SortProps> = ({
 
 	//监听dataList改变触发onChange
 	useEffect(() => {
-		console.log('ppppp', dataList);
 		// !避免回显错误
 		if (!dataList) return;
 		// !
