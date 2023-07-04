@@ -30,6 +30,7 @@ interface Props {
 	canAdd: boolean; //是否可添加多个主体
 	setdefaultName: (name: string) => void;
 	onRef: React.MutableRefObject<unknown>;
+	resetAllNextGraph: () => void;
 }
 
 interface bodyTypeOption {
@@ -64,8 +65,16 @@ export enum FormItems {
 	paths = 'paths'
 }
 export default (props: Props) => {
-	const { updateData, toggleLayout, canAdd, setdefaultName, curData, onRef } =
-		props;
+	const {
+		updateData,
+		toggleLayout,
+		canAdd,
+		setdefaultName,
+		curData,
+		onRef,
+		resetAllNextGraph,
+		getAllNextGraphInfo
+	} = props;
 	const [filterNAlgorithDisable, setFilterNAlgorithDisable] =
 		useState<boolean>(false);
 	const [configVisibile, setconfigVisibile] = useState(true);
@@ -167,10 +176,12 @@ export default (props: Props) => {
 	};
 
 	// 提交表单 获取数据
-	const searchUpdate = async (nextGraphs = null) => {
-		// 重置select id
-		if (!nextGraphs) {
+	const searchUpdate = async (isPenetrate = false) => {
+		if (!isPenetrate) {
+			// 重置select id
 			onSetSelectID({ selectID: null });
+			// 重置穿透下一层
+			resetAllNextGraph();
 		}
 
 		const formData: IFormData = form.getFieldsValue();
@@ -198,7 +209,7 @@ export default (props: Props) => {
 				nodeFilter: bodyFilter,
 				nodes,
 				paths,
-				nextGraphs
+				nextGraphs: getAllNextGraphInfo()
 			});
 
 			if (data.limited) {

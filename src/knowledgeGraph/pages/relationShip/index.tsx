@@ -1,4 +1,4 @@
-import React, { Ref, useEffect, useRef, useState } from 'react';
+import React, { Ref, createContext, useEffect, useRef, useState } from 'react';
 import { Button, message, Input, Form, Row, Col } from 'antd';
 import { type GraphinData } from '@antv/graphin';
 import html2canvas from 'html2canvas';
@@ -12,6 +12,10 @@ import {
 	uploadGraphPic
 } from '@/api/knowLedgeGraph/graphin';
 import CustomDialog from '@/components/custom-dialog';
+import {
+	GraphContext,
+	useNextGraphRef
+} from '@/knowledgeGraph/components/hooks';
 
 interface SaveProps {
 	open: boolean;
@@ -80,10 +84,6 @@ const SaveCom = React.memo((props: SaveProps) => {
 	);
 });
 
-interface GraphinRef {
-	refersh: () => void;
-}
-
 const RelationShipCom = () => {
 	// 数据来源
 	const [data, setDate] = useState<GraphinData>();
@@ -93,11 +93,20 @@ const RelationShipCom = () => {
 	const [defaultName, setdefaultName] = React.useState();
 	const sideBarRef = useRef<any>(null);
 
-	const searchNewGraph = (nextGraphParam: INextGraphParam) => {
+	const searchNewGraph = () => {
+		const relations: INextGraphParam[] = getAllNextGraphInfo();
+
 		if (sideBarRef.current) {
-			sideBarRef.current.getGraph([nextGraphParam]);
+			sideBarRef.current.getGraph(relations);
 		}
 	};
+	const {
+		setNextGraphInfo,
+		getNextGraphInfo,
+		resetAllNextGraph,
+		getAllNextGraphInfo
+	} = useNextGraphRef();
+
 	useEffect(() => {
 		getGraphinData();
 	}, []);
@@ -157,20 +166,27 @@ const RelationShipCom = () => {
 					canAdd={true}
 					setdefaultName={setdefaultName}
 					onRef={sideBarRef}
+					resetAllNextGraph={resetAllNextGraph}
+					getAllNextGraphInfo={getAllNextGraphInfo}
 				></SideBar>
 			</div>
 			<div className={styles['graphin-box']}>
 				{data && (
 					<>
 						<div className={styles['graphin-box__com']}>
-							<GraphinCom
-								// ref={graphinRef}
-								data={data}
-								refersh={barOpen}
-								updateData={updateData}
-								searchNewGraph={searchNewGraph}
-								onClose={() => {}}
-							></GraphinCom>
+							<GraphContext.Provider
+								value={{
+									updateData,
+									data,
+									setNextGraphInfo,
+									getNextGraphInfo,
+									resetAllNextGraph,
+									searchNewGraph,
+									refresh: barOpen
+								}}
+							>
+								<GraphinCom />
+							</GraphContext.Provider>
 						</div>
 						<div className={styles['graphin-box__btn']}>
 							<Button

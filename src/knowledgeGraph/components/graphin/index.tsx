@@ -21,6 +21,7 @@ import formatCustomEdges from './customEdge';
 import formatCustomNodes from './customNode';
 import FocusCenter from './FocusCenter';
 import { onSetCenterID, useFocuseState } from '@/redux/store';
+import { useGraphContext } from '../hooks';
 const { Hoverable } = Behaviors;
 interface Props {
 	data: IGraphData;
@@ -55,7 +56,10 @@ const formatCombo = (nodes: IResNode[]) => {
 		};
 	});
 };
-const formatGraphData = (data: IGraphData): GraphinData => {
+const formatGraphData = (data: IGraphData | null): GraphinData => {
+	if (!data) {
+		return { nodes: [], edges: [] };
+	}
 	const { edges, nodes } = Object.assign({}, data);
 
 	const customEdges = formatCustomEdges({ edges });
@@ -68,75 +72,14 @@ const formatGraphData = (data: IGraphData): GraphinData => {
 		combos: combos
 	};
 };
-interface IGraphContext {
-	searchNewGraph: (nextGraphParam: INextGraphParam) => void;
-	updateData: ((data: GraphinData) => void) | null;
-	curData: Record<string, any> | null;
-	setNextGraphInfo: ISetNextGraphInfo;
-	getNextGraphInfo: IGetNextGraphInfo;
-	resetAllNextGraph: () => void;
-}
-const GraphContext = createContext<IGraphContext>({
-	updateData: null,
-	curData: null,
-	setNextGraphInfo: function ({
-		nodeID,
-		relations
-	}: {
-		nodeID: number;
-		relations: string[];
-	}): void {
-		throw new Error('Function not implemented.');
-	},
-	getNextGraphInfo: function (nodeID: number): string[] {
-		throw new Error('Function not implemented.');
-	},
-	searchNewGraph: function (nextGraphParam: INextGraphParam): void {
-		throw new Error('Function not implemented.');
-	},
-	resetAllNextGraph: function (): void {
-		throw new Error('Function not implemented.');
-	}
-});
-export const useGraphContext = () => {
-	return useContext(GraphContext);
-};
-type ISetNextGraphInfo = ({
-	nodeID,
-	relations
-}: {
-	nodeID: number;
 
-	relations: string[];
-}) => void;
-type IGetNextGraphInfo = (nodeID: number) => string[];
-interface INextGraphRef {
-	[nodeId: string]: string[];
-}
-// 用于记录穿透下一层节点的勾选 id - path - nodes/edges
-const useNextGraphRef = () => {
-	const ref = useRef<INextGraphRef>({});
-	const setNextGraphInfo: ISetNextGraphInfo = ({ nodeID, relations }) => {
-		ref.current[nodeID] = relations;
-	};
-	const resetAllNextGraph = () => {
-		ref.current = {};
-	};
-	const getNextGraphInfo = (nodeID: number): string[] => {
-		return ref.current[nodeID] || [];
-	};
-
-	return { setNextGraphInfo, getNextGraphInfo, resetAllNextGraph };
-};
-const GraphinCom = React.memo((props: Props) => {
-	const { data, updateData, refersh, searchNewGraph } = props;
+const GraphinCom = () => {
+	const { data, refresh } = useGraphContext();
 	const formatData = formatGraphData(data);
 	// 中心节点居中
-	const centerNode = getCenterNode({ nodes: data.nodes });
+	const centerNode = getCenterNode({ nodes: data?.nodes });
 	onSetCenterID({ centerID: centerNode });
 	const [key, setKey] = useState('');
-
-	const curData = { ...data };
 	const [width, setWidth] = useState(600);
 	const graphinContainerRef = useRef<HTMLDivElement>();
 	// 调整尺寸
@@ -149,9 +92,8 @@ const GraphinCom = React.memo((props: Props) => {
 		const rect = graphinContainerRef?.current?.getBoundingClientRect();
 		setKey(`${rect?.width}`);
 		setWidth(rect?.width as number);
-	}, [refersh]);
-	const { setNextGraphInfo, getNextGraphInfo, resetAllNextGraph } =
-		useNextGraphRef();
+	}, [refresh]);
+
 	return (
 		<div ref={graphinContainerRef} className={styles['graphin-box']}>
 			<Graphin
@@ -177,18 +119,9 @@ const GraphinCom = React.memo((props: Props) => {
 					}}
 				</Legend>
 				<LeftEvent />
-				<GraphContext.Provider
-					value={{
-						updateData,
-						curData,
-						setNextGraphInfo,
-						getNextGraphInfo,
-						resetAllNextGraph,
-						searchNewGraph
-					}}
-				>
-					<RightMenu />
-				</GraphContext.Provider>
+
+				<RightMenu />
+
 				<FocusCenter />
 				{/* <Hoverable bindType="node" /> */}
 				<ZoomCanvas enableOptimize />
@@ -198,6 +131,6 @@ const GraphinCom = React.memo((props: Props) => {
 			</Graphin>
 		</div>
 	);
-});
+};
 
 export default GraphinCom;
