@@ -1,26 +1,21 @@
-import { useRef, useState, useEffect } from 'react';
-// import DataTable from '@/components/data-table';
+import { useRef, useState } from 'react';
+import DataTable from '@/components/data-table';
 import Delete from '@/components/delete-dialog';
 import Edit from './components/edit';
 import Show from './components/show';
 import Add from './components/add';
-import emptyPage from '@/assets/img/newEmpty.png';
 
 import styles from './index.module.less';
 import {
 	Button,
+	Col,
 	DatePicker,
 	Divider,
 	Form,
 	Input,
-	message,
-	Table,
-	Pagination,
-	Empty,
 	Row,
-	Col
+	message
 } from 'antd';
-import type { PaginationProps } from 'antd';
 import SvgIcon from '@/components/svg-icon';
 
 import {
@@ -50,16 +45,12 @@ export default () => {
 	const [openEdit, setOpenEdit] = useState(false);
 	const [openShow, setOpenShow] = useState(false);
 	const [openAdd, setOpenAdd] = useState(false);
-	// 表数据
-	const [tableData, setTableData] = useState([]);
-	const [current, setCurrent] = useState(1);
-	const [size, setSize] = useState(10);
-	const [total, setTotal] = useState(0);
+
 	const columns = [
 		{
 			title: '序号',
 			width: 100,
-			render: (text, record, index) => `${(current - 1) * size + index + 1}`
+			type: 'globalIndex'
 		},
 		{
 			title: 'SQL名称',
@@ -116,10 +107,6 @@ export default () => {
 		}
 	];
 
-	useEffect(() => {
-		getData();
-	}, [current, size]);
-
 	// 打开新增弹框
 	const handleAdd = () => {
 		setOpenAdd(true);
@@ -137,7 +124,7 @@ export default () => {
 		});
 
 		setOpenAdd(false);
-		getData();
+		tableRefresh();
 	};
 
 	// 取消编辑
@@ -176,7 +163,7 @@ export default () => {
 		});
 
 		setOpenEdit(false);
-		getData();
+		tableRefresh();
 	};
 
 	// 取消编辑
@@ -204,16 +191,15 @@ export default () => {
 			content: '删除成功'
 		});
 		setOpenDel(false);
-		// tableRefresh();
-		getData();
+		tableRefresh();
 	};
 
-	const getData = async () => {
+	const getData = async (pageIndex: number, pageSize: number) => {
 		const query = searchForm.getFieldsValue();
 
 		const res = await getSqlPage({
-			current: current,
-			size: size,
+			current: pageIndex,
+			size: pageSize,
 			name: query.sqlName || '',
 			startTime: query.createdDate
 				? query.createdDate[0].format('YYYY-MM-DD')
@@ -229,46 +215,23 @@ export default () => {
 			gmtModified: item.gmtModified
 		}));
 
-		// return {
-		// 	list,
-		// 	total: res.total
-		// };
-		setTableData(list);
-		setTotal(res.total);
+		return {
+			list,
+			total: res.total
+		};
 	};
 
-	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
-		current: number,
-		pageSize: number
-	) => {
-		setSize(pageSize);
-	};
-
-	const onChange: PaginationProps['onChange'] = (pageNumber: number) => {
-		setCurrent(pageNumber);
+	const tableRefresh = () => {
+		tableRef.current.refresh();
 	};
 
 	const onReset = () => {
 		searchForm.resetFields();
-		getData();
+		tableRefresh();
 	};
-
 	const search = () => {
-		setCurrent(1);
-		getData();
+		tableRefresh();
 	};
-
-	// const tableRefresh = () => {
-	// 	tableRef.current.refresh();
-	// };
-
-	// const onReset = () => {
-	// 	searchForm.resetFields();
-	// 	tableRefresh();
-	// };
-	// const search = () => {
-	// 	tableRefresh();
-	// };
 
 	return (
 		<div className={styles.page} style={{ padding: '20px' }}>
@@ -323,66 +286,14 @@ export default () => {
 				新增SQL
 			</Button>
 
-			{/* <div className={styles['my-table-box']}>
-				<Table
-					className={styles['my-table']}
-					columns={columns}
-					dataSource={tableData}
-					pagination={false}
-				></Table>
-				<div className={styles['pagination-box']}>
-					<div>
-						<span style={{ marginRight: '10px' }}>共{total}条记录</span>
-						<span>
-							第{current}/{Math.ceil(total / size)}页
-						</span>
-					</div>
-					<Pagination
-						current={current}
-						total={total}
-						showSizeChanger
-						onShowSizeChange={onShowSizeChange}
-						onChange={onChange}
-						showQuickJumper
-					/>
-				</div>
-			</div> */}
-			{tableData && tableData.length ? (
-				<div className={styles['my-table-box']}>
-					<Table
-						className={styles['my-table']}
-						columns={columns}
-						dataSource={tableData}
-						pagination={false}
-					></Table>
-					<div className={styles['pagination-box']}>
-						<div>
-							<span style={{ marginRight: '10px' }}>共{total}条记录</span>
-							<span>
-								第{current}/{Math.ceil(total / size)}页
-							</span>
-						</div>
-						<Pagination
-							current={current}
-							total={total}
-							showSizeChanger
-							onShowSizeChange={onShowSizeChange}
-							onChange={onChange}
-							showQuickJumper
-						/>
-					</div>
-				</div>
-			) : (
-				<Empty
-					image={emptyPage}
-					description={
-						<div className={styles['empty-tip-box']}>
-							<div className={styles['empty-tip1']}>暂无数据</div>
-							<div className={styles['empty-tip2']}>数据空空如也~</div>
-						</div>
-					}
-				/>
-			)}
+			<DataTable
+				ref={tableRef}
+				columns={columns}
+				scroll={true}
+				getData={getData}
+				className={styles.table}
+			></DataTable>
+
 			{contextHolder}
 
 			<Delete
