@@ -34,8 +34,8 @@ interface Props {
 const getCenterNode = ({ nodes }: Pick<IGraphData, 'nodes'>): string | null => {
 	let centerNode = null;
 	for (const node of nodes) {
-		const { isCenter, id } = node;
-		if (isCenter) {
+		const { center, id } = node;
+		if (center) {
 			centerNode = id + '-node';
 			break;
 		}
