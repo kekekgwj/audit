@@ -85,6 +85,7 @@ export default (props: Props) => {
 
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
+	const bodyFilter = Form.useWatch('bodyFilter', form);
 	useEffect(() => {
 		setFilterNAlgorithDisable(true);
 	}, [bodys]);
@@ -272,6 +273,13 @@ export default (props: Props) => {
 		}
 	};
 	const getFilterKey = () => {
+		//主体类型过滤改变需从新触发链路筛选
+		let curBodyFilter;
+		if (bodyFilter && bodyFilter.length) {
+			curBodyFilter = bodyFilter.join('-');
+		} else {
+			curBodyFilter = '';
+		}
 		if (
 			bodys &&
 			Array.isArray(bodys) &&
@@ -280,13 +288,12 @@ export default (props: Props) => {
 		) {
 			const curNodeType = bodys[0].bodyType as string;
 			const curNodeVaule = bodys[0].bodyName as string;
-			return curNodeType + '-' + curNodeVaule;
+			return curNodeType + '-' + curNodeVaule + '-' + curBodyFilter;
 		}
 		return Date.now();
 	};
 
 	const handleChangeBodyType = (key: any, e: any) => {
-		console.log(key, e, 2742742374);
 		// if (!e) {
 		// 	const bodys = form.getFieldValue('bodys');
 		// 	bodys[key].bodyName = '';
@@ -296,6 +303,10 @@ export default (props: Props) => {
 		bodys[key].bodyName = '';
 		form.setFieldValue('bodyName', bodys);
 		// 重置链路
+		form.setFieldValue('paths', null);
+	};
+
+	const handleChangeBodyFilter = (e: any) => {
 		form.setFieldValue('paths', null);
 	};
 
@@ -425,6 +436,9 @@ export default (props: Props) => {
 									style={{ width: '100%' }}
 									placeholder="请选择"
 									options={bodyTypeOptions}
+									onChange={(e) => {
+										handleChangeBodyFilter(e);
+									}}
 								/>
 							</Form.Item>
 						</div>
