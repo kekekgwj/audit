@@ -91,7 +91,7 @@ export default (props: Props) => {
 	}, [bodys]);
 	useEffect(() => {
 		if (bodys?.length > 1) {
-			form.setFieldValue('level', 4);
+			form.setFieldValue('level', 5);
 			form.setFieldValue('paths', null);
 		} else {
 			form.setFieldValue('level', 1);
@@ -206,7 +206,7 @@ export default (props: Props) => {
 		try {
 			const data = await getGraph({
 				algorithmName: algorithm,
-				depth: level, //多主体时传4
+				depth: level, //多主体时传5
 				nodeFilter: bodyFilter,
 				nodes,
 				paths,
