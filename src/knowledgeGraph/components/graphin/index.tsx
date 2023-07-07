@@ -58,8 +58,8 @@ const formatGraphData = (data: IGraphData | null): GraphinData => {
 
 	return {
 		edges: customEdges,
-		nodes: customNodes,
-		combos: combos
+		nodes: customNodes
+		// combos: combos
 	};
 };
 const defaultLayout = {
