@@ -88,12 +88,13 @@ export default (props: Props) => {
 
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
+	const bodyFilter = Form.useWatch('bodyFilter', form);
 	useEffect(() => {
 		setFilterNAlgorithDisable(true);
 	}, [bodys]);
 	useEffect(() => {
 		if (bodys?.length > 1) {
-			form.setFieldValue('level', 4);
+			form.setFieldValue('level', 5);
 			form.setFieldValue('paths', null);
 		} else {
 			form.setFieldValue('level', 1);
@@ -219,7 +220,7 @@ export default (props: Props) => {
 		try {
 			const data = await getGraph({
 				algorithmName: algorithm,
-				depth: level, //多主体时传4
+				depth: level, //多主体时传5
 				nodeFilter: bodyFilter,
 				nodes,
 				paths,
@@ -296,6 +297,13 @@ export default (props: Props) => {
 		}
 	};
 	const getFilterKey = () => {
+		//主体类型过滤改变需从新触发链路筛选
+		let curBodyFilter;
+		if (bodyFilter && bodyFilter.length) {
+			curBodyFilter = bodyFilter.join('-');
+		} else {
+			curBodyFilter = '';
+		}
 		if (
 			bodys &&
 			Array.isArray(bodys) &&
@@ -304,7 +312,7 @@ export default (props: Props) => {
 		) {
 			const curNodeType = bodys[0].bodyType as string;
 			const curNodeVaule = bodys[0].bodyName as string;
-			return curNodeType + '-' + curNodeVaule;
+			return curNodeType + '-' + curNodeVaule + '-' + curBodyFilter;
 		}
 		return Date.now();
 	};
@@ -319,6 +327,10 @@ export default (props: Props) => {
 		bodys[key].bodyName = '';
 		form.setFieldValue('bodyName', bodys);
 		// 重置链路
+		form.setFieldValue('paths', null);
+	};
+
+	const handleChangeBodyFilter = (e: any) => {
 		form.setFieldValue('paths', null);
 	};
 
@@ -448,6 +460,9 @@ export default (props: Props) => {
 									style={{ width: '100%' }}
 									placeholder="请选择"
 									options={bodyTypeOptions}
+									onChange={(e) => {
+										handleChangeBodyFilter(e);
+									}}
 								/>
 							</Form.Item>
 						</div>

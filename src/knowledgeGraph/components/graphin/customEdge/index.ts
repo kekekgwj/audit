@@ -13,8 +13,8 @@ const formatCustomEdges = ({ edges }: Pick<IGraphData, 'edges'>) => {
 		const defaultType = 'graphin-line';
 		const customID = id + '-edge';
 		const customLineWidth = similarity
-			? (1 + transformedData[index]) * 4 + 1
-			: 1;
+			? (1 + transformedData[index]) * 4 + 2
+			: 2;
 
 		const customLabel = type;
 		const [customSourceNode, customTargetNode] = [source, target].map((v) =>
@@ -29,10 +29,12 @@ const formatCustomEdges = ({ edges }: Pick<IGraphData, 'edges'>) => {
 			target: customTargetNode,
 			style: {
 				label: {
-					value: customLabel
+					value: customLabel,
+					fill: '#18181F'
 				},
 				keyshape: {
-					lineWidth: customLineWidth
+					lineWidth: customLineWidth,
+					stroke: '#444'
 				}
 			}
 		};
