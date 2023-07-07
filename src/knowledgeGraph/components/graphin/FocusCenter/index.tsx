@@ -9,7 +9,6 @@ const FocusCenter = () => {
 	const { graph, apis } = useContext(GraphinContext);
 	useEffect(() => {
 		graph.on('afterlayout', () => {
-			console.log(selectID, centerID);
 			if (selectID) {
 				const node = graph.findById(selectID);
 				node && apis.focusNodeById(selectID);

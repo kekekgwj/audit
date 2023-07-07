@@ -31,6 +31,8 @@ interface Props {
 	setdefaultName: (name: string) => void;
 	onRef: React.MutableRefObject<unknown>;
 	resetAllNextGraph: () => void;
+	getAllNextGraphInfo: () => void;
+	setIsClusterLayout: (val: boolean) => void;
 }
 
 interface bodyTypeOption {
@@ -73,7 +75,8 @@ export default (props: Props) => {
 		curData,
 		onRef,
 		resetAllNextGraph,
-		getAllNextGraphInfo
+		getAllNextGraphInfo,
+		setIsClusterLayout
 	} = props;
 	const [filterNAlgorithDisable, setFilterNAlgorithDisable] =
 		useState<boolean>(false);
@@ -177,6 +180,7 @@ export default (props: Props) => {
 
 	// 提交表单 获取数据
 	const searchUpdate = async (isPenetrate = false) => {
+		setIsClusterLayout(false);
 		if (!isPenetrate) {
 			// 重置select id
 			onSetSelectID({ selectID: null });
@@ -187,6 +191,16 @@ export default (props: Props) => {
 		const formData: IFormData = form.getFieldsValue();
 		// 调用接口 获取筛选数据
 		const { bodyFilter, bodys, level, algorithm, paths } = formData;
+		// setTimeout(() => {
+		// 	if (setIsClusterLayout) {
+		// 		if (['louvain', 'label_propagation'].includes(algorithm)) {
+		// 			setIsClusterLayout(true);
+		// 		} else {
+		// 			setIsClusterLayout(false);
+		// 		}
+		// 	}
+		// }, 2000);
+
 		//设置主体为默认保存图谱名称
 		setdefaultName(bodys[0].bodyName);
 		const nodes: IFilterNode[] = [];
@@ -244,7 +258,17 @@ export default (props: Props) => {
 	const handleAlgorithmChange = (value: string) => {
 		// searchUpdate({ algorithmName: value, pathFilter: curPath });
 	};
-
+	const isGroupAlgorithm = () => {
+		const algorithm = getFormItemValue(FormItems.algorithm);
+		return ['louvain', 'label_propagation'].includes(algorithm);
+	};
+	const handleGroup = () => {
+		if (setIsClusterLayout && isGroupAlgorithm()) {
+			setIsClusterLayout((prevState) => {
+				return !prevState;
+			});
+		}
+	};
 	// 重置表单
 	const onReset = () => {
 		form.resetFields();
@@ -286,7 +310,6 @@ export default (props: Props) => {
 	};
 
 	const handleChangeBodyType = (key: any, e: any) => {
-		console.log(key, e, 2742742374);
 		// if (!e) {
 		// 	const bodys = form.getFieldValue('bodys');
 		// 	bodys[key].bodyName = '';
@@ -547,6 +570,15 @@ export default (props: Props) => {
 							<></>
 						)}
 						<div className={styles['filter-form__btns']}>
+							{isGroupAlgorithm() && (
+								<Button
+									onClick={() => {
+										handleGroup();
+									}}
+								>
+									group
+								</Button>
+							)}
 							<Button
 								htmlType="button"
 								onClick={onReset}

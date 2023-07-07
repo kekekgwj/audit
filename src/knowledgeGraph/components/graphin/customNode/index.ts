@@ -36,7 +36,7 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 
-	const formatNodes = nodes.map((node) => {
+	const formatNodes = nodes.map((node, index) => {
 		const { type, score, communityId, id, center = false, labels } = node;
 
 		const [strokeColor, fillColor, labelColor] = getColorByType(
@@ -52,6 +52,9 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 			...node,
 			id: id + '-node',
 			comboId: communityId,
+			cluster: communityId,
+			// comboId: index % 2 == 0 ? 2001 : 2002,
+			// cluster: index % 2 == 0 ? 2001 : 2002,
 			type: 'graphin-circle',
 			style: {
 				label: {
