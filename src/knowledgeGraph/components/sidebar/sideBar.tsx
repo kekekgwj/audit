@@ -76,7 +76,7 @@ export default (props: Props) => {
 		onRef,
 		resetAllNextGraph,
 		getAllNextGraphInfo,
-		setIsClusterLayout
+		setIsClusterLayout = () => {}
 	} = props;
 	const [filterNAlgorithDisable, setFilterNAlgorithDisable] =
 		useState<boolean>(false);
@@ -181,7 +181,7 @@ export default (props: Props) => {
 
 	// 提交表单 获取数据
 	const searchUpdate = async (isPenetrate = false) => {
-		setIsClusterLayout(false);
+		setIsClusterLayout && setIsClusterLayout(false);
 		if (!isPenetrate) {
 			// 重置select id
 			onSetSelectID({ selectID: null });
