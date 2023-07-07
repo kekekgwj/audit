@@ -94,7 +94,7 @@ export default (props: Props) => {
 	}, [bodys]);
 	useEffect(() => {
 		if (bodys?.length > 1) {
-			form.setFieldValue('level', 5);
+			form.setFieldValue('level', 4);
 			form.setFieldValue('paths', null);
 		} else {
 			form.setFieldValue('level', 1);
