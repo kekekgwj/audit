@@ -90,6 +90,7 @@ const Algorithm = () => {
 	const [open, setSaveOpen] = React.useState(false);
 	const [fileUrl, setFile] = React.useState();
 	const [defaultName, setdefaultName] = React.useState();
+	const [isClusterLayout, setIsClusterLayout] = React.useState<boolean>(false);
 	const sideBarRef = useRef<any>(null);
 
 	const searchNewGraph = () => {
@@ -164,6 +165,7 @@ const Algorithm = () => {
 					setdefaultName={setdefaultName}
 					resetAllNextGraph={resetAllNextGraph}
 					getAllNextGraphInfo={getAllNextGraphInfo}
+					setIsClusterLayout={setIsClusterLayout}
 				></SideBar>
 			</div>
 			<div className={styles['graphin-box']}>
@@ -181,7 +183,7 @@ const Algorithm = () => {
 									refresh: barOpen
 								}}
 							>
-								<GraphinCom />
+								<GraphinCom isClusterLayout={isClusterLayout} />
 							</GraphContext.Provider>
 						</div>
 						<div className={styles['graphin-box__btn']}>

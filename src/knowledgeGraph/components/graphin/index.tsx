@@ -1,12 +1,7 @@
-import React, {
-	createContext,
-	useContext,
-	useEffect,
-	useRef,
-	useState
-} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Graphin, {
 	Behaviors,
+	G6,
 	type GraphinData,
 	type LegendChildrenProps
 } from '@antv/graphin';
@@ -20,22 +15,16 @@ import styles from './index.module.less';
 import formatCustomEdges from './customEdge';
 import formatCustomNodes from './customNode';
 import FocusCenter from './FocusCenter';
-import { onSetCenterID, useFocuseState } from '@/redux/store';
+import { onSetCenterID } from '@/redux/store';
 import { useGraphContext } from '../hooks';
-const { Hoverable } = Behaviors;
-interface Props {
-	data: IGraphData;
-	refersh: boolean;
-	updateData: (data: GraphinData) => void;
-	onClose: () => void;
-	id?: string;
+interface IProps {
+	isClusterLayout: boolean;
 }
-
 const getCenterNode = ({ nodes }: Pick<IGraphData, 'nodes'>): string | null => {
 	let centerNode = null;
 	for (const node of nodes) {
-		const { isCenter, id } = node;
-		if (isCenter) {
+		const { center, id } = node;
+		if (center) {
 			centerNode = id + '-node';
 			break;
 		}
@@ -44,7 +33,8 @@ const getCenterNode = ({ nodes }: Pick<IGraphData, 'nodes'>): string | null => {
 };
 
 const formatCombo = (nodes: IResNode[]) => {
-	const comboID = new Set<string>();
+	const comboID = new Set<string>([]);
+	// const comboID = new Set<string>([2001, 2002]);
 	nodes.forEach((node) => {
 		const { communityId } = node;
 		communityId && comboID.add(communityId);
@@ -72,8 +62,42 @@ const formatGraphData = (data: IGraphData | null): GraphinData => {
 		combos: combos
 	};
 };
-
-const GraphinCom = () => {
+const defaultLayout = {
+	type: 'force',
+	preventOverlap: true,
+	nodeSize: 200,
+	nodeSpacing: 50
+};
+const clusterLayout = {
+	type: 'force',
+	clustering: true,
+	clusterNodeStrength: -5,
+	clusterEdgeDistance: 200,
+	clusterNodeSize: 20,
+	clusterFociStrength: 1.2,
+	nodeSpacing: 5,
+	preventOverlap: true
+};
+const layout = {
+	type: 'comboCombined',
+	animation: 'false',
+	comboPadding: 120,
+	preventOverlap: true,
+	outerLayout: new G6.Layout['gForce']({
+		// gForce forceAtlas2 graphin-force
+		preventOverlap: true,
+		animation: false, // for graphin-force
+		animate: false, // for gForce and fruchterman
+		gravity: 1,
+		factor: 100,
+		linkDistance: (edge, source, target) => {
+			const nodeSize =
+				((source.size?.[0] || 40) + (target.size?.[0] || 40)) / 2;
+			return Math.min(nodeSize * 1.5, 1000);
+		}
+	})
+};
+const GraphinCom = ({ isClusterLayout = false }: IProps) => {
 	const { data, refresh } = useGraphContext();
 	const formatData = formatGraphData(data);
 	// 中心节点居中
@@ -101,12 +125,7 @@ const GraphinCom = () => {
 				data={formatData}
 				width={width}
 				animate={false}
-				layout={{
-					type: 'force',
-					preventOverlap: true,
-					nodeSize: 200,
-					nodeSpacing: 50
-				}}
+				layout={isClusterLayout ? layout : defaultLayout}
 			>
 				<Legend bindType="node" sortKey="config.type">
 					{(renderProps: LegendChildrenProps) => {
@@ -125,7 +144,8 @@ const GraphinCom = () => {
 				<FocusCenter />
 				{/* <Hoverable bindType="node" /> */}
 				<ZoomCanvas enableOptimize />
-				<DragNode />
+				<DragNode onlyChangeComboSize={true} />
+				{/* <DragNode /> */}
 				<DragCanvas />
 				<ActivateRelations />
 			</Graphin>

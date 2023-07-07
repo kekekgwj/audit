@@ -317,7 +317,6 @@ const GraphCom = () => {
 						nodes: formatCustomNodes({ nodes: formatNodes })
 					};
 
-					console.log(graphData, 319319319);
 					setDate(graphData);
 				}
 			} else {
