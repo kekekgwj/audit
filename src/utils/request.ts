@@ -6,6 +6,7 @@ export async function http<T>(request: RequestInfo): Promise<T> {
 	const response = await fetch(request);
 	try {
 		const body = await response.json();
+		console.log({ response });
 		if (response.ok) {
 			return body.data;
 		} else {
@@ -13,6 +14,10 @@ export async function http<T>(request: RequestInfo): Promise<T> {
 		}
 	} catch (e) {
 		console.error(e);
+
+		if (e.code === 401) {
+			window.location.href = 'http://audit.zhejianglab.com/login';
+		}
 
 		message.warning(e?.msg || '系统错误');
 
