@@ -57,7 +57,8 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 			// cluster: index % 2 == 0 ? 2001 : 2002,
 			type: 'graphin-circle',
 			style: {
-				label: {
+				// icon支持drag
+				icon: {
 					// value: label,
 					value: str,
 					fontSize: 12,
