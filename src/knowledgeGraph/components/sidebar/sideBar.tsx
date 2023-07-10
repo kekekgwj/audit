@@ -469,9 +469,10 @@ export default (props: Props) => {
 
 						<div>
 							<div
-								className={`${styles['filter-item']} ${
-									bodys?.length > 1 ? styles['filter-item-disable'] : ''
-								}`}
+								className={styles['filter-item']}
+								// className={`${styles['filter-item']} ${
+								// 	bodys?.length > 1 ? styles['filter-item-disable'] : ''
+								// }`}
 							>
 								<SvgIcon name="filter"></SvgIcon>
 								<span>关系层级</span>
@@ -480,15 +481,15 @@ export default (props: Props) => {
 								name={FormItems.level}
 								label="查询层级"
 								initialValue={1}
-								// className={styles['filter-form-item']}
-								className={`${styles['filter-form-item']} ${
-									bodys?.length > 1 ? styles['filter-label-disable'] : ''
-								}`}
+								className={styles['filter-form-item']}
+								// className={`${styles['filter-form-item']} ${
+								// 	bodys?.length > 1 ? styles['filter-label-disable'] : ''
+								// }`}
 							>
 								<InputNumber
 									min={1}
-									max={6}
-									disabled={bodys?.length > 1 ? true : false}
+									max={bodys?.length > 1 ? 4 : 6}
+									// disabled={bodys?.length > 1 ? true : false}
 								/>
 							</Form.Item>
 						</div>
