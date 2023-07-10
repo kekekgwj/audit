@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { type GraphinData } from '@antv/graphin';
 import GraphinCom from '../../components/graphin';
 import SideBar from '../../components/sidebar/sideBar';
-import { Button, message, Input, Form, Row, Col } from 'antd';
+import { Button, message, Input, Form, Row, Col, Spin } from 'antd';
 import html2canvas from 'html2canvas';
 import styles from './index.module.less';
 import { toImgStyle } from '@/utils/other';
@@ -90,7 +90,11 @@ const Algorithm = () => {
 	const [open, setSaveOpen] = React.useState(false);
 	const [fileUrl, setFile] = React.useState();
 	const [defaultName, setdefaultName] = React.useState();
+	const [isClusterLayout, setIsClusterLayout] = React.useState<boolean>(false);
 	const sideBarRef = useRef<any>(null);
+
+	//加载等待
+	const [loading, setLoading] = React.useState(false);
 
 	const searchNewGraph = () => {
 		const relations: INextGraphParam[] = getAllNextGraphInfo();
@@ -164,9 +168,54 @@ const Algorithm = () => {
 					setdefaultName={setdefaultName}
 					resetAllNextGraph={resetAllNextGraph}
 					getAllNextGraphInfo={getAllNextGraphInfo}
+					setIsClusterLayout={setIsClusterLayout}
+					setLoading={setLoading}
 				></SideBar>
 			</div>
-			<div className={styles['graphin-box']}>
+			<>
+				{loading ? (
+					<div style={{ width: '100%', height: '100%' }}>
+						<Spin tip="Loading..." size="large">
+							<div className="content" />
+						</Spin>
+					</div>
+				) : (
+					<div className={styles['graphin-box']}>
+						{data && (
+							<>
+								<div className={styles['graphin-box__com']}>
+									<GraphContext.Provider
+										value={{
+											updateData,
+											data,
+											setNextGraphInfo,
+											getNextGraphInfo,
+											resetAllNextGraph,
+											searchNewGraph,
+											refresh: barOpen
+										}}
+									>
+										<GraphinCom isClusterLayout={isClusterLayout} />
+									</GraphContext.Provider>
+								</div>
+								<div className={styles['graphin-box__btn']}>
+									<Button
+										htmlType="button"
+										style={{ background: '#23955C', color: '#fff' }}
+										onClick={() => {
+											saveGraph();
+										}}
+									>
+										保存图谱
+									</Button>
+								</div>
+							</>
+						)}
+					</div>
+				)}
+			</>
+
+			{/* <div className={styles['graphin-box']}>
 				{data && (
 					<>
 						<div className={styles['graphin-box__com']}>
@@ -181,7 +230,7 @@ const Algorithm = () => {
 									refresh: barOpen
 								}}
 							>
-								<GraphinCom />
+								<GraphinCom isClusterLayout={isClusterLayout} />
 							</GraphContext.Provider>
 						</div>
 						<div className={styles['graphin-box__btn']}>
@@ -197,7 +246,7 @@ const Algorithm = () => {
 						</div>
 					</>
 				)}
-			</div>
+			</div> */}
 			<SaveCom
 				open={open}
 				defaultName={defaultName}

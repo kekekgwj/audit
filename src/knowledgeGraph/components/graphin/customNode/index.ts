@@ -4,23 +4,23 @@ import { getCanvasText } from '@/utils/graphin';
 const Colors: {
 	[key: string]: Array<string>;
 } = {
-	中心节点: ['#E6697B ', '#E6697B ', '#fff'],
-	人: ['#E369E6', '#E369E6', '#fff'],
-	法人: ['#9CB2FF', '#9CB2FF', '#fff'],
-	科研项目: ['#38BDE8', '#38BDE8', '#fff'],
-	经费卡: ['#CA923E', '#CA923E', '#fff'],
-	部门: ['#E57637', '#E57637', '#fff'],
-	采购事项: ['#E4D26E', '#E4D26E', '#fff'],
-	合同: ['#759DD9', '#759DD9', '#fff'],
-	发票: ['#5ACBA9', '#5ACBA9', '#fff'],
-	资产: ['#24A36F', '#24A36F', '#fff'],
-	lightNode: ['#f00', '#f00', '#fff'], //高亮节点
-	noLightNode: ['#EBF3EF', '#EBF3EF', '#fff'], //不高亮节点
-	BASE: ['red', 'red', '#fff'],
-	Company: ['#E6697B', '#E6697B', '#fff'],
-	Person: ['#EBF3EF', '#EBF3EF', '#000'],
-	Property: ['#708FFF', '#708FFF', '#fff'],
-	Recipient: ['#24A36F', '#24A36F', '#fff']
+	中心节点: ['#E6697B ', '#E6697B ', '#18181F'],
+	人: ['#E369E6', '#E369E6', '#18181F'],
+	法人: ['#9CB2FF', '#9CB2FF', '#18181F'],
+	科研项目: ['#38BDE8', '#38BDE8', '#18181F'],
+	经费卡: ['#CA923E', '#CA923E', '#18181F'],
+	部门: ['#E57637', '#E57637', '#18181F'],
+	采购事项: ['#E4D26E', '#E4D26E', '#18181F'],
+	合同: ['#759DD9', '#759DD9', '#18181F '],
+	发票: ['#5ACBA9', '#5ACBA9', '#18181F'],
+	资产: ['#24A36F', '#24A36F', '#18181F'],
+	lightNode: ['#FF4242', '#FF4242', '#18181F'], //高亮节点
+	noLightNode: ['#EBF3EF', '#EBF3EF', '#18181F'], //不高亮节点
+	BASE: ['red', 'red', '#18181F'],
+	Company: ['#E6697B', '#E6697B', '#18181F'],
+	Person: ['#EBF3EF', '#EBF3EF', '#18181F'],
+	Property: ['#708FFF', '#708FFF', '#18181F'],
+	Recipient: ['#24A36F', '#24A36F', '#18181F']
 };
 export const nodeSequence = Object.keys(Colors);
 // 获取 stroke、FILL、
@@ -36,11 +36,11 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 
-	const formatNodes = nodes.map((node) => {
-		const { type, score, communityId, id, isCenter = false, labels } = node;
+	const formatNodes = nodes.map((node, index) => {
+		const { type, score, communityId, id, center = false, labels } = node;
 
 		const [strokeColor, fillColor, labelColor] = getColorByType(
-			isCenter ? '中心节点' : type
+			center ? '中心节点' : type
 		);
 
 		const size = score
@@ -52,12 +52,17 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 			...node,
 			id: id + '-node',
 			comboId: communityId,
+			cluster: communityId,
+			// comboId: index % 2 == 0 ? 2001 : 2002,
+			// cluster: index % 2 == 0 ? 2001 : 2002,
 			type: 'graphin-circle',
 			style: {
-				label: {
+				// icon支持drag
+				icon: {
 					// value: label,
 					value: str,
 					fontSize: 12,
+					fontWeight: 500,
 					x: 0,
 					y: 6,
 					textAlign: 'center',
@@ -79,7 +84,7 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 			},
 			config: {
 				// type
-				type: isCenter ? '中心节点' : type
+				type: center ? '中心节点' : type
 			}
 		};
 	});

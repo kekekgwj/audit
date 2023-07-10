@@ -31,6 +31,9 @@ interface Props {
 	setdefaultName: (name: string) => void;
 	onRef: React.MutableRefObject<unknown>;
 	resetAllNextGraph: () => void;
+	getAllNextGraphInfo: () => void;
+	setIsClusterLayout: (val: boolean) => void;
+	setLoading: (val: boolean) => void;
 }
 
 interface bodyTypeOption {
@@ -73,7 +76,9 @@ export default (props: Props) => {
 		curData,
 		onRef,
 		resetAllNextGraph,
-		getAllNextGraphInfo
+		getAllNextGraphInfo,
+		setIsClusterLayout = () => {},
+		setLoading
 	} = props;
 	const [filterNAlgorithDisable, setFilterNAlgorithDisable] =
 		useState<boolean>(false);
@@ -85,6 +90,7 @@ export default (props: Props) => {
 
 	const [form] = Form.useForm();
 	const bodys = Form.useWatch('bodys', form);
+	const bodyFilter = Form.useWatch('bodyFilter', form);
 	useEffect(() => {
 		setFilterNAlgorithDisable(true);
 	}, [bodys]);
@@ -177,6 +183,7 @@ export default (props: Props) => {
 
 	// 提交表单 获取数据
 	const searchUpdate = async (isPenetrate = false) => {
+		setIsClusterLayout && setIsClusterLayout(false);
 		if (!isPenetrate) {
 			// 重置select id
 			onSetSelectID({ selectID: null });
@@ -187,6 +194,16 @@ export default (props: Props) => {
 		const formData: IFormData = form.getFieldsValue();
 		// 调用接口 获取筛选数据
 		const { bodyFilter, bodys, level, algorithm, paths } = formData;
+		// setTimeout(() => {
+		// 	if (setIsClusterLayout) {
+		// 		if (['louvain', 'label_propagation'].includes(algorithm)) {
+		// 			setIsClusterLayout(true);
+		// 		} else {
+		// 			setIsClusterLayout(false);
+		// 		}
+		// 	}
+		// }, 2000);
+
 		//设置主体为默认保存图谱名称
 		setdefaultName(bodys[0].bodyName);
 		const nodes: IFilterNode[] = [];
@@ -203,15 +220,16 @@ export default (props: Props) => {
 			return;
 		}
 		try {
+			setLoading(true);
 			const data = await getGraph({
 				algorithmName: algorithm,
-				depth: level, //多主体时传4
+				depth: level, //多主体时传5
 				nodeFilter: bodyFilter,
 				nodes,
 				paths,
 				nextGraphs: getAllNextGraphInfo()
 			});
-
+			setLoading(false);
 			if (data.limited) {
 				if (algorithm) {
 					message.warning(
@@ -244,7 +262,17 @@ export default (props: Props) => {
 	const handleAlgorithmChange = (value: string) => {
 		// searchUpdate({ algorithmName: value, pathFilter: curPath });
 	};
-
+	const isGroupAlgorithm = () => {
+		const algorithm = getFormItemValue(FormItems.algorithm);
+		return ['louvain', 'label_propagation'].includes(algorithm);
+	};
+	const handleGroup = () => {
+		if (setIsClusterLayout && isGroupAlgorithm()) {
+			setIsClusterLayout((prevState) => {
+				return !prevState;
+			});
+		}
+	};
 	// 重置表单
 	const onReset = () => {
 		form.resetFields();
@@ -272,6 +300,13 @@ export default (props: Props) => {
 		}
 	};
 	const getFilterKey = () => {
+		//主体类型过滤改变需从新触发链路筛选
+		let curBodyFilter;
+		if (bodyFilter && bodyFilter.length) {
+			curBodyFilter = bodyFilter.join('-');
+		} else {
+			curBodyFilter = '';
+		}
 		if (
 			bodys &&
 			Array.isArray(bodys) &&
@@ -280,13 +315,12 @@ export default (props: Props) => {
 		) {
 			const curNodeType = bodys[0].bodyType as string;
 			const curNodeVaule = bodys[0].bodyName as string;
-			return curNodeType + '-' + curNodeVaule;
+			return curNodeType + '-' + curNodeVaule + '-' + curBodyFilter;
 		}
 		return Date.now();
 	};
 
 	const handleChangeBodyType = (key: any, e: any) => {
-		console.log(key, e, 2742742374);
 		// if (!e) {
 		// 	const bodys = form.getFieldValue('bodys');
 		// 	bodys[key].bodyName = '';
@@ -296,6 +330,10 @@ export default (props: Props) => {
 		bodys[key].bodyName = '';
 		form.setFieldValue('bodyName', bodys);
 		// 重置链路
+		form.setFieldValue('paths', null);
+	};
+
+	const handleChangeBodyFilter = (e: any) => {
 		form.setFieldValue('paths', null);
 	};
 
@@ -425,15 +463,19 @@ export default (props: Props) => {
 									style={{ width: '100%' }}
 									placeholder="请选择"
 									options={bodyTypeOptions}
+									onChange={(e) => {
+										handleChangeBodyFilter(e);
+									}}
 								/>
 							</Form.Item>
 						</div>
 
 						<div>
 							<div
-								className={`${styles['filter-item']} ${
-									bodys?.length > 1 ? styles['filter-item-disable'] : ''
-								}`}
+								className={styles['filter-item']}
+								// className={`${styles['filter-item']} ${
+								// 	bodys?.length > 1 ? styles['filter-item-disable'] : ''
+								// }`}
 							>
 								<SvgIcon name="filter"></SvgIcon>
 								<span>关系层级</span>
@@ -442,15 +484,15 @@ export default (props: Props) => {
 								name={FormItems.level}
 								label="查询层级"
 								initialValue={1}
-								// className={styles['filter-form-item']}
-								className={`${styles['filter-form-item']} ${
-									bodys?.length > 1 ? styles['filter-label-disable'] : ''
-								}`}
+								className={styles['filter-form-item']}
+								// className={`${styles['filter-form-item']} ${
+								// 	bodys?.length > 1 ? styles['filter-label-disable'] : ''
+								// }`}
 							>
 								<InputNumber
 									min={1}
-									max={6}
-									disabled={bodys?.length > 1 ? true : false}
+									max={bodys?.length > 1 ? 4 : 6}
+									// disabled={bodys?.length > 1 ? true : false}
 								/>
 							</Form.Item>
 						</div>
@@ -547,6 +589,15 @@ export default (props: Props) => {
 							<></>
 						)}
 						<div className={styles['filter-form__btns']}>
+							{isGroupAlgorithm() && (
+								<Button
+									onClick={() => {
+										handleGroup();
+									}}
+								>
+									group
+								</Button>
+							)}
 							<Button
 								htmlType="button"
 								onClick={onReset}

@@ -9,14 +9,22 @@ const FocusCenter = () => {
 	const { graph, apis } = useContext(GraphinContext);
 	useEffect(() => {
 		graph.on('afterlayout', () => {
-			console.log(selectID, centerID);
 			if (selectID) {
-				const node = graph.findById(selectID);
-				node && apis.focusNodeById(selectID);
+				graph.focusItem(selectID, true, {
+					duration: 200,
+					easing: 'easeCubic'
+				});
+				// const node = graph.findById(selectID);
+
+				// node && apis.focusNodeById(selectID);
 			} else {
 				if (centerID) {
-					const node = graph.findById(centerID);
-					node && apis.focusNodeById(centerID);
+					graph.focusItem(centerID, true, {
+						duration: 200,
+						easing: 'easeCubic'
+					});
+					// const node = graph.findById(centerID);
+					// node && apis.focusNodeById(centerID);
 				}
 			}
 		});

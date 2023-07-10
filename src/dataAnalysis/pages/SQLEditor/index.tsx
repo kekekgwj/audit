@@ -44,7 +44,8 @@ const SQLEditor: React.FC = () => {
 		// }
 	}, []);
 	const onChange = (val: string) => {
-		setSql(val);
+		const sqlStr = val.replace(/\n/g, ' '); //空格代替换行
+		setSql(sqlStr);
 		setShowSearchBox(BoxType.NONE);
 		// 获得焦点
 
@@ -191,9 +192,10 @@ const SQLEditor: React.FC = () => {
 						name="editor"
 						ref={editorRef}
 						fontSize={16}
-						minLines={15}
-						maxLines={10}
+						// minLines={15}
+						// maxLines={10}
 						width="100%"
+						height="100%"
 						showPrintMargin={false}
 						showGutter={false}
 						placeholder="Write your Query here..."

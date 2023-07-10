@@ -69,6 +69,7 @@ export default (props: IProps) => {
 	const cntInitRef = useRef<boolean>(true);
 	const [selectNodeID, setSelectedNodeID] = useState<string | null>(null);
 	const nodeFilter = getFormItemValue(FormItems.bodyFilter);
+	console.log(nodeFilter, 72727272);
 	const curNode: {
 		bodyType: string;
 		bodyName: string;
@@ -100,8 +101,10 @@ export default (props: IProps) => {
 		try {
 			// 避免数据被销毁
 			if (!cntInitRef.current) return;
+			console.log(nodeFilter, 104104104);
 			const res = await getNextPaths({
-				nodeFilter,
+				// nodeFilter,
+				nodeFilter: getFormItemValue(FormItems.bodyFilter),
 				parentPaths: [],
 				type: curNodeType,
 				value: curNodeVaule

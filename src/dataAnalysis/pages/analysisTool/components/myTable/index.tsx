@@ -105,7 +105,8 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 				components={components}
 				columns={columns}
 				dataSource={dataSource}
-				scroll={{ y: total ? 240 : 300 }}
+				// scroll={{ y: total ? 240 : 300 }}
+				scroll={{ y: total ? 140 : 200 }}
 				pagination={
 					total
 						? {

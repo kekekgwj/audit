@@ -69,7 +69,7 @@ export interface IResNode {
 	labels: string[];
 	score: number | null;
 	type: string;
-	isCenter?: boolean;
+	center?: boolean;
 }
 
 export interface IResEdge {
