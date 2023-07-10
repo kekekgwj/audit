@@ -10,7 +10,7 @@ import { IGraphData, IResNode } from '@/api/knowLedgeGraph/graphin';
 import Legend from './legend';
 import LeftEvent from './LeftEvent';
 import RightMenu from './RightMenu';
-
+import EdgeDetail from './EdgeDetail';
 import styles from './index.module.less';
 import formatCustomEdges from './customEdge';
 import formatCustomNodes from './customNode';
@@ -137,6 +137,7 @@ const GraphinCom = ({ isClusterLayout = false }: IProps) => {
 						);
 					}}
 				</Legend>
+				<EdgeDetail />
 				<LeftEvent />
 
 				<RightMenu />
