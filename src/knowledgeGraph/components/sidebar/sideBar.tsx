@@ -33,6 +33,7 @@ interface Props {
 	resetAllNextGraph: () => void;
 	getAllNextGraphInfo: () => void;
 	setIsClusterLayout: (val: boolean) => void;
+	setLoading: (val: boolean) => void;
 }
 
 interface bodyTypeOption {
@@ -76,7 +77,8 @@ export default (props: Props) => {
 		onRef,
 		resetAllNextGraph,
 		getAllNextGraphInfo,
-		setIsClusterLayout = () => {}
+		setIsClusterLayout = () => {},
+		setLoading
 	} = props;
 	const [filterNAlgorithDisable, setFilterNAlgorithDisable] =
 		useState<boolean>(false);
@@ -218,6 +220,7 @@ export default (props: Props) => {
 			return;
 		}
 		try {
+			setLoading(true);
 			const data = await getGraph({
 				algorithmName: algorithm,
 				depth: level, //多主体时传5
@@ -226,7 +229,7 @@ export default (props: Props) => {
 				paths,
 				nextGraphs: getAllNextGraphInfo()
 			});
-
+			setLoading(false);
 			if (data.limited) {
 				if (algorithm) {
 					message.warning(

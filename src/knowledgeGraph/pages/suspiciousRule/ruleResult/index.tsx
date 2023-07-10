@@ -20,7 +20,8 @@ import {
 	Form,
 	Table,
 	Button,
-	Empty
+	Empty,
+	Spin
 } from 'antd';
 import emptyPage from '@/assets/img/nohit.png';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -362,7 +363,11 @@ const GraphCom = () => {
 			}
 		>
 			{loading ? (
-				<div>loading...</div>
+				<div style={{ width: '100%', height: '100%' }}>
+					<Spin tip="Loading..." size="large">
+						<div className="content" />
+					</Spin>
+				</div>
 			) : (
 				<div>
 					<div className={styles['top-tips']}>

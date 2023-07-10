@@ -1,6 +1,7 @@
 .rule-result-page {
 	position: relative;
 	width: 100%;
+	height: 100%;
 	padding-left: 20px;
 	::-webkit-scrollbar {
 		width: 6px;
@@ -174,6 +175,19 @@
 			ul.graphin-components-legend-content li.item {
 				display: block !important;
 			}
+		}
+	}
+	:global {
+		.ant-spin-nested-loading {
+			width: 100% !important;
+			height: 100% !important;
+		}
+		.ant-spin-nested-loading > div > .ant-spin {
+			max-height: 100% !important;
+		}
+		.ant-spin-text {
+			color: #444 !important;
+			font-size: 16px !important;
 		}
 	}
 }

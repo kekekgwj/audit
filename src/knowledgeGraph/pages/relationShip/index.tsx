@@ -1,5 +1,6 @@
 import React, { Ref, createContext, useEffect, useRef, useState } from 'react';
-import { Button, message, Input, Form, Row, Col } from 'antd';
+import { Button, message, Input, Form, Row, Col, Spin } from 'antd';
+
 import { type GraphinData } from '@antv/graphin';
 import html2canvas from 'html2canvas';
 import GraphinCom from '@graph/components/graphin';
@@ -93,6 +94,9 @@ const RelationShipCom = () => {
 	const [defaultName, setdefaultName] = React.useState();
 	const sideBarRef = useRef<any>(null);
 
+	//加载等待
+	const [loading, setLoading] = useState(false);
+
 	const searchNewGraph = () => {
 		const relations: INextGraphParam[] = getAllNextGraphInfo();
 
@@ -168,9 +172,52 @@ const RelationShipCom = () => {
 					onRef={sideBarRef}
 					resetAllNextGraph={resetAllNextGraph}
 					getAllNextGraphInfo={getAllNextGraphInfo}
+					setLoading={setLoading}
 				></SideBar>
 			</div>
-			<div className={styles['graphin-box']}>
+			<>
+				{loading ? (
+					<div style={{ width: '100%', height: '100%' }}>
+						<Spin tip="Loading..." size="large">
+							<div className="content" />
+						</Spin>
+					</div>
+				) : (
+					<div className={styles['graphin-box']}>
+						{data && (
+							<>
+								<div className={styles['graphin-box__com']}>
+									<GraphContext.Provider
+										value={{
+											updateData,
+											data,
+											setNextGraphInfo,
+											getNextGraphInfo,
+											resetAllNextGraph,
+											searchNewGraph,
+											refresh: barOpen
+										}}
+									>
+										<GraphinCom />
+									</GraphContext.Provider>
+								</div>
+								<div className={styles['graphin-box__btn']}>
+									<Button
+										htmlType="button"
+										style={{ background: '#23955C', color: '#fff' }}
+										onClick={() => {
+											saveGraph();
+										}}
+									>
+										保存图谱
+									</Button>
+								</div>
+							</>
+						)}
+					</div>
+				)}
+			</>
+			{/* <div className={styles['graphin-box']}>
 				{data && (
 					<>
 						<div className={styles['graphin-box__com']}>
@@ -201,7 +248,7 @@ const RelationShipCom = () => {
 						</div>
 					</>
 				)}
-			</div>
+			</div> */}
 			<SaveCom
 				open={open}
 				defaultName={defaultName}
