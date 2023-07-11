@@ -44,16 +44,16 @@ export default (props: Props) => {
 			>
 				<Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
 					<Form.Item name="code" label="SQL编码">
-						<Input placeholder="请输入" disabled />
+						<Input placeholder="请输入" readOnly />
 					</Form.Item>
 					<Form.Item name="sqlName" label="SQL名称">
-						<Input placeholder="请输入" disabled />
+						<Input placeholder="请输入" readOnly />
 					</Form.Item>
 					<Form.Item name="sqlContent" label="SQL内容">
-						<TextArea rows={4} placeholder="请输入" disabled />
+						<TextArea rows={4} placeholder="请输入" readOnly />
 					</Form.Item>
 					<Form.Item name="useTo" label="规则描述">
-						<TextArea rows={4} placeholder="请输入" disabled />
+						<TextArea rows={4} placeholder="请输入" readOnly />
 					</Form.Item>
 				</Form>
 			</CustomDialog>
