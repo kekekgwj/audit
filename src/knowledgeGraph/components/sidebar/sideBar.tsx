@@ -254,7 +254,7 @@ export default (props: Props) => {
 			});
 			setFilterNAlgorithDisable(false);
 		} catch (e) {
-			// message.error('查询结果为空');
+			setLoading(false);
 		}
 	};
 
