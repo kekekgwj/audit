@@ -6,7 +6,9 @@ import {
 	CaretDownOutlined,
 	CloseOutlined,
 	ArrowRightOutlined,
-	RightOutlined
+	RightOutlined,
+	CloseCircleOutlined,
+	CloseCircleFilled
 } from '@ant-design/icons';
 import FillterAttr, { ComponentsType } from './fillterAttr';
 import SvgIcon from '@/components/svg-icon';
@@ -404,6 +406,14 @@ export default (props: IProps) => {
 		}
 	};
 
+	const cleanPath = (e) => {
+		e.stopPropagation();
+		setFormItemValue('paths', null);
+		setSaveNodes([]);
+		// 重置选项，打开时重新请求数据
+		cntInitRef.current = true;
+	};
+
 	const ref = useRef(null);
 	const [width, setWidth] = useState(700);
 
@@ -432,13 +442,32 @@ export default (props: IProps) => {
 			>
 				<div className={styles['fillter-into-button']}>
 					{convertPathToHint() ? (
-						<span>{convertPathToHint()}</span>
+						<>
+							<span
+								style={{
+									maxWidth: '160px',
+									overflow: 'hidden',
+									textOverflow: 'ellipsis'
+								}}
+							>
+								{convertPathToHint()}
+							</span>
+							<span
+								className={styles['clean-path-icon']}
+								// style={{ color: 'rgba(0, 0, 0, 0.25)' }}
+								onClick={cleanPath}
+							>
+								<CloseCircleFilled />
+							</span>
+						</>
 					) : (
-						<span style={{ color: 'rgba(0, 0, 0, 0.25)' }}>请选择</span>
+						<>
+							<span style={{ color: 'rgba(0, 0, 0, 0.25)' }}>请选择</span>
+							<span style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
+								<RightOutlined />
+							</span>
+						</>
 					)}
-					<span style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
-						<RightOutlined />
-					</span>
 				</div>
 			</Button>
 			{/* <CloseOutlined

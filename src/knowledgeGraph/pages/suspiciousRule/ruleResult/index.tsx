@@ -2,12 +2,13 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { toImgStyle } from '@/utils/other';
 import Graphin, {
+	Behaviors,
 	Components,
 	type TooltipValue,
 	type GraphinData,
 	type LegendChildrenProps
 } from '@antv/graphin';
-
+const { ActivateRelations } = Behaviors;
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
@@ -41,20 +42,6 @@ const { Tooltip, ContextMenu, Legend } = Components;
 
 interface Props {
 	data: GraphinData;
-	refersh: boolean;
-	updateData: (data: GraphinData) => void;
-	onClose: () => void;
-	id?: string;
-}
-
-interface MenuProps {
-	onClose: () => void;
-	updateData: (data: GraphinData) => void;
-	id?: string;
-}
-
-interface NodeDetailProps {
-	nodeModel: ModelConfig;
 }
 
 interface SaveProps {
@@ -143,7 +130,7 @@ const SaveCom = React.memo((props: SaveProps) => {
 });
 
 const GraphinCom = React.memo((props: Props) => {
-	const { data, updateData, refersh } = props;
+	const { data } = props;
 	const [key, setKey] = useState('');
 
 	const graphinRef = useRef<HTMLDivElement>();
@@ -159,7 +146,9 @@ const GraphinCom = React.memo((props: Props) => {
 					nodeSize: 140,
 					nodeSpacing: 50
 				}}
-			></Graphin>
+			>
+				<ActivateRelations />
+			</Graphin>
 		</div>
 	);
 });
@@ -288,14 +277,10 @@ const GraphCom = () => {
 							//需要高亮
 							return {
 								...node,
-								type: 'lightNode',
-								style: {
-									keyshape: {
-										// fill: getFillColorByType(type)
-									}
-								},
+								// type: 'lightNode',
+								type: type,
 								config: {
-									type: 'lightNode',
+									type: type,
 									size: 100
 								}
 							};
