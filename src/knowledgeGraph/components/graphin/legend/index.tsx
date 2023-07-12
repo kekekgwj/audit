@@ -14,9 +14,15 @@ const Legend: React.FunctionComponent<LegendProps> & { Node: typeof Node } = (
 ) => {
 	const { bindType = 'node', sortKey, children, style } = props;
 
-	const { dataMap, options } = useLegend({
+	let { dataMap, options } = useLegend({
 		bindType,
 		sortKey
+	});
+
+	dataMap = new Map([...dataMap].filter(([k, v]) => k != '非可疑节点'));
+
+	options = options.filter((item) => {
+		return item.value != '非可疑节点';
 	});
 
 	return (

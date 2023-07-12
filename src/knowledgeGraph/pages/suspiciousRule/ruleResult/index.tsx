@@ -8,7 +8,7 @@ import Graphin, {
 	type GraphinData,
 	type LegendChildrenProps
 } from '@antv/graphin';
-const { ActivateRelations } = Behaviors;
+const { ActivateRelations, ClickSelect } = Behaviors;
 import SvgIcon from '@/components/svg-icon';
 import styles from './index.module.less';
 import { INode, ModelConfig, NodeConfig } from '@antv/g6';
@@ -34,11 +34,11 @@ import { getGraphByRule } from '@/api/knowLedgeGraph/rule';
 // import { getFillColorByType } from './custom-node/Base';
 import formatCustomNodes from '@graph/components/graphin/customNode';
 import formatCustomEdges from '@graph/components/graphin/customEdge';
-
+import Legend from '@graph/components/graphin/legend';
 // 注册自定义节点
 
 //功能组件
-const { Tooltip, ContextMenu, Legend } = Components;
+const { Tooltip, ContextMenu } = Components;
 
 interface Props {
 	data: GraphinData;
@@ -140,6 +140,7 @@ const GraphinCom = React.memo((props: Props) => {
 			<Graphin
 				key={key}
 				data={data}
+				animate={false}
 				layout={{
 					type: 'force',
 					preventOverlap: true,
@@ -148,6 +149,17 @@ const GraphinCom = React.memo((props: Props) => {
 				}}
 			>
 				<ActivateRelations />
+				<ClickSelect selectedState="normal" />
+				<Legend bindType="node" sortKey="config.type">
+					{(renderProps: LegendChildrenProps) => {
+						return (
+							<Legend.Node
+								{...renderProps}
+								onChange={(checkedValue, result) => {}}
+							/>
+						);
+					}}
+				</Legend>
 			</Graphin>
 		</div>
 	);
@@ -276,6 +288,7 @@ const GraphCom = () => {
 						if (lightNodeTypes.includes(type)) {
 							//需要高亮
 							return {
+								ignoreCenter: true,
 								...node,
 								// type: 'lightNode',
 								type: type,
@@ -287,10 +300,11 @@ const GraphCom = () => {
 						} else {
 							//设为默认色
 							return {
+								ignoreCenter: true,
 								...node,
-								type: 'noLightNode',
+								type: '非可疑节点',
 								config: {
-									type: 'noLightNode',
+									type: '非可疑节点',
 									size: 100
 								}
 							};

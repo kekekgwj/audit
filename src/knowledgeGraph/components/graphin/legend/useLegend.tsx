@@ -25,12 +25,13 @@ export const getEnumValue = (obj: any, keyString: string) => {
 export const getEnumDataMap = (data: any[], sortKey: string) => {
 	const enumDataMap: Map<string | number, any[]> = new Map();
 	data.forEach((item) => {
-		const { center } = item;
+		const { center, ignoreCenter = false } = item;
 		/** 得到枚举值 */
 		const enumValue = getEnumValue(item, sortKey);
 		/** 按照枚举值重新将节点存放 */
 		const current = enumDataMap.get(enumValue);
-		const mapKey = center ? '中心节点' : enumValue;
+		// const mapKey = center ? '中心节点' : enumValue;
+		const mapKey = ignoreCenter ? enumValue : center ? '中心节点' : enumValue;
 		if (current) {
 			enumDataMap.set(mapKey, [...current, item]);
 		} else {

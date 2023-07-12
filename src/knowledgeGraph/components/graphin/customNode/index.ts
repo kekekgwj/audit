@@ -15,7 +15,7 @@ const Colors: {
 	发票: ['#5ACBA9', '#5ACBA9', '#18181F'],
 	资产: ['#24A36F', '#24A36F', '#18181F'],
 	lightNode: ['#FF4242', '#FF4242', '#18181F'], //高亮节点
-	noLightNode: ['#EBF3EF', '#EBF3EF', '#18181F'], //不高亮节点
+	非可疑节点: ['#EBF3EF', '#EBF3EF', '#18181F'], //不高亮节点
 	BASE: ['red', 'red', '#18181F'],
 	Company: ['#E6697B', '#E6697B', '#18181F'],
 	Person: ['#EBF3EF', '#EBF3EF', '#18181F'],
@@ -37,10 +37,21 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 
 	const formatNodes = nodes.map((node, index) => {
-		const { type, score, communityId, id, center = false, labels } = node;
+		const {
+			type,
+			score,
+			communityId,
+			id,
+			center = false,
+			labels,
+			ignoreCenter = false
+		} = node;
+
+		console.log(ignoreCenter, 505050);
 
 		const [strokeColor, fillColor, labelColor] = getColorByType(
-			center ? '中心节点' : type
+			// center ? '中心节点' : type
+			ignoreCenter ? type : center ? '中心节点' : type
 		);
 
 		const size = score
@@ -83,8 +94,8 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 				}
 			},
 			config: {
-				// type
-				type: center ? '中心节点' : type
+				// type: center ? '中心节点' : type
+				type: ignoreCenter ? type : center ? '中心节点' : type
 			}
 		};
 	});

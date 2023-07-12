@@ -457,7 +457,7 @@ export default (props: IProps) => {
 								// style={{ color: 'rgba(0, 0, 0, 0.25)' }}
 								onClick={cleanPath}
 							>
-								<CloseCircleFilled />
+								<CloseCircleFilled style={{ fontSize: '12px' }} />
 							</span>
 						</>
 					) : (
