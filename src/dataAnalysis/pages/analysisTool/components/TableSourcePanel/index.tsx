@@ -9,6 +9,8 @@ import { IImageTypes } from '../../lib/utils';
 import SvgIcon from '@/components/svg-icon';
 import { SearchOutlined } from '@ant-design/icons';
 import { getTablesData } from '@/api/dataAnalysis/graph';
+import { getClassifiedTables } from '@/api/sqlEditor';
+
 const TableItem: React.FC = ({ data, disabled }) => {
 	if (!data) {
 		return null;
@@ -106,11 +108,27 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 	const [myData, setMyData] = useState({}); //我的数据
 	const [searchData, setSearchData] = useState({}); //搜索数据
 	const [showSearch, setShowSearch] = useState(false); //展示搜索数据
+	const [table, setTable] = useState([]); // 表
 	const { isPublicTemplate } = useGraphContext();
 	useEffect(() => {
-		getSystemData();
-		getMyData();
+		// getSystemData();
+		// getMyData();
+		getTables();
 	}, []);
+
+	const getTables = async () => {
+		const res = await getClassifiedTables({
+			keyword: ''
+		});
+
+		setTable(
+			res.map((item) => ({
+				title: item.name,
+				tables: item.tables
+			}))
+		);
+	};
+
 	//系统数据
 	const getSystemData = async () => {
 		try {
@@ -186,14 +204,20 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 							<TableItem data={searchData}></TableItem>
 						) : (
 							<>
-								<TableItem
+								{table.map((item) => (
+									<TableItem
+										data={item}
+										disabled={isPublicTemplate}
+									></TableItem>
+								))}
+								{/* <TableItem
 									data={systemData}
 									disabled={isPublicTemplate}
 								></TableItem>
 								<TableItem
 									data={myData}
 									disabled={isPublicTemplate}
-								></TableItem>
+								></TableItem> */}
 							</>
 						)}
 					</div>

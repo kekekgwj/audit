@@ -17,3 +17,18 @@ export const getMyTables = () => {
 export const getSystemTables = () => {
 	return getTables(1);
 };
+
+interface QueryParams {
+	keyword?: string;
+	orderBy?: string | number;
+}
+export const getClassifiedTables = (data: QueryParams) => {
+	return get(
+		appendQueryParams(
+			API_PREFIX + '/blade-tool/dataAnalysis/getClassifiedTables',
+			{
+				...data
+			}
+		)
+	);
+};

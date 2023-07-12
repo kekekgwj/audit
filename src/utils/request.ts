@@ -20,16 +20,18 @@ export async function http<T>(request: RequestInfo): Promise<T> {
 			if (!timer) {
 				// window.location.href = 'http://audit.zhejianglab.com/login';
 				localStorage.setItem('openLoginTime', now);
+				message.warning(e?.msg || '系统错误');
 				window.open('http://audit.zhejianglab.com/login');
 			} else {
 				if (now - +timer > 5000) {
 					localStorage.setItem('openLoginTime', now);
+					message.warning(e?.msg || '系统错误');
 					window.open('http://audit.zhejianglab.com/login');
 				}
 			}
+		} else {
+			message.warning(e?.msg || '系统错误');
 		}
-
-		message.warning(e?.msg || '系统错误');
 
 		return Promise.reject(e);
 	}
