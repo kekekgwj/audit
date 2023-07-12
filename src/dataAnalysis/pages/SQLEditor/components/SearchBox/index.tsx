@@ -183,7 +183,7 @@ const SQLBox: FC<ISQlBOX> = () => {
 					/>
 				))}
 			</div> */}
-			<div className={classes.sqlBoxGroup}>
+			{/* <div className={classes.sqlBoxGroup}>
 				<div className={classes.sqlBoxGroupTitle}>审计规则SQL</div>
 				<div className={classes.sqlBoxItems}>
 					{auditRules.map(({ title, content, value }, index) => (
@@ -197,7 +197,7 @@ const SQLBox: FC<ISQlBOX> = () => {
 						/>
 					))}
 				</div>
-			</div>
+			</div> */}
 			<div className={classes.sqlBoxGroup}>
 				<div className={classes.sqlBoxGroupTitle}>我的常用SQL</div>
 				<div className={classes.sqlBoxItems}>

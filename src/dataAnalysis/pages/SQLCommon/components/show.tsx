@@ -45,10 +45,10 @@ export default (props: Props) => {
 			>
 				<Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
 					<Form.Item name="sqlName" label="SQL名称">
-						<Input placeholder="请输入" />
+						<Input placeholder="请输入" readOnly />
 					</Form.Item>
 					<Form.Item name="sqlContent" label="SQL内容">
-						<TextArea rows={4} placeholder="请输入" />
+						<TextArea rows={4} placeholder="请输入" readOnly />
 					</Form.Item>
 				</Form>
 			</CustomDialog>

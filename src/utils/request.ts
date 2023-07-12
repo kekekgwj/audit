@@ -6,7 +6,6 @@ export async function http<T>(request: RequestInfo): Promise<T> {
 	const response = await fetch(request);
 	try {
 		const body = await response.json();
-		console.log({ response });
 		if (response.ok) {
 			return body.data;
 		} else {
@@ -16,7 +15,18 @@ export async function http<T>(request: RequestInfo): Promise<T> {
 		console.error(e);
 
 		if (e.code === 401) {
-			window.location.href = 'http://audit.zhejianglab.com/login';
+			const timer = localStorage.getItem('openLoginTime');
+			const now = Date.now();
+			if (!timer) {
+				// window.location.href = 'http://audit.zhejianglab.com/login';
+				localStorage.setItem('openLoginTime', now);
+				window.open('http://audit.zhejianglab.com/login');
+			} else {
+				if (now - +timer > 5000) {
+					localStorage.setItem('openLoginTime', now);
+					window.open('http://audit.zhejianglab.com/login');
+				}
+			}
 		}
 
 		message.warning(e?.msg || '系统错误');
