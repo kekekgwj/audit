@@ -264,6 +264,7 @@ export default (props: IProps) => {
 					formatValue.operationLinks = [];
 					formatValue.operations = [];
 				} else {
+					formatValue.operationLinks.push(1);
 					formatValue.operations.push({
 						// >=
 						operatorType: 3,
@@ -283,6 +284,9 @@ export default (props: IProps) => {
 				// 	value: value
 				// });
 				value.forEach((item: string, index: number) => {
+					if (index > 0) {
+						formatValue.operationLinks.push(2);
+					}
 					formatValue.operations.push({
 						operatorType: 1,
 						value: item
