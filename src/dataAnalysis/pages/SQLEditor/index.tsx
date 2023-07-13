@@ -5,7 +5,7 @@ import React, {
 	useRef,
 	useState
 } from 'react';
-import { Button, Divider, Table, message } from 'antd';
+import { Button, Divider, Table, message, ConfigProvider } from 'antd';
 import AceEditor from 'react-ace';
 import classes from './index.module.less';
 // import 'ace-builds/src-noconflict/mode-javascript';
@@ -21,7 +21,8 @@ import SvgIcon from '@/components/svg-icon';
 import SaveDialog from './components/SaveDialog';
 
 import { saveSql, getResultBySql, exportBySql } from '@/api/dataAnalysis/sql';
-import { DownloadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, CloseOutlined } from '@ant-design/icons';
+import emptyPage from '@/assets/img/empty-data.png';
 
 export const EditorContext = createContext({});
 
@@ -93,6 +94,11 @@ const SQLEditor: React.FC = () => {
 	const [current, setCurrent] = useState(1);
 	const [total, setTotal] = useState(0);
 
+	const currentRef = useRef();
+	useEffect(() => {
+		currentRef.current = current;
+	}, [current]);
+
 	const [messageApi, contextHolder] = message.useMessage();
 
 	const triggerSearchBox = (type: BoxType) => {
@@ -125,39 +131,59 @@ const SQLEditor: React.FC = () => {
 		setOpenAdd(true);
 	};
 
-	const handleExecute = async () => {
+	const handleExecute = async (type: string) => {
+		// type: 1执行需要重置页码 2:翻页不需要
+		if (type == '1') {
+			setCurrent(1);
+		}
 		const params = {
-			current,
+			current: type == '1' ? 1 : currentRef.current,
 			size: 10,
 			sql
 		};
 		const res = await getResultBySql(params);
 		setTotal(res.total);
-		const columns = res.head.map((item: string, index: number) => ({
-			title: item,
-			dataIndex: index,
-			width: 120
-		}));
+		const columns =
+			res.head?.map((item: string, index: number) => ({
+				title: item,
+				dataIndex: index,
+				width: 120
+			})) || [];
 
 		// 设置结果的列配置
-
 		setColumns(columns);
 		// 设置结果数据
 		setResult(res.data);
+
 		// 展示结果
 		setHasResult(true);
 	};
 
 	const searchChange = (page) => {
-		console.log(page, 151515151);
 		setCurrent(page);
+		setTimeout(() => {
+			if (sql) {
+				handleExecute('2');
+			}
+		}, 200);
 	};
 
-	useEffect(() => {
-		if (sql) {
-			handleExecute();
-		}
-	}, [current]);
+	const handleCloseResult = () => {
+		setHasResult(false);
+	};
+
+	const customizeRenderEmpty = () => (
+		<div className={classes.emptyTableBox}>
+			<img src={emptyPage} alt="" />
+			<div className={classes.emptyTableText}>暂无数据</div>
+		</div>
+	);
+
+	// useEffect(() => {
+	// 	if (sql) {
+	// 		handleExecute();
+	// 	}
+	// }, [current]);
 
 	// 下载
 	const handleDownLoad = async () => {
@@ -178,7 +204,9 @@ const SQLEditor: React.FC = () => {
 					<Button
 						type="primary"
 						className={classes.executeBtn}
-						onClick={handleExecute}
+						onClick={() => {
+							handleExecute('1');
+						}}
 					>
 						执行
 					</Button>
@@ -203,7 +231,7 @@ const SQLEditor: React.FC = () => {
 						setOptions={{
 							enableBasicAutocompletion: true,
 							enableSnippets: true,
-							enableLiveAutocompletion: true
+							enableLiveAutocompletion: false
 						}}
 						commands={[
 							{
@@ -250,7 +278,7 @@ const SQLEditor: React.FC = () => {
 						</Button>
 					</div>
 					{hasResult && (
-						<>
+						<div className={classes.sqlResultBox}>
 							<div className={classes.aceResultMid}>
 								<div className={classes.downloadBtn} onClick={handleDownLoad}>
 									<SvgIcon
@@ -259,23 +287,29 @@ const SQLEditor: React.FC = () => {
 									></SvgIcon>
 									<span>下载</span>
 								</div>
+								<div onClick={handleCloseResult}>
+									<CloseOutlined style={{ fontSize: '14px' }} />
+								</div>
 							</div>
 							<div className={classes.aceResultTable}>
-								<Table
-									columns={columns}
-									dataSource={result}
-									scroll={{ y: 300 }}
-									pagination={{
-										current,
-										total,
-										pageSize: 10,
-										onChange: (page) => {
-											searchChange(page);
-										}
-									}}
-								/>
+								<ConfigProvider renderEmpty={customizeRenderEmpty}>
+									<Table
+										columns={columns}
+										dataSource={result}
+										// scroll={{ y: 300 }}
+										scroll={{ y: 120 }}
+										pagination={{
+											current,
+											total,
+											pageSize: 10,
+											onChange: (page) => {
+												searchChange(page);
+											}
+										}}
+									/>
+								</ConfigProvider>
 							</div>
-						</>
+						</div>
 					)}
 				</div>
 			</div>

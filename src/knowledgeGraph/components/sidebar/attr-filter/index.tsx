@@ -260,16 +260,22 @@ export default (props: IProps) => {
 
 			if (ComponentsType.DATE.includes(String(type))) {
 				const [start, end] = value;
-				formatValue.operations.push({
-					// >=
-					operatorType: 3,
-					value: start
-				});
-				formatValue.operations.push({
-					// <=
-					operatorType: 5,
-					value: end
-				});
+				if (!start || !end) {
+					formatValue.operationLinks = [];
+					formatValue.operations = [];
+				} else {
+					formatValue.operationLinks.push(1);
+					formatValue.operations.push({
+						// >=
+						operatorType: 3,
+						value: start
+					});
+					formatValue.operations.push({
+						// <=
+						operatorType: 5,
+						value: end
+					});
+				}
 			}
 
 			if (ComponentsType.GENDER.includes(String(type))) {
@@ -278,6 +284,9 @@ export default (props: IProps) => {
 				// 	value: value
 				// });
 				value.forEach((item: string, index: number) => {
+					if (index > 0) {
+						formatValue.operationLinks.push(2);
+					}
 					formatValue.operations.push({
 						operatorType: 1,
 						value: item
@@ -286,8 +295,19 @@ export default (props: IProps) => {
 			}
 
 			if (ComponentsType.RANGE.includes(String(type))) {
-				formatValue.operationLinks = value?.operationLinks || [];
-				formatValue.operations = value?.operations || [];
+				console.log(value, 290290290290);
+				// 为空时不穿值
+				if (
+					value?.operations.length == 1 &&
+					!value?.operations[0].operatorType &&
+					!value?.operations[0].value
+				) {
+					formatValue.operationLinks = [];
+					formatValue.operations = [];
+				} else {
+					formatValue.operationLinks = value?.operationLinks || [];
+					formatValue.operations = value?.operations || [];
+				}
 			}
 			if (
 				formatValue.operationLinks.length === 0 &&
@@ -331,6 +351,7 @@ export default (props: IProps) => {
 			};
 		});
 		const listTransNoNull = listTrans.filter((v) => v !== null) as IPath[];
+		// const listTransNoNull = listTrans.filter((v) => !v) as IPath[];
 		return listTransNoNull.length === 0 ? null : listTransNoNull;
 	};
 
