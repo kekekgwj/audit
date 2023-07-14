@@ -431,6 +431,7 @@ export default (props: IProps) => {
 		e.stopPropagation();
 		setFormItemValue('paths', null);
 		setSaveNodes([]);
+		setSelectedNodeID(null);
 		// 重置选项，打开时重新请求数据
 		cntInitRef.current = true;
 	};
