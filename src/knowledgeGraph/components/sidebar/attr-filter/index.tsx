@@ -299,8 +299,8 @@ export default (props: IProps) => {
 				// 为空时不穿值
 				if (
 					value?.operations.length == 1 &&
-					!value?.operations[0].operatorType &&
-					!value?.operations[0].value
+					!value?.operations[0]?.operatorType &&
+					!value?.operations[0]?.value
 				) {
 					formatValue.operationLinks = [];
 					formatValue.operations = [];
