@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import classes from './index.module.less';
-import { Collapse, Input, Tooltip } from 'antd';
+import { Collapse, Input, Tooltip, message } from 'antd';
 const { Search } = Input;
 const { Panel } = Collapse;
 import { GraphContext, useGraphContext } from '../../lib';
@@ -106,7 +106,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 
 	const [systemData, setSystemData] = useState({}); //系统数据
 	const [myData, setMyData] = useState({}); //我的数据
-	const [searchData, setSearchData] = useState({}); //搜索数据
+	const [searchData, setSearchData] = useState([]); //搜索数据
 	const [showSearch, setShowSearch] = useState(false); //展示搜索数据
 	const [table, setTable] = useState([]); // 表
 	const { isPublicTemplate } = useGraphContext();
@@ -163,21 +163,35 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 			setShowSearch(false);
 			return;
 		}
-		try {
-			const res = await getTablesData({
-				queryType: 3,
-				keyword: val,
-				orderBy: 2
-			});
-			const data = {
-				title: '搜索结果',
-				tables: res
-			};
-			setSearchData(data);
-			setShowSearch(true);
-		} catch (e) {
-			console.error(e);
+		const res = await getClassifiedTables({
+			keyword: val
+		});
+		if (!res.length) {
+			message.warning('暂无数据');
 		}
+		setSearchData(
+			res.map((item) => ({
+				title: item.name,
+				tables: item.tables
+			}))
+		);
+		setShowSearch(true);
+
+		// try {
+		// 	const res = await getTablesData({
+		// 		queryType: 3,
+		// 		keyword: val,
+		// 		orderBy: 2
+		// 	});
+		// 	const data = {
+		// 		title: '搜索结果',
+		// 		tables: res
+		// 	};
+		// 	setSearchData(data);
+		// 	setShowSearch(true);
+		// } catch (e) {
+		// 	console.error(e);
+		// }
 	};
 	const changeSearch = (e: any) => {
 		// 没有数据，关闭搜索
@@ -199,9 +213,23 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 							onChange={changeSearch}
 						/>
 					</div>
-					<div style={{ height: ' calc(100% - 32px)', overflowY: 'auto' }}>
+					<div
+						style={{
+							height: ' calc(100% - 32px)',
+							overflowY: 'auto',
+							paddingBottom: '20px'
+						}}
+					>
 						{showSearch ? (
-							<TableItem data={searchData}></TableItem>
+							// <TableItem data={searchData}></TableItem>
+							<>
+								{searchData.map((item) => (
+									<TableItem
+										data={item}
+										disabled={isPublicTemplate}
+									></TableItem>
+								))}
+							</>
 						) : (
 							<>
 								{table.map((item) => (
