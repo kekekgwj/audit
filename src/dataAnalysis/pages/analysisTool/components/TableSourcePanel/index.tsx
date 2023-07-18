@@ -108,6 +108,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 	const [myData, setMyData] = useState({}); //我的数据
 	const [searchData, setSearchData] = useState([]); //搜索数据
 	const [showSearch, setShowSearch] = useState(false); //展示搜索数据
+	const [searchEmpty, setSearchEmpty] = useState(false); //搜索结果是否为空
 	const [table, setTable] = useState([]); // 表
 	const { isPublicTemplate } = useGraphContext();
 	useEffect(() => {
@@ -167,14 +168,17 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 			keyword: val
 		});
 		if (!res.length) {
-			message.warning('暂无数据');
+			// message.warning('暂无数据');
+			setSearchEmpty(true);
+		} else {
+			setSearchEmpty(false);
+			setSearchData(
+				res.map((item) => ({
+					title: item.name,
+					tables: item.tables
+				}))
+			);
 		}
-		setSearchData(
-			res.map((item) => ({
-				title: item.name,
-				tables: item.tables
-			}))
-		);
 		setShowSearch(true);
 
 		// try {
@@ -206,6 +210,7 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 					<div style={{ paddingRight: '15px', marginBottom: '20px' }}>
 						<Search
 							placeholder="请输入关键字"
+							allowClear
 							enterButton="查询"
 							size="middle"
 							prefix={<SearchOutlined className="site-form-item-icon" />}
@@ -221,15 +226,18 @@ const TableSourcePanel: React.FC<IProps> = ({ setOpen, open }) => {
 						}}
 					>
 						{showSearch ? (
-							// <TableItem data={searchData}></TableItem>
-							<>
-								{searchData.map((item) => (
-									<TableItem
-										data={item}
-										disabled={isPublicTemplate}
-									></TableItem>
-								))}
-							</>
+							searchEmpty ? (
+								<div className={classes.searchEmpty}>暂无数据</div>
+							) : (
+								<>
+									{searchData.map((item) => (
+										<TableItem
+											data={item}
+											disabled={isPublicTemplate}
+										></TableItem>
+									))}
+								</>
+							)
 						) : (
 							<>
 								{table.map((item) => (

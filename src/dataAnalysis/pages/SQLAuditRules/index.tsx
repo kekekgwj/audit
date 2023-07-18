@@ -146,6 +146,7 @@ export default () => {
 			<DataTable
 				ref={tableRef}
 				columns={columns}
+				scroll={true}
 				getData={getData}
 				className={styles.table}
 			></DataTable>

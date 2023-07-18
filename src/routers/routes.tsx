@@ -76,7 +76,7 @@ export const routes: CustomRoute[] = [
 				// path: 'analysis',
 				path: 'dataVisualization',
 				component: lazy(() => import('@sql/pages/dataVisualization')),
-				meta: { title: '数据可视化', icon: 'visualization' },
+				meta: { title: '可视化数据分析', icon: 'visualization' },
 
 				children: [
 					{
@@ -104,7 +104,7 @@ export const routes: CustomRoute[] = [
 				path: 'sqlQuery',
 				component: lazy(() => import('@sql/pages/dataVisualization')),
 				// component: lazy(() => import('@sql/pages/SQLEditor')),
-				meta: { title: 'SQL查询', icon: 'query' },
+				meta: { title: 'SQL数据分析', icon: 'query' },
 				children: [
 					{
 						path: 'editer',
