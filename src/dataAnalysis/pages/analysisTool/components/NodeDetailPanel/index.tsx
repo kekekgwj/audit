@@ -207,8 +207,11 @@ const Panel: React.FC = () => {
 		type paramsType = getParameterFirst<Parameters<typeof getResult>>;
 		const curConfis = getAllConfigs();
 		const curType = getNodeTypeById(graph, id)[0] as IImageTypes;
+
+		const isEmpty = !curConfis[id] || Object.keys(curConfis[id]).length < 2;
+
 		// 除了table和end的类型 不存在config 不自动执行
-		if (!executeType.includes(curType) && !curConfis[id]) {
+		if (!executeType.includes(curType) && isEmpty) {
 			updateTable([], []);
 			return;
 		}
