@@ -264,8 +264,11 @@ const SelectGroup: React.FC = () => {
 
 	useEffect(() => {
 		const connectionSentences = [];
+		let frist = false;
 
-		if (isEmpty(initValue.connectionSentences)) {
+		console.log(initValue, initValue.frist);
+
+		if (!initValue.frist) {
 			if (!isEmpty(config[0].recommendFieldNames)) {
 				config[0].recommendFieldNames.forEach((item, index) => {
 					connectionSentences.push({
@@ -278,6 +281,13 @@ const SelectGroup: React.FC = () => {
 						rightTableName: config[1].tableName
 					});
 				});
+				frist = true;
+				setValue({
+					connectionSentences,
+					connectionType: 'INNER JOIN',
+					...initValue,
+					frist
+				});
 			}
 		}
 
@@ -287,13 +297,12 @@ const SelectGroup: React.FC = () => {
 			...initValue
 		});
 
-		setValue(
-			formatSubmitValue({
-				connectionSentences,
-				connectionType: 'INNER JOIN',
-				...initValue
-			})
-		);
+		// setValue({
+		// 	connectionSentences,
+		// 	connectionType: 'INNER JOIN',
+		// 	...initValue,
+		// 	frist
+		// });
 	}, []);
 
 	return (
@@ -307,8 +316,7 @@ const SelectGroup: React.FC = () => {
 				}}
 				// initialValues={{
 				// 	connectionSentences: [],
-				// 	connectionType: 'INNER JOIN',
-				// 	...initValue
+				// 	connectionType: 'INNER JOIN'
 				// }}
 				form={form}
 				disabled={isPublicTemplate}
