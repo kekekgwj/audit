@@ -134,6 +134,7 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 						? {
 								current,
 								total,
+								showSizeChanger: false,
 								pageSize: 10,
 								onChange: (page) => {
 									searchChange(page);
