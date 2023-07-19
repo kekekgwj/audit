@@ -266,8 +266,6 @@ const SelectGroup: React.FC = () => {
 		const connectionSentences = [];
 		let frist = false;
 
-		console.log(initValue, initValue.frist);
-
 		if (!initValue.frist) {
 			if (!isEmpty(config[0].recommendFieldNames)) {
 				config[0].recommendFieldNames.forEach((item, index) => {
