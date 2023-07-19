@@ -215,7 +215,7 @@ const Row = (props: RowProps) => {
 				defaultValue={cascaderDefaultValue}
 				onChange={(value) => handleChange('table', value)}
 				dropdownMenuColumnStyle={{
-					maxWidth: '300px',
+					maxWidth: '350px',
 					overflow: 'hidden',
 					textOverflow: 'ellipsis'
 				}}

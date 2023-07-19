@@ -151,14 +151,14 @@ const Panel: React.FC = () => {
 					content: canvasData
 				})
 			};
-			setTableLoading(true);
+			// setTableLoading(true);
 			const config: any = await getCanvasConfig(params);
 			if (!config || config.length < 1) {
 				setIsEmptyConfig(true);
 			} else {
 				setIsEmptyConfig(false);
 			}
-			setTableLoading(false);
+			// setTableLoading(false);
 			setNodeConfig(config);
 			const tableNames = config.map((item) => item.tableName);
 			const key = encodeNodeSources([...tableNames, id]);
@@ -231,6 +231,7 @@ const Panel: React.FC = () => {
 
 		let data, head, totalNum;
 		try {
+			setTableLoading(true);
 			if (pathName === '审计模板') {
 				const res = await getResultByAuditProject({
 					auditProjectId: projectID,
@@ -249,9 +250,11 @@ const Panel: React.FC = () => {
 			}
 		} catch (e) {
 			updateTable([], []);
+			setTableLoading(false);
 			return;
 		}
 		updateTable(data, head);
+		setTableLoading(false);
 		setTotal(totalNum);
 	};
 
