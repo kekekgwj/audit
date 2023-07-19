@@ -8,7 +8,8 @@ import {
 	Empty,
 	message,
 	Col,
-	Row
+	Row,
+	Tooltip
 } from 'antd';
 import fileImg from '@/assets/img/file.png';
 import styles from './index.module.less';
@@ -187,7 +188,12 @@ const AuditTemplate = () => {
 													<div className={styles['img-icon']}>
 														<img src={fileImg} alt="" />
 													</div>
-													<div className={styles['text-name']}>{item.name}</div>
+													<div
+														className={styles['text-name']}
+														title={item.name}
+													>
+														{item.name}
+													</div>
 													<div
 														style={{ textAlign: 'center' }}
 														className={styles['text-time']}

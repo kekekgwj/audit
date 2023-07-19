@@ -214,6 +214,11 @@ const Row = (props: RowProps) => {
 				options={filterateContext?.cascaderOptions}
 				defaultValue={cascaderDefaultValue}
 				onChange={(value) => handleChange('table', value)}
+				dropdownMenuColumnStyle={{
+					maxWidth: '300px',
+					overflow: 'hidden',
+					textOverflow: 'ellipsis'
+				}}
 			/>
 			<Select
 				className={styles['filter-box__row_item']}

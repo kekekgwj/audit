@@ -7,7 +7,8 @@ import {
 	message,
 	Pagination,
 	Col,
-	Row
+	Row,
+	Tooltip
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { PlusCircleOutlined } from '@ant-design/icons';
@@ -249,7 +250,11 @@ const MyTemplate = () => {
 											<div className={styles['img-icon']}>
 												<img src={fileImg} alt="" />
 											</div>
-											<div className={styles['text-name']}>{item.name}</div>
+
+											<div className={styles['text-name']} title={item.name}>
+												{item.name}
+											</div>
+
 											<div
 												style={{ textAlign: 'center' }}
 												className={styles['text-time']}
