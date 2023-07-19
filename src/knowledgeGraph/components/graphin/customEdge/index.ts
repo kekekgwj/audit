@@ -18,7 +18,7 @@ const formatCustomEdges = ({ edges }: Pick<IGraphData, 'edges'>) => {
 		// 	? (1 + transformedData[index]) * 4 + 2
 		// 	: 2;
 		const customLineWidth =
-			similarity > 0 ? (similarity / maxSimilarity) * 8 + 2 : 2;
+			similarity && similarity > 0 ? (similarity / maxSimilarity) * 8 + 2 : 2;
 
 		const customLabel = type;
 		const [customSourceNode, customTargetNode] = [source, target].map((v) =>
