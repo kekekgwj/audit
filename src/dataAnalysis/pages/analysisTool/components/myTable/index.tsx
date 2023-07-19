@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Table } from 'antd';
 import { Resizable } from 'react-resizable';
 import './style.less';
@@ -39,8 +39,15 @@ interface Props {
 }
 const ResizeTable: React.FC<Props> = (props: Props) => {
 	// table 数据
-	const { columnsData, dataSource, loading, searchChange, current, total } =
-		props;
+	const {
+		columnsData,
+		dataSource,
+		loading,
+		searchChange,
+		current,
+		total,
+		panelHeight
+	} = props;
 
 	// const [columns, setColumns] = useState(formatCol(columnsData));
 
@@ -67,8 +74,11 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 	// 	};
 
 	// 测试
+	const tabRef = useRef(null);
 	const [cols, setCols] = useState(columnsData);
 	const [columns, setColumns] = useState([]);
+
+	const [scrollHeight, setScrollHeight] = useState(0);
 	// 处理拖拽
 	const handleResize =
 		(index) =>
@@ -95,8 +105,20 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 		);
 	}, [cols]);
 
+	useEffect(() => {
+		getScrollHeight();
+	}, [panelHeight]);
+
+	// 计算表格滚动高度
+	const getScrollHeight = () => {
+		if (!tabRef.current || !scroll) return;
+		const bound = tabRef.current.getBoundingClientRect();
+		const height = bound.height - (total ? 80 : 0);
+		setScrollHeight(height);
+	};
+
 	return (
-		<div className="components-table-resizable-column">
+		<div ref={tabRef} className="components-table-resizable-column">
 			<Table
 				size="small"
 				bordered
@@ -106,7 +128,7 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 				columns={columns}
 				dataSource={dataSource}
 				// scroll={{ y: total ? 240 : 300 }}
-				scroll={{ y: total ? 140 : 200 }}
+				scroll={{ y: scrollHeight }}
 				pagination={
 					total
 						? {
