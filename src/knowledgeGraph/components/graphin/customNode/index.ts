@@ -47,16 +47,17 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 			ignoreCenter = false
 		} = node;
 
-		console.log(ignoreCenter, 505050);
+		console.log('averageScore:' + averageScore, 505050);
 
 		const [strokeColor, fillColor, labelColor] = getColorByType(
 			// center ? '中心节点' : type
 			ignoreCenter ? type : center ? '中心节点' : type
 		);
 
-		const size = score
-			? Math.min(Math.max((score / averageScore) * 200, 100), 200)
-			: 100;
+		// const size = score
+		// 	? Math.min(Math.max((score / averageScore) * 200, 100), 200)
+		// 	: 100;
+		const size = score ? (1 + score) * 100 : 100;
 		const labelStr = labels.join('/');
 		const [str] = getCanvasText(labelStr, 12, size);
 		return {
