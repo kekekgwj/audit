@@ -33,6 +33,10 @@ export const getFillColorByType = (type: string): string => {
 };
 
 const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
+	const sourceArr = nodes.map((node, index) => (node.score ? node.score : 0));
+	const maxSource = Math.max(...sourceArr);
+	const secondMaxSource = sourceArr.sort((a, b) => b - a)[1];
+	console.log(maxSource, secondMaxSource, 393939);
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 
@@ -57,7 +61,15 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 		// const size = score
 		// 	? Math.min(Math.max((score / averageScore) * 200, 100), 200)
 		// 	: 100;
-		const size = score && score > 0 ? (1 + score) * 150 : 100;
+
+		// const size = score && score > 0 ? (1 + score) * 150 : 100;
+		let size;
+		if (maxSource == score) {
+			size = 250;
+		} else {
+			size = score && score > 0 ? (score / secondMaxSource + 1) * 100 : 100;
+		}
+
 		const labelStr = labels.join('/');
 		const [str] = getCanvasText(labelStr, 12, size);
 		return {
