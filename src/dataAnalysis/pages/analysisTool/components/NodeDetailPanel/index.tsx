@@ -34,6 +34,7 @@ import {
 } from '@/api/dataAnalysis/graph';
 import emptyPage from '@/assets/img/empty-data.png';
 import ResizeTable from '../myTable/';
+import { Resizable } from 'react-resizable';
 
 const { DOWNLOAD } = ASSETS;
 interface IConfigContext {
@@ -100,6 +101,7 @@ const Panel: React.FC = () => {
 	const { data, columns, updateTable } = useTableSource();
 
 	const [showConfig, setShowConfig] = useState(true);
+	const [panelHeight, setPanelHeight] = useState(400);
 
 	// 是否配置为空
 	const [isEmptyConfig, setIsEmptyConfig] = useState(true);
@@ -388,109 +390,121 @@ const Panel: React.FC = () => {
 		</div>
 	);
 
+	const onResize = (event, { node, size, handle }) => {
+		setPanelHeight(size.height);
+	};
+
 	return (
-		<div className={classes.container}>
-			<div className={classes.data}>
-				{pathName == '我的模板' ? (
-					<div className={classes.download}>
-						<div
-							onClick={downLoadData}
-							style={{
-								cursor: 'pointer',
-								display: 'flex',
-								alignItems: 'center',
-								height: '100%'
-							}}
-						>
-							<DownloadOutlined
-								style={{ color: '#24A36F', fontSize: '20px' }}
-							/>
-							<span className={classes.download_text}>下载</span>
+		<Resizable
+			height={panelHeight}
+			axis={'y'}
+			resizeHandles={['n']}
+			onResize={onResize}
+		>
+			<div style={{ height: panelHeight + 'px' }} className={classes.container}>
+				<div className={classes.data}>
+					{pathName == '我的模板' ? (
+						<div className={classes.download}>
+							<div
+								onClick={downLoadData}
+								style={{
+									cursor: 'pointer',
+									display: 'flex',
+									alignItems: 'center',
+									height: '100%'
+								}}
+							>
+								<DownloadOutlined
+									style={{ color: '#24A36F', fontSize: '20px' }}
+								/>
+								<span className={classes.download_text}>下载</span>
+							</div>
 						</div>
+					) : !executeType.includes(clickNodeType) ? (
+						<div className={classes.download}></div>
+					) : null}
+					<div className={classes.tableWrapper}>
+						<ConfigProvider renderEmpty={customizeRenderEmpty}>
+							{/* <Table
+								loading={tableLoading}
+								columns={columns}
+								dataSource={data}
+								pagination={{ defaultPageSize: 10 }}
+							/> */}
+							<ResizeTable
+								columnsData={columns}
+								dataSource={data}
+								loading={tableLoading}
+								key={columns}
+								searchChange={searchChange}
+								current={currentRef.current}
+								panelHeight={panelHeight}
+								total={total}
+							></ResizeTable>
+						</ConfigProvider>
 					</div>
-				) : !executeType.includes(clickNodeType) ? (
-					<div className={classes.download}></div>
-				) : null}
-				<div className={classes.tableWrapper}>
-					<ConfigProvider renderEmpty={customizeRenderEmpty}>
-						{/* <Table
-							loading={tableLoading}
-							columns={columns}
-							dataSource={data}
-							pagination={{ defaultPageSize: 10 }}
-						/> */}
-						<ResizeTable
-							columnsData={columns}
-							dataSource={data}
-							loading={tableLoading}
-							key={columns}
-							searchChange={searchChange}
-							current={currentRef.current}
-							total={total}
-						></ResizeTable>
-					</ConfigProvider>
+				</div>
+				<div className={classes.rightConfigBox}>
+					{!executeType.includes(clickNodeType) ? (
+						<div
+							className={`${
+								showConfig ? classes.configPanel : classes.hideConfigPanel
+							}`}
+						>
+							<div className={classes.configPanel_title}>
+								{!showConfig ? (
+									<span
+										onClick={() => toggleConfig()}
+										className={classes.svgIcon}
+										style={{ marginRight: '5px' }}
+									>
+										<SvgIcon
+											name="closeArrow"
+											className={classes.closeIcon}
+										></SvgIcon>
+									</span>
+								) : null}
+								<span className={classes.configPanel_title_text}>参数配置</span>
+								{showConfig ? (
+									<span
+										onClick={() => toggleConfig()}
+										className={classes.svgIcon}
+									>
+										<SvgIcon
+											name="openArrow"
+											className={classes.closeIcon}
+										></SvgIcon>
+									</span>
+								) : null}
+							</div>
+							{showConfig ? (
+								<div className={classes.configWrapper}>
+									<ConfigContext.Provider
+										value={{
+											type: clickNodeType,
+											id: id,
+											initValue,
+											config: nodeConfig,
+											getValue,
+											setValue,
+											resetValue,
+											updateTable,
+											executeByNodeConfig
+										}}
+									>
+										{!isEmptyConfig ? (
+											<ConfigPanel key={getNodeKey()} />
+										) : (
+											<div className={classes.emptyConfig}>缺少数据表配置</div>
+										)}
+									</ConfigContext.Provider>
+								</div>
+							) : null}
+						</div>
+					) : null}
 				</div>
 			</div>
-			<div className={classes.rightConfigBox}>
-				{!executeType.includes(clickNodeType) ? (
-					<div
-						className={`${
-							showConfig ? classes.configPanel : classes.hideConfigPanel
-						}`}
-					>
-						<div className={classes.configPanel_title}>
-							{!showConfig ? (
-								<span
-									onClick={() => toggleConfig()}
-									className={classes.svgIcon}
-									style={{ marginRight: '5px' }}
-								>
-									<SvgIcon
-										name="closeArrow"
-										className={classes.closeIcon}
-									></SvgIcon>
-								</span>
-							) : null}
-							<span className={classes.configPanel_title_text}>参数配置</span>
-							{showConfig ? (
-								<span
-									onClick={() => toggleConfig()}
-									className={classes.svgIcon}
-								>
-									<SvgIcon
-										name="openArrow"
-										className={classes.closeIcon}
-									></SvgIcon>
-								</span>
-							) : null}
-						</div>
-						{showConfig ? (
-							<div className={classes.configWrapper}>
-								<ConfigContext.Provider
-									value={{
-										type: clickNodeType,
-										id: id,
-										initValue,
-										config: nodeConfig,
-										getValue,
-										setValue,
-										resetValue,
-										updateTable,
-										executeByNodeConfig
-									}}
-								>
-									{!isEmptyConfig ? (
-										<ConfigPanel key={getNodeKey()} />
-									) : (
-										<div className={classes.emptyConfig}>缺少数据表配置</div>
-									)}
-								</ConfigContext.Provider>
-							</div>
-						) : null}
-					</div>
-				) : null}
-			</div>
-		</div>
+		</Resizable>
 	);
 };
 

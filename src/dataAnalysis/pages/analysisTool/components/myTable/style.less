@@ -1,3 +1,8 @@
+.components-table-resizable-column {
+	height: 100%;
+	overflow: hidden;
+}
+
 /* 内容过多以...显示 */
 .ellipsisText {
 	overflow: hidden;
@@ -13,7 +18,7 @@
 }
 
 /* 显示拖拽手势 */
-.react-resizable-handle {
+.react-resizable-handle-se {
 	position: absolute;
 	width: 10px;
 	height: 100%;
@@ -21,6 +26,18 @@
 	right: 0;
 	// cursor: col-resize;
 	cursor: ew-resize;
+	z-index: 6;
+	//border-left: white 1px solid;
+}
+
+.react-resizable-handle-n {
+	position: absolute;
+	width: 100%;
+	height: 10px;
+	top: 0;
+	left: 0;
+	// cursor: col-resize;
+	cursor: row-resize;
 	z-index: 6;
 	//border-left: white 1px solid;
 }
