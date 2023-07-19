@@ -57,7 +57,7 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 		// const size = score
 		// 	? Math.min(Math.max((score / averageScore) * 200, 100), 200)
 		// 	: 100;
-		const size = score ? (1 + score) * 100 : 100;
+		const size = score && score > 0 ? (1 + score) * 150 : 100;
 		const labelStr = labels.join('/');
 		const [str] = getCanvasText(labelStr, 12, size);
 		return {
