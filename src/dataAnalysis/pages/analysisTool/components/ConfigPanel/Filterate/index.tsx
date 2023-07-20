@@ -63,6 +63,7 @@ interface FilterateContext {
 	delRow: delRow;
 	addRow: addRow;
 	cascaderOptions: any;
+	isPublicTemplate: boolean;
 }
 
 const CheckboxGroup = Checkbox.Group;
@@ -187,10 +188,12 @@ const Row = (props: RowProps) => {
 	};
 
 	const handleDel = () => {
+		if (filterateContext?.isPublicTemplate) return;
 		props.delRow(props.groupIndex, props.index);
 	};
 
 	const handleAdd = () => {
+		if (filterateContext?.isPublicTemplate) return;
 		filterateContext?.addRow(props.groupIndex, props.index);
 	};
 
@@ -211,6 +214,7 @@ const Row = (props: RowProps) => {
 			<Cascader
 				className={styles['filter-box__row_item']}
 				placeholder="请选择"
+				disabled={filterateContext?.isPublicTemplate}
 				options={filterateContext?.cascaderOptions}
 				defaultValue={cascaderDefaultValue}
 				onChange={(value) => handleChange('table', value)}
@@ -222,12 +226,14 @@ const Row = (props: RowProps) => {
 			/>
 			<Select
 				className={styles['filter-box__row_item']}
+				disabled={filterateContext?.isPublicTemplate}
 				defaultValue={props.defaultValue.operator}
 				placeholder="请选择"
 				options={symbolSelect}
 				onChange={(value) => handleChange('operator', value)}
 			/>
 			<Input
+				disabled={filterateContext?.isPublicTemplate}
 				defaultValue={props.defaultValue.value}
 				className={styles['filter-box__row_item']}
 				placeholder="请输入"
@@ -533,7 +539,8 @@ export default () => {
 					delGroup,
 					delRow,
 					addRow,
-					cascaderOptions
+					cascaderOptions,
+					isPublicTemplate
 				}}
 			>
 				<div className={styles.boxxScroll}>
