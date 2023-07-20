@@ -255,6 +255,10 @@ export default (props: Props) => {
 			setFilterNAlgorithDisable(false);
 		} catch (e) {
 			setLoading(false);
+			updateData({
+				nodes: [],
+				edges: []
+			});
 		}
 	};
 

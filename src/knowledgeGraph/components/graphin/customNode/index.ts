@@ -1,5 +1,6 @@
 import { IGraphData } from '@/api/knowLedgeGraph/graphin';
 import { getCanvasText } from '@/utils/graphin';
+import { lte } from 'semver';
 
 const Colors: {
 	[key: string]: Array<string>;
@@ -22,6 +23,8 @@ const Colors: {
 	Property: ['#708FFF', '#708FFF', '#18181F'],
 	Recipient: ['#24A36F', '#24A36F', '#18181F']
 };
+//不同了型节点分类统计，算法时展示不同大小展示大小
+
 export const nodeSequence = Object.keys(Colors);
 // 获取 stroke、FILL、
 export const getColorByType = (type: string): string[] => {
@@ -33,12 +36,43 @@ export const getFillColorByType = (type: string): string => {
 };
 
 const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
-	const sourceArr = nodes.map((node, index) => (node.score ? node.score : 0));
-	const maxSource = Math.max(...sourceArr);
-	const secondMaxSource = sourceArr.sort((a, b) => b - a)[1];
-	console.log(maxSource, secondMaxSource, 393939);
 	const averageScore =
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
+
+	// 定义在外面可能会多次执行导致数据错误
+	const Types = {
+		中心节点: [],
+		人: [],
+		法人: [],
+		科研项目: [],
+		经费卡: [],
+		部门: [],
+		采购事项: [],
+		合同: [],
+		发票: [],
+		资产: [],
+		lightNode: [], //高亮节点
+		非可疑节点: [], //不高亮节点
+		BASE: [],
+		Company: [],
+		Person: [],
+		Property: [],
+		Recipient: []
+	};
+
+	// 将每个节点放到对应的类里面
+	nodes.map((item, index) => {
+		const { type, center = false } = item;
+		// const type = center ? '中心节点' : item.type;
+		const score = item.score ? item.score : 0;
+		for (let key in Types) {
+			if (key == type) {
+				Types[key].push(score);
+			}
+		}
+	});
+
+	console.log(Types, 75757575);
 
 	const formatNodes = nodes.map((node, index) => {
 		const {
@@ -51,7 +85,15 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 			ignoreCenter = false
 		} = node;
 
-		console.log('averageScore:' + averageScore, 505050);
+		// 获取对应的分类数组
+		let typeScoreArr;
+		for (let key in Types) {
+			if (key == type) {
+				typeScoreArr = Types[key];
+			}
+		}
+
+		console.log('typeScoreArr:' + typeScoreArr, 505050);
 
 		const [strokeColor, fillColor, labelColor] = getColorByType(
 			// center ? '中心节点' : type
@@ -64,10 +106,12 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 
 		// const size = score && score > 0 ? (1 + score) * 150 : 100;
 		let size;
-		if (maxSource == score) {
+		if (center && score) {
+			// 中心节点特殊处理
 			size = 250;
 		} else {
-			size = score && score > 0 ? (score / secondMaxSource + 1) * 100 : 100;
+			const maxSource = Math.max(...typeScoreArr);
+			size = score && score > 0 ? (score / maxSource + 1) * 100 : 100;
 		}
 
 		const labelStr = labels.join('/');
