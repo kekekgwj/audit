@@ -40,39 +40,37 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 		nodes.reduce((acc, curr) => acc + (curr?.score || 0), 0) / nodes.length;
 
 	// 定义在外面可能会多次执行导致数据错误
-	const Types = {
-		中心节点: [],
-		人: [],
-		法人: [],
-		科研项目: [],
-		经费卡: [],
-		部门: [],
-		采购事项: [],
-		合同: [],
-		发票: [],
-		资产: [],
-		lightNode: [], //高亮节点
-		非可疑节点: [], //不高亮节点
-		BASE: [],
-		Company: [],
-		Person: [],
-		Property: [],
-		Recipient: []
-	};
+	// const Types = {
+	// 	中心节点: [],
+	// 	人: [],
+	// 	法人: [],
+	// 	科研项目: [],
+	// 	经费卡: [],
+	// 	部门: [],
+	// 	采购事项: [],
+	// 	合同: [],
+	// 	发票: [],
+	// 	资产: [],
+	// 	lightNode: [], //高亮节点
+	// 	非可疑节点: [], //不高亮节点
+	// 	BASE: [],
+	// 	Company: [],
+	// 	Person: [],
+	// 	Property: [],
+	// 	Recipient: []
+	// };
 
 	// 将每个节点放到对应的类里面
-	nodes.map((item, index) => {
-		const { type, center = false } = item;
-		// const type = center ? '中心节点' : item.type;
-		const score = item.score ? item.score : 0;
-		for (let key in Types) {
-			if (key == type) {
-				Types[key].push(score);
-			}
-		}
-	});
-
-	console.log(Types, 75757575);
+	// nodes.map((item, index) => {
+	// 	const { type, center = false } = item;
+	// 	// const type = center ? '中心节点' : item.type;
+	// 	const score = item.score ? item.score : 0;
+	// 	for (let key in Types) {
+	// 		if (key == type) {
+	// 			Types[key].push(score);
+	// 		}
+	// 	}
+	// });
 
 	const formatNodes = nodes.map((node, index) => {
 		const {
@@ -86,33 +84,30 @@ const formatCustomNodes = ({ nodes }: Pick<IGraphData, 'nodes'>) => {
 		} = node;
 
 		// 获取对应的分类数组
-		let typeScoreArr;
-		for (let key in Types) {
-			if (key == type) {
-				typeScoreArr = Types[key];
-			}
-		}
-
-		console.log('typeScoreArr:' + typeScoreArr, 505050);
+		// let typeScoreArr;
+		// for (let key in Types) {
+		// 	if (key == type) {
+		// 		typeScoreArr = Types[key];
+		// 	}
+		// }
 
 		const [strokeColor, fillColor, labelColor] = getColorByType(
 			// center ? '中心节点' : type
 			ignoreCenter ? type : center ? '中心节点' : type
 		);
 
-		// const size = score
-		// 	? Math.min(Math.max((score / averageScore) * 200, 100), 200)
-		// 	: 100;
+		const size = score
+			? Math.min(Math.max((score / averageScore) * 200, 100), 200)
+			: 100;
 
-		// const size = score && score > 0 ? (1 + score) * 150 : 100;
-		let size;
-		if (center && score) {
-			// 中心节点特殊处理
-			size = 250;
-		} else {
-			const maxSource = Math.max(...typeScoreArr);
-			size = score && score > 0 ? (score / maxSource + 1) * 100 : 100;
-		}
+		// let size;
+		// if (center && score) {
+		// 	// 中心节点特殊处理
+		// 	size = 250;
+		// } else {
+		// 	const maxSource = Math.max(...typeScoreArr);
+		// 	size = score && score > 0 ? (score / maxSource + 1) * 100 : 100;
+		// }
 
 		const labelStr = labels.join('/');
 		const [str] = getCanvasText(labelStr, 12, size);
