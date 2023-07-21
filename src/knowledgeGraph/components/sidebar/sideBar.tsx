@@ -598,8 +598,9 @@ export default (props: Props) => {
 									onClick={() => {
 										handleGroup();
 									}}
+									style={{ marginRight: '10px' }}
 								>
-									group
+									分簇
 								</Button>
 							)}
 							<Button
