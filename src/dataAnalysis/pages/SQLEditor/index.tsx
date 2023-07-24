@@ -30,6 +30,7 @@ import SaveDialog from './components/SaveDialog';
 import { saveSql, getResultBySql, exportBySql } from '@/api/dataAnalysis/sql';
 import { DownloadOutlined, CloseOutlined } from '@ant-design/icons';
 import emptyPage from '@/assets/img/empty-data.png';
+import { Resizable } from 'react-resizable';
 
 export const EditorContext = createContext({});
 
@@ -99,12 +100,22 @@ const SQLEditor: React.FC = () => {
 	const [showSearchBox, setShowSearchBox] = useState<BoxType>(BoxType.NONE);
 	const [sql, setSql] = useState('');
 	const [current, setCurrent] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
 	const [total, setTotal] = useState(0);
 
 	const currentRef = useRef();
+	const pageSizeRef = useRef();
+	const tabRef = useRef(null);
+
+	const [panelHeight, setPanelHeight] = useState(60);
+	const [scrollHeight, setScrollHeight] = useState(0);
 	useEffect(() => {
 		currentRef.current = current;
 	}, [current]);
+
+	useEffect(() => {
+		pageSizeRef.current = pageSize;
+	}, [pageSize]);
 
 	const [messageApi, contextHolder] = message.useMessage();
 
@@ -142,10 +153,11 @@ const SQLEditor: React.FC = () => {
 		// type: 1执行需要重置页码 2:翻页不需要
 		if (type == '1') {
 			setCurrent(1);
+			setPageSize(10);
 		}
 		const params = {
 			current: type == '1' ? 1 : currentRef.current,
-			size: 10,
+			size: pageSizeRef.current,
 			sql
 		};
 		const res = await getResultBySql(params);
@@ -164,10 +176,14 @@ const SQLEditor: React.FC = () => {
 
 		// 展示结果
 		setHasResult(true);
+		if (panelHeight === 60) {
+			setPanelHeight(400);
+		}
 	};
 
-	const searchChange = (page) => {
+	const searchChange = (page, size) => {
 		setCurrent(page);
+		setPageSize(size);
 		setTimeout(() => {
 			if (sql) {
 				handleExecute('2');
@@ -177,6 +193,7 @@ const SQLEditor: React.FC = () => {
 
 	const handleCloseResult = () => {
 		setHasResult(false);
+		setPanelHeight(60);
 	};
 
 	const customizeRenderEmpty = () => (
@@ -264,6 +281,23 @@ const SQLEditor: React.FC = () => {
 
 		clouseNotification(uniqueKey);
 	};
+
+	const onResize = (event, { node, size, handle }) => {
+		setPanelHeight(size.height);
+	};
+
+	useEffect(() => {
+		getScrollHeight();
+	}, [panelHeight]);
+
+	// 计算表格滚动高度
+	const getScrollHeight = () => {
+		if (!tabRef.current || !scroll) return;
+		const bound = tabRef.current.getBoundingClientRect();
+		const height = bound.height - (total ? 120 : 0);
+		setScrollHeight(height);
+	};
+
 	return (
 		<div className={classes.container}>
 			{/* <TableSourcePanel /> */}
@@ -342,51 +376,62 @@ const SQLEditor: React.FC = () => {
 
 				{/* <div className={classes.saveBtn}>保存为我的常用</div> */}
 
-				<div className={classes.aceResult}>
-					<div className={classes.aceResultTop}>
-						<Button
-							type="primary"
-							className={classes.saveBtn}
-							onClick={handleAddCommon}
-						>
-							保存为我的常用
-						</Button>
-					</div>
-					{hasResult && (
-						<div className={classes.sqlResultBox}>
-							<div className={classes.aceResultMid}>
-								<div className={classes.downloadBtn} onClick={handleDownLoad}>
-									<SvgIcon
-										name="download"
-										className={classes.downloadIcon}
-									></SvgIcon>
-									<span>下载</span>
-								</div>
-								<div onClick={handleCloseResult}>
-									<CloseOutlined style={{ fontSize: '14px' }} />
-								</div>
-							</div>
-							<div className={classes.aceResultTable}>
-								<ConfigProvider renderEmpty={customizeRenderEmpty}>
-									<Table
-										columns={columns}
-										dataSource={result}
-										// scroll={{ y: 300 }}
-										scroll={{ y: 120 }}
-										pagination={{
-											current,
-											total,
-											pageSize: 10,
-											onChange: (page) => {
-												searchChange(page);
-											}
-										}}
-									/>
-								</ConfigProvider>
-							</div>
+				<Resizable
+					height={panelHeight}
+					axis={'y'}
+					resizeHandles={['n']}
+					onResize={onResize}
+				>
+					<div
+						style={{ height: panelHeight + 'px' }}
+						className={classes.aceResult}
+					>
+						<div className={classes.aceResultTop}>
+							<Button
+								type="primary"
+								className={classes.saveBtn}
+								onClick={handleAddCommon}
+							>
+								保存为我的常用
+							</Button>
 						</div>
-					)}
-				</div>
+						{hasResult && (
+							<div className={classes.sqlResultBox}>
+								<div className={classes.aceResultMid}>
+									<div className={classes.downloadBtn} onClick={handleDownLoad}>
+										<SvgIcon
+											name="download"
+											className={classes.downloadIcon}
+										></SvgIcon>
+										<span>下载</span>
+									</div>
+									<div onClick={handleCloseResult}>
+										<CloseOutlined style={{ fontSize: '14px' }} />
+									</div>
+								</div>
+								<div ref={tabRef} className={classes.aceResultTable}>
+									<ConfigProvider renderEmpty={customizeRenderEmpty}>
+										<Table
+											columns={columns}
+											dataSource={result}
+											// scroll={{ y: 300 }}
+											scroll={{ y: scrollHeight }}
+											pagination={{
+												current,
+												total,
+												showSizeChanger: true,
+												pageSize,
+												onChange: (page, size) => {
+													searchChange(page, size);
+												}
+											}}
+										/>
+									</ConfigProvider>
+								</div>
+							</div>
+						)}
+					</div>
+				</Resizable>
 			</div>
 
 			<EditorContext.Provider value={{ insertText }}>

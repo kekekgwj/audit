@@ -122,11 +122,17 @@ const Panel: React.FC = () => {
 
 	// 分页
 	const [current, setCurrent] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
 	const [total, setTotal] = useState(0);
 	const currentRef = useRef();
+	const pageSizeRef = useRef();
 	useEffect(() => {
 		currentRef.current = current;
 	}, [current]);
+
+	useEffect(() => {
+		pageSizeRef.current = pageSize;
+	}, [pageSize]);
 
 	useEffect(() => {
 		!isInit && syncGraph();
@@ -226,7 +232,7 @@ const Panel: React.FC = () => {
 			executeId: id, //当前选中元素id
 			projectId: projectID,
 			current: currentRef.current,
-			size: 10
+			size: pageSizeRef.current
 		};
 
 		let data, head, totalNum;
@@ -237,7 +243,7 @@ const Panel: React.FC = () => {
 					auditProjectId: projectID,
 					executeId: id,
 					current: currentRef.current,
-					size: 10
+					size: pageSizeRef.current
 				});
 				data = res.data;
 				head = res.head;
@@ -265,6 +271,7 @@ const Panel: React.FC = () => {
 			return;
 		}
 		setCurrent(1); //id改变 重置页码
+		setPageSize(10);
 
 		executeByNodeConfig();
 		// if (executeType.includes(curType)) {
@@ -284,9 +291,11 @@ const Panel: React.FC = () => {
 	};
 
 	// 分页改变
-	const searchChange = (page) => {
+	const searchChange = (page, size) => {
 		console.log(page, 267267);
 		setCurrent(page);
+		setPageSize(size);
+
 		setTimeout(() => {
 			executeByNodeConfig();
 		}, 200);
@@ -438,6 +447,7 @@ const Panel: React.FC = () => {
 								key={columns}
 								searchChange={searchChange}
 								current={currentRef.current}
+								pageSize={pageSizeRef.current}
 								panelHeight={panelHeight}
 								total={total}
 							></ResizeTable>
