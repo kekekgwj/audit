@@ -134,16 +134,15 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 				<Select style={{ width: 120 }}>
 					<Option
 						value={leftName}
-						label={leftName}
 						disabled
 						style={{ fontSize: '16px', color: '#000', fontWeight: '600' }}
-					></Option>
+					>
+						{leftName}
+					</Option>
 					{leftOptions.map((item) => (
-						<Option
-							key={item.value}
-							label={item.label}
-							value={item.value}
-						></Option>
+						<Option key={item.value} value={item.value}>
+							{item.label}
+						</Option>
 					))}
 				</Select>
 			</Form.Item>
@@ -156,15 +155,14 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 					<Option
 						style={{ fontSize: '16px', color: '#000', fontWeight: '600' }}
 						value={rightName}
-						label={rightName}
 						disabled
-					></Option>
+					>
+						{rightName}
+					</Option>
 					{rightOptions.map((item) => (
-						<Option
-							key={item.value}
-							label={item.label}
-							value={item.value}
-						></Option>
+						<Option key={item.value} value={item.value}>
+							{item.label}
+						</Option>
 					))}
 				</Select>
 			</Form.Item>
