@@ -1,4 +1,5 @@
 import { Button, Form, Select } from 'antd';
+const { Option } = Select;
 import React, { useEffect, useState } from 'react';
 import { isEmpty } from 'lodash';
 import classes from './index.module.less';
@@ -11,6 +12,8 @@ interface ISelectRowProps {
 	rowName: number;
 	leftOptions: [];
 	rightOptions: [];
+	rightName: string;
+	leftName: string;
 }
 interface IRowCondition {
 	leftHeaderName: string;
@@ -89,7 +92,9 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 	handleOnDelete,
 	rowName,
 	leftOptions,
-	rightOptions
+	rightOptions,
+	leftName,
+	rightName
 }) => {
 	if (!value || value.length < 3) {
 		return null;
@@ -125,13 +130,43 @@ const SelectRow: React.FC<ISelectRowProps> = ({
 	return (
 		<div className={classes.filterGroupWrapper}>
 			<Form.Item name={[rowName, 'leftHeaderName']} noStyle>
-				<Select options={leftOptions} style={{ width: 120 }}></Select>
+				{/* <Select options={leftOptions} style={{ width: 120 }}></Select> */}
+				<Select style={{ width: 120 }}>
+					<Option
+						value={leftName}
+						label={leftName}
+						disabled
+						style={{ fontSize: '16px', color: '#000', fontWeight: '600' }}
+					></Option>
+					{leftOptions.map((item) => (
+						<Option
+							key={item.value}
+							label={item.label}
+							value={item.value}
+						></Option>
+					))}
+				</Select>
 			</Form.Item>
 			<Form.Item name={[rowName, 'operator']} noStyle>
 				<Select options={symbolSelect} style={{ width: 120 }}></Select>
 			</Form.Item>
 			<Form.Item name={[rowName, 'rightHeaderName']} noStyle>
-				<Select options={rightOptions} style={{ width: 120 }}></Select>
+				{/* <Select options={rightOptions} style={{ width: 120 }}></Select> */}
+				<Select style={{ width: 120 }}>
+					<Option
+						style={{ fontSize: '16px', color: '#000', fontWeight: '600' }}
+						value={rightName}
+						label={rightName}
+						disabled
+					></Option>
+					{rightOptions.map((item) => (
+						<Option
+							key={item.value}
+							label={item.label}
+							value={item.value}
+						></Option>
+					))}
+				</Select>
 			</Form.Item>
 
 			{/* <div
@@ -161,7 +196,9 @@ const SelectGroup: React.FC = () => {
 	const [showTips, setShowTips] = useState<boolean>(false);
 	const { isPublicTemplate } = useGraphContext();
 	const [leftOptions, setLeftSelect] = useState([]);
+	const [leftName, setLeftName] = useState('');
 	const [rightOptions, setRightSelect] = useState([]);
+	const [rightName, setRightName] = useState('');
 
 	const handleGetNodeConfig = () => {
 		const configData1 = config[0] || [];
@@ -173,14 +210,22 @@ const SelectGroup: React.FC = () => {
 				value: item.fieldName
 			};
 		});
+		const leftName = configData1.tableCnName
+			? configData1.tableCnName + ':'
+			: configData1.tableName + ':';
 		const rightData = configData2?.fields?.map((item, index) => {
 			return {
 				label: item.description || item.fieldName, //展示描述没有展示名称
 				value: item.fieldName
 			};
 		});
+		const rightName = configData2.tableCnName
+			? configData2.tableCnName + ':'
+			: configData2.tableName + ':';
 		setLeftSelect(leftData);
+		setLeftName(leftName);
 		setRightSelect(rightData);
+		setRightName(rightName);
 	};
 
 	useEffect(() => {
@@ -337,6 +382,8 @@ const SelectGroup: React.FC = () => {
 											handleOnDelete={handleOnDelete}
 											leftOptions={leftOptions}
 											rightOptions={rightOptions}
+											leftName={leftName}
+											rightName={rightName}
 										></SelectRow>
 									</Form.Item>
 								))}

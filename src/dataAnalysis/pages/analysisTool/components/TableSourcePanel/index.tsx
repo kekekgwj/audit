@@ -52,7 +52,9 @@ const TableItem: React.FC = ({ data, disabled }) => {
 								<span className={classes.iconTable}></span>
 								<Tooltip
 									title={
-										table.tableCnName ? table.tableCnName : table.tableName
+										table.tableCnName
+											? table.tableCnName + table.tableName
+											: table.tableName
 									}
 								>
 									<span
