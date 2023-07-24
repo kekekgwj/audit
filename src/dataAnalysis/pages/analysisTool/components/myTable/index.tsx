@@ -33,8 +33,9 @@ interface Props {
 	columnsData: any;
 	dataSource: any;
 	loading: boolean;
-	searchChange: (page: number) => void;
+	searchChange: (page: number, size: number) => void;
 	current: number;
+	pageSize: number;
 	total: number;
 }
 const ResizeTable: React.FC<Props> = (props: Props) => {
@@ -45,6 +46,7 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 		loading,
 		searchChange,
 		current,
+		pageSize,
 		total,
 		panelHeight
 	} = props;
@@ -77,7 +79,6 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 	const tabRef = useRef(null);
 	const [cols, setCols] = useState(columnsData);
 	const [columns, setColumns] = useState([]);
-
 	const [scrollHeight, setScrollHeight] = useState(0);
 	// 处理拖拽
 	const handleResize =
@@ -134,10 +135,10 @@ const ResizeTable: React.FC<Props> = (props: Props) => {
 						? {
 								current,
 								total,
-								showSizeChanger: false,
-								pageSize: 10,
-								onChange: (page) => {
-									searchChange(page);
+								showSizeChanger: true,
+								pageSize,
+								onChange: (page, size) => {
+									searchChange(page, size);
 								}
 						  }
 						: false
