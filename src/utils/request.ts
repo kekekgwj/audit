@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import modal from 'antd/es/modal';
 import Cookies from 'js-cookie';
 
 // http request
@@ -20,13 +21,13 @@ export async function http<T>(request: RequestInfo): Promise<T> {
 			if (!timer) {
 				// window.location.href = 'http://audit.zhejianglab.com/login';
 				localStorage.setItem('openLoginTime', now);
-				message.warning(e?.msg || '系统错误').then(() => {
+				createTokenMessage().then(() => {
 					window.open('http://audit.zhejianglab.com/login');
 				});
 			} else {
 				if (now - +timer > 5000) {
 					localStorage.setItem('openLoginTime', now);
-					message.warning(e?.msg || '系统错误').then(() => {
+					createTokenMessage().then(() => {
 						window.open('http://audit.zhejianglab.com/login');
 					});
 				}
@@ -110,4 +111,27 @@ export const appendQueryParams: (
 			queryParams = queryParams.concat(key, '=', String(params[key]), '&');
 		});
 	return `${url}?${queryParams}`.slice(0, -1);
+};
+
+const createTokenMessage = (secondsToGo = 3) => {
+	return new Promise((resolve) => {
+		const instance = modal.warning({
+			title: '登录状态失效',
+			content: `${secondsToGo} 秒后跳转登录页.`,
+			footer: null
+		});
+
+		const timer = setInterval(() => {
+			secondsToGo -= 1;
+			instance.update({
+				content: `${secondsToGo} 秒后跳转登录页.`
+			});
+		}, 1000);
+
+		setTimeout(() => {
+			clearInterval(timer);
+			instance.destroy();
+			resolve(true);
+		}, secondsToGo * 1000);
+	});
 };
