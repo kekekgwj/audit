@@ -275,6 +275,10 @@ const SQLEditor: React.FC = () => {
 
 	// 下载
 	const handleDownLoad = async () => {
+		if (total >= 100000) {
+			message.error('文件大小超出限制,不支持下载');
+			return;
+		}
 		const uniqueKey = Date.now().toString();
 		showNotification(uniqueKey, '导出结果.xlsx');
 		await exportBySql(sql, 'sql执行.xlsx');

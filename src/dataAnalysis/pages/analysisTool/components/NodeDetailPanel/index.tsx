@@ -370,6 +370,10 @@ const Panel: React.FC = () => {
 	};
 
 	const downLoadData = async () => {
+		if (total >= 100000) {
+			message.error('文件大小超出限制,不支持下载');
+			return;
+		}
 		try {
 			const uniqueKey = Date.now().toString();
 			const canvasData = graph.toJSON();
