@@ -122,22 +122,31 @@ export const appendQueryParams: (
 
 const createTokenMessage = (secondsToGo = 3) => {
 	return new Promise((resolve) => {
-		const instance = modal.warning({
-			title: '登录状态失效',
-			content: `${secondsToGo} 秒后跳转登录页.`,
-			footer: null
-		});
+		const modalBox = document.createElement('div');
+		modalBox.className = 'modal-box';
+		const loginModal = document.createElement('div');
+		loginModal.innerHTML = `<div class="title">登录过期</div><div class="seconds">${secondsToGo}s</div>`;
+
+		loginModal.className = 'model-login';
+
+		modalBox.appendChild(loginModal);
+
+		document.body.appendChild(modalBox);
+
+		// const instance = modal.warning({
+		// 	title: '登录状态失效',
+		// 	content: `${secondsToGo} 秒后跳转登录页.`,
+		// 	footer: null
+		// });
 
 		const timer = setInterval(() => {
 			secondsToGo -= 1;
-			instance.update({
-				content: `${secondsToGo} 秒后跳转登录页.`
-			});
+			loginModal.innerHTML = `<div class="title">登录过期</div><div class="seconds">${secondsToGo}s</div>`;
 		}, 1000);
 
 		setTimeout(() => {
 			clearInterval(timer);
-			instance.destroy();
+			document.body.removeChild(modalBox);
 			resolve(true);
 		}, secondsToGo * 1000);
 	});
