@@ -277,7 +277,7 @@ const SQLEditor: React.FC = () => {
 	const handleDownLoad = async () => {
 		const uniqueKey = Date.now().toString();
 		showNotification(uniqueKey, '导出结果.xlsx');
-		await exportBySql(sql, 'sql执行.xlsx');
+		await exportBySql(sql, '导出结果.xlsx');
 
 		clouseNotification(uniqueKey);
 	};

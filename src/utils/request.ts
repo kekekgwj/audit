@@ -43,6 +43,13 @@ export async function http<T>(request: RequestInfo): Promise<T> {
 export async function download(request: RequestInfo, fileName: string) {
 	try {
 		const response = await fetch(request);
+
+		console.log('response', response);
+		if (response.status === 400) {
+			message.warning('下载失败');
+			return;
+		}
+
 		const blob = await response.blob();
 		const url = window.URL.createObjectURL(new Blob([blob]));
 		const link = document.createElement('a');
@@ -54,7 +61,7 @@ export async function download(request: RequestInfo, fileName: string) {
 		document.body.removeChild(link);
 		window.URL.revokeObjectURL(url);
 	} catch (e) {
-		console.log(e);
+		message.warning(e?.msg || '下载失败');
 		return Promise.reject(e);
 	}
 }
