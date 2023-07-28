@@ -125,7 +125,7 @@ const createTokenMessage = (secondsToGo = 3) => {
 		const modalBox = document.createElement('div');
 		modalBox.className = 'modal-box';
 		const loginModal = document.createElement('div');
-		loginModal.innerHTML = `<div class="title">登录过期</div><div class="seconds">${secondsToGo}s</div>`;
+		loginModal.innerHTML = `<div class="title">登录过期,请重新登录</div><div class="seconds">${secondsToGo}s</div>`;
 
 		loginModal.className = 'model-login';
 
@@ -141,7 +141,7 @@ const createTokenMessage = (secondsToGo = 3) => {
 
 		const timer = setInterval(() => {
 			secondsToGo -= 1;
-			loginModal.innerHTML = `<div class="title">登录过期</div><div class="seconds">${secondsToGo}s</div>`;
+			loginModal.innerHTML = `<div class="title">登录过期,请重新登录</div><div class="seconds">${secondsToGo}s</div>`;
 		}, 1000);
 
 		setTimeout(() => {
